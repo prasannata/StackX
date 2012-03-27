@@ -16,72 +16,72 @@ public class DateTimeUtils
 
     public static String getElapsedDurationSince(long seconds)
     {
-	String duration = null;
-	String unit = SECOND;
-	String residueUnit = null;
+        String duration = null;
+        String unit = SECOND;
+        String residueUnit = null;
 
-	long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-	long elapsedTimeInSeconds = currentTimeInSeconds - seconds;
+        long currentTimeInSeconds = System.currentTimeMillis() / 1000;
+        long elapsedTimeInSeconds = currentTimeInSeconds - seconds;
 
-	int count = 0;
-	int residue = 0;
+        int count = 0;
+        int residue = 0;
 
-	if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR)
-	{
-	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
-	    unit = MINUTE;
-	}
-	else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY)
-	{
-	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
-	    unit = HOUR;
-	}
-	else if (elapsedTimeInSeconds > SECONDS_IN_DAY)
-	{
-	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
-	    if (count > DAYS_IN_MONTH)
-	    {
+        if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR)
+        {
+            count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
+            unit = MINUTE;
+        }
+        else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY)
+        {
+            count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
+            unit = HOUR;
+        }
+        else if (elapsedTimeInSeconds > SECONDS_IN_DAY)
+        {
+            count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
+            if (count > DAYS_IN_MONTH)
+            {
 
-		residue = count % DAYS_IN_MONTH;
-		count /= DAYS_IN_MONTH;
+                residue = count % DAYS_IN_MONTH;
+                count /= DAYS_IN_MONTH;
 
-		if (count > MONTHS_IN_YEAR)
-		{
-		    residue = count % MONTHS_IN_YEAR;
-		    count /= MONTHS_IN_YEAR;
-		    unit = YEAR;
-		    residueUnit = MONTH;
-		}
-		else
-		{
-		    unit = MONTH;
-		    residueUnit = DAY;
-		}
-	    }
-	    else
-	    {
-		unit = DAY;
-	    }
-	}
+                if (count > MONTHS_IN_YEAR)
+                {
+                    residue = count % MONTHS_IN_YEAR;
+                    count /= MONTHS_IN_YEAR;
+                    unit = YEAR;
+                    residueUnit = MONTH;
+                }
+                else
+                {
+                    unit = MONTH;
+                    residueUnit = DAY;
+                }
+            }
+            else
+            {
+                unit = DAY;
+            }
+        }
 
-	duration = new String();
-	duration = count + " " + getUnit(count, unit);
-	if (residue > 0)
-	{
-	    duration += " and " + residue + " " + getUnit(residue, residueUnit);
-	}
+        duration = new String();
+        duration = count + " " + getUnit(count, unit);
+        if (residue > 0)
+        {
+            duration += " and " + residue + " " + getUnit(residue, residueUnit);
+        }
 
-	duration += " ago";
-	return duration;
+        duration += " ago";
+        return duration;
     }
 
     private static String getUnit(int count, String unit)
     {
-	if (count > 1)
-	{
-	    unit += "s";
-	}
+        if (count > 1)
+        {
+            unit += "s";
+        }
 
-	return unit;
+        return unit;
     }
 }

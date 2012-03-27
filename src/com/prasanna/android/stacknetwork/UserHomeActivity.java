@@ -22,7 +22,7 @@ import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.LayoutBuilder;
-import com.prasanna.android.views.CustomScrollView;
+import com.prasanna.android.views.ScrollViewWithNotifier;
 
 public class UserHomeActivity extends AbstractUserActionBarActivity
 {
@@ -58,7 +58,7 @@ public class UserHomeActivity extends AbstractUserActionBarActivity
 
     private LinearLayout masterLinearLayout;
 
-    private CustomScrollView scrollView;
+    private ScrollViewWithNotifier scrollView;
 
     private LinearLayout questionsLinearLayout;
 
@@ -72,7 +72,7 @@ public class UserHomeActivity extends AbstractUserActionBarActivity
 	setContentView(R.layout.questions_layout);
 
 	masterLinearLayout = (LinearLayout) findViewById(R.id.homeDisplay);
-	scrollView = (CustomScrollView) masterLinearLayout.findViewById(R.id.questionsScroll);
+	scrollView = (ScrollViewWithNotifier) masterLinearLayout.findViewById(R.id.questionsScroll);
 	scrollView.setUsingActivity(this);
 	questionsLinearLayout = (LinearLayout) scrollView.findViewById(R.id.questionsDisplay);
 	// setSiteHeader();
