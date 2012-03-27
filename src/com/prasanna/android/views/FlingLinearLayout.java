@@ -1,0 +1,89 @@
+package com.prasanna.android.views;
+
+import android.content.Context;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.widget.LinearLayout;
+
+import com.prasanna.android.listener.FlingActionListener;
+
+public class FlingLinearLayout extends LinearLayout
+{
+    private static final String TAG = FlingLinearLayout.class.getSimpleName();
+
+    private GestureDetector gestureDetector;
+    public FlingActionListener flingActionListener;
+
+    private GestureDetector.SimpleOnGestureListener sogl = new GestureDetector.SimpleOnGestureListener()
+    {
+	private static final int SWIPE_THRESHOLD_VELOCITY = 300;
+	private static final int SWIPE_MIN_DISTANCE = 120;
+	private static final int SWIPE_MAX_OFF_PATH = 250;
+
+	@Override
+	public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX,
+	        float velocityY)
+	{
+	    Log.d(TAG, "onFling invoked");
+
+	    float distance = event1.getRawX() - event2.getRawX();
+	    boolean enoughSpeed = Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY;
+
+	    if (Math.abs(event1.getY() - event1.getY()) > SWIPE_MAX_OFF_PATH)
+	    {
+		return false;
+	    }
+
+	    if (distance < -SWIPE_MIN_DISTANCE && enoughSpeed)
+	    {
+		Log.d(TAG, "Swiped left to right.");
+		if (flingActionListener != null)
+		{
+		    flingActionListener.flingedToRight();
+		}
+		return true;
+	    }
+	    else if (distance > SWIPE_MIN_DISTANCE && enoughSpeed)
+	    {
+		Log.d(TAG, "Swiped right to left.");
+		if (flingActionListener != null)
+		{
+		    flingActionListener.flingedToLeft();
+		}
+		return true;
+	    }
+	    else
+	    {
+		return false;
+	    }
+	}
+    };
+
+    public FlingLinearLayout(Context context, AttributeSet attrs, int defStyle)
+    {
+	super(context, attrs, defStyle);
+	gestureDetector = new GestureDetector(sogl);
+    }
+
+    public FlingLinearLayout(Context context, AttributeSet attrs)
+    {
+	super(context, attrs);
+	gestureDetector = new GestureDetector(sogl);
+    }
+
+    public FlingLinearLayout(Context context)
+    {
+	super(context);
+	gestureDetector = new GestureDetector(sogl);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+	Log.d(TAG, "onTouchEvent invoked");
+	return gestureDetector.onTouchEvent(event);
+    }
+    
+}

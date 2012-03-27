@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_search"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/search"
+        android:orderInCategory="0"
+        android:showAsAction="always"
+        android:title="@string/menu_search"/>
+    <item
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/refresh"
+        android:orderInCategory="1"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/menu_options"
+        android:icon="@drawable/expand"
+        android:orderInCategory="2"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_options">
+        <menu>
+            <item
+                android:id="@+id/menu_profile"
+                android:icon="@drawable/person"
+                android:showAsAction="always"
+                android:title="@string/menu_profile"/>
+            <item
+                android:id="@+id/menu_option_inbox"
+                android:icon="@drawable/email"
+                android:showAsAction="always"
+                android:title="@string/menu_option_inbox"/>
+            <item
+                android:id="@+id/menu_option_tags"
+                android:icon="@drawable/labels"
+                android:showAsAction="always"
+                android:title="@string/menu_option_tags"/>
+        </menu>
+    </item>
+
+</menu>
