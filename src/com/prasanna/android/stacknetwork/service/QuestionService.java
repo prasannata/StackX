@@ -56,6 +56,7 @@ public class QuestionService
 
                     JSONObject userJsonObject = jsonObject.getJSONObject(JsonFields.Answer.OWNER);
                     User user = new User();
+                    user.setId(userJsonObject.getLong(JsonFields.User.USER_ID));
                     user.setDisplayName(userJsonObject.getString(JsonFields.User.DISPLAY_NAME));
                     user.setReputation(userJsonObject.getInt(JsonFields.User.REPUTATION));
                     answer.setOwner(user);

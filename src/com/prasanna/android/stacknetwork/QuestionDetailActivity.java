@@ -15,16 +15,19 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.listener.FlingActionListener;
 import com.prasanna.android.stacknetwork.intent.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.HtmlTagFragmenter;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.FlingScrollView;
 
@@ -42,44 +45,42 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private FlingScrollView flingScrollView;
     private boolean viewingAnswer = false;
     private TextView currentAnswerAuthor;
+    private View answerAuthorDetailDivider;
+    private RelativeLayout answerHeader;
 
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
     {
-        public void flingedToRight()
+        public void flingedToLeft()
         {
-            Log.d(TAG, "Flinged to right");
+            Log.d(TAG, "Flinged to left");
             if (viewingAnswer && currentAnswerCount < answers.size() - 1)
             {
                 ++currentAnswerCount;
-                updateViewForAnswer(question.getAnswers().get(currentAnswerCount).getBody(),
-                        (currentAnswerCount + 1) + " of " + question.getAnswerCount(),
-                        question.getAnswers().get(currentAnswerCount).getOwner().getDisplayName(),
-                        answers.get(currentAnswerCount).isAccepted());
+                updateViewForAnswer(question.getAnswers().get(currentAnswerCount).getBody(), (currentAnswerCount + 1)
+                        + " of " + question.getAnswerCount(), question.getAnswers().get(currentAnswerCount).getOwner()
+                        .getDisplayName(), answers.get(currentAnswerCount).isAccepted());
             }
         }
 
-        public void flingedToLeft()
+        public void flingedToRight()
         {
-            Log.d(TAG, "Fling to left: " + currentAnswerCount);
+            Log.d(TAG, "Fling to right: " + currentAnswerCount);
             if (currentAnswerCount > 0)
             {
                 --currentAnswerCount;
-                updateViewForAnswer(question.getAnswers().get(currentAnswerCount).getBody(),
-                        (currentAnswerCount + 1) + " of " + question.getAnswerCount(),
-                        question.getAnswers().get(currentAnswerCount).getOwner().getDisplayName(),
-                        answers.get(currentAnswerCount).isAccepted());
+                updateViewForAnswer(question.getAnswers().get(currentAnswerCount).getBody(), (currentAnswerCount + 1)
+                        + " of " + question.getAnswerCount(), question.getAnswers().get(currentAnswerCount).getOwner()
+                        .getDisplayName(), answers.get(currentAnswerCount).isAccepted());
             }
         }
 
         private void updateViewForAnswer(String body, String textLabel, String author, boolean isAccepted)
         {
-            Log.d(TAG, "Updating webview with " + textLabel + " and " + body);
-            // webView.loadDataWithBaseURL("about:blank", body, "text/html",
-            // "utf-8", null);
             detailLinearLayout.removeAllViews();
             displayQuestionBody(body);
             currentAnswerOfTotalTextView.setText(textLabel);
             currentAnswerAuthor.setText(author);
+
             if (isAccepted)
             {
                 acceptedAnswerLogo.setVisibility(View.VISIBLE);
@@ -101,9 +102,19 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
         flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
         detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
+        answerHeader = (RelativeLayout) findViewById(R.id.answerHeader);
         acceptedAnswerLogo = (ImageView) findViewById(R.id.acceptedAnswerLogo);
         currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
         currentAnswerAuthor = (TextView) findViewById(R.id.currentAnswerAuthor);
+        currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                startActivity(IntentUtils.createUserProfileIntent(view, answers.get(currentAnswerCount).getOwner()
+                        .getId()));
+            }
+        });
+        answerAuthorDetailDivider = findViewById(R.id.answerAuthorDetailDivider);
 
         displayQuestionMetaData((Question) getIntent().getSerializableExtra("question"));
         registerReceiverAndStartService();
@@ -171,38 +182,38 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     {
         updateResponseCounts(question);
 
-        TextView textView = (TextView) findViewById(R.id.questionTitle);
-        textView.setText(Html.fromHtml(question.getTitle()));
-
-        textView = (TextView) findViewById(R.id.questionScore);
+        TextView textView = (TextView) findViewById(R.id.questionScore);
         textView.setText(String.valueOf(question.getScore()));
 
-        String userDetails = getOwnerString(question);
-        textView = (TextView) findViewById(R.id.questionTimeAndUserInfo);
-        textView.setText(userDetails);
+        textView = (TextView) findViewById(R.id.questionTitle);
+        textView.setText(Html.fromHtml(question.getTitle()));
+
+        textView = (TextView) findViewById(R.id.questionOwner);
+        textView.setText(getOwnerString(question.getOwner()));
+
         textView.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
             {
-                Intent userProfileIntent = new Intent(view.getContext(), UserProfileActivity.class);
-                userProfileIntent.putExtra(StringConstants.USER_ID, question.getOwner().getId());
-                startActivity(userProfileIntent);
+                startActivity(IntentUtils.createUserProfileIntent(view, question.getOwner().getId()));
             }
         });
+
+        textView = (TextView) findViewById(R.id.questionTime);
+        textView.setText(DateTimeUtils.getElapsedDurationSince(question.getCreateDate()));
 
         textView = (TextView) findViewById(R.id.questionViews);
         textView.append(String.valueOf(question.getViewCount()));
     }
 
-    private static String getOwnerString(Question question)
+    private static String getOwnerString(User user)
     {
-        String userDetails = DateTimeUtils.getElapsedDurationSince(question.getCreateDate());
-        userDetails += " by " + question.getOwner().getDisplayName();
-        userDetails += AppUtils.formatUserReputation(question.getOwner().getReputation());
+        String userDetails = " by " + Html.fromHtml(user.getDisplayName());
+        userDetails += AppUtils.formatUserReputation(user.getReputation());
 
-        if (question.getOwner().getAcceptRate() != -1)
+        if (user.getAcceptRate() != -1)
         {
-            userDetails += " Accept%: " + question.getOwner().getAcceptRate();
+            userDetails += " Accept%: " + user.getAcceptRate();
         }
         return userDetails;
     }
@@ -296,11 +307,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                         viewingAnswer = true;
                         currentAnswerOfTotalTextView.setText((currentAnswerCount + 1) + " of "
                                 + question.getAnswerCount());
-                        currentAnswerAuthor.setText(answers.get(currentAnswerCount).getOwner().getDisplayName()
+                        currentAnswerAuthor.setText(getString(R.string.by)
+                                + answers.get(currentAnswerCount).getOwner().getDisplayName()
                                 + AppUtils.formatUserReputation(answers.get(currentAnswerCount).getOwner()
                                         .getReputation()));
-                        currentAnswerOfTotalTextView.setVisibility(View.VISIBLE);
-                        currentAnswerAuthor.setVisibility(View.VISIBLE);
+                        answerHeader.setVisibility(View.VISIBLE);
                         body = answers.get(currentAnswerCount).getBody();
 
                         if (answers.get(currentAnswerCount).isAccepted())
@@ -320,9 +331,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
                         if (currentAnswerOfTotalTextView != null)
                         {
-                            currentAnswerAuthor.setVisibility(View.GONE);
-                            currentAnswerOfTotalTextView.setVisibility(View.GONE);
-                            acceptedAnswerLogo.setVisibility(View.GONE);
+                            answerHeader.setVisibility(View.GONE);
                         }
                     }
 

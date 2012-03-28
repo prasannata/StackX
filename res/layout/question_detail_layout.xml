@@ -55,129 +55,180 @@
         android:orientation="vertical" >
 
         <LinearLayout
-            android:id="@+id/questionStatsControl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_border_grey"
-            android:orientation="horizontal"
-            android:weightSum="1" >
-
-            <TextView
-                android:id="@+id/questionScore"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.1"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:textSize="12dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/questionTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="0.9"
-                android:textColor="@color/black"
-                android:textSize="15dp" />
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp" >
-
-            <TextView
-                android:id="@+id/questionViews"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/labelViews"
-                android:textColor="@color/black"
-                android:textSize="9dp" />
-
-            <TextView
-                android:id="@+id/questionTimeAndUserInfo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:layout_marginLeft="10dp"
-                android:layout_toRightOf="@id/questionViews"
-                android:gravity="right"
-                android:text="@string/labelAcceptRate"
-                android:textColor="@color/black"
-                android:textSize="9dp" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginTop="5dp" >
-
-            <ImageView
-                android:id="@+id/acceptedAnswerLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:contentDescription="@string/answers"
-                android:src="@drawable/tick_accept"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/currentAnswerOfTotal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_toRightOf="@id/acceptedAnswerLogo"
-                android:gravity="right"
-                android:textColor="@color/black"
-                android:textSize="12dp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/currentAnswerAuthor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/currentAnswerOfTotal"
-                android:layout_marginTop="1dp"
-                android:layout_toRightOf="@id/acceptedAnswerLogo"
-                android:gravity="right"
-                android:textColor="@color/black"
-                android:textSize="12dp"
-                android:visibility="gone" />
-        </RelativeLayout>
-
-        <com.prasanna.android.views.FlingScrollView
-            android:id="@+id/questionDisplayFlingScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp" >
+            android:background="@drawable/rounded_border_delft"
+            android:orientation="vertical" >
 
             <LinearLayout
-                android:id="@+id/questionAnswerDetail"
+                android:id="@+id/questionStatsControl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1" >
+
+                <TextView
+                    android:id="@+id/questionScore"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.1"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textSize="12dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/questionTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="0.9"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <ImageView
+                    android:id="@+id/viewQuestionAuthorProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="right"
+                    android:src="@drawable/click_to_view" />
+
+                <TextView
+                    android:id="@+id/questionOwner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_toLeftOf="@id/viewQuestionAuthorProfile"
+                    android:gravity="right"
+                    android:textColor="@color/black"
+                    android:textSize="11dp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="@color/lightGrey" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/questionViews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="@string/labelViews"
+                    android:textColor="@color/black"
+                    android:textSize="9dp" />
+
+                <TextView
+                    android:id="@+id/questionTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_gravity="right"
+                    android:gravity="right"
+                    android:textColor="@color/black"
+                    android:textSize="9dp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/rounded_border_delft"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/answerHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
-                android:layout_marginTop="3dp"
-                android:orientation="vertical" >
-            </LinearLayout>
-        </com.prasanna.android.views.FlingScrollView>
-        <!--
-             <com.prasanna.android.views.FlingWebView
-            android:id="@+id/questionBody"
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:background="@drawable/rounded_border_grey"
-            android:textColor="@color/black"
-            android:textSize="10dp" />
-        -->
+                android:layout_marginTop="1dp"
+                android:visibility="gone" >
+
+                <ImageView
+                    android:id="@+id/acceptedAnswerLogo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:contentDescription="@string/answers"
+                    android:src="@drawable/tick_accept"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/currentAnswerOfTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp"
+                    android:layout_toRightOf="@id/acceptedAnswerLogo"
+                    android:gravity="right"
+                    android:textColor="@color/black"
+                    android:textSize="12dp" />
+
+                <View
+                    android:id="@+id/answerAuthorDetailDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_below="@id/currentAnswerOfTotal"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginTop="2dp"
+                    android:background="@color/lightGrey" />
+
+                <ImageView
+                    android:id="@+id/viewAnswerAuthorProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/answerAuthorDetailDivider"
+                    android:layout_gravity="right"
+                    android:src="@drawable/click_to_view" />
+
+                <TextView
+                    android:id="@+id/currentAnswerAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/currentAnswerOfTotal"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toLeftOf="@id/viewAnswerAuthorProfile"
+                    android:gravity="right"
+                    android:text="@string/by"
+                    android:textColor="@color/black"
+                    android:textSize="11dp" />
+            </RelativeLayout>
+
+            <com.prasanna.android.views.FlingScrollView
+                android:id="@+id/questionDisplayFlingScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="2dp" >
+
+                <LinearLayout
+                    android:id="@+id/questionAnswerDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="3dp"
+                    android:orientation="vertical" >
+                </LinearLayout>
+            </com.prasanna.android.views.FlingScrollView>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
