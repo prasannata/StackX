@@ -5,12 +5,14 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ScrollView;
 
-import com.prasanna.android.stacknetwork.AbstractUserActionBarActivity;
-
 public class ScrollViewWithNotifier extends ScrollView
 {
+    private OnScrollListener onScrollListener;
 
-    private AbstractUserActionBarActivity activity;
+    public static interface OnScrollListener
+    {
+        public void onScrollToBottom(View view);
+    }
 
     public ScrollViewWithNotifier(Context context)
     {
@@ -27,11 +29,6 @@ public class ScrollViewWithNotifier extends ScrollView
         super(context, attrs);
     }
 
-    public void setUsingActivity(AbstractUserActionBarActivity activity)
-    {
-        this.activity = activity;
-    }
-
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt)
     {
@@ -41,12 +38,16 @@ public class ScrollViewWithNotifier extends ScrollView
 
         if (diff <= 0)
         {
-            if (activity != null)
+            if (onScrollListener != null)
             {
-                activity.scrollViewToBottomNotifier();
+                onScrollListener.onScrollToBottom(this);
             }
         }
         super.onScrollChanged(l, t, oldl, oldt);
     }
 
+    public void setOnScrollListener(OnScrollListener onScrollListener)
+    {
+        this.onScrollListener = onScrollListener;
+    }
 }

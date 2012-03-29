@@ -109,8 +109,8 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         {
             public void onClick(View view)
             {
-                startActivity(IntentUtils.createUserProfileIntent(view, answers.get(currentAnswerCount).getOwner()
-                        .getId()));
+                startActivity(IntentUtils.createUserProfileIntent(view.getContext(), answers.get(currentAnswerCount)
+                        .getOwner().getId()));
             }
         });
 
@@ -193,7 +193,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         {
             public void onClick(View view)
             {
-                startActivity(IntentUtils.createUserProfileIntent(view, question.getOwner().getId()));
+                startActivity(IntentUtils.createUserProfileIntent(view.getContext(), question.getOwner().getId()));
             }
         });
 
@@ -249,13 +249,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    public void scrollViewToBottomNotifier()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     public void refresh()
     {
         stopServiceAndUnregsiterReceiver();
@@ -263,9 +256,9 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    public View getActiveParentView()
+    public Context getCurrentAppContext()
     {
-        return null;
+        return getApplicationContext();
     }
 
     @Override

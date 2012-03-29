@@ -22,6 +22,7 @@ import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.LayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
 public class UserHomeActivity extends AbstractUserActionBarActivity
@@ -73,8 +74,24 @@ public class UserHomeActivity extends AbstractUserActionBarActivity
 
         masterLinearLayout = (LinearLayout) findViewById(R.id.homeDisplay);
         scrollView = (ScrollViewWithNotifier) masterLinearLayout.findViewById(R.id.questionsScroll);
-        scrollView.setUsingActivity(this);
         questionsLinearLayout = (LinearLayout) scrollView.findViewById(R.id.questionsDisplay);
+        scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+        {
+            @Override
+            public void onScrollToBottom(View view)
+            {
+                if (serviceRunning.equals(Boolean.FALSE))
+                {
+                    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                            LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(0, 15, 0, 15);
+                    questionsLinearLayout.addView(loadingProgressView, layoutParams);
+                    startQuestionsService();
+                }
+            }
+        });
+
         // setSiteHeader();
 
         startReceiverAndService();
@@ -93,7 +110,7 @@ public class UserHomeActivity extends AbstractUserActionBarActivity
     {
         questionsIntent = new Intent(this, UserQuestionsIntentService.class);
         questionsIntent.setAction(IntentActionEnum.QuestionIntentAction.ALL_QUESTIONS.name());
-        questionsIntent.putExtra("page", ++page);
+        questionsIntent.putExtra(StringConstants.PAGE, ++page);
         startService(questionsIntent);
         serviceRunning = Boolean.TRUE;
     }
@@ -154,28 +171,12 @@ public class UserHomeActivity extends AbstractUserActionBarActivity
 
         for (final Question question : questions)
         {
-            LinearLayout topLayout = LayoutBuilder.getInstance().buildQuestionSnippet(this, question);
-            questionsLinearLayout.addView(topLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(this, question);
+            questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }
 
         serviceRunning = Boolean.FALSE;
-    }
-
-    @Override
-    public void scrollViewToBottomNotifier()
-    {
-        Log.d(TAG, "Scroll view to bottom action invoked");
-
-        if (serviceRunning.equals(Boolean.FALSE))
-        {
-            loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(0, 15, 0, 15);
-            questionsLinearLayout.addView(loadingProgressView, layoutParams);
-            startQuestionsService();
-        }
     }
 
     @Override
@@ -187,9 +188,9 @@ public class UserHomeActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    public View getActiveParentView()
+    public Context getCurrentAppContext()
     {
-        return questionsLinearLayout;
+        return getApplicationContext();
     }
 
     @SuppressWarnings("unchecked")
