@@ -1,7 +1,5 @@
 package com.prasanna.android.views;
 
-import com.prasanna.android.listener.FlingActionListener;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -9,6 +7,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import com.prasanna.android.listener.FlingActionListener;
 
 public class FlingWebView extends WebView
 {

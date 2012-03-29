@@ -21,7 +21,6 @@ public abstract class AbstractUserActionBarActivity extends AbstractActivityWith
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-//	getActionBar().setDisplayShowTitleEnabled(false);
 	getActionBar().setTitle(OperatingSite.getSite().getName());
 	MenuInflater menuInflater = getMenuInflater();
 	menuInflater.inflate(R.menu.action_menu, menu);
@@ -47,8 +46,8 @@ public abstract class AbstractUserActionBarActivity extends AbstractActivityWith
 		break;
 
 	    case R.id.menu_profile:
-		Intent userProfileIntent = IntentUtils.createUserProfileIntent(getActiveParentView(),
-		        631937l);
+		Intent userProfileIntent = IntentUtils.createUserProfileIntent(
+		        getActiveParentView(), 631937l);
 		startActivity(userProfileIntent);
 		break;
 	}

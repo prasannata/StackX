@@ -2,13 +2,13 @@ package com.prasanna.android.stacknetwork.intent;
 
 import java.util.ArrayList;
 
+import android.app.IntentService;
+import android.content.Intent;
+
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-
-import android.app.IntentService;
-import android.content.Intent;
 
 public class UserQuestionsIntentService extends IntentService
 {

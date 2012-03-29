@@ -45,7 +45,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private FlingScrollView flingScrollView;
     private boolean viewingAnswer = false;
     private TextView currentAnswerAuthor;
-    private View answerAuthorDetailDivider;
     private RelativeLayout answerHeader;
 
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
@@ -114,7 +113,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                         .getId()));
             }
         });
-        answerAuthorDetailDivider = findViewById(R.id.answerAuthorDetailDivider);
 
         displayQuestionMetaData((Question) getIntent().getSerializableExtra("question"));
         registerReceiverAndStartService();

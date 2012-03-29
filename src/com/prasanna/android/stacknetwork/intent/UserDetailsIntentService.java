@@ -26,7 +26,7 @@ public class UserDetailsIntentService extends IntentService
     protected void onHandleIntent(Intent intent)
     {
 	long userId = (long) intent.getLongExtra(StringConstants.USER_ID, -1);
-	User user = userService.getUserByIdAndBroadcast(userId);
+	User user = userService.getUserById(userId);
 	broadcastUser(user);
     }
 

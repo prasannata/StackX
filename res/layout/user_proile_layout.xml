@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:id="@+id/userProfile"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@color/white" >
-
-    <include
-        android:id="@+id/userProfileHeader"
-        layout="@layout/site_header" />
 
     <LinearLayout
         android:id="@+id/profileUserInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/userProfileHeader"
         android:layout_marginTop="10dp"
         android:baselineAligned="false"
         android:orientation="horizontal"
@@ -164,91 +160,80 @@
         </LinearLayout>
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/statsLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/profileUserInfo"
-        android:layout_gravity="left"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="15dp"
-        android:gravity="left"
-        android:text="@string/stats"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
-
     <View
         android:id="@+id/statsUnderline"
         android:layout_width="match_parent"
         android:layout_height="0.1dip"
-        android:layout_below="@id/statsLabel"
+        android:layout_below="@id/profileUserInfo"
         android:layout_marginTop="2dp"
         android:background="@color/lightGrey" />
 
-    <TextView
-        android:id="@+id/questionCount"
+    <RelativeLayout
+        android:id="@+id/userStats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/statsLabel"
-        android:layout_gravity="left"
+        android:layout_below="@id/statsUnderline"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:clickable="true"
-        android:gravity="left"
-        android:text="@string/questionCount"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
-
-    <TextView
-        android:id="@+id/upvoteCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/statsLabel"
-        android:layout_gravity="right"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:clickable="true"
-        android:gravity="right"
-        android:text="@string/upvoteCount"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
+        android:background="@color/white" >
 
-    <TextView
-        android:id="@+id/answerCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/questionCount"
-        android:layout_alignRight="@id/questionCount"
-        android:layout_below="@id/questionCount"
-        android:layout_gravity="left"
-        android:layout_marginTop="20dp"
-        android:clickable="true"
-        android:gravity="left"
-        android:text="@string/answerCount"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
+        <TextView
+            android:id="@+id/questionCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:gravity="left"
+            android:text="@string/questionCount"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
 
-    <TextView
-        android:id="@+id/downvoteCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/upvoteCount"
-        android:layout_gravity="right"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:clickable="true"
-        android:gravity="right"
-        android:text="@string/downvoteCount"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
+        <TextView
+            android:id="@+id/upvoteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/statsUnderline"
+            android:layout_gravity="right"
+            android:layout_toRightOf="@id/questionCount"
+            android:gravity="right"
+            android:text="@string/upvoteCount"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/answerCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/questionCount"
+            android:layout_alignRight="@id/questionCount"
+            android:layout_below="@id/questionCount"
+            android:layout_gravity="left"
+            android:layout_marginTop="20dp"
+            android:gravity="left"
+            android:text="@string/answerCount"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/downvoteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/upvoteCount"
+            android:layout_gravity="right"
+            android:layout_marginTop="20dp"
+            android:gravity="right"
+            android:text="@string/downvoteCount"
+            android:textColor="@color/black"
+            android:textSize="15dp" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/accountsLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/answerCount"
+        android:layout_below="@id/userStats"
         android:layout_gravity="left"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="15dp"

@@ -109,7 +109,7 @@ public class UserService
 
     }
 
-    public User getUserByIdAndBroadcast(long userId)
+    public User getUserById(long userId)
     {
 	User user = null;
 	Map<String, String> queryParams = new HashMap<String, String>();

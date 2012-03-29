@@ -1,18 +1,31 @@
 package com.prasanna.android.stacknetwork;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.intent.UserDetailsIntentService;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.FetchImageAsyncTask;
 import com.prasanna.android.task.ImageFetchAsyncTaskCompleteNotifierImpl;
@@ -23,14 +36,86 @@ public class UserProfileActivity extends Activity
 
     private Intent userIntent;
 
+    private User user;
+
+    private ProgressDialog fetchProfileProgress;
+
+    private RelativeLayout relativeLayout;
+
+    private class TabListener implements ActionBar.TabListener
+    {
+	private Fragment mFragment;
+
+	public TabListener(Fragment fragment)
+	{
+	    mFragment = fragment;
+	}
+
+	public void onTabSelected(Tab tab, FragmentTransaction ft)
+	{
+	    ft.add(R.id.fragmentContainer, mFragment, null);
+	}
+
+	public void onTabUnselected(Tab tab, FragmentTransaction ft)
+	{
+	    ft.remove(mFragment);
+	}
+
+	public void onTabReselected(Tab tab, FragmentTransaction ft)
+	{
+	    Toast.makeText(UserProfileActivity.this, "Reselected!", Toast.LENGTH_SHORT).show();
+	}
+
+    }
+
+    private class ProfileFragment extends Fragment
+    {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState)
+	{
+	    relativeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout,
+		    container, false);
+
+	    if (user == null)
+	    {
+		fetchProfileProgress = ProgressDialog.show(UserProfileActivity.this, "",
+		        "Fetching profile");
+	    }
+	    else
+	    {
+		displayUserDetail(user, relativeLayout);
+	    }
+	    return relativeLayout;
+	}
+    }
+
+    private class QuestionsFragment extends Fragment
+    {
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	        Bundle savedInstanceState)
+	{
+	    TextView textView = new TextView(getApplicationContext());
+	    textView.setText("Questions go here");
+	    textView.setTextColor(R.color.black);
+	    return textView;
+	}
+    }
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver()
     {
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-	    User user = (User) intent
-		    .getSerializableExtra(IntentActionEnum.UserIntentAction.USER_DETAIL.getExtra());
-	    displayUserDetail(user);
+	    user = (User) intent.getSerializableExtra(IntentActionEnum.UserIntentAction.USER_DETAIL
+		    .getExtra());
+
+	    if (relativeLayout != null)
+	    {
+		fetchProfileProgress.dismiss();
+		displayUserDetail(user, relativeLayout);
+	    }
 	}
     };
 
@@ -38,10 +123,32 @@ public class UserProfileActivity extends Activity
     public void onCreate(android.os.Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
-
-	setContentView(R.layout.user_proile_layout);
+	setContentView(R.layout.fragment_container);
 	registerForUserServiceReceiver();
 	startUserService();
+	setupActionBarTabs();
+    }
+
+    private void setupActionBarTabs()
+    {
+	ActionBar actionBar = getActionBar();
+	getActionBar().setTitle(OperatingSite.getSite().getName());
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+	Tab profileTab = actionBar.newTab();
+	profileTab.setText("Profile").setTabListener(new TabListener(new ProfileFragment()));
+	actionBar.addTab(profileTab);
+
+	Tab questionsTab = actionBar.newTab();
+	questionsTab.setText("Questions").setTabListener(new TabListener(new QuestionsFragment()));
+	actionBar.addTab(questionsTab);
+
+	Tab answersTab = actionBar.newTab();
+	answersTab.setText("Answers").setTabListener(new TabListener(new ProfileFragment()));
+	actionBar.addTab(answersTab);
+
+	Tab tagsTab = actionBar.newTab();
+	tagsTab.setText("Tags").setTabListener(new TabListener(new ProfileFragment()));
+	actionBar.addTab(tagsTab);
     }
 
     @Override
@@ -93,63 +200,55 @@ public class UserProfileActivity extends Activity
 	registerReceiver(broadcastReceiver, filter);
     }
 
-    private void displayUserDetail(User user)
+    private void displayUserDetail(User user, RelativeLayout relativeLayout)
     {
 	if (user != null)
 	{
-	    updateProfileInfo(user);
+	    updateProfileInfo(user, relativeLayout);
 
-	    TextView textView = (TextView) findViewById(R.id.questionCount);
+	    TextView textView = (TextView) relativeLayout.findViewById(R.id.questionCount);
 	    textView.append(" " + String.valueOf(user.getQuestionCount()));
 
-	    textView = (TextView) findViewById(R.id.answerCount);
+	    textView = (TextView) relativeLayout.findViewById(R.id.answerCount);
 	    textView.append(" " + String.valueOf(user.getAnswerCount()));
 
-	    textView = (TextView) findViewById(R.id.upvoteCount);
+	    textView = (TextView) relativeLayout.findViewById(R.id.upvoteCount);
 	    textView.append(" " + String.valueOf(user.getUpvoteCount()));
 
-	    textView = (TextView) findViewById(R.id.downvoteCount);
+	    textView = (TextView) relativeLayout.findViewById(R.id.downvoteCount);
 	    textView.append(" " + String.valueOf(user.getDownvoteCount()));
 	}
     }
 
-    private void updateProfileInfo(User user)
+    private void updateProfileInfo(User user, RelativeLayout relativeLayout)
     {
-	ImageView userProfileImage = (ImageView) findViewById(R.id.profileUserImage);
+	ImageView userProfileImage = (ImageView) relativeLayout.findViewById(R.id.profileUserImage);
 	FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(
 	        new ImageFetchAsyncTaskCompleteNotifierImpl(userProfileImage));
 	fetchImageAsyncTask.execute(user.getProfileImageLink());
 
-	TextView textView = (TextView) findViewById(R.id.profileDisplayName);
+	TextView textView = (TextView) relativeLayout.findViewById(R.id.profileDisplayName);
 	textView.setText(user.getDisplayName());
 
-	textView = (TextView) findViewById(R.id.profileUserReputation);
-	if (user.getReputation() > 10000)
-	{
-	    double reputation = ((double) user.getReputation()) / 1000;
-	    textView.setText(String.format("%.1fk", reputation));
-	}
-	else
-	{
-	    textView.setText(String.valueOf(user.getReputation()));
-	}
+	textView = (TextView) relativeLayout.findViewById(R.id.profileUserReputation);
+	textView.setText(AppUtils.formatUserReputation(user.getReputation()));
 
 	if (user.getBadgeCounts() != null && user.getBadgeCounts().length == 3)
 	{
-	    textView = (TextView) findViewById(R.id.profileUserGoldNum);
+	    textView = (TextView) relativeLayout.findViewById(R.id.profileUserGoldNum);
 	    textView.setText(String.valueOf(user.getBadgeCounts()[0]));
 
-	    textView = (TextView) findViewById(R.id.profileUserSilverNum);
+	    textView = (TextView) relativeLayout.findViewById(R.id.profileUserSilverNum);
 	    textView.setText(String.valueOf(user.getBadgeCounts()[1]));
 
-	    textView = (TextView) findViewById(R.id.profileUserBronzeNum);
+	    textView = (TextView) relativeLayout.findViewById(R.id.profileUserBronzeNum);
 	    textView.setText(String.valueOf(user.getBadgeCounts()[2]));
 	}
 
-	textView = (TextView) findViewById(R.id.profileViews);
+	textView = (TextView) relativeLayout.findViewById(R.id.profileViews);
 	textView.append(" " + user.getProfileViews());
 
-	textView = (TextView) findViewById(R.id.profileUserLastSeen);
+	textView = (TextView) relativeLayout.findViewById(R.id.profileUserLastSeen);
 	textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.getLastAccessTime()));
 
     }

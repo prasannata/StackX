@@ -9,18 +9,18 @@
         android:showAsAction="always"
         android:title="@string/menu_search"/>
     <item
-        android:id="@+id/menu_refresh"
-        android:icon="@drawable/refresh"
-        android:orderInCategory="1"
-        android:showAsAction="ifRoom"
-        android:title="@string/menu_refresh"/>
-    <item
         android:id="@+id/menu_options"
         android:icon="@drawable/expand"
         android:orderInCategory="2"
         android:showAsAction="ifRoom"
         android:title="@string/menu_options">
         <menu>
+            <item
+                android:id="@+id/menu_refresh"
+                android:icon="@drawable/refresh"
+                android:orderInCategory="1"
+                android:showAsAction="always"
+                android:title="@string/menu_refresh"/>
             <item
                 android:id="@+id/menu_profile"
                 android:icon="@drawable/person"
