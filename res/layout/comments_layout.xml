@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_border_delft" >
+
+    <LinearLayout
+        android:id="@+id/commentsList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="3dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/closeCommentsPopup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:clickable="true"
+            android:gravity="right"
+            android:text="Close"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+</ScrollView>

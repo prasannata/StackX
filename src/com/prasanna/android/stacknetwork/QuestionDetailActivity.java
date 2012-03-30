@@ -6,16 +6,24 @@ import java.util.List;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.listener.FlingActionListener;
@@ -37,6 +45,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private Intent questionIntent;
     private LinearLayout detailLinearLayout;
     private TextView answersOrQuestion;
+    private TextView commentsCickableTextView;
     private TextView currentAnswerOfTotalTextView;
     private ImageView acceptedAnswerLogo;
     private Question question;
@@ -46,6 +55,9 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private boolean viewingAnswer = false;
     private TextView currentAnswerAuthor;
     private RelativeLayout answerHeader;
+    private PopupWindow pw;
+    private LinearLayout questionDetailMasterLayout;
+    private View hrInQuestionTitle;
 
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
     {
@@ -105,6 +117,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         acceptedAnswerLogo = (ImageView) findViewById(R.id.acceptedAnswerLogo);
         currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
         currentAnswerAuthor = (TextView) findViewById(R.id.currentAnswerAuthor);
+        hrInQuestionTitle = findViewById(R.id.hrInQuestionTitle);
         currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
@@ -114,8 +127,52 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             }
         });
 
+        setupCommentsPopup();
+
         displayQuestionMetaData((Question) getIntent().getSerializableExtra("question"));
         registerReceiverAndStartService();
+    }
+
+    private void setupCommentsPopup()
+    {
+        final LinearLayout questionTitleLayout = (LinearLayout) findViewById(R.id.questionTitleLayout);
+        commentsCickableTextView = (TextView) findViewById(R.id.comments);
+        commentsCickableTextView.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v)
+            {
+                final ScrollView commentsView = (ScrollView) getLayoutInflater()
+                        .inflate(R.layout.comments_layout, null);
+
+                LinearLayout commentsLayout = (LinearLayout) commentsView.findViewById(R.id.commentsList);
+                TextView closeCommentsPopup = (TextView) commentsLayout.findViewById(R.id.closeCommentsPopup);
+                closeCommentsPopup.setOnClickListener(new View.OnClickListener()
+                {
+
+                    @Override
+                    public void onClick(View v)
+                    {
+                        if (pw != null)
+                        {
+                            pw.dismiss();
+                        }
+                    }
+                });
+                Point size = new Point();
+                getWindowManager().getDefaultDisplay().getSize(size);
+                TextView textView = new TextView(commentsView.getContext());
+                textView.setText("Comments appear here");
+                textView.setTextColor(Color.BLACK);
+                commentsLayout.addView(textView, LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                Log.d(TAG, "Height diff:" + questionTitleLayout.getHeight());
+                pw = new PopupWindow(commentsView, size.x - 50, size.y - questionTitleLayout.getHeight() - 150, true);
+                pw.showAsDropDown(hrInQuestionTitle, 10, 10);
+            }
+        });
     }
 
     private void registerReceiverAndStartService()
