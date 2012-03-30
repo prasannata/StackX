@@ -284,6 +284,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             if (questionDetailsReceiver != null)
             {
                 unregisterReceiver(questionDetailsReceiver);
+                unregisterReceiver(questionCommentsReceiver);
             }
         }
         catch (IllegalArgumentException e)
