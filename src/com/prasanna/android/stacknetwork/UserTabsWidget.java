@@ -21,7 +21,7 @@ public class UserTabsWidget extends TabActivity
 	TabHost tabHost = getTabHost();
 	TabHost.TabSpec spec;
 
-	Intent intent = new Intent().setClass(this, UserHomeActivity.class);
+	Intent intent = new Intent().setClass(this, QuestionsActivity.class);
 	spec = tabHost.newTabSpec("userHome").setIndicator("Home").setContent(intent);
 	tabHost.addTab(spec);
 

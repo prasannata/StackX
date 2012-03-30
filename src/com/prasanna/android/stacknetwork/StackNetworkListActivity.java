@@ -54,7 +54,7 @@ public class StackNetworkListActivity extends ListActivity
     {
 	Site site = sites.get(position);
 	OperatingSite.setSite(site);
-	Intent myIntent = new Intent(this, UserHomeActivity.class);
+	Intent myIntent = new Intent(this, QuestionsActivity.class);
 	startActivity(myIntent);
     }
 

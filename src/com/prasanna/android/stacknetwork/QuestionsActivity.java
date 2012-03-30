@@ -16,9 +16,9 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserHomeActivity extends AbstractQuestionsDisplayActivity
+public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 {
-    private static final String TAG = UserHomeActivity.class.getSimpleName();
+    private static final String TAG = QuestionsActivity.class.getSimpleName();
 
     private int page = 0;
 
@@ -44,7 +44,7 @@ public class UserHomeActivity extends AbstractQuestionsDisplayActivity
 
     private void startReceiverAndService()
     {
-        fetchingQuestionsDialog = ProgressDialog.show(UserHomeActivity.this, "", getString(R.string.loading));
+        fetchingQuestionsDialog = ProgressDialog.show(QuestionsActivity.this, "", getString(R.string.loading));
 
         registerQuestionsReceiver();
 
