@@ -7,63 +7,14 @@ public class Site implements Serializable
 
     private static final long serialVersionUID = 7057957647981597410L;
 
-    private String name;
+    public String name;
 
-    private String apiSiteParameter;
+    public String apiSiteParameter;
 
-    private String link;
+    public String link;
 
-    private String logoUrl;
+    public String logoUrl;
 
-    private int headerResId;
-
-    public String getApiSiteParameter()
-    {
-	return apiSiteParameter;
-    }
-
-    public void setApiSiteParameter(String apiSiteParameter)
-    {
-	this.apiSiteParameter = apiSiteParameter;
-    }
-
-    public String getLink()
-    {
-	return link;
-    }
-
-    public void setLink(String link)
-    {
-	this.link = link;
-    }
-
-    public String getLogoUrl()
-    {
-	return logoUrl;
-    }
-
-    public void setLogoUrl(String logoUrl)
-    {
-	this.logoUrl = logoUrl;
-    }
-
-    public void setName(String name)
-    {
-	this.name = name;
-    }
-
-    public void setHeaderResId(int headerResId)
-    {
-	this.headerResId = headerResId;
-    }
-
-    public String getName()
-    {
-	return name;
-    }
-
-    public int getHeaderResId()
-    {
-	return headerResId;
-    }
+    public int headerResId;
+  
 }

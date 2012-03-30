@@ -21,26 +21,25 @@ public class SiteListAdapter extends ArrayAdapter<Site>
 
     public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites)
     {
-	super(context, textViewResourceId, sites);
-	this.context = context;
-	this.sites = sites;
+        super(context, textViewResourceId, sites);
+        this.context = context;
+        this.sites = sites;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-	View view = convertView;
-	if (view == null)
-	{
-	    LayoutInflater vi = (LayoutInflater) context
-		    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	    view = vi.inflate(R.layout.sitelist_row, null);
-	}
-	final Site site = sites.get(position);
-	TextView textView = (TextView) view.findViewById(R.id.siteName);
-	textView.setGravity(Gravity.LEFT);
-	textView.setId(site.getName().hashCode());
-	textView.setText(site.getName());
-	return view;
+        View view = convertView;
+        if (view == null)
+        {
+            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = vi.inflate(R.layout.sitelist_row, null);
+        }
+        final Site site = sites.get(position);
+        TextView textView = (TextView) view.findViewById(R.id.siteName);
+        textView.setGravity(Gravity.LEFT);
+        textView.setId(site.name.hashCode());
+        textView.setText(site.name);
+        return view;
     }
 }

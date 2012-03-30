@@ -14,45 +14,39 @@ public class QuestionDetailsIntentService extends IntentService
 
     public QuestionDetailsIntentService()
     {
-	this("QuestionService");
+        this("QuestionService");
     }
 
     public QuestionDetailsIntentService(String name)
     {
-	super(name);
+        super(name);
     }
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
-	Intent broadcastIntent = null;
-	if (question != null && question.getId() > 0)
-	{
-	    question.setBody(questionService.getQuestionBodyForId(question.getId()));
+        Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
+        Intent broadcastIntent = null;
+        if (question != null && question.id > 0)
+        {
+            question.body = questionService.getQuestionBodyForId(question.id);
 
-	    if (question.getAnswerCount() > 0)
-	    {
-		question.setAnswers(questionService.getAnswersForQuestion(question.getId()));
-		broadcastIntent = new Intent();
-		broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS
-		        .name());
-		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		broadcastIntent
-		        .putExtra(
-		                IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.getExtra(),
-		                question);
-		sendBroadcast(broadcastIntent);
-	    }
+            if (question.answerCount > 0)
+            {
+                question.answers = questionService.getAnswersForQuestion(question.id);
+                broadcastIntent = new Intent();
+                broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.name());
+                broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.getExtra(), question);
+                sendBroadcast(broadcastIntent);
+            }
 
-	    broadcastIntent = new Intent();
-	    broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS
-		    .name());
-	    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	    broadcastIntent.putExtra(
-		    IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.getExtra(),
-		    questionService.getCommentsForQuestion(question.getId()));
-	    sendBroadcast(broadcastIntent);
-	}
+            broadcastIntent = new Intent();
+            broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.name());
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.getExtra(),
+                    questionService.getCommentsForQuestion(question.id));
+            sendBroadcast(broadcastIntent);
+        }
     }
 }

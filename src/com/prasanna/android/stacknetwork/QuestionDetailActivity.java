@@ -57,427 +57,409 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private BroadcastReceiver questionDetailsReceiver = new BroadcastReceiver()
     {
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{
-	    question = (Question) intent
-		    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS
-		            .getExtra());
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            question = (Question) intent.getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS
+                    .getExtra());
 
-	    answers = question.getAnswers();
+            answers = question.answers;
 
-	    displayQuestionBody(question.getBody());
+            displayQuestionBody(question.body);
 
-	    setupAnswersOnClick();
-	}
+            setupAnswersOnClick();
+        }
     };
 
     private BroadcastReceiver questionCommentsReceiver = new BroadcastReceiver()
     {
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{
-	    int numComments = 0;
+        @SuppressWarnings("unchecked")
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            int numComments = 0;
 
-	    question.setComments((ArrayList<Comment>) intent
-		    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS
-		            .getExtra()));
+            question.comments = (ArrayList<Comment>) intent
+                    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.getExtra());
 
-	    if (question.getComments() != null)
-	    {
-		numComments = question.getComments().size();
-	    }
+            if (question.comments != null)
+            {
+                numComments = question.comments.size();
+            }
 
-	    commentsCickableTextView.setText("Comments (" + numComments + ")");
+            commentsCickableTextView.setText("Comments (" + numComments + ")");
 
-	}
+        }
     };
 
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
     {
-	public void flingedToLeft()
-	{
-	    Log.d(TAG, "Flinged to left");
-	    if (viewingAnswer && currentAnswerCount < answers.size() - 1)
-	    {
-		++currentAnswerCount;
-		updateViewForAnswer(question.getAnswers().get(currentAnswerCount).getBody(),
-		        (currentAnswerCount + 1) + " of " + question.getAnswerCount(), question
-		                .getAnswers().get(currentAnswerCount).getOwner().getDisplayName(),
-		        answers.get(currentAnswerCount).isAccepted());
-	    }
-	}
+        public void flingedToLeft()
+        {
+            Log.d(TAG, "Flinged to left");
+            if (viewingAnswer && currentAnswerCount < answers.size() - 1)
+            {
+                ++currentAnswerCount;
+                updateViewForAnswer(question.answers.get(currentAnswerCount).body, (currentAnswerCount + 1) + " of "
+                        + question.answerCount, question.answers.get(currentAnswerCount).owner.displayName,
+                        answers.get(currentAnswerCount).accepted);
+            }
+        }
 
-	public void flingedToRight()
-	{
-	    Log.d(TAG, "Fling to right: " + currentAnswerCount);
-	    if (currentAnswerCount > 0)
-	    {
-		--currentAnswerCount;
-		updateViewForAnswer(question.getAnswers().get(currentAnswerCount).getBody(),
-		        (currentAnswerCount + 1) + " of " + question.getAnswerCount(), question
-		                .getAnswers().get(currentAnswerCount).getOwner().getDisplayName(),
-		        answers.get(currentAnswerCount).isAccepted());
-	    }
-	}
+        public void flingedToRight()
+        {
+            Log.d(TAG, "Fling to right: " + currentAnswerCount);
+            if (currentAnswerCount > 0)
+            {
+                --currentAnswerCount;
+                updateViewForAnswer(question.answers.get(currentAnswerCount).body, (currentAnswerCount + 1) + " of "
+                        + question.answerCount, question.answers.get(currentAnswerCount).owner.displayName,
+                        answers.get(currentAnswerCount).accepted);
+            }
+        }
 
-	private void updateViewForAnswer(String body, String textLabel, String author,
-	        boolean isAccepted)
-	{
-	    detailLinearLayout.removeAllViews();
-	    displayQuestionBody(body);
-	    currentAnswerOfTotalTextView.setText(textLabel);
-	    currentAnswerAuthor.setText(author);
+        private void updateViewForAnswer(String body, String textLabel, String author, boolean isAccepted)
+        {
+            detailLinearLayout.removeAllViews();
+            displayQuestionBody(body);
+            currentAnswerOfTotalTextView.setText(textLabel);
+            currentAnswerAuthor.setText(author);
 
-	    if (isAccepted)
-	    {
-		acceptedAnswerLogo.setVisibility(View.VISIBLE);
-	    }
-	    else
-	    {
-		acceptedAnswerLogo.setVisibility(View.GONE);
-	    }
-	}
+            if (isAccepted)
+            {
+                acceptedAnswerLogo.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                acceptedAnswerLogo.setVisibility(View.GONE);
+            }
+        }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.question_detail_layout);
+        setContentView(R.layout.question_detail_layout);
 
-	flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
-	flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
-	detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
-	answerHeader = (RelativeLayout) findViewById(R.id.answerHeader);
-	acceptedAnswerLogo = (ImageView) findViewById(R.id.acceptedAnswerLogo);
-	currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
-	currentAnswerAuthor = (TextView) findViewById(R.id.currentAnswerAuthor);
-	hrInQuestionTitle = findViewById(R.id.hrInQuestionTitle);
-	currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
-	{
-	    public void onClick(View view)
-	    {
-		startActivity(IntentUtils.createUserProfileIntent(view.getContext(),
-		        answers.get(currentAnswerCount).getOwner().getId()));
-	    }
-	});
+        flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
+        flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
+        detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
+        answerHeader = (RelativeLayout) findViewById(R.id.answerHeader);
+        acceptedAnswerLogo = (ImageView) findViewById(R.id.acceptedAnswerLogo);
+        currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
+        currentAnswerAuthor = (TextView) findViewById(R.id.currentAnswerAuthor);
+        hrInQuestionTitle = findViewById(R.id.hrInQuestionTitle);
+        currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                startActivity(IntentUtils.createUserProfileIntent(view.getContext(),
+                        answers.get(currentAnswerCount).owner.id));
+            }
+        });
 
-	setupCommentsPopup();
+        setupCommentsPopup();
 
-	displayQuestionMetaData((Question) getIntent().getSerializableExtra("question"));
-	registerReceiverAndStartService();
+        displayQuestionMetaData((Question) getIntent().getSerializableExtra("question"));
+        registerReceiverAndStartService();
     }
 
     private void setupCommentsPopup()
     {
-	final LinearLayout questionTitleLayout = (LinearLayout) findViewById(R.id.questionTitleLayout);
-	commentsCickableTextView = (TextView) findViewById(R.id.comments);
-	commentsCickableTextView.setOnClickListener(new View.OnClickListener()
-	{
+        final LinearLayout questionTitleLayout = (LinearLayout) findViewById(R.id.questionTitleLayout);
+        commentsCickableTextView = (TextView) findViewById(R.id.comments);
+        commentsCickableTextView.setOnClickListener(new View.OnClickListener()
+        {
 
-	    @Override
-	    public void onClick(View v)
-	    {
-		if (question != null && question.getComments() != null
-		        && question.getComments().isEmpty() == false)
-		{
-		    final ScrollView commentsView = (ScrollView) getLayoutInflater().inflate(
-			    R.layout.comments_layout, null);
+            @Override
+            public void onClick(View v)
+            {
+                if (question != null && question.comments != null && question.comments.isEmpty() == false)
+                {
+                    final ScrollView commentsView = (ScrollView) getLayoutInflater().inflate(R.layout.comments_layout,
+                            null);
 
-		    LinearLayout commentsLayout = (LinearLayout) commentsView
-			    .findViewById(R.id.commentsList);
-		    ImageView closeCommentsPopup = (ImageView) commentsLayout
-			    .findViewById(R.id.closeCommentsPopup);
-		    closeCommentsPopup.setOnClickListener(new View.OnClickListener()
-		    {
+                    LinearLayout commentsLayout = (LinearLayout) commentsView.findViewById(R.id.commentsList);
+                    ImageView closeCommentsPopup = (ImageView) commentsLayout.findViewById(R.id.closeCommentsPopup);
+                    closeCommentsPopup.setOnClickListener(new View.OnClickListener()
+                    {
 
-			@Override
-			public void onClick(View v)
-			{
-			    if (pw != null)
-			    {
-				pw.dismiss();
-			    }
-			}
-		    });
+                        @Override
+                        public void onClick(View v)
+                        {
+                            if (pw != null)
+                            {
+                                pw.dismiss();
+                            }
+                        }
+                    });
 
-		    List<Comment> comments = (viewingAnswer && currentAnswerCount != -1) ? answers
-			    .get(currentAnswerCount).getComments() : question.getComments();
+                    List<Comment> comments = (viewingAnswer && currentAnswerCount != -1) ? answers
+                            .get(currentAnswerCount).comments : question.comments;
 
-		    if (comments != null)
-		    {
-			for (Comment comment : comments)
-			{
-			    RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater()
-				    .inflate(R.layout.comment_layout, null);
-			    TextView textView = (TextView) commentLayout
-				    .findViewById(R.id.commentScore);
-			    textView.setText(String.valueOf(comment.getScore()));
+                    if (comments != null)
+                    {
+                        for (Comment comment : comments)
+                        {
+                            RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
+                                    R.layout.comment_layout, null);
+                            TextView textView = (TextView) commentLayout.findViewById(R.id.commentScore);
+                            textView.setText(String.valueOf(comment.score));
 
-			    textView = (TextView) commentLayout.findViewById(R.id.commentContent);
-			    textView.setText(Html.fromHtml(comment.getBody()));
+                            textView = (TextView) commentLayout.findViewById(R.id.commentContent);
+                            textView.setText(Html.fromHtml(comment.body));
 
-			    textView = (TextView) commentLayout.findViewById(R.id.commentAuthor);
-			    textView.setText(comment.getOwner().getDisplayName());
+                            textView = (TextView) commentLayout.findViewById(R.id.commentAuthor);
+                            textView.setText(comment.owner.displayName);
 
-			    commentsLayout.addView(commentLayout,
-				    LinearLayout.LayoutParams.MATCH_PARENT,
-				    LinearLayout.LayoutParams.WRAP_CONTENT);
-			}
+                            commentsLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                        }
 
-			Point size = new Point();
-			getWindowManager().getDefaultDisplay().getSize(size);
+                        Point size = new Point();
+                        getWindowManager().getDefaultDisplay().getSize(size);
 
-			pw = new PopupWindow(commentsView, size.x - 50, size.y
-			        - questionTitleLayout.getHeight() - 150, true);
-			pw.showAsDropDown(hrInQuestionTitle, 10, 10);
-		    }
-		}
-	    }
-	});
+                        pw = new PopupWindow(commentsView, size.x - 50, size.y - questionTitleLayout.getHeight() - 150,
+                                true);
+                        pw.showAsDropDown(hrInQuestionTitle, 10, 10);
+                    }
+                }
+            }
+        });
     }
 
     private void registerReceiverAndStartService()
     {
-	registerForQuestionByIdReceiver();
+        registerForQuestionByIdReceiver();
 
-	registerForQuestionCommentsReceiver();
+        registerForQuestionCommentsReceiver();
 
-	startQuestionService();
+        startQuestionService();
     }
 
     private void startQuestionService()
     {
-	question = (Question) getIntent().getSerializableExtra("question");
-	questionIntent = new Intent(this, QuestionDetailsIntentService.class);
-	questionIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.name());
-	questionIntent.putExtra(StringConstants.QUESTION, question);
-	startService(questionIntent);
+        question = (Question) getIntent().getSerializableExtra("question");
+        questionIntent = new Intent(this, QuestionDetailsIntentService.class);
+        questionIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.name());
+        questionIntent.putExtra(StringConstants.QUESTION, question);
+        startService(questionIntent);
     }
 
     private void registerForQuestionByIdReceiver()
     {
-	IntentFilter filter = new IntentFilter(
-	        IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.name());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(questionDetailsReceiver, filter);
+        IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_DETAILS.name());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(questionDetailsReceiver, filter);
     }
 
     private void registerForQuestionCommentsReceiver()
     {
-	IntentFilter filter = new IntentFilter(
-	        IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.name());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(questionCommentsReceiver, filter);
+        IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.name());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(questionCommentsReceiver, filter);
     }
 
     @Override
     protected void onDestroy()
     {
-	super.onDestroy();
-	stopServiceAndUnregsiterReceiver();
+        super.onDestroy();
+        stopServiceAndUnregsiterReceiver();
     }
 
     private void stopServiceAndUnregsiterReceiver()
     {
-	if (questionIntent != null)
-	{
-	    stopService(questionIntent);
-	}
+        if (questionIntent != null)
+        {
+            stopService(questionIntent);
+        }
 
-	// If I do not unregister, it is leaked. Good, that is right. If I
-	// unregister, it throws
-	// IllegalArgumentException saying receiver not registered. WTF!
-	try
-	{
-	    if (questionDetailsReceiver != null)
-	    {
-		unregisterReceiver(questionDetailsReceiver);
-	    }
-	}
-	catch (IllegalArgumentException e)
-	{
-	    Log.d(TAG, e.getMessage());
-	}
+        // If I do not unregister, it is leaked. Good, that is right. If I
+        // unregister, it throws
+        // IllegalArgumentException saying receiver not registered. WTF!
+        try
+        {
+            if (questionDetailsReceiver != null)
+            {
+                unregisterReceiver(questionDetailsReceiver);
+            }
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     @Override
     protected void onStop()
     {
-	super.onStop();
+        super.onStop();
 
-	stopServiceAndUnregsiterReceiver();
+        stopServiceAndUnregsiterReceiver();
     }
 
     private void displayQuestionMetaData(final Question question)
     {
-	updateResponseCounts(question);
+        updateResponseCounts(question);
 
-	TextView textView = (TextView) findViewById(R.id.questionScore);
-	textView.setText(String.valueOf(question.getScore()));
+        TextView textView = (TextView) findViewById(R.id.questionScore);
+        textView.setText(String.valueOf(question.score));
 
-	textView = (TextView) findViewById(R.id.questionTitle);
-	textView.setText(Html.fromHtml(question.getTitle()));
+        textView = (TextView) findViewById(R.id.questionTitle);
+        textView.setText(Html.fromHtml(question.title));
 
-	textView = (TextView) findViewById(R.id.questionOwner);
-	textView.setText(getOwnerString(question.getOwner()));
+        textView = (TextView) findViewById(R.id.questionOwner);
+        textView.setText(getOwnerString(question.owner));
 
-	textView.setOnClickListener(new View.OnClickListener()
-	{
-	    public void onClick(View view)
-	    {
-		startActivity(IntentUtils.createUserProfileIntent(view.getContext(), question
-		        .getOwner().getId()));
-	    }
-	});
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                startActivity(IntentUtils.createUserProfileIntent(view.getContext(), question.owner.id));
+            }
+        });
 
-	textView = (TextView) findViewById(R.id.questionTime);
-	textView.setText(DateTimeUtils.getElapsedDurationSince(question.getCreationDate()));
+        textView = (TextView) findViewById(R.id.questionTime);
+        textView.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate));
 
-	textView = (TextView) findViewById(R.id.questionViews);
-	textView.append(String.valueOf(question.getViewCount()));
+        textView = (TextView) findViewById(R.id.questionViews);
+        textView.append(String.valueOf(question.viewCount));
     }
 
     private static String getOwnerString(User user)
     {
-	String userDetails = " by " + Html.fromHtml(user.getDisplayName());
-	userDetails += AppUtils.formatUserReputation(user.getReputation());
+        String userDetails = " by " + Html.fromHtml(user.displayName);
+        userDetails += AppUtils.formatUserReputation(user.reputation);
 
-	if (user.getAcceptRate() != -1)
-	{
-	    userDetails += " Accept%: " + user.getAcceptRate();
-	}
-	return userDetails;
+        if (user.acceptRate != -1)
+        {
+            userDetails += " Accept%: " + user.acceptRate;
+        }
+        return userDetails;
     }
 
     private void updateResponseCounts(final Question question)
     {
-	if (question.getAnswerCount() > 0)
-	{
-	    answersOrQuestion = (TextView) findViewById(R.id.answers);
-	    answersOrQuestion.append(" (" + question.getAnswerCount() + ")");
-	    answersOrQuestion.setClickable(true);
-	}
+        if (question.answerCount > 0)
+        {
+            answersOrQuestion = (TextView) findViewById(R.id.answers);
+            answersOrQuestion.append(" (" + question.answerCount + ")");
+            answersOrQuestion.setClickable(true);
+        }
     }
 
     private void displayQuestionBody(String text)
     {
-	try
-	{
-	    ArrayList<TextView> detailFragments = HtmlTagFragmenter.parse(getApplicationContext(),
-		    text);
-	    for (TextView detailFragment : detailFragments)
-	    {
-		detailLinearLayout.addView(detailFragment);
-	    }
-	}
-	catch (XmlPullParserException e)
-	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-	catch (IOException e)
-	{
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        try
+        {
+            ArrayList<TextView> detailFragments = HtmlTagFragmenter.parse(getApplicationContext(), text);
+            for (TextView detailFragment : detailFragments)
+            {
+                detailLinearLayout.addView(detailFragment);
+            }
+        }
+        catch (XmlPullParserException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void refresh()
     {
-	stopServiceAndUnregsiterReceiver();
-	registerReceiverAndStartService();
+        stopServiceAndUnregsiterReceiver();
+        registerReceiverAndStartService();
     }
 
     @Override
     public Context getCurrentAppContext()
     {
-	return getApplicationContext();
+        return getApplicationContext();
     }
 
     private void setupAnswersOnClick()
     {
-	if (answersOrQuestion != null)
-	{
-	    answersOrQuestion.setOnClickListener(new View.OnClickListener()
-	    {
-		public void onClick(View v)
-		{
-		    String label = null;
-		    String body = null;
+        if (answersOrQuestion != null)
+        {
+            answersOrQuestion.setOnClickListener(new View.OnClickListener()
+            {
+                public void onClick(View v)
+                {
+                    String label = null;
+                    String body = null;
 
-		    if (viewingAnswer == false)
-		    {
-			label = getString(R.string.question);
+                    if (viewingAnswer == false)
+                    {
+                        label = getString(R.string.question);
 
-			if (currentAnswerCount == -1)
-			{
-			    currentAnswerCount = 0;
-			}
+                        if (currentAnswerCount == -1)
+                        {
+                            currentAnswerCount = 0;
+                        }
 
-			Log.d(TAG, "Accepted: " + answers.get(currentAnswerCount).isAccepted());
-			viewingAnswer = true;
-			currentAnswerOfTotalTextView.setText((currentAnswerCount + 1) + " of "
-			        + question.getAnswerCount());
-			currentAnswerAuthor.setText(getString(R.string.by)
-			        + answers.get(currentAnswerCount).getOwner().getDisplayName()
-			        + AppUtils.formatUserReputation(answers.get(currentAnswerCount)
-			                .getOwner().getReputation()));
+                        Log.d(TAG, "Accepted: " + answers.get(currentAnswerCount).accepted);
+                        viewingAnswer = true;
+                        currentAnswerOfTotalTextView.setText((currentAnswerCount + 1) + " of " + question.answerCount);
+                        currentAnswerAuthor.setText(getString(R.string.by)
+                                + answers.get(currentAnswerCount).owner.displayName
+                                + AppUtils.formatUserReputation(answers.get(currentAnswerCount).owner.reputation));
 
-			if (answers.get(currentAnswerCount).getComments() == null)
-			{
-			    commentsCickableTextView.setText("Comments (0)");
-			}
-			else
-			{
-			    commentsCickableTextView.setText("Comments ("
-				    + answers.get(currentAnswerCount).getComments().size() + ")");
-			}
+                        if (answers.get(currentAnswerCount).comments == null)
+                        {
+                            commentsCickableTextView.setText("Comments (0)");
+                        }
+                        else
+                        {
+                            commentsCickableTextView.setText("Comments ("
+                                    + answers.get(currentAnswerCount).comments.size() + ")");
+                        }
 
-			answerHeader.setVisibility(View.VISIBLE);
-			body = answers.get(currentAnswerCount).getBody();
+                        answerHeader.setVisibility(View.VISIBLE);
+                        body = answers.get(currentAnswerCount).body;
 
-			if (answers.get(currentAnswerCount).isAccepted())
-			{
-			    acceptedAnswerLogo.setVisibility(View.VISIBLE);
-			}
-			else
-			{
-			    acceptedAnswerLogo.setVisibility(View.GONE);
-			}
-		    }
-		    else
-		    {
-			label = getString(R.string.answers) + " (" + question.getAnswerCount()
-			        + ")";
-			body = question.getBody();
-			viewingAnswer = false;
+                        if (answers.get(currentAnswerCount).accepted)
+                        {
+                            acceptedAnswerLogo.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            acceptedAnswerLogo.setVisibility(View.GONE);
+                        }
+                    }
+                    else
+                    {
+                        label = getString(R.string.answers) + " (" + question.answerCount + ")";
+                        body = question.body;
+                        viewingAnswer = false;
 
-			if (currentAnswerOfTotalTextView != null)
-			{
-			    answerHeader.setVisibility(View.GONE);
-			}
+                        if (currentAnswerOfTotalTextView != null)
+                        {
+                            answerHeader.setVisibility(View.GONE);
+                        }
 
-			if (question.getComments() == null)
-			{
-			    commentsCickableTextView.setText("Comments (0)");
-			}
-			else
-			{
-			    commentsCickableTextView.setText("Comments ("
-				    + question.getComments().size() + ")");
-			}
-		    }
+                        if (question.comments == null)
+                        {
+                            commentsCickableTextView.setText("Comments (0)");
+                        }
+                        else
+                        {
+                            commentsCickableTextView.setText("Comments (" + question.comments.size() + ")");
+                        }
+                    }
 
-		    detailLinearLayout.removeAllViews();
-		    displayQuestionBody(body);
-		    answersOrQuestion.setText(label);
-		}
-	    });
-	}
+                    detailLinearLayout.removeAllViews();
+                    displayQuestionBody(body);
+                    answersOrQuestion.setText(label);
+                }
+            });
+        }
     }
 }

@@ -20,7 +20,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        getActionBar().setTitle(OperatingSite.getSite().getName());
+        getActionBar().setTitle(OperatingSite.getSite().name);
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.action_menu, menu);
 
