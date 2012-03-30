@@ -1,7 +1,6 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.Bitmap;
