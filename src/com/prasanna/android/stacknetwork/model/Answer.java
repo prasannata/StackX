@@ -1,46 +1,19 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
+import java.util.List;
 
-public class Answer implements Serializable
+public class Answer extends BaseUserContribModelWithId implements Serializable
 {
-    private static final long serialVersionUID = 536695149282894189L;
-
-    private long id = -1;
+    private static final long serialVersionUID = -307252373087687685L;
 
     private long questionId = -1;
 
-    private int score;
-
     private String relativeLink;
-
-    private User owner;
 
     private boolean accepted;
 
-    private String body;
-
-    private long creationDate;
-
-    public long getId()
-    {
-	return id;
-    }
-
-    public void setId(long id)
-    {
-	this.id = id;
-    }
-
-    public int getScore()
-    {
-	return score;
-    }
-
-    public void setScore(int score)
-    {
-	this.score = score;
-    }
+    private List<Comment> comments;
 
     public String getRelativeLink()
     {
@@ -50,16 +23,6 @@ public class Answer implements Serializable
     public void setRelativeLink(String relativeLink)
     {
 	this.relativeLink = relativeLink;
-    }
-
-    public User getOwner()
-    {
-	return owner;
-    }
-
-    public void setOwner(User owner)
-    {
-	this.owner = owner;
     }
 
     public boolean isAccepted()
@@ -72,16 +35,6 @@ public class Answer implements Serializable
 	this.accepted = accepted;
     }
 
-    public String getBody()
-    {
-	return body;
-    }
-
-    public void setBody(String body)
-    {
-	this.body = body;
-    }
-
     public long getQuestionId()
     {
 	return questionId;
@@ -92,13 +45,13 @@ public class Answer implements Serializable
 	this.questionId = questionId;
     }
 
-    public long getCreationDate()
+    public List<Comment> getComments()
     {
-	return creationDate;
+	return comments;
     }
 
-    public void setCreationDate(long creationDate)
+    public void setComments(List<Comment> comments)
     {
-	this.creationDate = creationDate;
+	this.comments = comments;
     }
 }

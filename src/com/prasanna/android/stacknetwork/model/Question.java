@@ -4,13 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Question implements Serializable
+public class Question extends BaseUserContribModelWithId implements Serializable
 {
     private static final long serialVersionUID = -4722553914475051236L;
-
-    private long id = -1;
-
-    private String title;
 
     private int viewCount;
 
@@ -18,37 +14,17 @@ public class Question implements Serializable
 
     private int votes;
 
-    private int score;
-
     private String[] tags;
 
     private String relativeLink;
 
-    private User owner;
-
     private List<Answer> answers = new ArrayList<Answer>();
 
-    private List<Comment> comments = new ArrayList<Comment>();
+    private List<Comment> comments;
 
     private boolean answered;
 
-    private String body;
-
-    private long createDate;
-
-    private String restEndpoint = "/questions";
-
     private boolean hasAcceptedAnswer = false;
-
-    public String getTitle()
-    {
-	return title;
-    }
-
-    public void setTitle(String title)
-    {
-	this.title = title;
-    }
 
     public int getVotes()
     {
@@ -78,16 +54,6 @@ public class Question implements Serializable
     public void setRelativeLink(String relativeLink)
     {
 	this.relativeLink = relativeLink;
-    }
-
-    public long getId()
-    {
-	return id;
-    }
-
-    public void setId(long id)
-    {
-	this.id = id;
     }
 
     public List<Answer> getAnswers()
@@ -120,16 +86,6 @@ public class Question implements Serializable
 	return answered;
     }
 
-    public int getScore()
-    {
-	return score;
-    }
-
-    public void setScore(int score)
-    {
-	this.score = score;
-    }
-
     public int getAnswerCount()
     {
 	return answerCount;
@@ -148,44 +104,6 @@ public class Question implements Serializable
     public void setViewCount(int viewCount)
     {
 	this.viewCount = viewCount;
-    }
-
-    public User getOwner()
-    {
-	return owner;
-    }
-
-    public void setOwner(User owner)
-    {
-	this.owner = owner;
-    }
-
-    public String getBody()
-    {
-	return body;
-    }
-
-    public void setBody(String body)
-    {
-	this.body = body;
-    }
-
-    public long getCreateDate()
-    {
-	return createDate;
-    }
-
-    public void setCreateDate(long createDate)
-    {
-	this.createDate = createDate;
-    }
-
-    public String getRestEndpoint()
-    {
-	if (id > 0)
-	    return restEndpoint + id;
-	else
-	    return null;
     }
 
     public boolean getHasAcceptedAnswer()

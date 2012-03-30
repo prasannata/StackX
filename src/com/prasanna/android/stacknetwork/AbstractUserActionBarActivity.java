@@ -1,5 +1,6 @@
 package com.prasanna.android.stacknetwork;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
@@ -10,7 +11,7 @@ import android.widget.Toast;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
-public abstract class AbstractUserActionBarActivity extends AbstractActivityWithBroadcastReceiver
+public abstract class AbstractUserActionBarActivity extends Activity
 {
     public abstract void refresh();
 

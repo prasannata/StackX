@@ -1,6 +1,10 @@
 package com.prasanna.android.stacknetwork.model;
 
-public class Comment
+import java.io.Serializable;
+
+public class Comment extends BaseUserContribModelWithId implements Serializable
 {
+
+    private static final long serialVersionUID = 4507419037482371574L;
 
 }

@@ -28,7 +28,7 @@
     <string name="upvoteCount">Upvotes</string>
     <string name="downvoteCount">Downvotes</string>
     <string name="profileViews">Profile views</string>
-    <string name="zeroNumber">0</string>
+    <string name="zeroNumber">"0"</string>
     <string name="accounts">Accounts</string>
     <string name="lastSeen">Last seen</string>
     <string name="noEmail">Email not found</string>
@@ -46,6 +46,6 @@
     <string name="loadingSites">"Loading sites"</string>
     <string name="question">Question</string>
     <string name="answers">Answers</string>
-    <string name="comments">Comments</string>
-
+    <string name="comments">"Comments (…)"</string>
+	<string name="viewProfile">"View profile"</string>
 </resources>

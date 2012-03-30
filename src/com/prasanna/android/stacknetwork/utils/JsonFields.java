@@ -4,30 +4,35 @@ public class JsonFields
 {
     public static final String ITEMS = "items";
 
-    public static class Question
+    public static class BaseUserContribFields
     {
+	public static final String SCORE = "score";
+	public static final String OWNER = "owner";
+	public static final String BODY = "body";
 	public static final String TITLE = "title";
+	public static final String CREATION_DATE = "creation_date";
+    }
+
+    public static class Question extends BaseUserContribFields
+    {
 	public static final String QUESTION_ID = "question_id";
 	public static final String IS_ANSWERED = "is_answered";
 	public static final String ANSWER_COUNT = "answer_count";
 	public static final String VIEW_COUNT = "view_count";
-	public static final String SCORE = "score";
 	public static final String TAGS = "tags";
-	public static final String OWNER = "owner";
-	public static final String BODY = "body";
-	public static final String CREATION_DATE = "creation_date";
 	public static final String ACCEPTED_ANSWER_ID = "accepted_answer_id";
     }
 
-    public static class Answer
+    public static class Answer extends BaseUserContribFields
     {
 	public static final String ANSWER_ID = "answer_id";
 	public static final String QUESTION_ID = "question_id";
 	public static final String IS_ACCEPTED = "is_accepted";
-	public static final String SCORE = "score";
-	public static final String OWNER = "owner";
-	public static final String BODY = "body";
-	public static final String CREATION_DATE = "creation_date";
+    }
+
+    public static class Comment extends BaseUserContribFields
+    {
+	public static final String COMMENT_ID = "comment_id";
     }
 
     public static class Site

@@ -41,6 +41,7 @@
             android:layout_gravity="top|center_vertical"
             android:layout_weight="0.495"
             android:background="@drawable/square_bottom_edges"
+            android:clickable="false"
             android:gravity="top|center"
             android:text="@string/comments"
             android:textColor="@color/white"
@@ -100,6 +101,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_gravity="right"
+                    android:contentDescription="@string/viewProfile"
                     android:src="@drawable/click_to_view" />
 
                 <TextView
