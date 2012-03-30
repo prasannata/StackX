@@ -461,6 +461,16 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 			{
 			    answerHeader.setVisibility(View.GONE);
 			}
+
+			if (question.getComments() == null)
+			{
+			    commentsCickableTextView.setText("Comments (0)");
+			}
+			else
+			{
+			    commentsCickableTextView.setText("Comments ("
+				    + question.getComments().size() + ")");
+			}
 		    }
 
 		    detailLinearLayout.removeAllViews();
