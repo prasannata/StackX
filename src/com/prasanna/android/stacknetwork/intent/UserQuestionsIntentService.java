@@ -44,9 +44,9 @@ public class UserQuestionsIntentService extends IntentService
     {
         ArrayList<Question> questions = userService.getAllQuestions(page);
         Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.ALL_QUESTIONS.name());
+        broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.ALL_QUESTIONS.getExtra(), questions);
+        broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTIONS.getExtra(), questions);
         sendBroadcast(broadcastIntent);
     }
 

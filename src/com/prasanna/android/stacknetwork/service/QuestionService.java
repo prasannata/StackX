@@ -13,6 +13,7 @@ import android.util.Log;
 import com.prasanna.android.http.HttpHelper;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
@@ -20,7 +21,7 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUriQueryParams;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class QuestionService
+public class QuestionService extends AbstractBaseService
 {
     private static final String TAG = QuestionService.class.getSimpleName();
 
@@ -152,5 +153,26 @@ public class QuestionService
         queryParams.put(StackUriQueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUriQueryParams.FILTER, StringConstants.StackFilters.QUESTION_DETAIL_FILTER);
         return queryParams;
+    }
+
+    public ArrayList<Question> search(String query, int page)
+    {
+        String restEndPoint = "/search";
+        Map<String, String> queryParams = new HashMap<String, String>();
+        queryParams.put(StackUriQueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUriQueryParams.IN_TITLE, query);
+        queryParams.put(StackUriQueryParams.PAGE, String.valueOf(page));
+        queryParams.put(StackUriQueryParams.PAGE_SIZE, "20");
+
+        JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
+                restEndPoint, queryParams);
+
+        return getQuestionModel(questionsJsonResponse);
+    }
+
+    @Override
+    protected String getLogTag()
+    {
+        return TAG;
     }
 }

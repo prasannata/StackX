@@ -8,4 +8,5 @@ public class StackUriQueryParams
     public static final String PAGE = "page";
     public static final String ORDER = "order";
     public static final String PAGE_SIZE = "pageSize";
+    public static final String IN_TITLE = "intitle";
 }

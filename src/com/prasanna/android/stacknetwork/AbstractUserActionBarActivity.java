@@ -6,13 +6,16 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
-public abstract class AbstractUserActionBarActivity extends Activity
+public abstract class AbstractUserActionBarActivity extends Activity implements SearchView.OnQueryTextListener
 {
+    private SearchView searchView;
+
     public abstract void refresh();
 
     public abstract Context getCurrentAppContext();
@@ -23,7 +26,10 @@ public abstract class AbstractUserActionBarActivity extends Activity
         getActionBar().setTitle(OperatingSite.getSite().name);
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.action_menu, menu);
-
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Search in title");
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -41,7 +47,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
             break;
 
         case R.id.menu_search:
-            Toast.makeText(this, "Tapped search", Toast.LENGTH_SHORT).show();
             break;
 
         case R.id.menu_profile:

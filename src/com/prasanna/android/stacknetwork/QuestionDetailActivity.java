@@ -462,4 +462,18 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             });
         }
     }
+
+    @Override
+    public boolean onQueryTextSubmit(String paramString)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String paramString)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }
