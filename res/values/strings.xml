@@ -46,6 +46,9 @@
     <string name="loadingSites">"Loading sites"</string>
     <string name="question">Question</string>
     <string name="answers">Answers</string>
+    <string name="score">Score</string>
     <string name="comments">"Comments (…)"</string>
 	<string name="viewProfile">"View profile"</string>
+	<string name="viewQuestion">"Question"</string>
+	<string name="viewMyAnswer">"My answer"</string>
 </resources>

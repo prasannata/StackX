@@ -16,7 +16,9 @@
         <service android:name="com.prasanna.android.stacknetwork.intent.QuestionDetailsIntentService" />
         <service android:name="com.prasanna.android.stacknetwork.intent.UserDetailsIntentService" />
         <service android:name="com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService" />
+        <service android:name="com.prasanna.android.stacknetwork.intent.UserAnswersIntentService" />
         <service android:name="com.prasanna.android.stacknetwork.intent.SearchForQuestionsIntentService" />
+        
         <service android:name=".intent.UserSitesIntentService" />
 
         <activity

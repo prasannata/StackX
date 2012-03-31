@@ -5,7 +5,9 @@ public class IntentActionEnum
     public enum QuestionIntentAction implements IntentAction
     {
         QUESTIONS("questions"),
-        QUESTION_DETAILS("questionDetails"),
+        QUESTION_BODY("questioBody"),
+        QUESTION_FULL_DETAILS("questionFullDetails"),
+        QUESTION_ANSWERS("questionAnswers"),
         QUESTION_COMMENTS("questionComments"),
         QUESTION_SEARCH("questionSearch"), ;
         private final String extra;

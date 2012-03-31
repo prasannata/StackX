@@ -2,7 +2,6 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Question extends BaseUserContribModelWithId implements Serializable
 {
@@ -18,9 +17,9 @@ public class Question extends BaseUserContribModelWithId implements Serializable
 
     public String relativeLink;
 
-    public List<Answer> answers = new ArrayList<Answer>();
+    public ArrayList<Answer> answers = new ArrayList<Answer>();
 
-    public List<Comment> comments;
+    public ArrayList<Comment> comments;
 
     public boolean answered;
 

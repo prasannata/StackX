@@ -11,7 +11,6 @@
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:text="Question"
         android:textColor="@color/black" />
 
     <TextView
@@ -22,7 +21,7 @@
         android:layout_below="@id/answeredQuestionTitle"
         android:layout_marginRight="5dp"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:text="View question"
+        android:text="@string/viewQuestion"
         android:textColor="@color/delft"
         android:textSize="11dp" />
 
@@ -34,7 +33,7 @@
         android:layout_marginRight="10dp"
         android:layout_toLeftOf="@id/viewQuestion"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:text="View my answer"
+        android:text="@string/viewMyAnswer"
         android:textColor="@color/delft"
         android:textSize="11dp" />
 

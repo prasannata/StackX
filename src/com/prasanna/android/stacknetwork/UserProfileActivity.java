@@ -12,7 +12,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +22,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prasanna.android.stacknetwork.intent.UserAnswersIntentService;
 import com.prasanna.android.stacknetwork.intent.UserDetailsIntentService;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -47,6 +52,8 @@ public class UserProfileActivity extends Activity
 
     private Intent questionsByUserIntent;
 
+    private Intent anwersByUserIntent;
+
     private User user;
 
     private ProgressDialog fetchProfileProgress;
@@ -61,363 +68,499 @@ public class UserProfileActivity extends Activity
 
     private ArrayList<Question> questionsByUser = new ArrayList<Question>();
 
-    private ArrayList<Answer> answers = new ArrayList<Answer>();
+    private ArrayList<Answer> answersByUser = new ArrayList<Answer>();
 
     private LinearLayout loadingProgressView;
 
     private LinearLayout questionsDisplayList;
 
-    private int page = 0;
+    private int questionsPage = 0;
+
+    private int answersPage = 0;
 
     private int questionDisplayCount = 0;
 
+    private int answerDisplayCount = 0;
+
+    private PopupWindow pw;
+
     private class TabListener implements ActionBar.TabListener
     {
-        private Fragment mFragment;
+	private Fragment mFragment;
 
-        public TabListener(Fragment fragment)
-        {
-            mFragment = fragment;
-        }
+	public TabListener(Fragment fragment)
+	{
+	    mFragment = fragment;
+	}
 
-        public void onTabSelected(Tab tab, FragmentTransaction ft)
-        {
-            ft.add(R.id.fragmentContainer, mFragment, null);
-        }
+	public void onTabSelected(Tab tab, FragmentTransaction ft)
+	{
+	    ft.add(R.id.fragmentContainer, mFragment, null);
+	}
 
-        public void onTabUnselected(Tab tab, FragmentTransaction ft)
-        {
-            ft.remove(mFragment);
-        }
+	public void onTabUnselected(Tab tab, FragmentTransaction ft)
+	{
+	    ft.remove(mFragment);
+	}
 
-        public void onTabReselected(Tab tab, FragmentTransaction ft)
-        {
-            Toast.makeText(UserProfileActivity.this, "Reselected!", Toast.LENGTH_SHORT).show();
-        }
+	public void onTabReselected(Tab tab, FragmentTransaction ft)
+	{
+	    Toast.makeText(UserProfileActivity.this, "Reselected!", Toast.LENGTH_SHORT).show();
+	}
 
     }
 
     private class ProfileFragment extends Fragment
     {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+	    profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
 
-            if (user == null)
-            {
-                fetchProfileProgress = ProgressDialog.show(UserProfileActivity.this, "", "Fetching profile");
-            }
-            else
-            {
-                displayUserDetail(user, profileHomeLayout);
-            }
+	    if (user == null)
+	    {
+		fetchProfileProgress = ProgressDialog.show(UserProfileActivity.this, "", "Fetching profile");
+	    }
+	    else
+	    {
+		displayUserDetail(user, profileHomeLayout);
+	    }
 
-            return profileHomeLayout;
-        }
+	    return profileHomeLayout;
+	}
     }
 
     private class QuestionsFragment extends Fragment
     {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading questions");
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+	    questionDisplayCount = 0;
 
-            if (questionsLayout == null)
-            {
-                questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
-            }
-            else
-            {
-                questionsLayout.removeAllViews();
-            }
+	    Log.d(TAG, "Creating question fragment");
 
-            questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
-            questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
-            questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-            {
-                @Override
-                public void onScrollToBottom(View view)
-                {
-                    if (loadingProgressView == null)
-                    {
-                        loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress,
-                                null);
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-                        layoutParams.setMargins(0, 15, 0, 15);
-                        questionsDisplayList.addView(loadingProgressView, layoutParams);
-                    }
+	    fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading questions");
 
-                    startUserQuestionsService();
-                }
-            });
+	    questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
+	    questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
+	    questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
+	    questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	    {
+		@Override
+		public void onScrollToBottom(View view)
+		{
+		    if (loadingProgressView == null)
+		    {
+			loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress,
+			                null);
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+			                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			layoutParams.setMargins(0, 15, 0, 15);
+			questionsDisplayList.addView(loadingProgressView, layoutParams);
+		    }
 
-            displayQuestions();
+		    startUserQuestionsService();
+		}
+	    });
 
-            return questionsLayout;
-        }
+	    displayQuestions();
+
+	    return questionsLayout;
+	}
     }
 
     private class AnswersFragment extends Fragment
     {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-        {
-            fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading answers");
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+	    answerDisplayCount = 0;
 
-            if (questionsLayout == null)
-            {
-                questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
-            }
-            else
-            {
-                questionsLayout.removeAllViews();
-            }
+	    Log.d(TAG, "Creating answer fragment");
 
-            LinearLayout questionsLinearLayout = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
-            RelativeLayout answerRow = (RelativeLayout) inflater.inflate(R.layout.user_answer_layout, null);
-            TextView textView = (TextView) answerRow.findViewById(R.id.answeredQuestionTitle);
-            questionsLinearLayout.addView(answerRow);
-            return questionsLayout;
-        }
+	    fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading answers");
+
+	    questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
+
+	    questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
+	    questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
+	    questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	    {
+		@Override
+		public void onScrollToBottom(View view)
+		{
+		    if (loadingProgressView == null)
+		    {
+			loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress,
+			                null);
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+			                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			layoutParams.setMargins(0, 15, 0, 15);
+			questionsDisplayList.addView(loadingProgressView, layoutParams);
+		    }
+
+		    startUserAnswersService();
+		}
+	    });
+
+	    displayAnswers();
+
+	    return questionsLayout;
+	}
+    }
+
+    private void displayAnswers()
+    {
+	if (fetchUserQuestionsProgress != null)
+	{
+	    fetchUserQuestionsProgress.dismiss();
+	    fetchUserQuestionsProgress = null;
+	}
+
+	if (loadingProgressView != null)
+	{
+	    loadingProgressView.setVisibility(View.GONE);
+	    loadingProgressView = null;
+	}
+
+	if (answersByUser != null && questionsLayout != null && questionsDisplayList != null)
+	{
+	    for (; answerDisplayCount < answersByUser.size(); answerDisplayCount++)
+	    {
+		final RelativeLayout answerRow = (RelativeLayout) getLayoutInflater().inflate(
+		                R.layout.user_answer_layout, null);
+		final Answer answer = answersByUser.get(answerDisplayCount);
+		TextView textView = (TextView) answerRow.findViewById(R.id.answeredQuestionTitle);
+		textView.setText(Html.fromHtml(answer.title));
+
+		textView = (TextView) answerRow.findViewById(R.id.viewMyAnswer);
+		textView.setClickable(true);
+		textView.setOnClickListener(new View.OnClickListener()
+		{
+
+		    @Override
+		    public void onClick(View v)
+		    {
+			final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(
+			                R.layout.comments_layout, null);
+
+			LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.commentsList);
+			ImageView closeCommentsPopup = (ImageView) popupLinearLayout
+			                .findViewById(R.id.closeCommentsPopup);
+			closeCommentsPopup.setOnClickListener(new View.OnClickListener()
+			{
+
+			    @Override
+			    public void onClick(View v)
+			    {
+				if (pw != null)
+				{
+				    pw.dismiss();
+				}
+			    }
+			});
+
+			RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
+			                R.layout.comment_layout, null);
+			TextView textView = (TextView) commentLayout.findViewById(R.id.commentScore);
+			textView.setText(String.valueOf(answer.score));
+
+			textView = (TextView) commentLayout.findViewById(R.id.commentContent);
+			textView.setText(Html.fromHtml(answer.body));
+
+			popupLinearLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,
+			                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+			Point size = new Point();
+			getWindowManager().getDefaultDisplay().getSize(size);
+
+			pw = new PopupWindow(scrollView, size.x - 30, 400, true);
+			pw.showAsDropDown(answerRow, 10, 10);
+		    }
+		});
+
+		textView = (TextView) answerRow.findViewById(R.id.viewQuestion);
+		textView.setClickable(true);
+		textView.setOnClickListener(new View.OnClickListener()
+		{
+		    @Override
+		    public void onClick(View v)
+		    {
+			Intent intent = new Intent(getApplicationContext(), QuestionDetailActivity.class);
+			Question question = new Question();
+			question.id = answer.questionId;
+			question.title = answer.title;
+			intent.putExtra(StringConstants.QUESTION, question);
+			intent.putExtra("fetchFullDetails", true);
+			startActivity(intent);
+		    }
+		});
+		questionsDisplayList.addView(answerRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		                LayoutParams.WRAP_CONTENT));
+	    }
+	}
     }
 
     private void displayQuestions()
     {
-        if (fetchUserQuestionsProgress != null)
-        {
-            fetchUserQuestionsProgress.dismiss();
-            fetchUserQuestionsProgress = null;
-        }
+	if (questionsByUser != null && questionsLayout != null && questionsDisplayList != null)
+	{
+	    Log.d(TAG, "Displaying questions");
 
-        if (loadingProgressView != null)
-        {
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
+	    if (fetchUserQuestionsProgress != null)
+	    {
+		fetchUserQuestionsProgress.dismiss();
+		fetchUserQuestionsProgress = null;
+	    }
 
-        if (questionsByUser != null && questionsLayout != null && questionsDisplayList != null)
-        {
-            for (; questionDisplayCount < questionsByUser.size(); questionDisplayCount++)
-            {
-                LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(
-                        questionsLayout.getContext(), questionsByUser.get(questionDisplayCount));
-                questionsDisplayList.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                        LayoutParams.WRAP_CONTENT));
-            }
-        }
+	    if (loadingProgressView != null)
+	    {
+		loadingProgressView.setVisibility(View.GONE);
+		loadingProgressView = null;
+	    }
+
+	    for (; questionDisplayCount < questionsByUser.size(); questionDisplayCount++)
+	    {
+		LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(
+		                questionsLayout.getContext(), questionsByUser.get(questionDisplayCount));
+		questionsDisplayList.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		                LayoutParams.WRAP_CONTENT));
+	    }
+	}
     }
 
     private BroadcastReceiver userProfileReceiver = new BroadcastReceiver()
     {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            user = (User) intent.getSerializableExtra(IntentActionEnum.UserIntentAction.USER_DETAIL.getExtra());
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    user = (User) intent.getSerializableExtra(IntentActionEnum.UserIntentAction.USER_DETAIL.getExtra());
 
-            if (profileHomeLayout != null)
-            {
-                fetchProfileProgress.dismiss();
-                displayUserDetail(user, profileHomeLayout);
-            }
-        }
+	    if (profileHomeLayout != null)
+	    {
+		fetchProfileProgress.dismiss();
+		displayUserDetail(user, profileHomeLayout);
+	    }
+	}
     };
 
     private BroadcastReceiver questionsByUserReceiver = new BroadcastReceiver()
     {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            questionsByUser.addAll((ArrayList<Question>) intent
-                    .getSerializableExtra(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.getExtra()));
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    questionsByUser.addAll((ArrayList<Question>) intent
+		            .getSerializableExtra(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.getExtra()));
 
-            displayQuestions();
+	    displayQuestions();
 
-            Log.d(TAG, "Number of questions by user: " + questionsByUser.size());
-        }
+	    Log.d(TAG, "Number of questions by user: " + questionsByUser.size());
+	}
     };
 
     private BroadcastReceiver answersByUserReceiver = new BroadcastReceiver()
     {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            answers.addAll((ArrayList<Answer>) intent
-                    .getSerializableExtra(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.getExtra()));
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    answersByUser.addAll((ArrayList<Answer>) intent
+		            .getSerializableExtra(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.getExtra()));
 
-            displayQuestions();
+	    displayAnswers();
 
-            Log.d(TAG, "Number of questions by user: " + questionsByUser.size());
-        }
+	    Log.d(TAG, "Number of answers by user: " + answersByUser.size());
+	}
     };
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.questions_layout, null);
-        setContentView(R.layout.fragment_container);
-        registerForUserProfileReceiver();
-        registerForQuestionsByUserReceiver();
-        startUserProfileService();
-        startUserQuestionsService();
-        setupActionBarTabs();
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.fragment_container);
+
+	registerForUserProfileReceiver();
+	registerForQuestionsByUserReceiver();
+	registerForAnwersByUserReceiver();
+
+	startUserProfileService();
+	startUserQuestionsService();
+	startUserAnswersService();
+
+	setupActionBarTabs();
     }
 
     private void setupActionBarTabs()
     {
-        ActionBar actionBar = getActionBar();
-        getActionBar().setTitle(OperatingSite.getSite().name);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        Tab profileTab = actionBar.newTab();
-        profileTab.setIcon(R.drawable.person).setTabListener(new TabListener(new ProfileFragment()));
-        actionBar.addTab(profileTab);
+	ActionBar actionBar = getActionBar();
+	getActionBar().setTitle(OperatingSite.getSite().name);
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+	Tab profileTab = actionBar.newTab();
+	profileTab.setIcon(R.drawable.person).setTabListener(new TabListener(new ProfileFragment()));
+	actionBar.addTab(profileTab);
 
-        Tab questionsTab = actionBar.newTab();
-        questionsTab.setIcon(R.drawable.question_mark).setTabListener(new TabListener(new QuestionsFragment()));
-        actionBar.addTab(questionsTab);
+	Tab questionsTab = actionBar.newTab();
+	questionsTab.setIcon(R.drawable.question_mark).setTabListener(new TabListener(new QuestionsFragment()));
+	actionBar.addTab(questionsTab);
 
-        Tab answersTab = actionBar.newTab();
-        answersTab.setIcon(R.drawable.answers).setTabListener(new TabListener(new AnswersFragment()));
-        actionBar.addTab(answersTab);
+	Tab answersTab = actionBar.newTab();
+	answersTab.setIcon(R.drawable.answers).setTabListener(new TabListener(new AnswersFragment()));
+	actionBar.addTab(answersTab);
 
-        Tab tagsTab = actionBar.newTab();
-        tagsTab.setIcon(R.drawable.labels).setTabListener(new TabListener(new ProfileFragment()));
-        actionBar.addTab(tagsTab);
+	Tab tagsTab = actionBar.newTab();
+	tagsTab.setIcon(R.drawable.labels).setTabListener(new TabListener(new ProfileFragment()));
+	actionBar.addTab(tagsTab);
     }
 
     @Override
     protected void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        stopServiceAndUnregsiterReceivers();
+	stopServiceAndUnregsiterReceivers();
     }
 
     @Override
     protected void onDestroy()
     {
-        super.onDestroy();
+	super.onDestroy();
 
-        stopServiceAndUnregsiterReceivers();
+	stopServiceAndUnregsiterReceivers();
     }
 
     private void stopServiceAndUnregsiterReceivers()
     {
-        if (userProfileIntent != null)
-        {
-            stopService(userProfileIntent);
-        }
+	if (userProfileIntent != null)
+	{
+	    stopService(userProfileIntent);
+	}
 
-        try
-        {
-            unregisterReceiver(userProfileReceiver);
-            unregisterReceiver(questionsByUserReceiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
+	if (questionsByUserIntent != null)
+	{
+	    stopService(questionsByUserIntent);
+	}
+
+	if (anwersByUserIntent != null)
+	{
+	    stopService(anwersByUserIntent);
+	}
+
+	try
+	{
+	    unregisterReceiver(userProfileReceiver);
+	    unregisterReceiver(questionsByUserReceiver);
+	    unregisterReceiver(answersByUserReceiver);
+	}
+	catch (IllegalArgumentException e)
+	{
+	    Log.d(TAG, e.getMessage());
+	}
     }
 
     private void startUserProfileService()
     {
-        long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
-        userProfileIntent = new Intent(this, UserDetailsIntentService.class);
-        userProfileIntent.setAction(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
-        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
-        startService(userProfileIntent);
+	long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
+	userProfileIntent = new Intent(this, UserDetailsIntentService.class);
+	userProfileIntent.setAction(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
+	userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+	startService(userProfileIntent);
     }
 
     private void startUserQuestionsService()
     {
-        long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
-        questionsByUserIntent = new Intent(this, UserQuestionsIntentService.class);
-        questionsByUserIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
-        questionsByUserIntent.putExtra(StringConstants.USER_ID, userId);
-        questionsByUserIntent.putExtra(StringConstants.PAGE, ++page);
-        startService(questionsByUserIntent);
+	long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
+	questionsByUserIntent = new Intent(this, UserQuestionsIntentService.class);
+	questionsByUserIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	questionsByUserIntent.putExtra(StringConstants.USER_ID, userId);
+	questionsByUserIntent.putExtra(StringConstants.PAGE, ++questionsPage);
+	startService(questionsByUserIntent);
 
     }
 
     private void startUserAnswersService()
     {
-        long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
-        questionsByUserIntent = new Intent(this, UserQuestionsIntentService.class);
-        questionsByUserIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
-        questionsByUserIntent.putExtra(StringConstants.USER_ID, userId);
-        questionsByUserIntent.putExtra(StringConstants.PAGE, ++page);
-        startService(questionsByUserIntent);
-
+	long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
+	anwersByUserIntent = new Intent(this, UserAnswersIntentService.class);
+	anwersByUserIntent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+	anwersByUserIntent.putExtra(StringConstants.USER_ID, userId);
+	anwersByUserIntent.putExtra(StringConstants.PAGE, ++answersPage);
+	startService(anwersByUserIntent);
     }
 
     private void registerForUserProfileReceiver()
     {
-        IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(userProfileReceiver, filter);
+	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(userProfileReceiver, filter);
     }
 
     private void registerForQuestionsByUserReceiver()
     {
-        IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(questionsByUserReceiver, filter);
+	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(questionsByUserReceiver, filter);
+    }
+
+    private void registerForAnwersByUserReceiver()
+    {
+	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(answersByUserReceiver, filter);
     }
 
     private void displayUserDetail(User user, RelativeLayout relativeLayout)
     {
-        if (user != null)
-        {
-            updateProfileInfo(user, relativeLayout);
+	if (user != null)
+	{
+	    updateProfileInfo(user, relativeLayout);
 
-            TextView textView = (TextView) relativeLayout.findViewById(R.id.questionCount);
-            textView.append(" " + String.valueOf(user.questionCount));
+	    TextView textView = (TextView) relativeLayout.findViewById(R.id.questionCount);
+	    textView.append(" " + String.valueOf(user.questionCount));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.answerCount);
-            textView.append(" " + String.valueOf(user.answerCount));
+	    textView = (TextView) relativeLayout.findViewById(R.id.answerCount);
+	    textView.append(" " + String.valueOf(user.answerCount));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.upvoteCount);
-            textView.append(" " + String.valueOf(user.upvoteCount));
+	    textView = (TextView) relativeLayout.findViewById(R.id.upvoteCount);
+	    textView.append(" " + String.valueOf(user.upvoteCount));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.downvoteCount);
-            textView.append(" " + String.valueOf(user.downvoteCount));
-        }
+	    textView = (TextView) relativeLayout.findViewById(R.id.downvoteCount);
+	    textView.append(" " + String.valueOf(user.downvoteCount));
+	}
     }
 
     private void updateProfileInfo(User user, RelativeLayout relativeLayout)
     {
-        ImageView userProfileImage = (ImageView) relativeLayout.findViewById(R.id.profileUserImage);
-        FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(new ImageFetchAsyncTaskCompleteNotifierImpl(
-                userProfileImage));
-        fetchImageAsyncTask.execute(user.profileImageLink);
+	ImageView userProfileImage = (ImageView) relativeLayout.findViewById(R.id.profileUserImage);
+	if (userProfileImage.getDrawable() == null)
+	{
+	    FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(
+		            new ImageFetchAsyncTaskCompleteNotifierImpl(userProfileImage));
+	    fetchImageAsyncTask.execute(user.profileImageLink);
+	}
 
-        TextView textView = (TextView) relativeLayout.findViewById(R.id.profileDisplayName);
-        textView.setText(user.displayName);
+	TextView textView = (TextView) relativeLayout.findViewById(R.id.profileDisplayName);
+	textView.setText(user.displayName);
 
-        textView = (TextView) relativeLayout.findViewById(R.id.profileUserReputation);
-        textView.setText(AppUtils.formatUserReputation(user.reputation));
+	textView = (TextView) relativeLayout.findViewById(R.id.profileUserReputation);
+	textView.setText(AppUtils.formatUserReputation(user.reputation));
 
-        if (user.badgeCounts != null && user.badgeCounts.length == 3)
-        {
-            textView = (TextView) relativeLayout.findViewById(R.id.profileUserGoldNum);
-            textView.setText(String.valueOf(user.badgeCounts[0]));
+	if (user.badgeCounts != null && user.badgeCounts.length == 3)
+	{
+	    textView = (TextView) relativeLayout.findViewById(R.id.profileUserGoldNum);
+	    textView.setText(String.valueOf(user.badgeCounts[0]));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.profileUserSilverNum);
-            textView.setText(String.valueOf(user.badgeCounts[1]));
+	    textView = (TextView) relativeLayout.findViewById(R.id.profileUserSilverNum);
+	    textView.setText(String.valueOf(user.badgeCounts[1]));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.profileUserBronzeNum);
-            textView.setText(String.valueOf(user.badgeCounts[2]));
-        }
+	    textView = (TextView) relativeLayout.findViewById(R.id.profileUserBronzeNum);
+	    textView.setText(String.valueOf(user.badgeCounts[2]));
+	}
 
-        textView = (TextView) relativeLayout.findViewById(R.id.profileViews);
-        textView.append(" " + user.profileViews);
+	textView = (TextView) relativeLayout.findViewById(R.id.profileViews);
+	textView.append(" " + user.profileViews);
 
-        textView = (TextView) relativeLayout.findViewById(R.id.profileUserLastSeen);
-        textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+	textView = (TextView) relativeLayout.findViewById(R.id.profileUserLastSeen);
+	textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 }

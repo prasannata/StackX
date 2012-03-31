@@ -21,11 +21,11 @@
             android:layout_height="fill_parent"
             android:layout_gravity="top|center_vertical"
             android:layout_weight="0.495"
-            android:background="@drawable/square_bottom_edges"
+            android:background="@drawable/square_bottom_edges_grey_bg"
             android:clickable="false"
             android:gravity="top|center"
             android:text="@string/answers"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             android:textSize="15dp" />
 
         <TextView
@@ -162,7 +162,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginTop="1dp"
-                android:visibility="gone" >
+                android:visibility="visible" >
 
                 <ImageView
                     android:id="@+id/acceptedAnswerLogo"
@@ -213,6 +213,19 @@
                     android:layout_toLeftOf="@id/viewAnswerAuthorProfile"
                     android:gravity="right"
                     android:text="@string/by"
+                    android:textColor="@color/black"
+                    android:textSize="11dp" />
+
+                <TextView
+                    android:id="@+id/currentAnswerScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignTop="@id/currentAnswerAuthor"
+                    android:layout_below="@id/answerAuthorDetailDivider"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="1dp"
+                    android:gravity="left"
                     android:textColor="@color/black"
                     android:textSize="11dp" />
             </RelativeLayout>

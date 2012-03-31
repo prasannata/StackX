@@ -8,15 +8,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.prasanna.android.http.HttpHelper;
+import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.stacknetwork.utils.StackUriQueryParams;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 
 public class UserService extends AbstractBaseService
 {
@@ -26,64 +28,64 @@ public class UserService extends AbstractBaseService
 
     public static UserService getInstance()
     {
-        return userService;
+	return userService;
     }
 
     public ArrayList<Site> getAllSitesForUnauthorizedUser()
     {
-        ArrayList<Site> sites = new ArrayList<Site>();
+	ArrayList<Site> sites = new ArrayList<Site>();
 
-        JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding("sites", null);
+	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding("sites", null);
 
-        try
-        {
-            if (jsonObject != null)
-            {
-                JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
+	try
+	{
+	    if (jsonObject != null)
+	    {
+		JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null)
-                {
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
-                        JSONObject siteJsonObject = jsonArray.getJSONObject(i);
-                        Site site = getSerializedSiteObject(siteJsonObject);
-                        if (site != null)
-                        {
-                            sites.add(site);
-                        }
-                    }
-                }
-            }
+		if (jsonArray != null)
+		{
+		    for (int i = 0; i < jsonArray.length(); i++)
+		    {
+			JSONObject siteJsonObject = jsonArray.getJSONObject(i);
+			Site site = getSerializedSiteObject(siteJsonObject);
+			if (site != null)
+			{
+			    sites.add(site);
+			}
+		    }
+		}
+	    }
 
-        }
-        catch (JSONException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+	}
+	catch (JSONException e)
+	{
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
 
-        return sites;
+	return sites;
     }
 
     private Site getSerializedSiteObject(JSONObject siteJsonObject)
     {
-        Site site = null;
+	Site site = null;
 
-        try
-        {
-            site = new Site();
-            site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
-            site.logoUrl = siteJsonObject.getString(JsonFields.Site.LOGO_URL);
-            site.name = siteJsonObject.getString(JsonFields.Site.NAME);
-            site.link = siteJsonObject.getString(JsonFields.Site.SITE_URL);
-        }
-        catch (JSONException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+	try
+	{
+	    site = new Site();
+	    site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
+	    site.logoUrl = siteJsonObject.getString(JsonFields.Site.LOGO_URL);
+	    site.name = siteJsonObject.getString(JsonFields.Site.NAME);
+	    site.link = siteJsonObject.getString(JsonFields.Site.SITE_URL);
+	}
+	catch (JSONException e)
+	{
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	}
 
-        return site;
+	return site;
     }
 
     public void getSitesForUser(long userId)
@@ -93,31 +95,26 @@ public class UserService extends AbstractBaseService
 
     public ArrayList<Question> getQuestionsByUser(long userId, int page)
     {
-        String restEndPoint = "/users/" + userId + "/questions";
+	String restEndPoint = "/users/" + userId + "/questions";
 
-        ArrayList<Question> questions = new ArrayList<Question>();
+	ArrayList<Question> questions = new ArrayList<Question>();
 
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.put(StackUriQueryParams.ORDER, "desc");
-        queryParams.put(StackUriQueryParams.SORT, "activity");
-        queryParams.put(StackUriQueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-        queryParams.put(StackUriQueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUriQueryParams.PAGE_SIZE, "25");
+	Map<String, String> queryParams = new HashMap<String, String>();
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, "25");
 
-        JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
-                restEndPoint, queryParams);
+	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
+	                restEndPoint, queryParams);
 
-        if (questionsJsonResponse != null)
-        {
-            questions = getQuestionModel(questionsJsonResponse);
-        }
+	if (questionsJsonResponse != null)
+	{
+	    questions = getQuestionModel(questionsJsonResponse);
+	}
 
-        return questions;
-    }
-
-    public void getAnswersByUser(long userId)
-    {
-
+	return questions;
     }
 
     public void getTagsForUser(long userId)
@@ -127,58 +124,88 @@ public class UserService extends AbstractBaseService
 
     public User getUserById(long userId)
     {
-        User user = null;
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.put(StackUriQueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-        queryParams.put(StackUriQueryParams.FILTER, StringConstants.StackFilters.USER_DETAIL_FILTER);
+	User user = null;
+	Map<String, String> queryParams = new HashMap<String, String>();
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-        if (userId != -1)
-        {
-            JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
-                    "/users/" + userId, queryParams);
+	if (userId != -1)
+	{
+	    JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
+		            "/users/" + userId, queryParams);
+	    JSONObjectWrapper userJsonObject = jsonObject.getObjectFromArray(JsonFields.ITEMS, 0);
+	    user = getSerializedUserObject(userJsonObject);
+	}
 
-            try
-            {
-                JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
-                JSONObject userJsonObject = jsonArray.getJSONObject(0);
-                user = getSerializedUserObject(userJsonObject);
-            }
-            catch (JSONException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-        return user;
+	return user;
     }
 
     public ArrayList<Question> getAllQuestions(int page)
     {
-        ArrayList<Question> questions = new ArrayList<Question>();
+	ArrayList<Question> questions = new ArrayList<Question>();
 
-        String restEndPoint = "questions";
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.put(StackUriQueryParams.ORDER, "desc");
-        queryParams.put(StackUriQueryParams.SORT, "activity");
-        queryParams.put(StackUriQueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-        queryParams.put(StackUriQueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUriQueryParams.PAGE_SIZE, "25");
+	String restEndPoint = "questions";
+	Map<String, String> queryParams = new HashMap<String, String>();
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
 
-        JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
-                restEndPoint, queryParams);
-        if (questionsJsonResponse != null)
-        {
-            questions = getQuestionModel(questionsJsonResponse);
+	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
+	                restEndPoint, queryParams);
+	if (questionsJsonResponse != null)
+	{
+	    questions = getQuestionModel(questionsJsonResponse);
 
-        }
+	}
 
-        return questions;
+	return questions;
     }
 
     @Override
     protected String getLogTag()
     {
-        return TAG;
+	return TAG;
+    }
+
+    public ArrayList<Answer> getAnswersByUser(long userId, int page)
+    {
+	String restEndPoint = "/users/" + userId + "/answers";
+
+	ArrayList<Answer> answers = new ArrayList<Answer>();
+
+	Map<String, String> queryParams = new HashMap<String, String>();
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
+
+	JSONObjectWrapper answersJsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
+	                queryParams);
+
+	if (answersJsonObject != null)
+	{
+	    JSONArray jsonArray = answersJsonObject.getJSONArray(JsonFields.ITEMS);
+	    if (jsonArray != null)
+	    {
+		try
+		{
+		    for (int i = 0; i < jsonArray.length(); i++)
+		    {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+			answers.add(getSerializedAnswerObject(jsonObject));
+		    }
+		}
+		catch (JSONException e)
+		{
+		    Log.d(getLogTag(), e.getMessage());
+		}
+	    }
+	}
+
+	return answers;
     }
 }

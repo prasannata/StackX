@@ -16,6 +16,10 @@ public class JSONObjectWrapper extends JSONObject
 	super(jsonText);
     }
 
+    public JSONObjectWrapper(JSONObject jsonObject) throws JSONException
+    {
+    }
+
     @Override
     public Object get(String name)
     {
@@ -92,12 +96,18 @@ public class JSONObjectWrapper extends JSONObject
     }
 
     @Override
-    public JSONObject getJSONObject(String name)
+    public JSONObjectWrapper getJSONObject(String name)
     {
-	JSONObject jsonObject = null;
+	JSONObjectWrapper jsonObject = null;
 	try
 	{
-	    jsonObject = super.getJSONObject(name);
+	    JSONObject object = super.getJSONObject(name);
+
+	    if (object != null)
+	    {
+		jsonObject = new JSONObjectWrapper(object.toString());
+	    }
+
 	}
 	catch (JSONException e)
 	{
@@ -136,4 +146,22 @@ public class JSONObjectWrapper extends JSONObject
 	return returnValue;
     }
 
+    public JSONObjectWrapper getObjectFromArray(String arrayName, int index)
+    {
+	JSONObjectWrapper jsonObject = null;
+	try
+	{
+	    JSONArray jsonArray = super.getJSONArray(arrayName);
+	    if (jsonArray != null && jsonArray.length() > index)
+	    {
+		jsonObject = new JSONObjectWrapper(jsonArray.getJSONObject(index).toString());
+	    }
+
+	}
+	catch (JSONException e)
+	{
+	    Log.d(TAG, e.getMessage());
+	}
+	return jsonObject;
+    }
 }
