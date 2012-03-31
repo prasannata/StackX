@@ -25,7 +25,8 @@ public class IntentActionEnum
     {
         ALL_USERS("users"),
         USER_DETAIL("userDetail"),
-        QUESTIONS_BY_USER("questionsByUser");
+        QUESTIONS_BY_USER("questionsByUser"),
+        ANSWERS_BY_USER("answersByUser");
         private final String extra;
 
         private UserIntentAction(String extra)

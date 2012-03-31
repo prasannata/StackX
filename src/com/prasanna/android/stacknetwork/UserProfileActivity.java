@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.intent.UserDetailsIntentService;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
+import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -59,6 +60,8 @@ public class UserProfileActivity extends Activity
     private ScrollViewWithNotifier questionsScroll;
 
     private ArrayList<Question> questionsByUser = new ArrayList<Question>();
+
+    private ArrayList<Answer> answers = new ArrayList<Answer>();
 
     private LinearLayout loadingProgressView;
 
@@ -121,6 +124,15 @@ public class UserProfileActivity extends Activity
         {
             fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading questions");
 
+            if (questionsLayout == null)
+            {
+                questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
+            }
+            else
+            {
+                questionsLayout.removeAllViews();
+            }
+
             questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
             questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
             questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -153,7 +165,22 @@ public class UserProfileActivity extends Activity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            return null;
+            fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading answers");
+
+            if (questionsLayout == null)
+            {
+                questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
+            }
+            else
+            {
+                questionsLayout.removeAllViews();
+            }
+
+            LinearLayout questionsLinearLayout = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
+            RelativeLayout answerRow = (RelativeLayout) inflater.inflate(R.layout.user_answer_layout, null);
+            TextView textView = (TextView) answerRow.findViewById(R.id.answeredQuestionTitle);
+            questionsLinearLayout.addView(answerRow);
+            return questionsLayout;
         }
     }
 
@@ -206,6 +233,21 @@ public class UserProfileActivity extends Activity
         {
             questionsByUser.addAll((ArrayList<Question>) intent
                     .getSerializableExtra(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.getExtra()));
+
+            displayQuestions();
+
+            Log.d(TAG, "Number of questions by user: " + questionsByUser.size());
+        }
+    };
+
+    private BroadcastReceiver answersByUserReceiver = new BroadcastReceiver()
+    {
+        @SuppressWarnings("unchecked")
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            answers.addAll((ArrayList<Answer>) intent
+                    .getSerializableExtra(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.getExtra()));
 
             displayQuestions();
 
@@ -292,6 +334,17 @@ public class UserProfileActivity extends Activity
     }
 
     private void startUserQuestionsService()
+    {
+        long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
+        questionsByUserIntent = new Intent(this, UserQuestionsIntentService.class);
+        questionsByUserIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+        questionsByUserIntent.putExtra(StringConstants.USER_ID, userId);
+        questionsByUserIntent.putExtra(StringConstants.PAGE, ++page);
+        startService(questionsByUserIntent);
+
+    }
+
+    private void startUserAnswersService()
     {
         long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
         questionsByUserIntent = new Intent(this, UserQuestionsIntentService.class);
