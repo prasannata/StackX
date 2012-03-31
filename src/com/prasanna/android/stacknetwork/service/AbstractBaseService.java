@@ -20,9 +20,7 @@ public abstract class AbstractBaseService
 
     protected User getSerializedUserObject(JSONObjectWrapper userJsonObject)
     {
-	User user = null;
-
-	user = new User();
+	User user = new User();
 	user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
 	user.accountId = userJsonObject.getLong(JsonFields.User.ACCOUNT_ID);
 	user.displayName = userJsonObject.getString(JsonFields.User.DISPLAY_NAME);
@@ -33,19 +31,16 @@ public abstract class AbstractBaseService
 	user.upvoteCount = userJsonObject.getInt(JsonFields.User.UP_VOTE_COUNT);
 	user.downvoteCount = userJsonObject.getInt(JsonFields.User.DOWN_VOTE_COUNT);
 	user.profileViews = userJsonObject.getInt(JsonFields.User.VIEW_COUNT);
-	user.badgeCounts = getBadgeCounts(userJsonObject);
+	user.badgeCounts = getBadgeCounts(userJsonObject.getJSONObject(JsonFields.User.BADGE_COUNTS));
 	user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
 	user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
 	return user;
     }
 
-    protected int[] getBadgeCounts(JSONObjectWrapper userJsonObject)
+    protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject)
     {
-	int[] badgeCounts = new int[3];
-	badgeCounts[0] = 0;
-	badgeCounts[1] = 0;
-	badgeCounts[2] = 0;
-	JSONObjectWrapper badgeCountJsonObject = userJsonObject.getJSONObject(JsonFields.User.BADGE_COUNTS);
+	int[] badgeCounts = { 0, 0, 0 };
+
 	badgeCounts[0] = badgeCountJsonObject.getInt(JsonFields.BadgeCounts.GOLD);
 	badgeCounts[1] = badgeCountJsonObject.getInt(JsonFields.BadgeCounts.SILVER);
 	badgeCounts[2] = badgeCountJsonObject.getInt(JsonFields.BadgeCounts.BRONZE);
@@ -93,12 +88,11 @@ public abstract class AbstractBaseService
 	    question.hasAcceptedAnswer = true;
 	}
 
-	question.owner = getSerializableUserObject(jsonObject.getJSONObject(JsonFields.Question.OWNER));
-	Log.d("AbsrtractBaseService", "User is " + question.owner);
+	question.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Question.OWNER));
 	return question;
     }
 
-    protected User getSerializableUserObject(JSONObject userJsonObject)
+    protected User getSerializableUserSnippetObject(JSONObject userJsonObject)
     {
 	User user = null;
 	try
@@ -119,7 +113,6 @@ public abstract class AbstractBaseService
 	    e.printStackTrace();
 	}
 
-	Log.d(getLogTag(), "User fetched " + user);
 	return user;
     }
 
@@ -134,7 +127,7 @@ public abstract class AbstractBaseService
 	answer.creationDate = jsonObject.getLong(JsonFields.Answer.CREATION_DATE);
 	answer.accepted = jsonObject.getBoolean(JsonFields.Answer.IS_ACCEPTED);
 
-	answer.owner = getSerializableUserObject(jsonObject.getJSONObject(JsonFields.Answer.OWNER));
+	answer.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Answer.OWNER));
 	return answer;
     }
 

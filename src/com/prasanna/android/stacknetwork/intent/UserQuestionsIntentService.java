@@ -32,7 +32,7 @@ public class UserQuestionsIntentService extends IntentService
 
         if (userId == -1)
         {
-            getQuestionsForUnauthorizedUser(page);
+            getFrontPageQuestions(page);
         }
         else
         {
@@ -40,7 +40,7 @@ public class UserQuestionsIntentService extends IntentService
         }
     }
 
-    private void getQuestionsForUnauthorizedUser(int page)
+    private void getFrontPageQuestions(int page)
     {
         ArrayList<Question> questions = userService.getAllQuestions(page);
         Intent broadcastIntent = new Intent();

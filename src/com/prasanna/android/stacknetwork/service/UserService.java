@@ -104,7 +104,7 @@ public class UserService extends AbstractBaseService
 	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-	queryParams.put(StackUri.QueryParams.PAGE_SIZE, "25");
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
 
 	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
 	                restEndPoint, queryParams);
@@ -142,7 +142,7 @@ public class UserService extends AbstractBaseService
 
     public ArrayList<Question> getAllQuestions(int page)
     {
-	ArrayList<Question> questions = new ArrayList<Question>();
+	ArrayList<Question> questions = null;
 
 	String restEndPoint = "questions";
 	Map<String, String> queryParams = new HashMap<String, String>();
@@ -157,7 +157,6 @@ public class UserService extends AbstractBaseService
 	if (questionsJsonResponse != null)
 	{
 	    questions = getQuestionModel(questionsJsonResponse);
-
 	}
 
 	return questions;

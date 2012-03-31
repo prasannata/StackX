@@ -110,7 +110,7 @@ public class QuestionService extends AbstractBaseService
 		    comment.body = jsonObject.getString(JsonFields.Comment.BODY);
 		    comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
 		    comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
-		    comment.owner = getSerializableUserObject(jsonObject.getJSONObject(JsonFields.Comment.OWNER));
+		    comment.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Comment.OWNER));
 
 		    if (comments == null)
 		    {
