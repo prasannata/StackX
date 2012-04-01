@@ -450,6 +450,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 			currentAnswerAuthor.setText(getString(R.string.by)
 			                + question.answers.get(currentAnswerCount).owner.displayName
 			                + AppUtils.formatUserReputation(question.answers.get(currentAnswerCount).owner.reputation));
+			currentAnswerScore.setText(String.valueOf(question.answers.get(currentAnswerCount).score));
 
 			if (question.answers.get(currentAnswerCount).comments == null)
 			{

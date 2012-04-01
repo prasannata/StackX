@@ -15,7 +15,7 @@ public class UserSitesIntentService extends IntentService
 
     public UserSitesIntentService()
     {
-	this("UserSitesIntentService");
+	this(UserSitesIntentService.class.getName());
     }
 
     public UserSitesIntentService(String name)
@@ -26,7 +26,8 @@ public class UserSitesIntentService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	ArrayList<Site> sites = userService.getAllSitesForUnauthorizedUser();
+	ArrayList<Site> sites = null;
+	sites = userService.getAllSitesInNetwork();
 
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

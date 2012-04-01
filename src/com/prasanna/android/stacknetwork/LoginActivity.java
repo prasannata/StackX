@@ -1,23 +1,36 @@
 package com.prasanna.android.stacknetwork;
 
+import com.prasanna.android.stacknetwork.utils.IntentUtils;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class LoginActivity extends Activity
 {
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
-	setContentView(R.layout.main);
 
-	handleLogin();
-	handleNoLogin();
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	if (sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null) == null)
+	{
+	    setContentView(R.layout.main);
+	    handleLogin();
+	    handleNoLogin();
+	}
+	else
+	{
+	    startActivity(IntentUtils.createSiteListIntent(getApplicationContext()));
+	}
     }
 
     private void handleLogin()
@@ -27,8 +40,8 @@ public class LoginActivity extends Activity
 	{
 	    public void onClick(View view)
 	    {
-		Toast.makeText(LoginActivity.this, "Not supported at this time. Please skip login",
-		        Toast.LENGTH_SHORT).show();
+		Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
+		startActivity(oAuthIntent);
 	    }
 	});
     }
@@ -41,11 +54,7 @@ public class LoginActivity extends Activity
 
 	    public void onClick(View view)
 	    {
-		Intent listStackNetworkIntent = new Intent(view.getContext(),
-		        StackNetworkListActivity.class);
-		listStackNetworkIntent.putExtra("allSites", true);
-		startActivity(listStackNetworkIntent);
-
+		startActivity(IntentUtils.createSiteListIntent(view.getContext()));
 	    }
 	});
     }

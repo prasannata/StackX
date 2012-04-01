@@ -159,7 +159,7 @@ public class UserProfileActivity extends Activity
 			questionsDisplayList.addView(loadingProgressView, layoutParams);
 		    }
 
-		    startUserQuestionsService();
+		    startUserQuestionsService(user.id, user.accessToken);
 		}
 	    });
 
@@ -199,7 +199,7 @@ public class UserProfileActivity extends Activity
 			questionsDisplayList.addView(loadingProgressView, layoutParams);
 		    }
 
-		    startUserAnswersService();
+		    startUserAnswersService(user.id, user.accessToken);
 		}
 	    });
 
@@ -380,13 +380,14 @@ public class UserProfileActivity extends Activity
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.fragment_container);
 
+	User intentForUser = (User) getIntent().getSerializableExtra(StringConstants.USER);
 	registerForUserProfileReceiver();
 	registerForQuestionsByUserReceiver();
 	registerForAnwersByUserReceiver();
 
-	startUserProfileService();
-	startUserQuestionsService();
-	startUserAnswersService();
+	startUserProfileService(intentForUser.id, intentForUser.accessToken);
+	startUserQuestionsService(intentForUser.id, intentForUser.accessToken);
+	startUserAnswersService(intentForUser.id, intentForUser.accessToken);
 
 	setupActionBarTabs();
     }
@@ -458,33 +459,32 @@ public class UserProfileActivity extends Activity
 	}
     }
 
-    private void startUserProfileService()
+    private void startUserProfileService(long userId, String accessToken)
     {
-	long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
 	userProfileIntent = new Intent(this, UserDetailsIntentService.class);
 	userProfileIntent.setAction(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
 	userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+	userProfileIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
 	startService(userProfileIntent);
     }
 
-    private void startUserQuestionsService()
+    private void startUserQuestionsService(long userId, String accessToken)
     {
-	long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
 	questionsByUserIntent = new Intent(this, UserQuestionsIntentService.class);
 	questionsByUserIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
 	questionsByUserIntent.putExtra(StringConstants.USER_ID, userId);
 	questionsByUserIntent.putExtra(StringConstants.PAGE, ++questionsPage);
+	questionsByUserIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
 	startService(questionsByUserIntent);
-
     }
 
-    private void startUserAnswersService()
+    private void startUserAnswersService(long userId, String accessToken)
     {
-	long userId = (long) getIntent().getLongExtra(StringConstants.USER_ID, -1);
 	anwersByUserIntent = new Intent(this, UserAnswersIntentService.class);
 	anwersByUserIntent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
 	anwersByUserIntent.putExtra(StringConstants.USER_ID, userId);
 	anwersByUserIntent.putExtra(StringConstants.PAGE, ++answersPage);
+	anwersByUserIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
 	startService(anwersByUserIntent);
     }
 

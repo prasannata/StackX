@@ -15,6 +15,7 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -31,11 +32,17 @@ public class UserService extends AbstractBaseService
 	return userService;
     }
 
-    public ArrayList<Site> getAllSitesForUnauthorizedUser()
+    public ArrayList<Site> getAllSitesInNetwork()
+    {
+	return getSites("sites", null);
+    }
+
+    private ArrayList<Site> getSites(String restEndPoint, Map<String, String> queryParams)
     {
 	ArrayList<Site> sites = new ArrayList<Site>();
 
-	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding("sites", null);
+	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
+	                queryParams);
 
 	try
 	{
@@ -63,7 +70,6 @@ public class UserService extends AbstractBaseService
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
-
 	return sites;
     }
 
@@ -88,16 +94,41 @@ public class UserService extends AbstractBaseService
 	return site;
     }
 
-    public void getSitesForUser(long userId)
+    public ArrayList<Site> getSitesForUser(String accessToken)
     {
+	return getSites("/me/associated", AppUtils.getAuthenticatedUserQueryParams(accessToken));
+    }
 
+    private ArrayList<Question> getQuestions(String restEndPoint, Map<String, String> queryParams)
+    {
+	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
+	                restEndPoint, queryParams);
+
+	if (questionsJsonResponse != null)
+	{
+	    return getQuestionModel(questionsJsonResponse);
+	}
+
+	return null;
+    }
+
+    public ArrayList<Question> getMyQuestions(String accessToken, int page)
+    {
+	String restEndPoint = "/me/questions";
+
+	Map<String, String> queryParams = AppUtils.getAuthenticatedUserQueryParams(accessToken);
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+
+	return getQuestions(restEndPoint, queryParams);
     }
 
     public ArrayList<Question> getQuestionsByUser(long userId, int page)
     {
 	String restEndPoint = "/users/" + userId + "/questions";
-
-	ArrayList<Question> questions = new ArrayList<Question>();
 
 	Map<String, String> queryParams = new HashMap<String, String>();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
@@ -106,20 +137,22 @@ public class UserService extends AbstractBaseService
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
 
-	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
-	                restEndPoint, queryParams);
-
-	if (questionsJsonResponse != null)
-	{
-	    questions = getQuestionModel(questionsJsonResponse);
-	}
-
-	return questions;
+	return getQuestions(restEndPoint, queryParams);
     }
 
     public void getTagsForUser(long userId)
     {
 
+    }
+
+    public User getLoggedInUser(String accessToken)
+    {
+	Map<String, String> queryParams = AppUtils.getAuthenticatedUserQueryParams(accessToken);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
+
+	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding("/me", queryParams);
+	return getSerializedUserObject(jsonObject.getObjectFromArray(JsonFields.ITEMS, 0));
     }
 
     public User getUserById(long userId)
@@ -168,19 +201,9 @@ public class UserService extends AbstractBaseService
 	return TAG;
     }
 
-    public ArrayList<Answer> getAnswersByUser(long userId, int page)
+    private ArrayList<Answer> getAnswers(String restEndPoint, Map<String, String> queryParams)
     {
-	String restEndPoint = "/users/" + userId + "/answers";
-
 	ArrayList<Answer> answers = new ArrayList<Answer>();
-
-	Map<String, String> queryParams = new HashMap<String, String>();
-	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
-	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
-	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
 
 	JSONObjectWrapper answersJsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
 	                queryParams);
@@ -206,5 +229,34 @@ public class UserService extends AbstractBaseService
 	}
 
 	return answers;
+    }
+
+    public ArrayList<Answer> getMyAnswers(String accessToken, int page)
+    {
+	String restEndPoint = "/me/answers";
+
+	Map<String, String> queryParams = AppUtils.getAuthenticatedUserQueryParams(accessToken);
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
+	
+	return getAnswers(restEndPoint, queryParams);
+    }
+
+    public ArrayList<Answer> getAnswersByUser(long userId, int page)
+    {
+	String restEndPoint = "/users/" + userId + "/answers";
+
+	Map<String, String> queryParams = new HashMap<String, String>();
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.QueryParamDefaultValues.SORT);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
+	return getAnswers(restEndPoint, queryParams);
     }
 }

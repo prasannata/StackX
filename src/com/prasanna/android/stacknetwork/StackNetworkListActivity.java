@@ -8,7 +8,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -39,14 +41,23 @@ public class StackNetworkListActivity extends ListActivity
 
     private ArrayList<Site> sites;
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
 
-	HttpHelper.getInstance().setHost(getString(R.string.stackExchangeDomain));
+	Object lastNonConfigurationInstance = getLastNonConfigurationInstance();
+	if (lastNonConfigurationInstance == null)
+	{
+	    HttpHelper.getInstance().setHost(getString(R.string.stackExchangeDomain));
 
-	registerReceiverAndStartService();
+	    registerReceiverAndStartService();
+	}
+	else
+	{
+	    updateView((ArrayList<Site>) lastNonConfigurationInstance);
+	}
     }
 
     @Override
@@ -92,10 +103,9 @@ public class StackNetworkListActivity extends ListActivity
 
     private void registerReceiverAndStartService()
     {
-	progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
-	        getString(R.string.loadingSites));
+	progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
 
-	registerQuestionsReceiver();
+	registerReceiver();
 
 	startIntentService();
     }
@@ -103,10 +113,16 @@ public class StackNetworkListActivity extends ListActivity
     private void startIntentService()
     {
 	sitesIntent = new Intent(this, UserSitesIntentService.class);
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+	{
+	    sitesIntent.putExtra(StringConstants.ACCESS_TOKEN,
+		            sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null));
+	}
 	startService(sitesIntent);
     }
 
-    private void registerQuestionsReceiver()
+    private void registerReceiver()
     {
 	IntentFilter filter = new IntentFilter(StringConstants.SITES);
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -132,4 +148,11 @@ public class StackNetworkListActivity extends ListActivity
 	    setListAdapter(new SiteListAdapter(this, R.layout.sitelist_row, sites));
 	}
     }
+
+    @Override
+    public Object onRetainNonConfigurationInstance()
+    {
+	return sites;
+    }
+
 }
