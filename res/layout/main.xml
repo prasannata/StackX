@@ -11,62 +11,37 @@
         android:id="@+id/userNamePasswordLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" >
-
-        <EditText
-            android:id="@+id/userNameValue"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@android:drawable/editbox_background"
-            android:gravity="center_vertical"
-            android:inputType="text"
-            android:text="@string/userName"
-            android:textColor="@color/lightGrey" />
-
-        <EditText
-            android:id="@+id/passwordValue"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/userNameValue"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:background="@android:drawable/editbox_background"
-            android:gravity="center_vertical"
-            android:inputType="text"
-            android:text="@string/password"
-            android:textColor="@color/lightGrey" />
+        android:layout_gravity="center"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp" >
 
         <Button
             android:id="@+id/login_button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@id/passwordValue"
-            android:layout_below="@id/passwordValue"
             android:layout_marginTop="5dip"
-            android:background="@drawable/rounded_corners_grey_bg"
+            android:background="@drawable/rounded_border_grey_min_padding"
             android:text="@string/login"
+            android:textColor="@color/delft"
             android:textSize="15dp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="@color/delft" >
 
         <Button
             android:id="@+id/noLogin"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="3dp"
+            android:layout_below="@id/login_button"
             android:layout_marginTop="3dp"
-            android:background="@drawable/rounded_corners_grey_bg"
+            android:background="@drawable/rounded_border_grey_min_padding"
             android:text="@string/skipLogin"
-            android:textColor="@color/black"
+            android:textColor="@color/delft"
             android:textSize="15dp" />
     </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom"
+        android:background="@color/delft" />
 
 </FrameLayout>

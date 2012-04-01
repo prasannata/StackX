@@ -1,8 +1,5 @@
 package com.prasanna.android.stacknetwork;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
@@ -12,10 +9,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -23,6 +18,8 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class OAuthActivity extends Activity
 {
+    private static final String TAG = OAuthActivity.class.getName();
+
     private class OAuthWebViewClient extends WebViewClient
     {
 	@Override
@@ -34,7 +31,7 @@ public class OAuthActivity extends Activity
 	@Override
 	public boolean shouldOverrideUrlLoading(WebView view, String url)
 	{
-	    Log.d("OAuthActivity", url);
+	    Log.d(TAG, url);
 
 	    if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
 	    {
@@ -64,45 +61,6 @@ public class OAuthActivity extends Activity
 	    }
 	    return true;
 	}
-
-	@Override
-	public WebResourceResponse shouldInterceptRequest(WebView view, String url)
-	{
-	    Log.d("OAuthActivity: shouldInterceptRequest", url);
-	    if (url.startsWith("http://oauth.prasanna.stackx.com"))
-	    {
-		String html = "<html><body>Authenticated</body></html>";
-		InputStream data = new ByteArrayInputStream(html.getBytes());
-		return new WebResourceResponse("text/html", "utf-8", data);
-	    }
-	    else
-	    {
-		return super.shouldInterceptRequest(view, url);
-	    }
-	}
-
-	@Override
-	public void onPageFinished(WebView view, String url)
-	{
-	    Log.d("OAuthActivity: onPageFinished", url);
-
-	    super.onPageFinished(view, url);
-	}
-
-	@Override
-	public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm)
-	{
-	    Log.d("OAuthActivity: onReceivedHttpAuthRequest", host);
-	    super.onReceivedHttpAuthRequest(view, handler, host, realm);
-	}
-
-	@Override
-	public void onReceivedLoginRequest(WebView view, String realm, String account, String args)
-	{
-	    Log.d("OAuthActivity: onReceivedLoginRequest", account);
-	    super.onReceivedLoginRequest(view, realm, account, args);
-	}
-
     }
 
     @Override
@@ -115,7 +73,6 @@ public class OAuthActivity extends Activity
 	webview.setHorizontalScrollBarEnabled(true);
 	webview.getSettings().setJavaScriptEnabled(true);
 	webview.getSettings().setDomStorageEnabled(true);
-	webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
 	webview.getSettings().setLoadsImagesAutomatically(true);
 	webview.getSettings().setSaveFormData(false);
 	webview.getSettings().setSavePassword(false);

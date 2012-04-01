@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -38,8 +40,13 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 
 	if (isAuthenticatedRealm() == false)
 	{
-	    menu.removeItem(R.id.menu_profile);
-	    menu.removeItem(R.id.menu_option_inbox);
+	    Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
+
+	    MenuItem menuOptions = menu.findItem(R.id.menu_options);
+	    SubMenu subMenu = menuOptions.getSubMenu();
+
+	    subMenu.removeItem(R.id.menu_profile);
+	    subMenu.removeItem(R.id.menu_option_inbox);
 	}
 
 	return super.onCreateOptionsMenu(menu);
@@ -78,7 +85,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	    accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
 	}
 
-	return (accessToken == null);
+	return (accessToken != null);
     }
 
     public String getAccessToken()
