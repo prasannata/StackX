@@ -105,10 +105,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    question.answers = (ArrayList<Answer>) intent
 		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra());
 
+	    answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
+	    answersOrQuestion.setTextColor(Color.WHITE);
+
 	    if (question.answers != null)
 	    {
-		answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
-		answersOrQuestion.setTextColor(Color.WHITE);
 		answersOrQuestion.setClickable(true);
 		answersOrQuestion.setEnabled(true);
 	    }
@@ -120,6 +121,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	public void flingedToLeft()
 	{
 	    Log.d(TAG, "Flinged to left");
+	    
 	    if (viewingAnswer && question.answers != null && currentAnswerCount < question.answers.size() - 1)
 	    {
 		++currentAnswerCount;
@@ -130,6 +132,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	public void flingedToRight()
 	{
 	    Log.d(TAG, "Fling to right: " + currentAnswerCount);
+	    
 	    if (currentAnswerCount > 0)
 	    {
 		--currentAnswerCount;
@@ -356,7 +359,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	updateAnswerCount(question);
 
 	TextView textView = (TextView) findViewById(R.id.questionScore);
-	textView.setText(String.valueOf(question.score));
+	textView.setText("Score: " + String.valueOf(question.score));
 
 	textView = (TextView) findViewById(R.id.questionTitle);
 	textView.setText(Html.fromHtml(question.title));
@@ -393,13 +396,10 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void updateAnswerCount(final Question question)
     {
-	if (question.answerCount > 0)
-	{
-	    answersOrQuestion = (TextView) findViewById(R.id.answers);
-	    answersOrQuestion.append(" (" + question.answerCount + ")");
-	    answersOrQuestion.setClickable(false);
-	    answersOrQuestion.setEnabled(false);
-	}
+	answersOrQuestion = (TextView) findViewById(R.id.answers);
+	answersOrQuestion.append(" (" + question.answerCount + ")");
+	answersOrQuestion.setClickable(false);
+	answersOrQuestion.setEnabled(false);
     }
 
     private void displayBody(String text)

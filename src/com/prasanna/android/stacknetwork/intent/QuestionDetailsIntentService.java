@@ -63,14 +63,14 @@ public class QuestionDetailsIntentService extends IntentService
 		if (question.answerCount > 0)
 		{
 		    question.answers = questionService.getAnswersForQuestion(question.id);
-
-		    broadcastIntent = new Intent();
-		    broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name());
-		    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		    broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra(),
-			            question.answers);
-		    sendBroadcast(broadcastIntent);
 		}
+
+		broadcastIntent = new Intent();
+		broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name());
+		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+		broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra(),
+		                question.answers);
+		sendBroadcast(broadcastIntent);
 	    }
 	}
     }

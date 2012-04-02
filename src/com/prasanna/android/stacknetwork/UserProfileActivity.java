@@ -26,7 +26,6 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.intent.UserAnswersIntentService;
 import com.prasanna.android.stacknetwork.intent.UserDetailsIntentService;
@@ -84,7 +83,7 @@ public class UserProfileActivity extends Activity
 
     private PopupWindow pw;
 
-    private class TabListener implements ActionBar.TabListener
+    public class TabListener implements ActionBar.TabListener
     {
 	private Fragment mFragment;
 
@@ -105,13 +104,17 @@ public class UserProfileActivity extends Activity
 
 	public void onTabReselected(Tab tab, FragmentTransaction ft)
 	{
-	    Toast.makeText(UserProfileActivity.this, "Reselected!", Toast.LENGTH_SHORT).show();
 	}
 
     }
 
-    private class ProfileFragment extends Fragment
+    public class ProfileFragment extends Fragment
     {
+	public ProfileFragment()
+	{
+	    super();
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -130,7 +133,7 @@ public class UserProfileActivity extends Activity
 	}
     }
 
-    private class QuestionsFragment extends Fragment
+    public class QuestionsFragment extends Fragment
     {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -169,7 +172,7 @@ public class UserProfileActivity extends Activity
 	}
     }
 
-    private class AnswersFragment extends Fragment
+    public class AnswersFragment extends Fragment
     {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)

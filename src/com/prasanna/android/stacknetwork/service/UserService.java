@@ -140,11 +140,6 @@ public class UserService extends AbstractBaseService
 	return getQuestions(restEndPoint, queryParams);
     }
 
-    public void getTagsForUser(long userId)
-    {
-
-    }
-
     public User getLoggedInUser(String accessToken)
     {
 	Map<String, String> queryParams = AppUtils.getAuthenticatedUserQueryParams(accessToken);

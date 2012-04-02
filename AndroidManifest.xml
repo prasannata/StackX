@@ -53,6 +53,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
+            android:launchMode="singleTask"
             android:name=".UserProfileActivity"
             android:label="@string/app_name" >
         </activity>
