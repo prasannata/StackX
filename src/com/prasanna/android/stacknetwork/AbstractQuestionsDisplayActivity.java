@@ -11,6 +11,7 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.LayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
 public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActionBarActivity
@@ -87,8 +88,9 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
     }
 
     @Override
-    public Object onRetainNonConfigurationInstance()
+    protected void onSaveInstanceState(Bundle outState)
     {
-        return questions;
+        outState.putSerializable(StringConstants.QUESTIONS, questions);
+        super.onSaveInstanceState(outState);
     }
 }

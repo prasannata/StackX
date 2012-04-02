@@ -40,17 +40,21 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Object lastSavedObject = null;
+        if (savedInstanceState != null)
+        {
+            lastSavedObject = savedInstanceState.getSerializable(StringConstants.QUESTIONS);
+        }
 
-        startReceiverAndService();
+        startReceiverAndService(lastSavedObject);
     }
 
-    @SuppressWarnings(
-    { "unchecked", "deprecation" })
-    private void startReceiverAndService()
+    @SuppressWarnings("unchecked")
+    private void startReceiverAndService(Object lastSavedObject)
     {
         registerQuestionsReceiver();
 
-        if (getLastNonConfigurationInstance() == null)
+        if (lastSavedObject == null)
         {
             fetchingQuestionsDialog = ProgressDialog.show(QuestionsActivity.this, "", getString(R.string.loading));
 
@@ -58,7 +62,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
         }
         else
         {
-            questions = (ArrayList<Question>) getLastNonConfigurationInstance();
+            questions = (ArrayList<Question>) lastSavedObject;
             page = questions.size() / Integer.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE);
             processQuestions();
         }
@@ -118,7 +122,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     {
         stopServiceAndUnregisterReceiver();
         questionsLinearLayout.removeAllViews();
-        startReceiverAndService();
+        startReceiverAndService(null);
     }
 
     @Override

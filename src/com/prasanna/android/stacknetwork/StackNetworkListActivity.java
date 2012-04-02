@@ -41,15 +41,19 @@ public class StackNetworkListActivity extends ListActivity
 
     private ArrayList<Site> sites;
 
-    @SuppressWarnings(
-    { "unchecked", "deprecation" })
+    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        Object lastNonConfigurationInstance = getLastNonConfigurationInstance();
-        if (lastNonConfigurationInstance == null)
+        Object lastSavedInstance = null;
+        if (savedInstanceState != null)
+        {
+            lastSavedInstance = savedInstanceState.getSerializable(StringConstants.SITES);
+        }
+
+        if (lastSavedInstance == null)
         {
             HttpHelper.getInstance().setHost(getString(R.string.stackExchangeDomain));
 
@@ -57,7 +61,7 @@ public class StackNetworkListActivity extends ListActivity
         }
         else
         {
-            updateView((ArrayList<Site>) lastNonConfigurationInstance);
+            updateView((ArrayList<Site>) lastSavedInstance);
         }
     }
 
@@ -151,9 +155,9 @@ public class StackNetworkListActivity extends ListActivity
     }
 
     @Override
-    public Object onRetainNonConfigurationInstance()
+    protected void onSaveInstanceState(Bundle outState)
     {
-        return sites;
+        outState.putSerializable(StringConstants.SITES, sites);
+        super.onSaveInstanceState(outState);
     }
-
 }
