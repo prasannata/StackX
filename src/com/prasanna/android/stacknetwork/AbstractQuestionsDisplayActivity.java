@@ -21,8 +21,6 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
     protected ProgressDialog fetchingQuestionsDialog;
 
-    protected LinearLayout masterLinearLayout;
-
     protected ScrollViewWithNotifier scrollView;
 
     protected LinearLayout questionsLinearLayout;
@@ -31,6 +29,10 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
     protected abstract void startQuestionsService();
 
+    protected ArrayList<Question> questions = new ArrayList<Question>();
+
+    protected int lastDisplayQuestionIndex = 0;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -38,8 +40,7 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
         setContentView(R.layout.questions_layout);
 
-        masterLinearLayout = (LinearLayout) findViewById(R.id.homeDisplay);
-        scrollView = (ScrollViewWithNotifier) masterLinearLayout.findViewById(R.id.questionsScroll);
+        scrollView = (ScrollViewWithNotifier) findViewById(R.id.questionsScroll);
         questionsLinearLayout = (LinearLayout) scrollView.findViewById(R.id.questionsDisplay);
         scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
@@ -59,7 +60,7 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
         });
     }
 
-    protected void processQuestions(ArrayList<Question> questions)
+    protected void processQuestions()
     {
         if (fetchingQuestionsDialog != null)
         {
@@ -74,9 +75,10 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
             loadingProgressView = null;
         }
 
-        for (final Question question : questions)
+        for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
         {
-            LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(this, question);
+            LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(this,
+                    questions.get(lastDisplayQuestionIndex));
             questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }
@@ -84,4 +86,9 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
         serviceRunning = false;
     }
 
+    @Override
+    public Object onRetainNonConfigurationInstance()
+    {
+        return questions;
+    }
 }

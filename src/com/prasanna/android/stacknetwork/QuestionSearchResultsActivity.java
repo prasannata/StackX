@@ -47,13 +47,13 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            ArrayList<Question> questions = (ArrayList<Question>) intent
-                    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.getExtra());
+            questions.addAll((ArrayList<Question>) intent
+                    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.getExtra()));
 
             Log.d(TAG, "Received search response " + questions);
 
             questionsLinearLayout.removeAllViews();
-            processQuestions(questions);
+            processQuestions();
         }
     };
 
