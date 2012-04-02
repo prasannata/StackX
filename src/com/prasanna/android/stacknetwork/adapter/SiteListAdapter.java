@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
@@ -15,7 +16,6 @@ import com.prasanna.android.stacknetwork.model.Site;
 
 public class SiteListAdapter extends ArrayAdapter<Site>
 {
-
     private final List<Site> sites;
     private final Context context;
 
@@ -29,17 +29,18 @@ public class SiteListAdapter extends ArrayAdapter<Site>
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        View view = convertView;
-        if (view == null)
+        LinearLayout linearLayoutForSites = (LinearLayout) convertView;
+
+        if (sites != null && position >= 0 && position < sites.size())
         {
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = vi.inflate(R.layout.sitelist_row, null);
+            linearLayoutForSites = (LinearLayout) vi.inflate(R.layout.sitelist_row, null);
+
+            TextView textView = (TextView) linearLayoutForSites.findViewById(R.id.siteName);
+            textView.setGravity(Gravity.LEFT);
+            textView.setId(sites.get(position).name.hashCode());
+            textView.setText(sites.get(position).name);
         }
-        final Site site = sites.get(position);
-        TextView textView = (TextView) view.findViewById(R.id.siteName);
-        textView.setGravity(Gravity.LEFT);
-        textView.setId(site.name.hashCode());
-        textView.setText(site.name);
-        return view;
+        return linearLayoutForSites;
     }
 }
