@@ -336,6 +336,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             if (questionBodyReceiver != null)
             {
                 unregisterReceiver(questionBodyReceiver);
+                unregisterReceiver(questionAnswersReceiver);
                 unregisterReceiver(questionCommentsReceiver);
             }
         }

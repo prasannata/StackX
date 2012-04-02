@@ -52,5 +52,5 @@
     <string name="comments">"Comments (…)"</string>
 	<string name="viewProfile">"View profile"</string>
 	<string name="viewQuestion">"Question"</string>
-	<string name="viewMyAnswer">"My answer"</string>
+	<string name="viewUserAnswer">"View answer"</string>
 </resources>

@@ -33,7 +33,7 @@
         android:layout_marginRight="10dp"
         android:layout_toLeftOf="@id/viewQuestion"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:text="@string/viewMyAnswer"
+        android:text="@string/viewUserAnswer"
         android:textColor="@color/delft"
         android:textSize="11dp" />
 
