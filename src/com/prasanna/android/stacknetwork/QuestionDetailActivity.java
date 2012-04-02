@@ -121,7 +121,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	public void flingedToLeft()
 	{
 	    Log.d(TAG, "Flinged to left");
-	    
+
 	    if (viewingAnswer && question.answers != null && currentAnswerCount < question.answers.size() - 1)
 	    {
 		++currentAnswerCount;
@@ -132,7 +132,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	public void flingedToRight()
 	{
 	    Log.d(TAG, "Fling to right: " + currentAnswerCount);
-	    
+
 	    if (currentAnswerCount > 0)
 	    {
 		--currentAnswerCount;
@@ -214,7 +214,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void setupCommentsPopup()
     {
-	final LinearLayout questionTitleLayout = (LinearLayout) findViewById(R.id.questionTitleLayout);
+	final RelativeLayout questionTitleLayout = (RelativeLayout) findViewById(R.id.questionTitleLayout);
 	commentsCickableTextView = (TextView) findViewById(R.id.comments);
 	commentsCickableTextView.setOnClickListener(new View.OnClickListener()
 	{
@@ -258,7 +258,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 			    textView.setText(Html.fromHtml(comment.body));
 
 			    textView = (TextView) commentLayout.findViewById(R.id.commentAuthor);
-			    textView.setText(comment.owner.displayName);
+			    textView.setText(Html.fromHtml(comment.owner.displayName));
 
 			    commentsLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,
 				            LinearLayout.LayoutParams.WRAP_CONTENT);
