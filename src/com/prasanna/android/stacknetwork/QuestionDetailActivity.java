@@ -336,9 +336,18 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             if (questionBodyReceiver != null)
             {
                 unregisterReceiver(questionBodyReceiver);
+            }
+
+            if (questionAnswersReceiver != null)
+            {
                 unregisterReceiver(questionAnswersReceiver);
+            }
+
+            if (questionCommentsReceiver != null)
+            {
                 unregisterReceiver(questionCommentsReceiver);
             }
+
         }
         catch (IllegalArgumentException e)
         {
