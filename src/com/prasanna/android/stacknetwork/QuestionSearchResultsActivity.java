@@ -95,6 +95,38 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     }
 
     @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        stopServiceAndUnregisterReceiver();
+    }
+
+    private void stopServiceAndUnregisterReceiver()
+    {
+        if (questionsIntent != null)
+        {
+            stopService(questionsIntent);
+        }
+
+        try
+        {
+            unregisterReceiver(searchResultReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+    }
+
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+
+        stopServiceAndUnregisterReceiver();
+    }
+
+    @Override
     public void refresh()
     {
         // TODO Auto-generated method stub
