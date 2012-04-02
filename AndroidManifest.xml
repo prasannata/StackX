@@ -19,6 +19,7 @@
         <service android:name="com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService" />
         <service android:name="com.prasanna.android.stacknetwork.intent.UserAnswersIntentService" />
         <service android:name="com.prasanna.android.stacknetwork.intent.SearchForQuestionsIntentService" />
+        <service android:name="com.prasanna.android.stacknetwork.intent.UserDeauthenticateAppIntentService" />
         <service android:name=".intent.UserSitesIntentService" />
 
         <activity
@@ -37,6 +38,10 @@
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
+            android:name=".LogoutActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
             android:name=".OAuthActivity"
             android:label="@string/app_name" >
         </activity>
@@ -53,9 +58,9 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:launchMode="singleTask"
             android:name=".UserProfileActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleTask" >
         </activity>
         <activity
             android:name=".UserTabsWidget"

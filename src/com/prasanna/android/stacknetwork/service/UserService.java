@@ -14,6 +14,7 @@ import com.prasanna.android.http.HttpHelper;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
@@ -237,7 +238,7 @@ public class UserService extends AbstractBaseService
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
 	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
-	
+
 	return getAnswers(restEndPoint, queryParams);
     }
 
@@ -253,5 +254,23 @@ public class UserService extends AbstractBaseService
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
 	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
 	return getAnswers(restEndPoint, queryParams);
+    }
+
+    public StackExchangeHttpError logout(String accessToken)
+    {
+	StackExchangeHttpError error = new StackExchangeHttpError();
+	error.id = -1;
+	
+	String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
+	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint, null);
+	boolean success = jsonObject != null && jsonObject.has(JsonFields.ITEMS) && jsonObject.getJSONArray(JsonFields.ITEMS)
+	                .length() == 0;
+	if(success == false)
+	{
+	   error.id =  jsonObject.getInt(JsonFields.Error.ERROR_ID);
+	   error.name = jsonObject.getString(JsonFields.Error.ERROR_NAME);
+	   error.message =  jsonObject.getString(JsonFields.Error.ERROR_MESSAGE);
+	}
+	return error;
     }
 }

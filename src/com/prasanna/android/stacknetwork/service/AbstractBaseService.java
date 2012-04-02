@@ -21,19 +21,22 @@ public abstract class AbstractBaseService
     protected User getSerializedUserObject(JSONObjectWrapper userJsonObject)
     {
 	User user = new User();
-	user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
-	user.accountId = userJsonObject.getLong(JsonFields.User.ACCOUNT_ID);
-	user.displayName = userJsonObject.getString(JsonFields.User.DISPLAY_NAME);
-	user.reputation = userJsonObject.getInt(JsonFields.User.REPUTATION);
-	user.profileImageLink = userJsonObject.getString(JsonFields.User.PROFILE_IMAGE);
-	user.questionCount = userJsonObject.getInt(JsonFields.User.QUESTION_COUNT);
-	user.answerCount = userJsonObject.getInt(JsonFields.User.ANSWER_COUNT);
-	user.upvoteCount = userJsonObject.getInt(JsonFields.User.UP_VOTE_COUNT);
-	user.downvoteCount = userJsonObject.getInt(JsonFields.User.DOWN_VOTE_COUNT);
-	user.profileViews = userJsonObject.getInt(JsonFields.User.VIEW_COUNT);
-	user.badgeCounts = getBadgeCounts(userJsonObject.getJSONObject(JsonFields.User.BADGE_COUNTS));
-	user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
-	user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
+	if (userJsonObject != null)
+	{
+	    user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
+	    user.accountId = userJsonObject.getLong(JsonFields.User.ACCOUNT_ID);
+	    user.displayName = userJsonObject.getString(JsonFields.User.DISPLAY_NAME);
+	    user.reputation = userJsonObject.getInt(JsonFields.User.REPUTATION);
+	    user.profileImageLink = userJsonObject.getString(JsonFields.User.PROFILE_IMAGE);
+	    user.questionCount = userJsonObject.getInt(JsonFields.User.QUESTION_COUNT);
+	    user.answerCount = userJsonObject.getInt(JsonFields.User.ANSWER_COUNT);
+	    user.upvoteCount = userJsonObject.getInt(JsonFields.User.UP_VOTE_COUNT);
+	    user.downvoteCount = userJsonObject.getInt(JsonFields.User.DOWN_VOTE_COUNT);
+	    user.profileViews = userJsonObject.getInt(JsonFields.User.VIEW_COUNT);
+	    user.badgeCounts = getBadgeCounts(userJsonObject.getJSONObject(JsonFields.User.BADGE_COUNTS));
+	    user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
+	    user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
+	}
 	return user;
     }
 

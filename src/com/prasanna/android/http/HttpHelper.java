@@ -25,6 +25,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -141,11 +142,14 @@ public class HttpHelper
 	Bitmap bitmap = null;
 	try
 	{
-	    DefaultHttpClient client = getClient(null, null);
-	    HttpGet request = new HttpGet(absoluteUrl);
+	    if (absoluteUrl != null)
+	    {
+		DefaultHttpClient client = getClient(null, null);
+		HttpGet request = new HttpGet(absoluteUrl);
 
-	    HttpResponse response = client.execute(request);
-	    bitmap = BitmapFactory.decodeStream(response.getEntity().getContent());
+		HttpResponse response = client.execute(request);
+		bitmap = BitmapFactory.decodeStream(response.getEntity().getContent());
+	    }
 	}
 	catch (ClientProtocolException e)
 	{
@@ -198,7 +202,7 @@ public class HttpHelper
 	    HttpEntity entity = httpResponse.getEntity();
 	    String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
 
-	    if (httpResponse.getStatusLine().getStatusCode() == 200)
+	    if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
 	    {
 		jsonObject = new JSONObjectWrapper(jsonText);
 	    }

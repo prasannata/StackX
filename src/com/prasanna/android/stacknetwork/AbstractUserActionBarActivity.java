@@ -11,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -30,6 +29,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+	getActionBar().setHomeButtonEnabled(true);
 	getActionBar().setTitle(OperatingSite.getSite().name);
 	MenuInflater menuInflater = getMenuInflater();
 	menuInflater.inflate(R.menu.action_menu, menu);
@@ -47,6 +47,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 
 	    subMenu.removeItem(R.id.menu_profile);
 	    subMenu.removeItem(R.id.menu_option_inbox);
+	    subMenu.removeItem(R.id.menu_option_logout);
 	}
 
 	return super.onCreateOptionsMenu(menu);
@@ -58,7 +59,9 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	switch (item.getItemId())
 	{
 	    case android.R.id.home:
-		Toast.makeText(this, "Tapped home", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(this, QuestionsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
 		break;
 
 	    case R.id.menu_refresh:
@@ -73,7 +76,18 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		                .createUserProfileIntent(getCurrentAppContext(), getAccessToken());
 		startActivity(userProfileIntent);
 		break;
+
+	    case R.id.menu_option_change_site:
+		Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
+		startActivity(siteListIntent);
+		break;
+
+	    case R.id.menu_option_logout:
+		Intent logoutIntent = new Intent(this, LogoutActivity.class);
+		startActivity(logoutIntent);
+		break;
 	}
+
 	return super.onOptionsItemSelected(item);
     }
 

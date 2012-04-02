@@ -16,26 +16,41 @@
         android:title="@string/menu_options">
         <menu>
             <item
+                android:id="@+id/menu_profile"
+                android:icon="@drawable/person"
+                android:orderInCategory="0"
+                android:showAsAction="always"
+                android:title="@string/menu_profile"/>
+            <item
                 android:id="@+id/menu_refresh"
                 android:icon="@drawable/refresh"
                 android:orderInCategory="1"
                 android:showAsAction="always"
                 android:title="@string/menu_refresh"/>
             <item
-                android:id="@+id/menu_profile"
-                android:icon="@drawable/person"
-                android:showAsAction="always"
-                android:title="@string/menu_profile"/>
-            <item
                 android:id="@+id/menu_option_inbox"
                 android:icon="@drawable/email"
+                android:orderInCategory="2"
                 android:showAsAction="always"
                 android:title="@string/menu_option_inbox"/>
             <item
                 android:id="@+id/menu_option_tags"
                 android:icon="@drawable/labels"
+                android:orderInCategory="3"
                 android:showAsAction="always"
                 android:title="@string/menu_option_tags"/>
+            <item
+                android:id="@+id/menu_option_change_site"
+                android:icon="@drawable/labels"
+                android:orderInCategory="4"
+                android:showAsAction="always"
+                android:title="@string/menu_option_change_site"/>
+            <item
+                android:id="@+id/menu_option_logout"
+                android:icon="@drawable/logout"
+                android:orderInCategory="5"
+                android:showAsAction="always"
+                android:title="@string/menu_option_logout"/>
         </menu>
     </item>
 

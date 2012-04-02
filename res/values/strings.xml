@@ -38,6 +38,8 @@
     <string name="menu_options">Options</string>
     <string name="menu_option_inbox">Inbox</string>
     <string name="menu_option_tags">Tags</string>
+    <string name="menu_option_change_site">Change site</string>
+    <string name="menu_option_logout">Logout</string>
     <string name="Enter">Enter</string>
     <string name="site">site</string>
     <string name="by">"by "</string>

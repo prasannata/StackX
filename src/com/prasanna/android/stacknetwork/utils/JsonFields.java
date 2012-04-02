@@ -66,4 +66,12 @@ public class JsonFields
 	public static final String SILVER = "silver";
 	public static final String BRONZE = "bronze";
     }
+
+    public static class Error
+    {
+	public static final String ERROR_ID = "error_id";
+	public static final String ERROR_NAME = "error_name";
+	public static final String ERROR_MESSAGE = "error_message";
+    }
+
 }
