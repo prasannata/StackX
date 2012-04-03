@@ -1,7 +1,7 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 
@@ -35,7 +35,7 @@ public class User implements Serializable
 
     public int profileViews;
 
-    public List<Account> accounts;
+    public ArrayList<Account> accounts;
 
     public long lastAccessTime;
     
