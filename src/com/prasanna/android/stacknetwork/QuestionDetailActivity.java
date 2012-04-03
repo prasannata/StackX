@@ -255,14 +255,14 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                         for (Comment comment : comments)
                         {
                             RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
-                                    R.layout.comment_layout, null);
-                            TextView textView = (TextView) commentLayout.findViewById(R.id.commentScore);
+                                    R.layout.popup_item_row, null);
+                            TextView textView = (TextView) commentLayout.findViewById(R.id.popupItemScore);
                             textView.setText(String.valueOf(comment.score));
 
-                            textView = (TextView) commentLayout.findViewById(R.id.commentContent);
+                            textView = (TextView) commentLayout.findViewById(R.id.popupItemContent);
                             textView.setText(Html.fromHtml(comment.body));
 
-                            textView = (TextView) commentLayout.findViewById(R.id.commentAuthor);
+                            textView = (TextView) commentLayout.findViewById(R.id.popupItemAuthor);
                             textView.setText(Html.fromHtml(comment.owner.displayName));
 
                             commentsLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,

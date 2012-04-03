@@ -196,9 +196,9 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
                     });
 
                     RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
-                            R.layout.comment_layout, null);
+                            R.layout.popup_item_row, null);
 
-                    TextView textView = (TextView) commentLayout.findViewById(R.id.commentContent);
+                    TextView textView = (TextView) commentLayout.findViewById(R.id.popupItemContent);
                     textView.setText(Html.fromHtml(inboxItem.body));
 
                     popupLinearLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,

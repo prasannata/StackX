@@ -10,14 +10,14 @@
     android:background="@color/white" >
 
     <LinearLayout
-        android:id="@+id/commentScoreAndContent"
+        android:id="@+id/popupItemScoreAndContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="1" >
 
         <TextView
-            android:id="@+id/commentScore"
+            android:id="@+id/popupItemScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -27,7 +27,7 @@
             android:textSize="10dp" />
 
         <TextView
-            android:id="@+id/commentContent"
+            android:id="@+id/popupItemContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -37,11 +37,11 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/commentAuthor"
+        android:id="@+id/popupItemAuthor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/commentScoreAndContent"
+        android:layout_below="@id/popupItemScoreAndContent"
         android:textColor="@color/black"
         android:textSize="10dp" />
 
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/commentAuthor"
+        android:layout_below="@id/popupItemAuthor"
         android:layout_marginBottom="2dp"
         android:layout_marginTop="2dp"
         android:background="@color/delft" />
