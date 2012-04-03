@@ -20,6 +20,7 @@
             android:layout_gravity="right"
             android:clickable="true"
             android:gravity="right"
+            android:background="@drawable/rounded_border_grey_min_padding"
             android:src="@drawable/remove" />
     </LinearLayout>
 
