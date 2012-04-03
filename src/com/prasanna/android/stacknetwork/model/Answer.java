@@ -3,7 +3,7 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.util.List;
 
-public class Answer extends BaseUserContribModelWithId implements Serializable
+public class Answer extends BaseStackExchangeItem implements Serializable
 {
     private static final long serialVersionUID = -307252373087687685L;
 
