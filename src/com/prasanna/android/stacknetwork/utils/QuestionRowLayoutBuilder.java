@@ -14,21 +14,21 @@ import com.prasanna.android.stacknetwork.QuestionDetailActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Question;
 
-public class LayoutBuilder
+public class QuestionRowLayoutBuilder
 {
-    private static LayoutBuilder builder = new LayoutBuilder();
+    private static QuestionRowLayoutBuilder builder = new QuestionRowLayoutBuilder();
     private static int id = 0;
 
-    private LayoutBuilder()
+    private QuestionRowLayoutBuilder()
     {
     }
 
-    public static LayoutBuilder getInstance()
+    public static QuestionRowLayoutBuilder getInstance()
     {
         return builder;
     }
 
-    public LinearLayout buildQuestionSnippet(final Context context, Question question)
+    public LinearLayout build(final Context context, Question question)
     {
         LinearLayout topLayout = new LinearLayout(context);
         topLayout.setWeightSum(1f);
@@ -62,7 +62,8 @@ public class LayoutBuilder
         });
 
         RelativeLayout relativeLayout = new RelativeLayout(context);
-        TextView textView = getTextViewForQuestion(context, question);
+        TextView textView = ((TextView) getInflater(context).inflate(R.layout.question_snippet_layout, null));
+        textView.setText(Html.fromHtml(question.title));
         textView.setId(++id);
         relativeLayout.addView(textView);
 
@@ -78,7 +79,7 @@ public class LayoutBuilder
 
         if (question.tags != null && question.tags.length > 0)
         {
-            TextView tagTextView = inflateTagsTextView(context);
+            TextView tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
             tagTextView.setId(++id);
             tagTextView.setText(question.tags[0]);
             params.addRule(RelativeLayout.BELOW, id - 1);
@@ -88,7 +89,7 @@ public class LayoutBuilder
             for (int i = 1; i < question.tags.length; i++)
             {
                 RelativeLayout.LayoutParams layoutParams = getTagLayoutParams();
-                tagTextView = inflateTagsTextView(context);
+                tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
                 tagTextView.setId(++id);
                 tagTextView.setText(question.tags[i]);
                 tagTextView.setLayoutParams(layoutParams);
@@ -111,15 +112,15 @@ public class LayoutBuilder
     {
         LinearLayout countsLayout = new LinearLayout(context);
         countsLayout.setOrientation(LinearLayout.VERTICAL);
-        TextView textView = inflateCountsTextView(context);
+        TextView textView = ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
         textView.setText(context.getString(R.string.QuestionViews) + String.valueOf(question.viewCount));
         countsLayout.addView(textView);
 
-        textView = inflateCountsTextView(context);
+        textView = ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
         textView.setText(context.getString(R.string.QuestionScore) + String.valueOf(question.score));
         countsLayout.addView(textView);
 
-        textView = inflateCountsTextView(context);
+        textView = ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
         textView.setText(context.getString(R.string.QuestionAnswers) + String.valueOf(question.answerCount));
         countsLayout.addView(textView);
         LayoutParams params = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 0.14f);
@@ -130,27 +131,5 @@ public class LayoutBuilder
     private LayoutInflater getInflater(Context context)
     {
         return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    private TextView inflateQuestionSnippetView(Context context)
-    {
-        return ((TextView) getInflater(context).inflate(R.layout.question_snippet_layout, null));
-    }
-
-    private TextView inflateCountsTextView(Context context)
-    {
-        return ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
-    }
-
-    private TextView inflateTagsTextView(Context context)
-    {
-        return ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
-    }
-
-    private TextView getTextViewForQuestion(Context context, final Question question)
-    {
-        TextView textView = inflateQuestionSnippetView(context);
-        textView.setText(Html.fromHtml(question.title));
-        return textView;
     }
 }

@@ -36,7 +36,7 @@ import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.LayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.FetchImageAsyncTask;
@@ -344,7 +344,7 @@ public class UserProfileActivity extends Activity
             {
                 for (; questionDisplayCount < questionsByUser.size(); questionDisplayCount++)
                 {
-                    LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(
+                    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
                             questionsLayout.getContext(), questionsByUser.get(questionDisplayCount));
                     questionsDisplayList.addView(questionLayout, new LinearLayout.LayoutParams(
                             LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));

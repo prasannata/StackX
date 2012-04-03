@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.LayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
@@ -78,7 +78,7 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
         for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
         {
-            LinearLayout questionLayout = LayoutBuilder.getInstance().buildQuestionSnippet(this,
+            LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(this,
                     questions.get(lastDisplayQuestionIndex));
             questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
