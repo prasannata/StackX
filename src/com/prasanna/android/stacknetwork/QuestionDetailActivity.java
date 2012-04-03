@@ -130,7 +130,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
         public void flingedToRight()
         {
-            Log.d(TAG, "Fling to right: " + currentAnswerCount);
+            Log.d(TAG, "Flinged to right");
 
             if (currentAnswerCount > 0)
             {
@@ -198,9 +198,15 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
         registerReceivers();
 
-        fetchFullDetails = getIntent().getBooleanExtra("fetchFullDetails", false);
+        fetchQuestionDetail();
+    }
 
-        if (getIntent().getBooleanExtra("fetchFullDetails", false) == false)
+    private void fetchQuestionDetail()
+    {
+        fetchFullDetails = getIntent().getBooleanExtra(
+                IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), false);
+
+        if (fetchFullDetails == false)
         {
             displayQuestionMetaData((Question) getIntent().getSerializableExtra(StringConstants.QUESTION));
             startQuestionService(IntentActionEnum.QuestionIntentAction.QUESTION_BODY.name());

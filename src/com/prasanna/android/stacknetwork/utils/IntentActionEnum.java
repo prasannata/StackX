@@ -2,6 +2,10 @@ package com.prasanna.android.stacknetwork.utils;
 
 public class IntentActionEnum
 {
+    public interface IntentAction
+    {
+    }
+
     public enum QuestionIntentAction implements IntentAction
     {
         QUESTIONS("questions"),

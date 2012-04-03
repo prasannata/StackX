@@ -12,12 +12,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,21 +85,21 @@ public class UserProfileActivity extends Activity
 
     public class TabListener implements ActionBar.TabListener
     {
-        private Fragment mFragment;
+        private Fragment fragment;
 
         public TabListener(Fragment fragment)
         {
-            mFragment = fragment;
+            this.fragment = fragment;
         }
 
         public void onTabSelected(Tab tab, FragmentTransaction ft)
         {
-            ft.add(R.id.fragmentContainer, mFragment, null);
+            ft.add(R.id.fragmentContainer, fragment, null);
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
         {
-            ft.remove(mFragment);
+            ft.remove(fragment);
         }
 
         public void onTabReselected(Tab tab, FragmentTransaction ft)
@@ -232,15 +230,9 @@ public class UserProfileActivity extends Activity
         {
             if (answersByUser.isEmpty())
             {
-                TextView textView = new TextView(this);
+                TextView textView = (TextView) getLayoutInflater().inflate(R.layout.textview_black_textcolor, null);
                 textView.setText("No answers by " + user.displayName);
-                textView.setTextColor(Color.BLACK);
-                textView.setGravity(Gravity.CENTER);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT);
-                layoutParams.weight = 1;
-                layoutParams.gravity = Gravity.CENTER;
-                questionsDisplayList.addView(textView, layoutParams);
+                questionsDisplayList.addView(textView);
             }
             else
             {
@@ -263,7 +255,6 @@ public class UserProfileActivity extends Activity
             textView.setClickable(true);
             textView.setOnClickListener(new View.OnClickListener()
             {
-
                 @Override
                 public void onClick(View v)
                 {
@@ -316,7 +307,7 @@ public class UserProfileActivity extends Activity
                     question.id = answer.questionId;
                     question.title = answer.title;
                     intent.putExtra(StringConstants.QUESTION, question);
-                    intent.putExtra("fetchFullDetails", true);
+                    intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
                     startActivity(intent);
                 }
             });
@@ -327,25 +318,27 @@ public class UserProfileActivity extends Activity
 
     private void displayQuestions()
     {
+        Log.d(TAG, "Displaying questions");
+
+        if (fetchUserQuestionsProgress != null)
+        {
+            fetchUserQuestionsProgress.dismiss();
+            fetchUserQuestionsProgress = null;
+        }
+
+        if (loadingProgressView != null)
+        {
+            loadingProgressView.setVisibility(View.GONE);
+            loadingProgressView = null;
+        }
+
         if (questionsByUser != null && questionsLayout != null && questionsDisplayList != null)
         {
-            Log.d(TAG, "Displaying questions");
-
-            if (fetchUserQuestionsProgress != null)
-            {
-                fetchUserQuestionsProgress.dismiss();
-                fetchUserQuestionsProgress = null;
-            }
-
-            if (loadingProgressView != null)
-            {
-                loadingProgressView.setVisibility(View.GONE);
-                loadingProgressView = null;
-            }
-
             if (questionsByUser.isEmpty())
             {
-
+                TextView textView = (TextView) getLayoutInflater().inflate(R.layout.textview_black_textcolor, null);
+                textView.setText("No questions by " + user.displayName);
+                questionsDisplayList.addView(textView);
             }
             else
             {
