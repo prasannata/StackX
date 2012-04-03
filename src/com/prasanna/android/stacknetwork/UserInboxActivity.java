@@ -2,7 +2,6 @@ package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,9 +12,9 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -24,12 +23,12 @@ import android.widget.TextView;
 import com.prasanna.android.stacknetwork.intent.UserInboxIntentService;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserInboxActivity extends Activity
+public class UserInboxActivity extends AbstractUserActionBarActivity
 {
     private static final String TAG = UserInboxActivity.class.getSimpleName();
 
@@ -235,5 +234,21 @@ public class UserInboxActivity extends Activity
                     LayoutParams.WRAP_CONTENT));
         }
 
+    }
+
+    @Override
+    public void refresh()
+    {
+        questionsDisplayList.removeAllViews();
+        inboxItems.clear();
+        page = 0;
+        itemCursor = 0;
+        startIntentService();
+    }
+
+    @Override
+    public Context getCurrentAppContext()
+    {
+        return questionsDisplayList.getContext();
     }
 }

@@ -296,6 +296,7 @@ public class UserService extends AbstractBaseService
                             inboxItem.title = itemJsonObject.getString(JsonFields.InboxItem.TITLE);
                             inboxItem.creationDate = itemJsonObject.getLong(JsonFields.InboxItem.CREATION_DATE);
                             inboxItem.body = itemJsonObject.getString(JsonFields.InboxItem.BODY);
+                            inboxItem.unread = itemJsonObject.getBoolean(JsonFields.InboxItem.IS_UNREAD);
                             inboxItems.add(inboxItem);
                         }
                     }

@@ -74,6 +74,7 @@ public class JsonFields
         public static final String COMMENT_ID = "comment_id";
         public static final String ITEM_TYPE = "item_type";
         public static final String SITE = "site";
+        public static final String IS_UNREAD = "is_unread";
     }
 
     public static class Error

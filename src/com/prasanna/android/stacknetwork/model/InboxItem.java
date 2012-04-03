@@ -49,6 +49,8 @@ public class InboxItem implements Serializable
     public Site site;
 
     public String body;
-    
+
     public long creationDate;
+
+    public boolean unread = false;
 }

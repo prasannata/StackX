@@ -3,7 +3,6 @@ package com.prasanna.android.stacknetwork;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -129,21 +128,5 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     public Context getCurrentAppContext()
     {
         return getApplicationContext();
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query)
-    {
-        Intent intent = new Intent(this, QuestionSearchResultsActivity.class);
-        intent.putExtra(SearchManager.QUERY, query);
-        startActivity(intent);
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String paramString)
-    {
-        return false;
     }
 }
