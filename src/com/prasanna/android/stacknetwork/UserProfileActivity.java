@@ -245,24 +245,22 @@ public class UserProfileActivity extends Activity
     {
         for (; answerDisplayCount < answersByUser.size(); answerDisplayCount++)
         {
-            final RelativeLayout answerRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.user_answer_layout,
-                    null);
+            final RelativeLayout answerRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.user_item_row, null);
             final Answer answer = answersByUser.get(answerDisplayCount);
-            TextView textView = (TextView) answerRow.findViewById(R.id.answeredQuestionTitle);
+            TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
             textView.setText(Html.fromHtml(answer.title));
 
-            textView = (TextView) answerRow.findViewById(R.id.viewMyAnswer);
+            textView = (TextView) answerRow.findViewById(R.id.viewItem);
             textView.setClickable(true);
             textView.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
-                    final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(R.layout.comments_layout,
-                            null);
+                    final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(R.layout.popup_layout, null);
 
-                    LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.commentsList);
-                    ImageView closeCommentsPopup = (ImageView) popupLinearLayout.findViewById(R.id.closeCommentsPopup);
+                    LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.popupItemList);
+                    ImageView closeCommentsPopup = (ImageView) popupLinearLayout.findViewById(R.id.closePopup);
                     closeCommentsPopup.setOnClickListener(new View.OnClickListener()
                     {
 
@@ -402,7 +400,7 @@ public class UserProfileActivity extends Activity
     public void onCreate(android.os.Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_container);
+        setContentView(R.layout.ll_whitebg_vertical);
 
         User intentForUser = (User) getIntent().getSerializableExtra(StringConstants.USER);
         registerForUserProfileReceiver();

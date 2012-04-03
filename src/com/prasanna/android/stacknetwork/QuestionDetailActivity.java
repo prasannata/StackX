@@ -229,11 +229,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             {
                 if (question != null && question.comments != null && question.comments.isEmpty() == false)
                 {
-                    final ScrollView commentsView = (ScrollView) getLayoutInflater().inflate(R.layout.comments_layout,
+                    final ScrollView commentsView = (ScrollView) getLayoutInflater().inflate(R.layout.popup_layout,
                             null);
 
-                    LinearLayout commentsLayout = (LinearLayout) commentsView.findViewById(R.id.commentsList);
-                    ImageView closeCommentsPopup = (ImageView) commentsLayout.findViewById(R.id.closeCommentsPopup);
+                    LinearLayout commentsLayout = (LinearLayout) commentsView.findViewById(R.id.popupItemList);
+                    ImageView closeCommentsPopup = (ImageView) commentsLayout.findViewById(R.id.closePopup);
                     closeCommentsPopup.setOnClickListener(new View.OnClickListener()
                     {
 

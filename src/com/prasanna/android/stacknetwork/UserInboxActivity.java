@@ -164,14 +164,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     {
         for (; itemCursor < inboxItems.size(); itemCursor++)
         {
-            final RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.user_answer_layout,
-                    null);
+            final RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.user_item_row, null);
             final InboxItem inboxItem = inboxItems.get(itemCursor);
 
-            TextView textView = (TextView) itemRow.findViewById(R.id.answeredQuestionTitle);
+            TextView textView = (TextView) itemRow.findViewById(R.id.userItemTitle);
             textView.setText(Html.fromHtml(inboxItem.title));
 
-            textView = (TextView) itemRow.findViewById(R.id.viewMyAnswer);
+            textView = (TextView) itemRow.findViewById(R.id.viewItem);
             textView.setClickable(true);
             textView.setText("View message");
             textView.setOnClickListener(new View.OnClickListener()
@@ -179,11 +178,10 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
                 @Override
                 public void onClick(View v)
                 {
-                    final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(R.layout.comments_layout,
-                            null);
+                    final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(R.layout.popup_layout, null);
 
-                    LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.commentsList);
-                    ImageView closeCommentsPopup = (ImageView) popupLinearLayout.findViewById(R.id.closeCommentsPopup);
+                    LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.popupItemList);
+                    ImageView closeCommentsPopup = (ImageView) popupLinearLayout.findViewById(R.id.closePopup);
                     closeCommentsPopup.setOnClickListener(new View.OnClickListener()
                     {
 
