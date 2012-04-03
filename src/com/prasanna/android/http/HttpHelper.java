@@ -43,6 +43,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -205,7 +206,7 @@ public class HttpHelper
 
             if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
             {
-                jsonObject = new JSONObjectWrapper(jsonText);
+                jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
             }
             else
             {

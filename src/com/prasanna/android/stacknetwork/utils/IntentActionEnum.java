@@ -29,6 +29,7 @@ public class IntentActionEnum
 
     public enum UserIntentAction implements IntentAction
     {
+        INBOX("inbox"),
         ALL_USERS("users"),
         USER_DETAIL("userDetail"),
         QUESTIONS_BY_USER("questionsByUser"),
