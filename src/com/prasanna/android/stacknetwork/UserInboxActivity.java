@@ -12,12 +12,9 @@ import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.intent.UserInboxIntentService;
@@ -25,6 +22,7 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
@@ -43,8 +41,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     private ArrayList<InboxItem> inboxItems = new ArrayList<InboxItem>();
 
     private int itemCursor = 0;
-
-    private PopupWindow pw;
 
     private LinearLayout loadingProgressView;
 
@@ -178,37 +174,10 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
                 @Override
                 public void onClick(View v)
                 {
-                    final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(R.layout.popup_layout, null);
-
-                    LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.popupItemList);
-                    ImageView closeCommentsPopup = (ImageView) popupLinearLayout.findViewById(R.id.closePopup);
-                    closeCommentsPopup.setOnClickListener(new View.OnClickListener()
-                    {
-
-                        @Override
-                        public void onClick(View v)
-                        {
-                            if (pw != null)
-                            {
-                                pw.dismiss();
-                            }
-                        }
-                    });
-
-                    RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
-                            R.layout.popup_item_row, null);
-
-                    TextView textView = (TextView) commentLayout.findViewById(R.id.popupItemContent);
-                    textView.setText(Html.fromHtml(inboxItem.body));
-
-                    popupLinearLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-
                     Point size = new Point();
                     getWindowManager().getDefaultDisplay().getSize(size);
 
-                    pw = new PopupWindow(scrollView, size.x - 30, 400, true);
-                    pw.showAsDropDown(itemRow, 10, 10);
+                    PopupBuilder.build(getLayoutInflater(), itemRow, inboxItem, size);
                 }
             });
 

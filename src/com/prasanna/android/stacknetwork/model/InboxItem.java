@@ -2,7 +2,7 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class InboxItem implements Serializable
+public class InboxItem extends BaseStackExchangeItem implements Serializable
 {
     public static enum ItemType
     {
@@ -42,15 +42,9 @@ public class InboxItem implements Serializable
 
     public long commentId;
 
-    public String title;
-
     public ItemType itemType;
 
     public Site site;
-
-    public String body;
-
-    public long creationDate;
 
     public boolean unread = false;
 }

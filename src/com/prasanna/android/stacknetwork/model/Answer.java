@@ -1,7 +1,7 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.ArrayList;
 
 public class Answer extends BaseStackExchangeItem implements Serializable
 {
@@ -13,5 +13,5 @@ public class Answer extends BaseStackExchangeItem implements Serializable
 
     public boolean accepted;
 
-    public List<Comment> comments;
+    public ArrayList<Comment> comments;
 }

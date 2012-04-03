@@ -1,7 +1,6 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,9 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.listener.FlingActionListener;
@@ -31,6 +28,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.HtmlTagFragmenter;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
+import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.FlingScrollView;
 
@@ -49,7 +47,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private FlingScrollView flingScrollView;
     private TextView currentAnswerAuthor;
     private RelativeLayout answerHeader;
-    private PopupWindow pw;
     private View hrInQuestionTitle;
     private int currentAnswerCount = -1;
     private boolean viewingAnswer = false;
@@ -219,63 +216,21 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void setupCommentsPopup()
     {
-        final RelativeLayout questionTitleLayout = (RelativeLayout) findViewById(R.id.questionTitleLayout);
         commentsCickableTextView = (TextView) findViewById(R.id.comments);
         commentsCickableTextView.setOnClickListener(new View.OnClickListener()
         {
-
             @Override
             public void onClick(View v)
             {
                 if (question != null && question.comments != null && question.comments.isEmpty() == false)
                 {
-                    final ScrollView commentsView = (ScrollView) getLayoutInflater().inflate(R.layout.popup_layout,
-                            null);
+                    Point size = new Point();
+                    getWindowManager().getDefaultDisplay().getSize(size);
 
-                    LinearLayout commentsLayout = (LinearLayout) commentsView.findViewById(R.id.popupItemList);
-                    ImageView closeCommentsPopup = (ImageView) commentsLayout.findViewById(R.id.closePopup);
-                    closeCommentsPopup.setOnClickListener(new View.OnClickListener()
-                    {
-
-                        @Override
-                        public void onClick(View v)
-                        {
-                            if (pw != null)
-                            {
-                                pw.dismiss();
-                            }
-                        }
-                    });
-
-                    List<Comment> comments = (viewingAnswer && currentAnswerCount != -1) ? question.answers
+                    ArrayList<Comment> comments = (viewingAnswer && currentAnswerCount != -1) ? question.answers
                             .get(currentAnswerCount).comments : question.comments;
 
-                    if (comments != null)
-                    {
-                        for (Comment comment : comments)
-                        {
-                            RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
-                                    R.layout.popup_item_row, null);
-                            TextView textView = (TextView) commentLayout.findViewById(R.id.popupItemScore);
-                            textView.setText(String.valueOf(comment.score));
-
-                            textView = (TextView) commentLayout.findViewById(R.id.popupItemContent);
-                            textView.setText(Html.fromHtml(comment.body));
-
-                            textView = (TextView) commentLayout.findViewById(R.id.popupItemAuthor);
-                            textView.setText(Html.fromHtml(comment.owner.displayName));
-
-                            commentsLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT);
-                        }
-
-                        Point size = new Point();
-                        getWindowManager().getDefaultDisplay().getSize(size);
-
-                        pw = new PopupWindow(commentsView, size.x - 50, size.y - questionTitleLayout.getHeight() - 150,
-                                true);
-                        pw.showAsDropDown(hrInQuestionTitle, 10, 10);
-                    }
+                    PopupBuilder.build(getLayoutInflater(), hrInQuestionTitle, comments, size);
                 }
             }
         });

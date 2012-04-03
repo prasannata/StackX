@@ -22,9 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.intent.UserAnswersIntentService;
@@ -36,8 +34,9 @@ import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.PopupBuilder;
+import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.FetchImageAsyncTask;
 import com.prasanna.android.task.ImageFetchAsyncTaskCompleteNotifierImpl;
@@ -80,8 +79,6 @@ public class UserProfileActivity extends Activity
     private int questionDisplayCount = 0;
 
     private int answerDisplayCount = 0;
-
-    private PopupWindow pw;
 
     public class TabListener implements ActionBar.TabListener
     {
@@ -257,39 +254,10 @@ public class UserProfileActivity extends Activity
                 @Override
                 public void onClick(View v)
                 {
-                    final ScrollView scrollView = (ScrollView) getLayoutInflater().inflate(R.layout.popup_layout, null);
-
-                    LinearLayout popupLinearLayout = (LinearLayout) scrollView.findViewById(R.id.popupItemList);
-                    ImageView closeCommentsPopup = (ImageView) popupLinearLayout.findViewById(R.id.closePopup);
-                    closeCommentsPopup.setOnClickListener(new View.OnClickListener()
-                    {
-
-                        @Override
-                        public void onClick(View v)
-                        {
-                            if (pw != null)
-                            {
-                                pw.dismiss();
-                            }
-                        }
-                    });
-
-                    RelativeLayout commentLayout = (RelativeLayout) getLayoutInflater().inflate(
-                            R.layout.popup_item_row, null);
-                    TextView textView = (TextView) commentLayout.findViewById(R.id.popupItemScore);
-                    textView.setText(String.valueOf(answer.score));
-
-                    textView = (TextView) commentLayout.findViewById(R.id.popupItemContent);
-                    textView.setText(Html.fromHtml(answer.body));
-
-                    popupLinearLayout.addView(commentLayout, LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-
                     Point size = new Point();
                     getWindowManager().getDefaultDisplay().getSize(size);
 
-                    pw = new PopupWindow(scrollView, size.x - 30, 400, true);
-                    pw.showAsDropDown(answerRow, 10, 10);
+                    PopupBuilder.build(getLayoutInflater(), answerRow, answer, size);
                 }
             });
 
