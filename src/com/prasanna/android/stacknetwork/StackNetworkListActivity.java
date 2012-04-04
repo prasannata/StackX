@@ -20,6 +20,7 @@ import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.intent.UserSitesIntentService;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class StackNetworkListActivity extends ListActivity
@@ -32,11 +33,11 @@ public class StackNetworkListActivity extends ListActivity
 
     private BroadcastReceiver receiver = new BroadcastReceiver()
     {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            processReceiverIntent(context, intent);
-        }
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    processReceiverIntent(context, intent);
+	}
     };
 
     private ArrayList<Site> sites;
@@ -45,119 +46,119 @@ public class StackNetworkListActivity extends ListActivity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        Object lastSavedInstance = null;
-        if (savedInstanceState != null)
-        {
-            lastSavedInstance = savedInstanceState.getSerializable(StringConstants.SITES);
-        }
+	Object lastSavedInstance = null;
+	if (savedInstanceState != null)
+	{
+	    lastSavedInstance = savedInstanceState.getSerializable(StringConstants.SITES);
+	}
 
-        if (lastSavedInstance == null)
-        {
-            HttpHelper.getInstance().setHost(getString(R.string.stackExchangeDomain));
+	if (lastSavedInstance == null)
+	{
+	    HttpHelper.getInstance().setHost(StackUri.STACKX_API_HOST);
 
-            registerReceiverAndStartService();
-        }
-        else
-        {
-            updateView((ArrayList<Site>) lastSavedInstance);
-        }
+	    registerReceiverAndStartService();
+	}
+	else
+	{
+	    updateView((ArrayList<Site>) lastSavedInstance);
+	}
     }
 
     @Override
     protected void onListItemClick(ListView listView, View v, int position, long id)
     {
-        Site site = sites.get(position);
-        OperatingSite.setSite(site);
-        Intent myIntent = new Intent(this, QuestionsActivity.class);
-        startActivity(myIntent);
+	Site site = sites.get(position);
+	OperatingSite.setSite(site);
+	Intent myIntent = new Intent(this, QuestionsActivity.class);
+	startActivity(myIntent);
     }
 
     @Override
     protected void onDestroy()
     {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
+	super.onDestroy();
+	stopServiceAndUnregisterReceiver();
     }
 
     private void stopServiceAndUnregisterReceiver()
     {
-        if (sitesIntent != null)
-        {
-            stopService(sitesIntent);
-        }
+	if (sitesIntent != null)
+	{
+	    stopService(sitesIntent);
+	}
 
-        try
-        {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
+	try
+	{
+	    unregisterReceiver(receiver);
+	}
+	catch (IllegalArgumentException e)
+	{
+	    Log.d(TAG, e.getMessage());
+	}
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceiver();
     }
 
     private void registerReceiverAndStartService()
     {
-        progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
+	progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
 
-        registerReceiver();
+	registerReceiver();
 
-        startIntentService();
+	startIntentService();
     }
 
     private void startIntentService()
     {
-        sitesIntent = new Intent(this, UserSitesIntentService.class);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-        {
-            sitesIntent.putExtra(StringConstants.ACCESS_TOKEN,
-                    sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null));
-        }
-        startService(sitesIntent);
+	sitesIntent = new Intent(this, UserSitesIntentService.class);
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+	{
+	    sitesIntent.putExtra(StringConstants.ACCESS_TOKEN,
+		            sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null));
+	}
+	startService(sitesIntent);
     }
 
     private void registerReceiver()
     {
-        IntentFilter filter = new IntentFilter(StringConstants.SITES);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
+	IntentFilter filter = new IntentFilter(StringConstants.SITES);
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(receiver, filter);
     }
 
     @SuppressWarnings("unchecked")
     private void processReceiverIntent(Context context, Intent intent)
     {
-        if (progressDialog != null)
-        {
-            progressDialog.dismiss();
-        }
+	if (progressDialog != null)
+	{
+	    progressDialog.dismiss();
+	}
 
-        sites = (ArrayList<Site>) intent.getSerializableExtra(StringConstants.SITES);
-        updateView(sites);
+	sites = (ArrayList<Site>) intent.getSerializableExtra(StringConstants.SITES);
+	updateView(sites);
     }
 
     private void updateView(ArrayList<Site> sites)
     {
-        if (sites != null)
-        {
-            setListAdapter(new SiteListAdapter(this, R.layout.sitelist_row, sites));
-        }
+	if (sites != null)
+	{
+	    setListAdapter(new SiteListAdapter(this, R.layout.sitelist_row, sites));
+	}
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        outState.putSerializable(StringConstants.SITES, sites);
-        super.onSaveInstanceState(outState);
+	outState.putSerializable(StringConstants.SITES, sites);
+	super.onSaveInstanceState(outState);
     }
 }
