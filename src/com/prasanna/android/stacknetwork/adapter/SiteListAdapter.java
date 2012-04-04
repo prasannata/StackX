@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.stacknetwork.model.User.UserType;
 
 public class SiteListAdapter extends ArrayAdapter<Site>
 {
@@ -40,6 +41,11 @@ public class SiteListAdapter extends ArrayAdapter<Site>
             textView.setGravity(Gravity.LEFT);
             textView.setId(sites.get(position).name.hashCode());
             textView.setText(sites.get(position).name);
+
+            if (sites.get(position).userType.equals(UserType.REGISTERED))
+            {
+                textView.append(" (registered)");
+            }
         }
         return linearLayoutForSites;
     }
