@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.SearchView;
 
+import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -39,7 +40,8 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Search in title");
 
-        if (isAuthenticatedRealm() == false)
+        if (isAuthenticatedRealm() == false || OperatingSite.getSite().userType == null
+                || OperatingSite.getSite().userType.equals(UserType.REGISTERED) == false)
         {
             Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
 
