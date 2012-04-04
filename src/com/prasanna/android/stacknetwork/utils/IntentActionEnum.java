@@ -32,6 +32,7 @@ public class IntentActionEnum
         INBOX("inbox"),
         ALL_USERS("users"),
         USER_DETAIL("userDetail"),
+        USER_ACCOUNTS("userAccounts"),
         QUESTIONS_BY_USER("questionsByUser"),
         ANSWERS_BY_USER("answersByUser"),
         LOGOUT("logout");

@@ -249,12 +249,18 @@
         android:layout_marginTop="2dp"
         android:background="@color/lightGrey" />
 
-    <LinearLayout
-        android:id="@+id/accountsList"
+    <ScrollView
+        android:id="@+id/userAccountScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/accountsUnderline"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:layout_below="@id/accountsUnderline" >
+
+        <LinearLayout
+            android:id="@+id/accountsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </ScrollView>
 
 </RelativeLayout>

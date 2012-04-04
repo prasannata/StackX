@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
@@ -28,6 +27,7 @@ import android.widget.TextView;
 import com.prasanna.android.stacknetwork.intent.UserAnswersIntentService;
 import com.prasanna.android.stacknetwork.intent.UserDetailsIntentService;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
+import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.User;
@@ -42,7 +42,7 @@ import com.prasanna.android.task.FetchImageAsyncTask;
 import com.prasanna.android.task.ImageFetchAsyncTaskCompleteNotifierImpl;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserProfileActivity extends Activity
+public class UserProfileActivity extends AbstractUserActionBarActivity
 {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
 
@@ -72,13 +72,17 @@ public class UserProfileActivity extends Activity
 
     private LinearLayout questionsDisplayList;
 
+    private LinearLayout userAccountList;
+
     private int questionsPage = 0;
 
     private int answersPage = 0;
 
-    private int questionDisplayCount = 0;
+    private int questionDisplayCursor = 0;
 
-    private int answerDisplayCount = 0;
+    private int answerDisplayCursor = 0;
+
+    private int usersAccountCursor = 0;
 
     public class TabListener implements ActionBar.TabListener
     {
@@ -115,7 +119,10 @@ public class UserProfileActivity extends Activity
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
+	    usersAccountCursor = 0;
+	    
 	    profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
+	    userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
 
 	    if (user == null)
 	    {
@@ -135,7 +142,7 @@ public class UserProfileActivity extends Activity
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-	    questionDisplayCount = 0;
+	    questionDisplayCursor = 0;
 
 	    Log.d(TAG, "Creating question fragment");
 
@@ -174,7 +181,7 @@ public class UserProfileActivity extends Activity
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-	    answerDisplayCount = 0;
+	    answerDisplayCursor = 0;
 
 	    Log.d(TAG, "Creating answer fragment");
 
@@ -240,10 +247,10 @@ public class UserProfileActivity extends Activity
 
     private void addAnswersToView()
     {
-	for (; answerDisplayCount < answersByUser.size(); answerDisplayCount++)
+	for (; answerDisplayCursor < answersByUser.size(); answerDisplayCursor++)
 	{
 	    final RelativeLayout answerRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.user_item_row, null);
-	    final Answer answer = answersByUser.get(answerDisplayCount);
+	    final Answer answer = answersByUser.get(answerDisplayCursor);
 	    TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
 	    textView.setText(Html.fromHtml(answer.title));
 
@@ -308,10 +315,10 @@ public class UserProfileActivity extends Activity
 	    }
 	    else
 	    {
-		for (; questionDisplayCount < questionsByUser.size(); questionDisplayCount++)
+		for (; questionDisplayCursor < questionsByUser.size(); questionDisplayCursor++)
 		{
 		    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(getLayoutInflater(),
-			            questionsLayout.getContext(), questionsByUser.get(questionDisplayCount));
+			            questionsLayout.getContext(), questionsByUser.get(questionDisplayCursor));
 		    questionsDisplayList.addView(questionLayout, new LinearLayout.LayoutParams(
 			            LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		}
@@ -364,6 +371,34 @@ public class UserProfileActivity extends Activity
 	}
     };
 
+    private BroadcastReceiver userAccountsReceiver = new BroadcastReceiver()
+    {
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    ArrayList<Account> accounts = (ArrayList<Account>) intent
+		            .getSerializableExtra(IntentActionEnum.UserIntentAction.USER_ACCOUNTS.getExtra());
+
+	    if (user != null && userAccountList != null)
+	    {
+		if (user.accounts == null)
+		{
+		    user.accounts = new ArrayList<Account>();
+		}
+
+		user.accounts.addAll(accounts);
+
+		for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
+		{
+		    TextView textView = (TextView) getLayoutInflater().inflate(R.layout.textview_black_textcolor, null);
+		    textView.setText(user.accounts.get(usersAccountCursor).siteName);
+		    userAccountList.addView(textView);
+		}
+	    }
+	}
+    };
+
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
@@ -374,6 +409,7 @@ public class UserProfileActivity extends Activity
 	registerForUserProfileReceiver();
 	registerForQuestionsByUserReceiver();
 	registerForAnwersByUserReceiver();
+	registerForUserAccountsReceiver();
 
 	startUserProfileService(intentForUser.id, intentForUser.accessToken);
 	startUserQuestionsService(intentForUser.id, intentForUser.accessToken);
@@ -442,6 +478,7 @@ public class UserProfileActivity extends Activity
 	    unregisterReceiver(userProfileReceiver);
 	    unregisterReceiver(questionsByUserReceiver);
 	    unregisterReceiver(answersByUserReceiver);
+	    unregisterReceiver(userAccountsReceiver);
 	}
 	catch (IllegalArgumentException e)
 	{
@@ -499,6 +536,13 @@ public class UserProfileActivity extends Activity
 	registerReceiver(answersByUserReceiver, filter);
     }
 
+    private void registerForUserAccountsReceiver()
+    {
+	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.USER_ACCOUNTS.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(userAccountsReceiver, filter);
+    }
+
     private void displayUserDetail(User user, RelativeLayout relativeLayout)
     {
 	if (user != null)
@@ -552,5 +596,17 @@ public class UserProfileActivity extends Activity
 
 	textView = (TextView) relativeLayout.findViewById(R.id.profileUserLastSeen);
 	textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+    }
+
+    @Override
+    public void refresh()
+    {
+	// TODO Auto-generated method stub
+    }
+
+    @Override
+    public Context getCurrentAppContext()
+    {
+	return getApplicationContext();
     }
 }
