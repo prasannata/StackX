@@ -3,11 +3,11 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@color/tags_bg_color"
-    android:inputType="textNoSuggestions"
     android:ellipsize="end"
+    android:inputType="textNoSuggestions"
+    android:paddingBottom="2dp"
     android:paddingLeft="2dp"
     android:paddingRight="2dp"
+    android:paddingTop="2dp"
     android:textColor="@color/black"
-    android:textSize="9dp" >
-
-</TextView>
+    android:textSize="9dp" />

@@ -9,7 +9,6 @@ import android.widget.ScrollView;
 
 import com.prasanna.android.listener.FlingActionListener;
 
-@SuppressWarnings("deprecation")
 public class FlingScrollView extends ScrollView
 {
     private GestureDetector gestureDetector;

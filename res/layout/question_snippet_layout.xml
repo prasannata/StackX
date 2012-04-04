@@ -1,12 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="5dp"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp"
-    android:paddingTop="0dp"
-    android:textColor="@color/black"
-    android:textSize="15dp" >
+    android:layout_height="wrap_content"
+    android:background="@drawable/question_unanswered_shape"
+    android:orientation="vertical" >
 
-</TextView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="4dp"
+        android:orientation="horizontal"
+        android:weightSum="1" >
+
+        <LinearLayout
+            android:id="@+id/questionCountLinearLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/questionScoreValue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:text="@string/questionScore"
+                android:textColor="@color/delft"
+                android:textSize="10dp" />
+
+            <TextView
+                android:id="@+id/questionViewsValue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:text="@string/questionViews"
+                android:textColor="@color/delft"
+                android:textSize="10dp" />
+
+            <TextView
+                android:id="@+id/questionAnswersValue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:text="@string/questionAnswers"
+                android:textColor="@color/delft"
+                android:textSize="10dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/questionSnippetTitle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="0.85"
+            android:textColor="@color/black"
+            android:textSize="15dp" >
+        </TextView>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/veryLightGrey" />
+
+    <LinearLayout
+        android:id="@+id/questionSnippetTags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginTop="3dp"
+        android:orientation="horizontal" >
+    </LinearLayout>
+
+</LinearLayout>

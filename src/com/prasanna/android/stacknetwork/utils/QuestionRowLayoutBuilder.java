@@ -6,7 +6,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -17,7 +16,6 @@ import com.prasanna.android.stacknetwork.model.Question;
 public class QuestionRowLayoutBuilder
 {
     private static QuestionRowLayoutBuilder builder = new QuestionRowLayoutBuilder();
-    private static int id = 0;
 
     private QuestionRowLayoutBuilder()
     {
@@ -25,111 +23,72 @@ public class QuestionRowLayoutBuilder
 
     public static QuestionRowLayoutBuilder getInstance()
     {
-        return builder;
+	return builder;
     }
 
-    public LinearLayout build(final Context context, Question question)
+    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, Question question)
     {
-        LinearLayout topLayout = new LinearLayout(context);
-        topLayout.setWeightSum(1f);
-        if (question.hasAcceptedAnswer == true)
-        {
-            topLayout.setBackgroundResource(R.drawable.question_answered_shape);
-        }
-        else
-        {
-            topLayout.setBackgroundResource(R.drawable.question_unanswered_shape);
-        }
+	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
+	if (question.hasAcceptedAnswer == true)
+	{
+	    questionRowLayout.setBackgroundResource(R.drawable.question_answered_shape);
+	}
 
-        topLayout.addView(createCountsView(context, question));
-        topLayout.addView(createQuestionSnippetView(context, question));
-        return topLayout;
+	createCountsView(questionRowLayout, question);
+	createQuestionSnippetView(questionRowLayout, context, question);
+	setupViewForTags(questionRowLayout, context, question);
+
+	return questionRowLayout;
     }
 
-    private LinearLayout createQuestionSnippetView(final Context context, final Question question)
+    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context,
+	            final Question question)
     {
-        LinearLayout questionLinearLayout = new LinearLayout(context);
-        questionLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-        questionLinearLayout.setClickable(true);
-        questionLinearLayout.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View view)
-            {
-                Intent displayQuestionIntent = new Intent(view.getContext(), QuestionDetailActivity.class);
-                displayQuestionIntent.putExtra("question", question);
-                context.startActivity(displayQuestionIntent);
-            }
-        });
-
-        RelativeLayout relativeLayout = new RelativeLayout(context);
-        TextView textView = ((TextView) getInflater(context).inflate(R.layout.question_snippet_layout, null));
-        textView.setText(Html.fromHtml(question.title));
-        textView.setId(++id);
-        relativeLayout.addView(textView);
-
-        setupViewForTags(context, question, relativeLayout);
-        questionLinearLayout.setLayoutParams(new LayoutParams(0, LayoutParams.WRAP_CONTENT, 0.86f));
-        questionLinearLayout.addView(relativeLayout);
-        return questionLinearLayout;
+	TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
+	textView.setText(Html.fromHtml(question.title));
+	textView.setOnClickListener(new View.OnClickListener()
+	{
+	    public void onClick(View view)
+	    {
+		Intent displayQuestionIntent = new Intent(view.getContext(), QuestionDetailActivity.class);
+		displayQuestionIntent.putExtra(StringConstants.QUESTION, question);
+		context.startActivity(displayQuestionIntent);
+	    }
+	});
     }
 
-    private void setupViewForTags(final Context context, final Question question, RelativeLayout relativeLayout)
+    private void setupViewForTags(final LinearLayout parentLayout, final Context context, final Question question)
     {
-        RelativeLayout.LayoutParams params = getTagLayoutParams();
+	LinearLayout tagsParentLayout = (LinearLayout) parentLayout.findViewById(R.id.questionSnippetTags);
 
-        if (question.tags != null && question.tags.length > 0)
-        {
-            TextView tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
-            tagTextView.setId(++id);
-            tagTextView.setText(question.tags[0]);
-            params.addRule(RelativeLayout.BELOW, id - 1);
-            tagTextView.setLayoutParams(params);
-            relativeLayout.addView(tagTextView);
-
-            for (int i = 1; i < question.tags.length; i++)
-            {
-                RelativeLayout.LayoutParams layoutParams = getTagLayoutParams();
-                tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
-                tagTextView.setId(++id);
-                tagTextView.setText(question.tags[i]);
-                tagTextView.setLayoutParams(layoutParams);
-                layoutParams.addRule(RelativeLayout.ALIGN_TOP, id - 1);
-                layoutParams.addRule(RelativeLayout.RIGHT_OF, id - 1);
-                relativeLayout.addView(tagTextView);
-            }
-        }
+	if (question.tags != null && question.tags.length > 0)
+	{
+	    for (int i = 0; i < question.tags.length; i++)
+	    {
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+		                LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+		params.setMargins(3, 0, 3, 0);
+		TextView tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
+		tagTextView.setText(question.tags[i]);
+		tagsParentLayout.addView(tagTextView, params);
+	    }
+	}
     }
 
-    private RelativeLayout.LayoutParams getTagLayoutParams()
+    private void createCountsView(final LinearLayout parentLayout, Question question)
     {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(0, 0, 7, 0);
-        return params;
-    }
+	TextView textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
+	textView.append(AppUtils.formatNumber(question.viewCount));
 
-    private LinearLayout createCountsView(Context context, Question question)
-    {
-        LinearLayout countsLayout = new LinearLayout(context);
-        countsLayout.setOrientation(LinearLayout.VERTICAL);
-        TextView textView = ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
-        textView.setText(context.getString(R.string.QuestionViews) + String.valueOf(question.viewCount));
-        countsLayout.addView(textView);
+	textView = (TextView) parentLayout.findViewById(R.id.questionScoreValue);
+	textView.append(AppUtils.formatNumber(question.score));
 
-        textView = ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
-        textView.setText(context.getString(R.string.QuestionScore) + String.valueOf(question.score));
-        countsLayout.addView(textView);
-
-        textView = ((TextView) getInflater(context).inflate(R.layout.question_counts_layout, null));
-        textView.setText(context.getString(R.string.QuestionAnswers) + String.valueOf(question.answerCount));
-        countsLayout.addView(textView);
-        LayoutParams params = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 0.14f);
-        countsLayout.setLayoutParams(params);
-        return countsLayout;
+	textView = (TextView) parentLayout.findViewById(R.id.questionAnswersValue);
+	textView.append(AppUtils.formatNumber(question.answerCount));
     }
 
     private LayoutInflater getInflater(Context context)
     {
-        return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 }

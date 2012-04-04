@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class AppUtils
 {
-    public static String formatUserReputation(int reputation)
+    public static String formatReputation(int reputation)
     {
 	String reputationString = "";
 
@@ -17,6 +17,22 @@ public class AppUtils
 	else
 	{
 	    reputationString += " (" + reputation + ")";
+	}
+	return reputationString;
+    }
+
+    public static String formatNumber(int reputation)
+    {
+	String reputationString = "";
+
+	if (reputation > 10000)
+	{
+	    float reputationInThousands = ((float) reputation) / 1000f;
+	    reputationString += " " + String.format("%.1fk", reputationInThousands);
+	}
+	else
+	{
+	    reputationString += " " + reputation;
 	}
 	return reputationString;
     }

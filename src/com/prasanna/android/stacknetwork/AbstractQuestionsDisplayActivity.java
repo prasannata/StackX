@@ -37,60 +37,60 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.questions_layout);
+	setContentView(R.layout.questions_layout);
 
-        scrollView = (ScrollViewWithNotifier) findViewById(R.id.questionsScroll);
-        questionsLinearLayout = (LinearLayout) scrollView.findViewById(R.id.questionsDisplay);
-        scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-        {
-            @Override
-            public void onScrollToBottom(View view)
-            {
-                if (serviceRunning == false)
-                {
-                    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                            LayoutParams.WRAP_CONTENT);
-                    layoutParams.setMargins(0, 15, 0, 15);
-                    questionsLinearLayout.addView(loadingProgressView, layoutParams);
-                    startQuestionsService();
-                }
-            }
-        });
+	scrollView = (ScrollViewWithNotifier) findViewById(R.id.questionsScroll);
+	questionsLinearLayout = (LinearLayout) scrollView.findViewById(R.id.questionsDisplay);
+	scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	{
+	    @Override
+	    public void onScrollToBottom(View view)
+	    {
+		if (serviceRunning == false)
+		{
+		    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
+		    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+			            LayoutParams.WRAP_CONTENT);
+		    layoutParams.setMargins(0, 15, 0, 15);
+		    questionsLinearLayout.addView(loadingProgressView, layoutParams);
+		    startQuestionsService();
+		}
+	    }
+	});
     }
 
     protected void processQuestions()
     {
-        if (fetchingQuestionsDialog != null)
-        {
-            fetchingQuestionsDialog.dismiss();
-            fetchingQuestionsDialog = null;
-        }
+	if (fetchingQuestionsDialog != null)
+	{
+	    fetchingQuestionsDialog.dismiss();
+	    fetchingQuestionsDialog = null;
+	}
 
-        if (loadingProgressView != null)
-        {
-            questionsLinearLayout.removeView(loadingProgressView);
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
+	if (loadingProgressView != null)
+	{
+	    questionsLinearLayout.removeView(loadingProgressView);
+	    loadingProgressView.setVisibility(View.GONE);
+	    loadingProgressView = null;
+	}
 
-        for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
-        {
-            LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(this,
-                    questions.get(lastDisplayQuestionIndex));
-            questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT));
-        }
+	for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
+	{
+	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(getLayoutInflater(), this,
+		            questions.get(lastDisplayQuestionIndex));
+	    questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		            LayoutParams.WRAP_CONTENT));
+	}
 
-        serviceRunning = false;
+	serviceRunning = false;
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        outState.putSerializable(StringConstants.QUESTIONS, questions);
-        super.onSaveInstanceState(outState);
+	outState.putSerializable(StringConstants.QUESTIONS, questions);
+	super.onSaveInstanceState(outState);
     }
 }

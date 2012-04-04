@@ -15,9 +15,9 @@
     <string name="usersUri">/users</string>
     <string name="usersByIdUri">/users/{id}</string>
     <string name="questionsUri">/questions</string>
-    <string name="QuestionViews">"V "</string>
-    <string name="QuestionScore">"S "</string>
-    <string name="QuestionAnswers">"A "</string>
+    <string name="questionViews">"V: "</string>
+    <string name="questionScore">"S: "</string>
+    <string name="questionAnswers">"A: "</string>
     <string name="plus">+</string>
     <string name="minus">-</string>
     <string name="skipLogin">Skip login</string>
@@ -40,6 +40,7 @@
     <string name="menu_option_tags">Tags</string>
     <string name="menu_option_change_site">Change site</string>
     <string name="menu_option_logout">Logout</string>
+    <string name="score">Score</string>
     <string name="Enter">Enter</string>
     <string name="site">site</string>
     <string name="by">"by "</string>
@@ -48,7 +49,6 @@
     <string name="loadingSites">"Loading sites"</string>
     <string name="question">Question</string>
     <string name="answers">Answers</string>
-    <string name="score">Score</string>
     <string name="comments">"Comments (…)"</string>
 	<string name="viewProfile">"View profile"</string>
 	<string name="viewQuestion">"Question"</string>
