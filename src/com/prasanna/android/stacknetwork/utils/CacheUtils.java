@@ -108,4 +108,29 @@ public class CacheUtils
 
         return sites;
     }
+
+    public static void clear(Context context)
+    {
+        if (context != null)
+        {
+            File cacheDir = context.getCacheDir();
+            if (cacheDir != null && cacheDir.isDirectory())
+            {
+                deleteDir(cacheDir);
+            }
+        }
+    }
+
+    public static boolean deleteDir(File dir)
+    {
+        if (dir != null && dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++)
+            {
+                deleteDir(new File(dir, children[i]));
+            }
+        }
+        return dir.delete();
+    }
 }
