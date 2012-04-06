@@ -48,6 +48,7 @@ public class StackNetworkListActivity extends ListActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.sitelist);
 
         Object lastSavedInstance = null;
         if (savedInstanceState != null)
@@ -56,7 +57,6 @@ public class StackNetworkListActivity extends ListActivity
         }
 
         HttpHelper.getInstance().setHost(StackUri.STACKX_API_HOST);
-
         if (lastSavedInstance == null && CacheUtils.hasSiteListCache(getApplicationContext()) == false)
         {
             registerReceiverAndStartService();
@@ -166,7 +166,7 @@ public class StackNetworkListActivity extends ListActivity
     {
         if (sites != null && sites.isEmpty() == false)
         {
-            setListAdapter(new SiteListAdapter(this, R.layout.sitelist_row, sites));
+            setListAdapter(new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView()));
         }
     }
 

@@ -49,7 +49,12 @@
     <string name="question">Question</string>
     <string name="answers">Answers</string>
     <string name="comments">"Comments (…)"</string>
-	<string name="viewProfile">"View profile"</string>
-	<string name="viewQuestion">"Question"</string>
-	<string name="viewUserAnswer">"View answer"</string>
+    <string name="viewProfile">"View profile"</string>
+    <string name="viewQuestion">"Question"</string>
+    <string name="viewUserAnswer">"View answer"</string>
+    <string name="registered">Registered</string>
+    <string name="reorder">Reorder</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+
 </resources>

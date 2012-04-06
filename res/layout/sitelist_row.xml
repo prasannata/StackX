@@ -3,6 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@drawable/rounded_border_grey"
+    android:orientation="horizontal"
     android:weightSum="1" >
 
     <TextView
@@ -10,7 +11,7 @@
         android:layout_height="fill_parent"
         android:layout_marginBottom="3dp"
         android:layout_marginLeft="3dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="5dp"
         android:layout_weight="0.1"
         android:background="@color/delft"
         android:gravity="center_vertical"
@@ -20,11 +21,24 @@
         android:id="@+id/siteName"
         android:layout_width="0dp"
         android:layout_height="fill_parent"
-        android:layout_marginLeft="5dp"
+        android:layout_marginLeft="3dp"
         android:layout_marginTop="5dp"
-        android:layout_weight="0.8"
+        android:layout_weight="0.65"
         android:gravity="left|center_vertical|center_horizontal"
         android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/siteUserTypeRegistered"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="0.15"
+        android:gravity="center"
+        android:text="@string/registered"
+        android:textColor="@color/darkGreen"
+        android:textSize="8dp"
+        android:visibility="invisible" />
 
     <ImageView
         android:layout_width="0dp"
