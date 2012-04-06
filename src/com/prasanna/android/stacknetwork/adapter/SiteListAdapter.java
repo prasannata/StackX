@@ -32,56 +32,61 @@ public class SiteListAdapter extends ArrayAdapter<Site>
     private final List<Site> sites;
     private final Context context;
     private final ListView listView;
-    int numRowsPassed = 0;
-    int lastRecordedY = -1;
-    int startOffset = 0;
+    private int numRowsPassed = 0;
+    private int lastRecordedY = -1;
+    private int startOffset = 0;
+    private boolean reorder = false;
 
     public class SiteDragAndDropListener implements View.OnDragListener
     {
         @Override
         public boolean onDrag(View paramView, DragEvent paramDragEvent)
         {
+            Log.d(TAG, "On drag enter");
 
-            switch (paramDragEvent.getAction())
+            if (reorder == true)
             {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    Log.d(TAG, "ACTION_DRAG_STARTED");
-                    return true;
-                case DragEvent.ACTION_DRAG_ENDED:
-                    Log.d(TAG, "ACTION_DRAG_ENDED");
-                    numRowsPassed = 0;
-                    lastRecordedY = -1;
-                    notifyDataSetChanged();
-                    return true;
-                case DragEvent.ACTION_DROP:
-                    Log.d(TAG, "ACTION_DROP");
-                    Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
-                    Intent intent = clipDataItem.getIntent();
-                    int draggedListItemPosition = intent.getIntExtra(POSITION, -1);
-                    if (draggedListItemPosition != -1)
-                    {
-                        int currentRowX = (int) paramDragEvent.getX();
-                        int currentRowY = startOffset + (numRowsPassed * paramView.getHeight());
-                        int currentRowPosition = listView.pointToPosition(currentRowX, currentRowY);
-                        sites.add(currentRowPosition + 1, sites.get(draggedListItemPosition));
-                        sites.remove(draggedListItemPosition);
-                    }
-                    return true;
-                case DragEvent.ACTION_DRAG_LOCATION:
-                    Log.d(TAG, "ACTION_DRAG_LOCATION");
-
-                    int y = (int) paramDragEvent.getY();
-
-                    paramView.setBackgroundColor(Color.GRAY);
-
-                    if (y < lastRecordedY)
-                    {
-                        numRowsPassed++;
+                switch (paramDragEvent.getAction())
+                {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        Log.d(TAG, "ACTION_DRAG_STARTED");
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        Log.d(TAG, "ACTION_DRAG_ENDED");
+                        numRowsPassed = 0;
                         lastRecordedY = -1;
-                    }
+                        notifyDataSetChanged();
+                        return true;
+                    case DragEvent.ACTION_DROP:
+                        Log.d(TAG, "ACTION_DROP");
+                        Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
+                        Intent intent = clipDataItem.getIntent();
+                        int draggedListItemPosition = intent.getIntExtra(POSITION, -1);
+                        if (draggedListItemPosition != -1)
+                        {
+                            int currentRowX = (int) paramDragEvent.getX();
+                            int currentRowY = startOffset + (numRowsPassed * paramView.getHeight());
+                            int currentRowPosition = listView.pointToPosition(currentRowX, currentRowY);
+                            sites.add(currentRowPosition + 1, sites.get(draggedListItemPosition));
+                            sites.remove(draggedListItemPosition);
+                        }
+                        return true;
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        Log.d(TAG, "ACTION_DRAG_LOCATION");
 
-                    lastRecordedY = y;
-                    return true;
+                        int y = (int) paramDragEvent.getY();
+
+                        paramView.setBackgroundColor(Color.GRAY);
+
+                        if (y < lastRecordedY)
+                        {
+                            numRowsPassed++;
+                            lastRecordedY = -1;
+                        }
+
+                        lastRecordedY = y;
+                        return true;
+                }
             }
 
             return false;
@@ -123,20 +128,30 @@ public class SiteListAdapter extends ArrayAdapter<Site>
                 @Override
                 public boolean onLongClick(View paramView)
                 {
-                    Intent intent = new Intent(DRAG);
-                    intent.putExtra(POSITION, position);
-                    ClipData.Item clipDataItem = new ClipData.Item(intent);
+                    if (reorder == true)
+                    {
+                        Intent intent = new Intent(DRAG);
+                        intent.putExtra(POSITION, position);
+                        ClipData.Item clipDataItem = new ClipData.Item(intent);
 
-                    ClipData dragData = new ClipData(sites.get(position).name, new String[]
-                    { "text/plain" }, clipDataItem);
+                        ClipData dragData = new ClipData(sites.get(position).name, new String[]
+                        { "text/plain" }, clipDataItem);
 
-                    startOffset = paramView.getBottom();
+                        startOffset = paramView.getBottom();
 
-                    paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
+                        paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
+                    }
                     return false;
                 }
             });
         }
         return linearLayoutForSites;
+    }
+
+    public void toggleReorder()
+    {
+        reorder = !reorder;
+
+        Log.d(TAG, "Reorder = " + reorder);
     }
 }

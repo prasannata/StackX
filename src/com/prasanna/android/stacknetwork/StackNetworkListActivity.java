@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.prasanna.android.http.HttpHelper;
@@ -34,6 +35,12 @@ public class StackNetworkListActivity extends ListActivity
 
     private ArrayList<Site> sites;
 
+    private Button reorderDoneToggleButton;
+
+    private SiteListAdapter siteListAdapter;
+
+    private Button cancelReorderButton;
+
     private BroadcastReceiver receiver = new BroadcastReceiver()
     {
         @Override
@@ -49,6 +56,23 @@ public class StackNetworkListActivity extends ListActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sitelist);
+
+        reorderDoneToggleButton = (Button) findViewById(R.id.reorderDoneToggle);
+        cancelReorderButton = (Button) findViewById(R.id.cancelSiteListReorder);
+
+        reorderDoneToggleButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (siteListAdapter != null)
+                {
+                    siteListAdapter.toggleReorder();
+                    toggleReorderDoneButtonText();
+                    toggleReorderCancelButtonVisibiltiy();
+                }
+            }
+        });
 
         Object lastSavedInstance = null;
         if (savedInstanceState != null)
@@ -166,8 +190,19 @@ public class StackNetworkListActivity extends ListActivity
     {
         if (sites != null && sites.isEmpty() == false)
         {
-            setListAdapter(new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView()));
+            siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView());
+            setListAdapter(siteListAdapter);
         }
+    }
+
+    private void toggleReorderDoneButtonText()
+    {
+
+    }
+
+    private void toggleReorderCancelButtonVisibiltiy()
+    {
+
     }
 
     @Override
