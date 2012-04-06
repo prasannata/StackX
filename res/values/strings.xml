@@ -56,5 +56,6 @@
     <string name="reorder">Reorder</string>
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
+    <string name="dragAndDropHint">"Long press and drag"</string>
 
 </resources>
