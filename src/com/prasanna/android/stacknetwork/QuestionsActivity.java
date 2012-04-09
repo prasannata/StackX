@@ -2,131 +2,140 @@ package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
 
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
-import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.FetchUserTagsAsyncTask;
 
 public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
 
-    private int page = 0;
+    private ArrayList<String> tags = new ArrayList<String>();
 
-    private BroadcastReceiver receiver = new BroadcastReceiver()
+    private ArrayAdapter<String> spinnerAdapter;
+
+    public class FetchUserTagsCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<String>>
     {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            questions.addAll((ArrayList<Question>) intent
-                    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTIONS.getExtra()));
+	@Override
+	public void notifyOnCompletion(ArrayList<String> result)
+	{
+	    tags.add(StringConstants.FRONT_PAGE);
+	    tags.addAll(result);
 
-            processQuestions();
-        }
-    };
+	    initActionBarAndSpinner(tags);
+	}
+    }
+
+    private void initActionBarAndSpinner(ArrayList<String> tags)
+    {
+	getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+	OnNavigationListener callback = new OnNavigationListener()
+	{
+	    @Override
+	    public boolean onNavigationItemSelected(int itemPosition, long itemId)
+	    {
+		if (itemPosition > 0)
+		{
+		    String tag = spinnerAdapter.getItem(itemPosition);
+		    Intent tagFaqIntent = new Intent(getApplicationContext(), TagFaqActivity.class);
+		    tagFaqIntent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), tag);
+		    startActivity(tagFaqIntent);
+		    return true;
+		}
+		return false;
+	    }
+	};
+
+	spinnerAdapter = new ArrayAdapter<String>(this, R.layout.action_bar_spinner, R.id.spinnertAdapterItem, tags);
+	getActionBar().setListNavigationCallbacks(spinnerAdapter, callback);
+    }
+
+    @Override
+    protected void onStart()
+    {
+	super.onStart();
+
+	if (isAuthenticatedRealm() == true)
+	{
+	    FetchUserTagsAsyncTask fetchUserAsyncTask = new FetchUserTagsAsyncTask(
+		            new FetchUserTagsCompletionNotifier());
+	    fetchUserAsyncTask.execute(1);
+	}
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        Object lastSavedObject = null;
-        if (savedInstanceState != null)
-        {
-            lastSavedObject = savedInstanceState.getSerializable(StringConstants.QUESTIONS);
-        }
+	super.onCreate(savedInstanceState);
+	Object lastSavedObject = null;
+	if (savedInstanceState != null)
+	{
+	    lastSavedObject = savedInstanceState.getSerializable(StringConstants.QUESTIONS);
+	}
 
-        startReceiverAndService(lastSavedObject);
+	registerReceiverAndStartService(lastSavedObject);
     }
 
-    @SuppressWarnings("unchecked")
-    private void startReceiverAndService(Object lastSavedObject)
+    private void registerReceiverAndStartService(Object lastSavedObject)
     {
-        registerQuestionsReceiver();
+	registerQuestionsReceiver();
 
-        if (lastSavedObject == null)
-        {
-            fetchingQuestionsDialog = ProgressDialog.show(QuestionsActivity.this, "", getString(R.string.loading));
-
-            startQuestionsService();
-        }
-        else
-        {
-            questions = (ArrayList<Question>) lastSavedObject;
-            page = questions.size() / Integer.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE);
-            processQuestions();
-        }
+	loadIfLastInstanceWasSaved(lastSavedObject);
     }
 
     @Override
     protected void startQuestionsService()
     {
-        questionsIntent = new Intent(this, UserQuestionsIntentService.class);
-        questionsIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
-        questionsIntent.putExtra(StringConstants.PAGE, ++page);
-        startService(questionsIntent);
-        serviceRunning = true;
-    }
-
-    private void registerQuestionsReceiver()
-    {
-        IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
+	questionsIntent = new Intent(this, UserQuestionsIntentService.class);
+	questionsIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+	questionsIntent.putExtra(StringConstants.PAGE, ++page);
+	startService(questionsIntent);
+	serviceRunning = true;
     }
 
     @Override
-    protected void onDestroy()
+    protected void registerQuestionsReceiver()
     {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
-    }
-
-    private void stopServiceAndUnregisterReceiver()
-    {
-        if (questionsIntent != null)
-        {
-            stopService(questionsIntent);
-        }
-
-        try
-        {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-
-        stopServiceAndUnregisterReceiver();
+	IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(receiver, filter);
     }
 
     @Override
     public void refresh()
     {
-        stopServiceAndUnregisterReceiver();
-        questionsLinearLayout.removeAllViews();
-        startReceiverAndService(null);
+	stopServiceAndUnregisterReceiver();
+	questionsLinearLayout.removeAllViews();
+	registerReceiverAndStartService(null);
     }
 
     @Override
     public Context getCurrentAppContext()
     {
-        return getApplicationContext();
+	return QuestionsActivity.this;
+    }
+
+    @Override
+    protected String getLogTag()
+    {
+	return TAG;
+    }
+
+    @Override
+    protected QuestionIntentAction getIntentAction()
+    {
+	return QuestionIntentAction.QUESTIONS;
     }
 }

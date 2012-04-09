@@ -88,7 +88,7 @@ public class StackNetworkListActivity extends ListActivity
 		{
 		    // Poor to just overwrite from cache.
 		    siteListAdapter.overwriteDataset(CacheUtils.fetchFromSiteListCache(getApplicationContext()));
-		    
+
 		    reorder = siteListAdapter.toggleReorderFlag();
 		    v.setVisibility(View.INVISIBLE);
 		    toggleReorderDoneButtonText();
@@ -122,13 +122,25 @@ public class StackNetworkListActivity extends ListActivity
 	}
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see android.app.ListActivity#onListItemClick(android.widget.ListView,
+     * android.view.View, int, long)
+     * 
+     * This nor listView.setOnItemClickListener is not getting called when each row of listView is made up of linear
+     * layout and that linear layout has onLongClickListener. Instead I had to
+     * set an onClickListener on the linear layout.
+     */
     @Override
     protected void onListItemClick(ListView listView, View v, int position, long id)
     {
+	Log.d(TAG, "Clicking on list item " + position);
+
 	Site site = sites.get(position);
 	OperatingSite.setSite(site);
-	Intent myIntent = new Intent(this, QuestionsActivity.class);
-	startActivity(myIntent);
+	Intent startQuestionActivityIntent = new Intent(this, QuestionsActivity.class);
+	startActivity(startQuestionActivityIntent);
     }
 
     @Override

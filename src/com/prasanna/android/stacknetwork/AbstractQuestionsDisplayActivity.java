@@ -3,14 +3,19 @@ package com.prasanna.android.stacknetwork;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
@@ -28,11 +33,31 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
     protected LinearLayout loadingProgressView;
 
-    protected abstract void startQuestionsService();
-
     protected ArrayList<Question> questions = new ArrayList<Question>();
 
     protected int lastDisplayQuestionIndex = 0;
+
+    protected abstract void startQuestionsService();
+
+    protected abstract void registerQuestionsReceiver();
+
+    protected abstract String getLogTag();
+
+    protected abstract QuestionIntentAction getIntentAction();
+
+    protected int page = 0;
+
+    protected BroadcastReceiver receiver = new BroadcastReceiver()
+    {
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    questions.addAll((ArrayList<Question>) intent.getSerializableExtra(getIntentAction().getExtra()));
+
+	    processQuestions();
+	}
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -59,6 +84,55 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 		}
 	    }
 	});
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void loadIfLastInstanceWasSaved(Object lastSavedObject)
+    {
+	if (lastSavedObject == null)
+	{
+	    fetchingQuestionsDialog = ProgressDialog.show(getCurrentAppContext(), "", getString(R.string.loading));
+
+	    startQuestionsService();
+	}
+	else
+	{
+	    questions = (ArrayList<Question>) lastSavedObject;
+	    page = questions.size() / Integer.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE);
+	    processQuestions();
+	}
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+	super.onDestroy();
+	stopServiceAndUnregisterReceiver();
+    }
+
+    @Override
+    public void onStop()
+    {
+	super.onStop();
+
+	stopServiceAndUnregisterReceiver();
+    }
+
+    protected void stopServiceAndUnregisterReceiver()
+    {
+	if (questionsIntent != null)
+	{
+	    stopService(questionsIntent);
+	}
+
+	try
+	{
+	    unregisterReceiver(receiver);
+	}
+	catch (IllegalArgumentException e)
+	{
+	    Log.d(getLogTag(), e.getMessage());
+	}
     }
 
     protected void processQuestions()

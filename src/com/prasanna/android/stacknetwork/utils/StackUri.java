@@ -25,7 +25,6 @@ public class StackUri
     {
         public static final String PAGE_SIZE = "15";
         public static final String ORDER = "desc";
-        public static final String SORT = "activity";
         public static final String QUESTION_DETAIL_FILTER = "!3vWTEWZ2QQ3pULbNz";
         public static final String USER_DETAIL_FILTER = "!-q2RdWJy";
         public static final String USER_INBOX_FILTER = "!-q2RaosI";
@@ -34,5 +33,12 @@ public class StackUri
         public static final String KEY = "Nt8I5NbbbzXXPPVwE0ujRg((";
         public static final String SCOPE = "read_inbox,no_expiry";
         public static final String REDIRECT_URI = "http://oauth.prasanna.stackx.com";
+    }
+    
+    public static class Sort
+    {
+	public static final String SORT_BY_ACTIVITY = "activity";
+	public static final String SORT_BY_POPULAR = "popular";
+	public static final String SORT_BY_NAME = "name";
     }
 }

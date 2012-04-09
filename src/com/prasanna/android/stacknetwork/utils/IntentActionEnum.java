@@ -13,7 +13,8 @@ public class IntentActionEnum
         QUESTION_FULL_DETAILS("questionFullDetails"),
         QUESTION_ANSWERS("questionAnswers"),
         QUESTION_COMMENTS("questionComments"),
-        QUESTION_SEARCH("questionSearch"), ;
+        QUESTION_SEARCH("questionSearch"),
+        TAGS_FAQ("tagsFaq");
         private final String extra;
 
         private QuestionIntentAction(String extra)

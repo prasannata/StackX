@@ -37,7 +37,7 @@ public class UserSitesIntentService extends IntentService
         }
 
         LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork(accessToken);
-        HashMap<String, Account> linkAccountsMap = userService.getAccounts(accessToken, 1);
+        HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
 
         if (linkAccountsMap != null && linkSitesMap != null)
         {

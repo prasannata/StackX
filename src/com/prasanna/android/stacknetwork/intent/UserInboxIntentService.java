@@ -33,7 +33,7 @@ public class UserInboxIntentService extends IntentService
 
         if (accessToken != null)
         {
-            inboxItems = userService.getInbox(accessToken, page);
+            inboxItems = userService.getInbox(page);
         }
 
         Intent broadcastIntent = new Intent();

@@ -14,14 +14,16 @@
         an=""
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
-        <service android:name="com.prasanna.android.stacknetwork.intent.QuestionDetailsIntentService" />
-        <service android:name="com.prasanna.android.stacknetwork.intent.UserDetailsIntentService" />
-        <service android:name="com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService" />
-        <service android:name="com.prasanna.android.stacknetwork.intent.UserAnswersIntentService" />
-        <service android:name="com.prasanna.android.stacknetwork.intent.SearchForQuestionsIntentService" />
-        <service android:name="com.prasanna.android.stacknetwork.intent.UserDeauthenticateAppIntentService" />
-        <service android:name="com.prasanna.android.stacknetwork.intent.UserInboxIntentService" />
+        <service android:name=".intent.QuestionDetailsIntentService" />
+        <service android:name=".intent.UserDetailsIntentService" />
+        <service android:name=".intent.UserQuestionsIntentService" />
+        <service android:name=".intent.UserAnswersIntentService" />
+        <service android:name=".intent.SearchForQuestionsIntentService" />
+        <service android:name=".intent.UserDeauthenticateAppIntentService" />
+        <service android:name=".intent.UserInboxIntentService" />
+        <service android:name=".intent.UserInboxIntentService" />
         <service android:name=".intent.UserSitesIntentService" />
+        <service android:name=".intent.TagFaqIntentService" />
 
         <activity
             android:name=".LoginActivity"
@@ -67,8 +69,8 @@
             android:name=".UserTabsWidget"
             android:label="@string/app_name" >
         </activity>
-        <activity android:name=".QuestionDetailActivity" >
-        </activity>
+        <activity android:name=".QuestionDetailActivity" />
+        <activity android:name=".TagFaqActivity" />
     </application>
 
 </manifest>

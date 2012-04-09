@@ -38,7 +38,7 @@ public class UserDetailsIntentService extends IntentService
         }
         else
         {
-            user = userService.getLoggedInUser(accessToken);
+            user = userService.getLoggedInUser();
         }
 
         Intent broadcastIntent = new Intent();
@@ -58,7 +58,7 @@ public class UserDetailsIntentService extends IntentService
         HashMap<String, Account> accounts = null;
         if (accessToken != null)
         {
-            accounts = userService.getAccounts(accessToken, 1);
+            accounts = userService.getAccounts(1);
         }
         else
         {

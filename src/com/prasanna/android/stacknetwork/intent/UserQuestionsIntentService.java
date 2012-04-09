@@ -48,7 +48,7 @@ public class UserQuestionsIntentService extends IntentService
         {
             if (action.equals(UserIntentAction.QUESTIONS_BY_USER.name()))
             {
-                broadcastIntent(userService.getMyQuestions(accessToken, page));
+                broadcastIntent(userService.getMyQuestions(page));
             }
             else
             {
@@ -59,7 +59,7 @@ public class UserQuestionsIntentService extends IntentService
 
     private void getFrontPageQuestionsAndBroadcast(String accessToken, int page)
     {
-        ArrayList<Question> questions = userService.getAllQuestions(accessToken, page);
+        ArrayList<Question> questions = userService.getAllQuestions(page);
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

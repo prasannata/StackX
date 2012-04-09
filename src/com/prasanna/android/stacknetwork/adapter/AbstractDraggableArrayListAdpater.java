@@ -22,7 +22,7 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
     private int numRowsPassed = 0;
     private int lastRecordedY = -1;
     private int startOffset = 0;
-    private final ListView listView;
+    protected final ListView listView;
     protected List<T> dataSet;
 
     protected boolean reorder = false;
@@ -30,11 +30,13 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 
     protected abstract String getTag();
 
-    protected class SiteDragAndDropListener implements View.OnDragListener
+    protected class ListViewDragListener implements View.OnDragListener
     {
 	@Override
 	public boolean onDrag(View paramView, DragEvent paramDragEvent)
 	{
+	    Log.d(getTag(), "on Drag");
+
 	    if (reorder == true)
 	    {
 		switch (paramDragEvent.getAction())
@@ -97,9 +99,10 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 	return changed;
     }
 
-    public void enableDragAndDrop(View view, final int itemPosition, final String clipDataLabel)
+    protected void enableDragAndDrop(View view, final int itemPosition, final String clipDataLabel)
     {
-	view.setOnDragListener(new SiteDragAndDropListener());
+	view.setOnDragListener(new ListViewDragListener());
+
 	view.setOnLongClickListener(new View.OnLongClickListener()
 	{
 	    @Override
@@ -116,7 +119,10 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 		    startOffset = paramView.getBottom();
 
 		    paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
+
+		    return true;
 		}
+
 		return false;
 	    }
 	});

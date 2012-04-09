@@ -3,6 +3,8 @@ package com.prasanna.android.stacknetwork.adapter;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
 public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
 {
@@ -47,6 +51,23 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
 		textView = (TextView) linearLayoutForSites.findViewById(R.id.siteUserTypeRegistered);
 		textView.setVisibility(View.VISIBLE);
 	    }
+
+	    /*
+	     * Not able to make onListItemClick work when onLongClickListener is
+	     * set for linearLayoutForSites.
+	     */
+	    linearLayoutForSites.setOnClickListener(new View.OnClickListener()
+	    {
+		public void onClick(View v)
+		{
+		    Log.d(TAG, "Clicking on list item " + position);
+
+		    Site site = dataSet.get(position);
+		    OperatingSite.setSite(site);
+		    Intent startQuestionActivityIntent = new Intent(listView.getContext(), QuestionsActivity.class);
+		    listView.getContext().startActivity(startQuestionActivityIntent);
+		}
+	    });
 
 	    enableDragAndDrop(linearLayoutForSites, position, dataSet.get(position).name);
 	}

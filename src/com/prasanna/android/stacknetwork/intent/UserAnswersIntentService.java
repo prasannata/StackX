@@ -40,7 +40,7 @@ public class UserAnswersIntentService extends IntentService
 	}
 	else
 	{
-	    broadcastIntent(userService.getMyAnswers(accessToken, page));
+	    broadcastIntent(userService.getMyAnswers(page));
 	}
     }
 
