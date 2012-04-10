@@ -15,7 +15,7 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
-import com.prasanna.android.task.FetchUserTagsAsyncTask;
+import com.prasanna.android.task.FetchTagsAsyncTask;
 
 public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 {
@@ -69,7 +69,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 
 	if (isAuthenticatedRealm() == true)
 	{
-	    FetchUserTagsAsyncTask fetchUserAsyncTask = new FetchUserTagsAsyncTask(
+	    FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(
 		            new FetchUserTagsCompletionNotifier());
 	    fetchUserAsyncTask.execute(1);
 	}
