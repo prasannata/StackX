@@ -74,8 +74,9 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
         super.onCreate(savedInstanceState);
 
         questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.questions_layout, null);
-        questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
         questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
+        questionsDisplayList = (LinearLayout) getLayoutInflater().inflate(R.layout.fragment_questions, null);
+        questionsScroll.addView(questionsDisplayList);
         questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override

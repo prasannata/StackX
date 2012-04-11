@@ -150,8 +150,10 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
             fetchUserQuestionsProgress = ProgressDialog.show(UserProfileActivity.this, "", "Loading questions");
 
             questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
-            questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
             questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
+            questionsDisplayList = (LinearLayout) getLayoutInflater().inflate(R.layout.fragment_questions,
+                    questionsScroll);
+
             questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
             {
                 @Override
@@ -190,8 +192,10 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
 
             questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
 
-            questionsDisplayList = (LinearLayout) questionsLayout.findViewById(R.id.questionsDisplay);
             questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
+            questionsDisplayList = (LinearLayout) getLayoutInflater().inflate(R.layout.fragment_questions, null);
+            questionsScroll.addView(questionsDisplayList);
+
             questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
             {
                 @Override

@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.intent.SearchForQuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
@@ -22,100 +24,116 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	query = getIntent().getStringExtra(SearchManager.QUERY);
+        query = getIntent().getStringExtra(SearchManager.QUERY);
 
-	Log.d(TAG, "started for query: " + query);
+        Log.d(TAG, "started for query: " + query);
 
-	fetchingQuestionsDialog = ProgressDialog.show(QuestionSearchResultsActivity.this, "",
-	                getString(R.string.loading));
+        fetchingQuestionsDialog = ProgressDialog.show(QuestionSearchResultsActivity.this, "",
+                getString(R.string.loading));
 
-	registerQuestionsReceiver();
+        registerQuestionsReceiver();
 
-	startQuestionsService();
+        fetchingQuestionsDialog = ProgressDialog.show(getCurrentAppContext(), "", getString(R.string.loading));
+        
+        startQuestionsService();
     }
 
     @Override
     public boolean onQueryTextSubmit(String paramString)
     {
-	if (serviceRunning == false)
-	{
-	    query = paramString;
-	    startQuestionsService();
-	    return true;
-	}
+        if (serviceRunning == false)
+        {
+            query = paramString;
+            startQuestionsService();
+            return true;
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     protected void processQuestions()
     {
-	Log.d(TAG, "Received search response " + questions);
+        Log.d(TAG, "Received search response " + questions);
 
-	questionsLinearLayout.removeAllViews();
+        questionsLinearLayout.removeAllViews();
 
-	super.processQuestions();
+        super.processQuestions();
     }
 
     @Override
     public boolean onQueryTextChange(String paramString)
     {
-	return false;
+        return false;
     }
 
     @Override
     protected void startQuestionsService()
     {
-	questionsIntent = new Intent(this, SearchForQuestionsIntentService.class);
-	questionsIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
-	questionsIntent.putExtra(SearchManager.QUERY, query);
-	questionsIntent.putExtra(StringConstants.PAGE, ++page);
-	startService(questionsIntent);
-	serviceRunning = true;
+        questionsIntent = new Intent(this, SearchForQuestionsIntentService.class);
+        questionsIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
+        questionsIntent.putExtra(SearchManager.QUERY, query);
+        questionsIntent.putExtra(StringConstants.PAGE, ++page);
+        startService(questionsIntent);
+        serviceRunning = true;
     }
 
     @Override
     public void refresh()
     {
-	if (serviceRunning == false && query != null)
-	{
-	    startQuestionsService();
-	}
+        if (serviceRunning == false && query != null)
+        {
+            startQuestionsService();
+        }
     }
 
     @Override
     public Context getCurrentAppContext()
     {
-	return getApplicationContext();
+        return getApplicationContext();
     }
 
     @Override
     protected void registerQuestionsReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(receiver, filter);
+        IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
     }
 
     @Override
     protected String getLogTag()
     {
-	return TAG;
+        return TAG;
     }
 
     @Override
     protected QuestionIntentAction getReceiverIntentAction()
     {
-	return QuestionIntentAction.QUESTION_SEARCH;
+        return QuestionIntentAction.QUESTION_SEARCH;
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-	outState.putSerializable(StringConstants.QUESTIONS, questions);
-	super.onSaveInstanceState(outState);
+        outState.putSerializable(StringConstants.QUESTIONS, questions);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onScrollToBottom()
+    {
+        if (serviceRunning == false)
+        {
+            loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 15, 0, 15);
+            questionsLinearLayout.addView(loadingProgressView, layoutParams);
+            startQuestionsService();
+        }
     }
 
 }
