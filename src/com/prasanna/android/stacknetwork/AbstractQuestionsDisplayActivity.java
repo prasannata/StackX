@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -16,7 +17,6 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StackUri;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
 public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActionBarActivity
@@ -43,9 +43,13 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
     protected abstract String getLogTag();
 
-    protected abstract QuestionIntentAction getIntentAction();
+    protected abstract QuestionIntentAction getReceiverIntentAction();
 
     protected int page = 0;
+
+    protected ArrayList<String> tags = new ArrayList<String>();
+
+    protected ArrayAdapter<String> spinnerAdapter;
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -53,7 +57,9 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-	    questions.addAll((ArrayList<Question>) intent.getSerializableExtra(getIntentAction().getExtra()));
+	    questions.addAll((ArrayList<Question>) intent.getSerializableExtra(getReceiverIntentAction().getExtra()));
+
+	    Log.d(getLogTag(), "Questions received: " + questions.size());
 
 	    processQuestions();
 	}
@@ -159,12 +165,5 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 	}
 
 	serviceRunning = false;
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-	outState.putSerializable(StringConstants.QUESTIONS, questions);
-	super.onSaveInstanceState(outState);
     }
 }

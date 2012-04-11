@@ -383,7 +383,7 @@ public class UserService extends AbstractBaseService
 	return error;
     }
 
-    public ArrayList<String> getTagsForUser(int page)
+    public ArrayList<String> getTags(int page)
     {
 	ArrayList<String> tags = null;
 	String restEndPoint = "/tags";

@@ -43,6 +43,7 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
 	{
 	    query = paramString;
 	    startQuestionsService();
+	    return true;
 	}
 
 	return false;
@@ -61,7 +62,6 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     @Override
     public boolean onQueryTextChange(String paramString)
     {
-	// TODO Auto-generated method stub
 	return false;
     }
 
@@ -79,7 +79,10 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     @Override
     public void refresh()
     {
-	// TODO Auto-generated method stub
+	if (serviceRunning == false && query != null)
+	{
+	    startQuestionsService();
+	}
     }
 
     @Override
@@ -103,9 +106,16 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     }
 
     @Override
-    protected QuestionIntentAction getIntentAction()
+    protected QuestionIntentAction getReceiverIntentAction()
     {
 	return QuestionIntentAction.QUESTION_SEARCH;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+	outState.putSerializable(StringConstants.QUESTIONS, questions);
+	super.onSaveInstanceState(outState);
     }
 
 }

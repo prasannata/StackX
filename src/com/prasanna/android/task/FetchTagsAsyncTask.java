@@ -18,17 +18,17 @@ public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<Strin
     @Override
     protected ArrayList<String> doInBackground(Integer... params)
     {
-	return UserService.getInstance().getTagsForUser(1);
+	return UserService.getInstance().getTags(1);
     }
 
     @Override
     protected void onPostExecute(ArrayList<String> result)
     {
-	super.onPostExecute(result);
-
 	if (fetchUserTagsCompletionNotifier != null)
 	{
 	    fetchUserTagsCompletionNotifier.notifyOnCompletion(result);
 	}
+	
+	super.onPostExecute(result);
     }
 }
