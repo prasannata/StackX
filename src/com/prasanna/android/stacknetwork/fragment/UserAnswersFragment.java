@@ -33,8 +33,8 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     private static final String TAG = UserAnswersFragment.class.getSimpleName();
     private int answerDisplayCursor = 0;
     private ProgressDialog progress;
-    private LinearLayout questionsLayout;
-    private ScrollViewWithNotifier questionsScroll;
+    private LinearLayout layoutContainer;
+    private ScrollViewWithNotifier scroller;
     private LinearLayout loadingProgressView;
     private User user;
     private Intent intent;
@@ -63,10 +63,10 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 
         progress = ProgressDialog.show(getActivity(), "", "Loading answers");
 
-        questionsLayout = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
-        questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.itemScroller);
-        questionsScroll.addView(itemsContainer);
-        questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+        layoutContainer = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
+        scroller = (ScrollViewWithNotifier) layoutContainer.findViewById(R.id.itemScroller);
+        scroller.addView(itemsContainer);
+        scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override
             public void onScrollToBottom(View view)
@@ -85,7 +85,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
             }
         });
 
-        return questionsLayout;
+        return layoutContainer;
     }
 
     @Override
@@ -205,7 +205,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
             loadingProgressView = null;
         }
 
-        if (items != null && questionsLayout != null && itemsContainer != null)
+        if (items != null && layoutContainer != null && itemsContainer != null)
         {
             if (items.isEmpty())
             {
