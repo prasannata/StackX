@@ -114,11 +114,17 @@ public class CacheUtils
     {
         if (context != null)
         {
+            Log.d(TAG, "Clearing cache");
+
             File cacheDir = context.getCacheDir();
             if (cacheDir != null && cacheDir.isDirectory())
             {
                 deleteDir(cacheDir);
             }
+
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.remove(StringConstants.ACCESS_TOKEN);
+            prefEditor.commit();
         }
     }
 
