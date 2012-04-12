@@ -87,18 +87,17 @@ public class StackNetworkListActivity extends ListActivity
             {
                 Log.d(TAG, "Cancelling ");
 
-		if (siteListAdapter != null)
-		{
-		    // Poor to just overwrite from cache.
-		    siteListAdapter.overwriteDataset(CacheUtils.fetchFromSiteListCache(getApplicationContext()));
+                if (siteListAdapter != null)
+                {
+                    // Poor to just overwrite from cache.
+                    siteListAdapter.overwriteDataset(CacheUtils.fetchFromSiteListCache(getApplicationContext()));
 
-		    reorder = siteListAdapter.toggleReorderFlag();
-		    v.setVisibility(View.INVISIBLE);
-		    toggleReorderDoneButtonText();
-		}
-	    }
-	});
-
+                    reorder = siteListAdapter.toggleReorderFlag();
+                    v.setVisibility(View.INVISIBLE);
+                    toggleReorderDoneButtonText();
+                }
+            }
+        });
 
         Object lastSavedInstance = null;
         if (savedInstanceState != null)
@@ -132,19 +131,20 @@ public class StackNetworkListActivity extends ListActivity
      * @see android.app.ListActivity#onListItemClick(android.widget.ListView,
      * android.view.View, int, long)
      * 
-     * This nor listView.setOnItemClickListener is not getting called when each row of listView is made up of linear
-     * layout and that linear layout has onLongClickListener. Instead I had to
-     * set an onClickListener on the linear layout.
+     * This nor listView.setOnItemClickListener is not getting called when each
+     * row of listView is made up of linear layout and that linear layout has
+     * onLongClickListener. Instead I had to set an onClickListener on the
+     * linear layout.
      */
     @Override
     protected void onListItemClick(ListView listView, View v, int position, long id)
     {
-	Log.d(TAG, "Clicking on list item " + position);
+        Log.d(TAG, "Clicking on list item " + position);
 
-	Site site = sites.get(position);
-	OperatingSite.setSite(site);
-	Intent startQuestionActivityIntent = new Intent(this, QuestionsActivity.class);
-	startActivity(startQuestionActivityIntent);
+        Site site = sites.get(position);
+        OperatingSite.setSite(site);
+        Intent startQuestionActivityIntent = new Intent(this, QuestionsActivity.class);
+        startActivity(startQuestionActivityIntent);
     }
 
     @Override
@@ -243,7 +243,7 @@ public class StackNetworkListActivity extends ListActivity
 
         dragDropHint.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
         cancelReorderButton.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
-        reorderDoneToggleButton.setText(reorder ? "Done" : "Reorder");
+        reorderDoneToggleButton.setBackgroundResource(reorder ? R.drawable.accept_white : R.drawable.sort_white);
     }
 
     @Override

@@ -54,6 +54,12 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        if (container == null)
+        {
+            Log.d(getLogTag(), "onCreateView return null");
+            return null;
+        }
+
         lastDisplayQuestionIndex = 0;
 
         questionsLinearLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.fragment_questions,
