@@ -72,7 +72,6 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
         setContentView(R.layout.questions_layout);
 
         scrollView = (ScrollViewWithNotifier) findViewById(R.id.questionsScroll);
-//        questionsLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.fragment_questions, null);
         scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override

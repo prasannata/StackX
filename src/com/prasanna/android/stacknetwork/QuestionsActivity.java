@@ -30,8 +30,6 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 
     private ArrayAdapter<String> spinnerAdapter;
 
-    private static QuestionsFragment homeFragment;
-
     public class FetchUserTagsCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<String>>
     {
         @Override
