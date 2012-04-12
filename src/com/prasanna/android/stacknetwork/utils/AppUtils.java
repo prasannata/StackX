@@ -34,22 +34,27 @@ public class AppUtils
         {
             reputationString += " " + reputation;
         }
-        
+
         return reputationString;
+    }
+
+    public static boolean inAuthenticatedRealm()
+    {
+        return CacheUtils.getAccessToken(null) == null ? false : true;
     }
 
     public static Map<String, String> getDefaultQueryParams()
     {
         Map<String, String> queryParams = new HashMap<String, String>();
         queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
-        
+
         String accessToken = CacheUtils.getAccessToken(null);
         if (accessToken != null)
         {
             queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, CacheUtils.getAccessToken(null));
             queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
         }
-        
+
         return queryParams;
     }
 }

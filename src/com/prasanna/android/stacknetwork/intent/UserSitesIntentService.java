@@ -11,6 +11,7 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserSitesIntentService extends IntentService
@@ -30,14 +31,13 @@ public class UserSitesIntentService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        String accessToken = null;
-        if (intent.hasExtra(StringConstants.ACCESS_TOKEN))
-        {
-            accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
-        }
+        HashMap<String, Account> linkAccountsMap = null;
+        LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
-        LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork(accessToken);
-        HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
+        if (AppUtils.inAuthenticatedRealm())
+        {
+            linkAccountsMap = userService.getAccounts(1);
+        }
 
         if (linkAccountsMap != null && linkSitesMap != null)
         {
