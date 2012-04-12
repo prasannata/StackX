@@ -34,7 +34,7 @@ public class FrontPageFragment extends QuestionsFragment
         if (savedInstanceState == null)
         {
             Log.d(TAG, "onCreate not savedInstanceState");
-            loadingQuestionsDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
+            loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
 
             startIntentService();
         }

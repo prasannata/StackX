@@ -17,7 +17,7 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.IntentAction;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 
 public abstract class QuestionsFragment extends Fragment implements ScrollableFragment
@@ -28,7 +28,7 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
 
     protected ArrayList<Question> questions = new ArrayList<Question>();
 
-    protected ProgressDialog loadingQuestionsDialog;
+    protected ProgressDialog loadingDialog;
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -41,11 +41,11 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
 
     private LinearLayout loadingProgressView;
 
-    private int lastDisplayQuestionIndex = 0;
+    private int displayCursor = 0;
 
     private Intent intentForService;
 
-    public abstract QuestionIntentAction getReceiverExtraName();
+    public abstract IntentAction getReceiverExtraName();
 
     public abstract void startIntentService();
 
@@ -60,7 +60,7 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
             return null;
         }
 
-        lastDisplayQuestionIndex = 0;
+        displayCursor = 0;
 
         questionsLinearLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.fragment_questions,
                 null);
@@ -125,10 +125,10 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
     @SuppressWarnings("unchecked")
     private void processIntentBroadcast(Context context, Intent intent)
     {
-        if (loadingQuestionsDialog != null)
+        if (loadingDialog != null)
         {
-            loadingQuestionsDialog.dismiss();
-            loadingQuestionsDialog = null;
+            loadingDialog.dismiss();
+            loadingDialog = null;
         }
 
         if (loadingProgressView != null)
@@ -145,12 +145,12 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
     protected void displayQuestions()
     {
         Log.d(getLogTag(), "questions size: " + questions.size() + ", lastDisplayQuestionIndex: "
-                + lastDisplayQuestionIndex);
+                + displayCursor);
 
-        for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
+        for (; displayCursor < questions.size(); displayCursor++)
         {
             LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-                    getActivity().getLayoutInflater(), getActivity(), questions.get(lastDisplayQuestionIndex));
+                    getActivity().getLayoutInflater(), getActivity(), questions.get(displayCursor));
             questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }

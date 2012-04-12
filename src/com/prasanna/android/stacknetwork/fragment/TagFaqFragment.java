@@ -36,7 +36,7 @@ public class TagFaqFragment extends QuestionsFragment
         {
             registerTagFaqReceiver();
 
-            loadingQuestionsDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
+            loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
             
             startIntentService();
         }

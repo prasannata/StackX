@@ -4,6 +4,7 @@ public class IntentActionEnum
 {
     public interface IntentAction
     {
+        String getExtra();
     }
 
     public enum QuestionIntentAction implements IntentAction
