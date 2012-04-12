@@ -69,9 +69,9 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.questions_layout);
+        setContentView(R.layout.items_scroll_layout);
 
-        scrollView = (ScrollViewWithNotifier) findViewById(R.id.questionsScroll);
+        scrollView = (ScrollViewWithNotifier) findViewById(R.id.itemScroller);
         scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override

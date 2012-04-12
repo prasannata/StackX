@@ -89,7 +89,7 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     }
 
     @Override
-    public Context getCurrentAppContext()
+    public Context getCurrentContext()
     {
 	return getApplicationContext();
     }

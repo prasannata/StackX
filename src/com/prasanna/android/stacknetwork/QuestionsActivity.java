@@ -75,9 +75,6 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
         super.onCreate(savedInstanceState);
         int lastSavedPosition = -1;
 
-        // homeFragment = (QuestionsFragment)
-        // getFragmentManager().findFragmentByTag(HOME_FRAGMENT_TAG);
-
         if (savedInstanceState != null)
         {
             tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
@@ -127,7 +124,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     }
 
     @Override
-    public Context getCurrentAppContext()
+    public Context getCurrentContext()
     {
         return QuestionsActivity.this;
     }
@@ -159,12 +156,6 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 
         if (itemPosition == 0)
         {
-            // if (homeFragment == null)
-            // {
-            // Log.d(TAG, "Opening home fragment");
-            // homeFragment = new FrontPageFragment();
-            // }
-
             currentFragment = new FrontPageFragment();
             fragmentTag = HOME_FRAGMENT_TAG;
         }
@@ -184,7 +175,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
             currentFragment.setRetainInstance(true);
 
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.questionsScroll, currentFragment, fragmentTag);
+            fragmentTransaction.replace(R.id.itemScroller, currentFragment, fragmentTag);
             fragmentTransaction.commit();
         }
     }

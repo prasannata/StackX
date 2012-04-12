@@ -34,6 +34,8 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
 
         public void onTabReselected(Tab tab, FragmentTransaction ft)
         {
+            onTabUnselected(tab, ft);
+            onTabSelected(tab, ft);
         }
     }
 
@@ -41,6 +43,7 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     public void onCreate(android.os.Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.ll_whitebg_vertical);
 
         setupActionBarTabs();
@@ -67,12 +70,13 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     @Override
     public void refresh()
     {
-        // TODO Auto-generated method stub
+        // TODO: Find a way to inform the fragment within current selected tab
+        // to refresh
     }
 
     @Override
-    public Context getCurrentAppContext()
+    public Context getCurrentContext()
     {
-        return getApplicationContext();
+        return UserProfileActivity.this;
     }
 }

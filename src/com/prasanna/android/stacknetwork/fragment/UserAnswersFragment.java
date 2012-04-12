@@ -36,7 +36,6 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     private LinearLayout questionsLayout;
     private ScrollViewWithNotifier questionsScroll;
     private LinearLayout loadingProgressView;
-    private LinearLayout questionsDisplayList;
     private User user;
     private Intent intent;
     private int page = 0;
@@ -56,19 +55,17 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        super.onCreateView(inflater, container, savedInstanceState);
+
         answerDisplayCursor = 0;
 
         Log.d(TAG, "Creating answer fragment");
 
         progress = ProgressDialog.show(getActivity(), "", "Loading answers");
 
-        questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
-
-        questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
-        questionsDisplayList = (LinearLayout) getActivity().getLayoutInflater().inflate(
-                R.layout.items_fragment_container, null);
-        questionsScroll.addView(questionsDisplayList);
-
+        questionsLayout = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
+        questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.itemScroller);
+        questionsScroll.addView(itemsContainer);
         questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override
@@ -81,7 +78,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT);
                     layoutParams.setMargins(0, 15, 0, 15);
-                    questionsDisplayList.addView(loadingProgressView, layoutParams);
+                    itemsContainer.addView(loadingProgressView, layoutParams);
                 }
 
                 startIntentService();
@@ -164,7 +161,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
                     startActivity(intent);
                 }
             });
-            questionsDisplayList.addView(answerRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+            itemsContainer.addView(answerRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }
     }
@@ -208,14 +205,14 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
             loadingProgressView = null;
         }
 
-        if (items != null && questionsLayout != null && questionsDisplayList != null)
+        if (items != null && questionsLayout != null && itemsContainer != null)
         {
             if (items.isEmpty())
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
                         R.layout.textview_black_textcolor, null);
                 textView.setText("No answers by " + user.displayName);
-                questionsDisplayList.addView(textView);
+                itemsContainer.addView(textView);
             }
             else
             {

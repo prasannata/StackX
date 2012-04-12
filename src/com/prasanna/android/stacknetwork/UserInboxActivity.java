@@ -73,8 +73,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     {
         super.onCreate(savedInstanceState);
 
-        questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.questions_layout, null);
-        questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
+        questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.items_scroll_layout, null);
+        questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.itemScroller);
         questionsDisplayList = (LinearLayout) getLayoutInflater().inflate(R.layout.items_fragment_container, null);
         questionsScroll.addView(questionsDisplayList);
         questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -215,8 +215,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    public Context getCurrentAppContext()
+    public Context getCurrentContext()
     {
-        return questionsDisplayList.getContext();
+        return UserInboxActivity.this;
     }
 }

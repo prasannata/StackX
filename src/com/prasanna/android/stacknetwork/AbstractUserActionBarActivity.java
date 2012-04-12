@@ -25,7 +25,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     private String accessToken;
     public abstract void refresh();
 
-    public abstract Context getCurrentAppContext();
+    public abstract Context getCurrentContext();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -77,12 +77,12 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 
 	    case R.id.menu_profile:
 		Intent userProfileIntent = IntentUtils
-		                .createUserProfileIntent(getCurrentAppContext(), getAccessToken());
+		                .createUserProfileIntent(getCurrentContext(), getAccessToken());
 		startActivity(userProfileIntent);
 		break;
 
 	    case R.id.menu_option_inbox:
-		Intent userInboxIntent = new Intent(getCurrentAppContext(), UserInboxActivity.class);
+		Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
 		userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
 		startActivity(userInboxIntent);
 		break;

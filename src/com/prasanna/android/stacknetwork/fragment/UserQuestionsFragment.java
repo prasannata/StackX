@@ -23,8 +23,8 @@ import com.prasanna.android.views.ScrollViewWithNotifier;
 public class UserQuestionsFragment extends AbstractQuestionsFragment
 {
     private static final String TAG = UserQuestionsFragment.class.getSimpleName();
-    private LinearLayout questionsLayout;
-    private ScrollViewWithNotifier questionsScroll;
+    private LinearLayout scrollViewContainer;
+    private ScrollViewWithNotifier itemScroller;
     private LinearLayout loadingProgressView;
     private User user;
     private Intent intent;
@@ -51,10 +51,10 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
 
         loadingDialog = ProgressDialog.show(getActivity(), "", "Loading questions");
 
-        questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
-        questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
-        questionsScroll.addView(itemsContainer);
-        questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+        scrollViewContainer = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
+        itemScroller = (ScrollViewWithNotifier) scrollViewContainer.findViewById(R.id.itemScroller);
+        itemScroller.addView(itemsContainer);
+        itemScroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override
             public void onScrollToBottom(View view)
@@ -73,7 +73,7 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
             }
         });
 
-        return questionsLayout;
+        return scrollViewContainer;
     }
 
     @Override
