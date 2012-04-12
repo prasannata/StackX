@@ -1,11 +1,6 @@
 package com.prasanna.android.stacknetwork.fragment;
 
-import java.util.ArrayList;
-
-import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
@@ -16,9 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.QuestionDetailActivity;
 import com.prasanna.android.stacknetwork.R;
@@ -27,38 +22,24 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.IntentAction;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserAnswersFragment extends Fragment
+public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 {
     private static final String TAG = UserAnswersFragment.class.getSimpleName();
     private int answerDisplayCursor = 0;
     private ProgressDialog progress;
     private LinearLayout questionsLayout;
     private ScrollViewWithNotifier questionsScroll;
-    private ArrayList<Answer> answers = new ArrayList<Answer>();
     private LinearLayout loadingProgressView;
     private LinearLayout questionsDisplayList;
     private User user;
     private Intent intent;
     private int page = 0;
-
-    private BroadcastReceiver answersByUserReceiver = new BroadcastReceiver()
-    {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            answers.addAll((ArrayList<Answer>) intent
-                    .getSerializableExtra(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.getExtra()));
-
-            displayAnswers();
-
-            Log.d(TAG, "Number of answers by user: " + answers.size());
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -69,7 +50,7 @@ public class UserAnswersFragment extends Fragment
 
         registerForAnwersByUserReceiver();
 
-        startUserAnswersService(user.id, user.accessToken);
+        startIntentService();
     }
 
     @Override
@@ -84,8 +65,8 @@ public class UserAnswersFragment extends Fragment
         questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
 
         questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
-        questionsDisplayList = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.fragment_questions,
-                null);
+        questionsDisplayList = (LinearLayout) getActivity().getLayoutInflater().inflate(
+                R.layout.items_fragment_container, null);
         questionsScroll.addView(questionsDisplayList);
 
         questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -103,7 +84,7 @@ public class UserAnswersFragment extends Fragment
                     questionsDisplayList.addView(loadingProgressView, layoutParams);
                 }
 
-                startUserAnswersService(user.id, user.accessToken);
+                startIntentService();
             }
         });
 
@@ -135,7 +116,7 @@ public class UserAnswersFragment extends Fragment
 
         try
         {
-            getActivity().unregisterReceiver(answersByUserReceiver);
+            getActivity().unregisterReceiver(receiver);
         }
         catch (IllegalArgumentException e)
         {
@@ -143,43 +124,13 @@ public class UserAnswersFragment extends Fragment
         }
     }
 
-    private void displayAnswers()
-    {
-        if (progress != null)
-        {
-            progress.dismiss();
-            progress = null;
-        }
-
-        if (loadingProgressView != null)
-        {
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
-
-        if (answers != null && questionsLayout != null && questionsDisplayList != null)
-        {
-            if (answers.isEmpty())
-            {
-                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                        R.layout.textview_black_textcolor, null);
-                textView.setText("No answers by " + user.displayName);
-                questionsDisplayList.addView(textView);
-            }
-            else
-            {
-                addAnswersToView();
-            }
-        }
-    }
-
     private void addAnswersToView()
     {
-        for (; answerDisplayCursor < answers.size(); answerDisplayCursor++)
+        for (; answerDisplayCursor < items.size(); answerDisplayCursor++)
         {
             final RelativeLayout answerRow = (RelativeLayout) getActivity().getLayoutInflater().inflate(
                     R.layout.user_item_row, null);
-            final Answer answer = answers.get(answerDisplayCursor);
+            final Answer answer = items.get(answerDisplayCursor);
             TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
             textView.setText(Html.fromHtml(answer.title));
 
@@ -218,20 +169,64 @@ public class UserAnswersFragment extends Fragment
         }
     }
 
-    private void startUserAnswersService(long userId, String accessToken)
+    private void registerForAnwersByUserReceiver()
+    {
+        IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.name());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(receiver, filter);
+    }
+
+    @Override
+    public IntentAction getReceiverExtraName()
+    {
+        return UserIntentAction.ANSWERS_BY_USER;
+    }
+
+    @Override
+    public void startIntentService()
     {
         intent = new Intent(getActivity(), UserAnswersIntentService.class);
         intent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-        intent.putExtra(StringConstants.USER_ID, userId);
+        intent.putExtra(StringConstants.USER_ID, user.id);
         intent.putExtra(StringConstants.PAGE, ++page);
-        intent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
+        intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
         getActivity().startService(intent);
     }
 
-    private void registerForAnwersByUserReceiver()
+    @Override
+    protected void displayItems()
     {
-        IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(answersByUserReceiver, filter);
+        if (progress != null)
+        {
+            progress.dismiss();
+            progress = null;
+        }
+
+        if (loadingProgressView != null)
+        {
+            loadingProgressView.setVisibility(View.GONE);
+            loadingProgressView = null;
+        }
+
+        if (items != null && questionsLayout != null && questionsDisplayList != null)
+        {
+            if (items.isEmpty())
+            {
+                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
+                        R.layout.textview_black_textcolor, null);
+                textView.setText("No answers by " + user.displayName);
+                questionsDisplayList.addView(textView);
+            }
+            else
+            {
+                addAnswersToView();
+            }
+        }
+    }
+
+    @Override
+    protected String getLogTag()
+    {
+        return TAG;
     }
 }

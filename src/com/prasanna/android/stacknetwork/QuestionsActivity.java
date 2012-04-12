@@ -11,8 +11,9 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.prasanna.android.stacknetwork.fragment.FrontPageFragment;
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment;
+import com.prasanna.android.stacknetwork.fragment.ItemDisplayFragment;
 import com.prasanna.android.stacknetwork.fragment.TagFaqFragment;
+import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -24,7 +25,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 
     private static String HOME_FRAGMENT_TAG = "home";
 
-    private QuestionsFragment currentFragment = null;
+    private ItemDisplayFragment<Question> currentFragment = null;
 
     private int itemPosition;
 
@@ -158,11 +159,11 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 
         if (itemPosition == 0)
         {
-//            if (homeFragment == null)
-//            {
-//                Log.d(TAG, "Opening home fragment");
-//                homeFragment = new FrontPageFragment();
-//            }
+            // if (homeFragment == null)
+            // {
+            // Log.d(TAG, "Opening home fragment");
+            // homeFragment = new FrontPageFragment();
+            // }
 
             currentFragment = new FrontPageFragment();
             fragmentTag = HOME_FRAGMENT_TAG;

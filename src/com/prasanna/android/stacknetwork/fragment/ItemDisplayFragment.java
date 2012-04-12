@@ -16,17 +16,17 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.IntentAction;
-import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 
-public abstract class QuestionsFragment extends Fragment implements ScrollableFragment
+public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> extends Fragment implements
+        ScrollableFragment
 {
     protected boolean serviceRunning = false;
 
-    protected LinearLayout questionsLinearLayout;
+    protected LinearLayout itemsContainer;
 
-    protected ArrayList<Question> questions = new ArrayList<Question>();
+    protected ArrayList<T> items = new ArrayList<T>();
 
     protected ProgressDialog loadingDialog;
 
@@ -41,15 +41,15 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
 
     private LinearLayout loadingProgressView;
 
-    private int displayCursor = 0;
-
     private Intent intentForService;
 
     public abstract IntentAction getReceiverExtraName();
 
     public abstract void startIntentService();
 
-    public abstract String getLogTag();
+    protected abstract void displayItems();
+
+    protected abstract String getLogTag();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -60,12 +60,10 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
             return null;
         }
 
-        displayCursor = 0;
-
-        questionsLinearLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.fragment_questions,
+        itemsContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.items_fragment_container,
                 null);
 
-        return questionsLinearLayout;
+        return itemsContainer;
     }
 
     @Override
@@ -110,7 +108,7 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT);
             layoutParams.setMargins(0, 15, 0, 15);
-            questionsLinearLayout.addView(loadingProgressView, layoutParams);
+            itemsContainer.addView(loadingProgressView, layoutParams);
             startIntentService();
         }
     }
@@ -137,24 +135,8 @@ public abstract class QuestionsFragment extends Fragment implements ScrollableFr
             loadingProgressView = null;
         }
 
-        questions.addAll((ArrayList<Question>) intent.getSerializableExtra(getReceiverExtraName().getExtra()));
+        items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName().getExtra()));
 
-        displayQuestions();
-    }
-
-    protected void displayQuestions()
-    {
-        Log.d(getLogTag(), "questions size: " + questions.size() + ", lastDisplayQuestionIndex: "
-                + displayCursor);
-
-        for (; displayCursor < questions.size(); displayCursor++)
-        {
-            LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-                    getActivity().getLayoutInflater(), getActivity(), questions.get(displayCursor));
-            questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT));
-        }
-
-        serviceRunning = false;
+        displayItems();
     }
 }

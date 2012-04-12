@@ -11,7 +11,7 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class TagFaqFragment extends QuestionsFragment
+public class TagFaqFragment extends AbstractQuestionsFragment
 {
     private static final String TAG = TagFaqFragment.class.getSimpleName();
 
@@ -24,7 +24,7 @@ public class TagFaqFragment extends QuestionsFragment
     public TagFaqFragment()
     {
         currentPage = 0;
-        questions.clear();
+        items.clear();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class TagFaqFragment extends QuestionsFragment
             registerTagFaqReceiver();
 
             loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
-            
+
             startIntentService();
         }
     }
@@ -45,9 +45,9 @@ public class TagFaqFragment extends QuestionsFragment
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        if (questions != null && questions.isEmpty() == false)
+        if (items != null && items.isEmpty() == false)
         {
-            outState.putSerializable(StringConstants.QUESTIONS, questions);
+            outState.putSerializable(StringConstants.QUESTIONS, items);
         }
 
         super.onSaveInstanceState(outState);

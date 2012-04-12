@@ -15,7 +15,7 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class FrontPageFragment extends QuestionsFragment
+public class FrontPageFragment extends AbstractQuestionsFragment
 {
     private static final String TAG = FrontPageFragment.class.getSimpleName();
 
@@ -41,8 +41,8 @@ public class FrontPageFragment extends QuestionsFragment
         else
         {
             Log.d(TAG, "onCreate savedInstanceState");
-            questions = (ArrayList<Question>) savedInstanceState.getSerializable(StringConstants.QUESTIONS);
-            displayQuestions();
+            items = (ArrayList<Question>) savedInstanceState.getSerializable(StringConstants.QUESTIONS);
+            displayItems();
         }
     }
 
@@ -50,9 +50,9 @@ public class FrontPageFragment extends QuestionsFragment
     public void onSaveInstanceState(Bundle outState)
     {
         Log.d(TAG, "Saving instance state");
-        if (questions != null && questions.isEmpty() == false)
+        if (items != null && items.isEmpty() == false)
         {
-            outState.putSerializable(StringConstants.QUESTIONS, questions);
+            outState.putSerializable(StringConstants.QUESTIONS, items);
         }
 
         super.onSaveInstanceState(outState);

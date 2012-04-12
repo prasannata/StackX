@@ -20,7 +20,7 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserQuestionsFragment extends QuestionsFragment
+public class UserQuestionsFragment extends AbstractQuestionsFragment
 {
     private static final String TAG = UserQuestionsFragment.class.getSimpleName();
     private LinearLayout questionsLayout;
@@ -53,7 +53,7 @@ public class UserQuestionsFragment extends QuestionsFragment
 
         questionsLayout = (LinearLayout) inflater.inflate(R.layout.questions_layout, null);
         questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.questionsScroll);
-        questionsScroll.addView(questionsLinearLayout);
+        questionsScroll.addView(itemsContainer);
         questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
         {
             @Override
@@ -66,7 +66,7 @@ public class UserQuestionsFragment extends QuestionsFragment
                     LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT);
                     layoutParams.setMargins(0, 15, 0, 15);
-                    questionsLinearLayout.addView(loadingProgressView, layoutParams);
+                    itemsContainer.addView(loadingProgressView, layoutParams);
                 }
 
                 startIntentService();

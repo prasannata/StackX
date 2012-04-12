@@ -30,7 +30,7 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
 
 	Log.d(TAG, "started for query: " + query);
 
-	questionsLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.fragment_questions, null);
+	questionsLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.items_fragment_container, null);
 	scrollView.addView(questionsLinearLayout);
 
 	registerQuestionsReceiver();
