@@ -25,6 +25,7 @@ public class OAuthActivity extends Activity
     private String oauthUrl;
     private static final String YAHOO_LOGIN_URL = "https://login.yahoo.com";
     private static final String PROGRESS_BAR_TEXT = "to stackexchange.com...";
+    private static final String LOGIN = "Login";
 
     private class OAuthWebViewClient extends WebViewClient
     {
@@ -107,7 +108,18 @@ public class OAuthActivity extends Activity
         webview.getSettings().setSavePassword(false);
         webview.getSettings().setBlockNetworkImage(false);
         webview.getSettings().setUseWideViewPort(false);
-        webview.setWebChromeClient(new WebChromeClient());
+        webview.setWebChromeClient(new WebChromeClient()
+        {
+            public void onProgressChanged(WebView view, int progress)
+            {
+                setTitle("Loading...");
+                setProgress(progress * 100);
+                if (progress == 100)
+                {
+                    setTitle(LOGIN);
+                }
+            }
+        });
         webview.setWebViewClient(new OAuthWebViewClient());
         webview.requestFocus(View.FOCUS_DOWN);
 
