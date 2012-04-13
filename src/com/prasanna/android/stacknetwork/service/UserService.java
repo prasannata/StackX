@@ -41,15 +41,10 @@ public class UserService extends AbstractBaseService
 
     public LinkedHashMap<String, Site> getAllSitesInNetwork()
     {
-	return getSites(StringConstants.SITES, null);
-    }
-
-    private LinkedHashMap<String, Site> getSites(String restEndPoint, Map<String, String> queryParams)
-    {
+	String restEndPoint = StringConstants.SITES;
 	LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
 
-	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
-	                queryParams);
+	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint, null);
 
 	try
 	{

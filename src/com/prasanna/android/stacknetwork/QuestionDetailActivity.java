@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -336,10 +337,10 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         textView = (TextView) findViewById(R.id.questionTitle);
         textView.setText(Html.fromHtml(question.title));
 
-        textView = (TextView) findViewById(R.id.questionOwner);
-        textView.setText(getOwnerString(question.owner));
+        Button button = (Button) findViewById(R.id.questionOwner);
+        button.setText(getOwnerString(question.owner));
 
-        textView.setOnClickListener(new View.OnClickListener()
+        button.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
             {
@@ -356,13 +357,17 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private static String getOwnerString(User user)
     {
-        String userDetails = " by " + Html.fromHtml(user.displayName);
-        userDetails += AppUtils.formatReputation(user.reputation);
+        String userDetails = "" + Html.fromHtml(user.displayName);
+        
+        userDetails += " {" + AppUtils.formatReputation(user.reputation);
 
         if (user.acceptRate != -1)
         {
-            userDetails += " Accept%: " + user.acceptRate;
+            userDetails += "," + user.acceptRate +"%";
         }
+        
+        userDetails += "}";
+        
         return userDetails;
     }
 
