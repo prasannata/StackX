@@ -32,14 +32,17 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
+        @SuppressWarnings("unchecked")
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            processIntentBroadcast(context, intent);
+            items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName().getExtra()));
+
+            displayItems();
         }
     };
 
-    private LinearLayout loadingProgressView;
+    protected LinearLayout loadingProgressView;
 
     private Intent intentForService;
 
@@ -118,25 +121,5 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         intentForService = new Intent(getActivity().getApplicationContext(), clazz);
         intentForService.setAction(action);
         return intentForService;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void processIntentBroadcast(Context context, Intent intent)
-    {
-        if (loadingDialog != null)
-        {
-            loadingDialog.dismiss();
-            loadingDialog = null;
-        }
-
-        if (loadingProgressView != null)
-        {
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
-
-        items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName().getExtra()));
-
-        displayItems();
     }
 }
