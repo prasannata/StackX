@@ -45,11 +45,14 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     {
         super.onCreate(savedInstanceState);
 
-        user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
+        if (items == null || items.isEmpty() == true)
+        {
+            user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-        registerForAnwersByUserReceiver();
+            registerForAnwersByUserReceiver();
 
-        startIntentService();
+            startIntentService();
+        }
     }
 
     @Override
@@ -84,6 +87,11 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
                 startIntentService();
             }
         });
+
+        if (items != null && items.isEmpty() == false)
+        {
+            displayItems();
+        }
 
         return layoutContainer;
     }
@@ -207,6 +215,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 
         if (items != null && layoutContainer != null && itemsContainer != null)
         {
+            Log.d(TAG, "Displaying already existing items: " + items.isEmpty());
             if (items.isEmpty())
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(

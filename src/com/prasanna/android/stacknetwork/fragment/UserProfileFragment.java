@@ -58,13 +58,7 @@ public class UserProfileFragment extends Fragment
 
                 user.accounts.addAll(accounts.values());
 
-                for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
-                {
-                    TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                            R.layout.textview_black_textcolor, null);
-                    textView.setText(user.accounts.get(usersAccountCursor).siteName);
-                    userAccountList.addView(textView);
-                }
+                displayUserAccounts();
             }
         }
     };
@@ -79,7 +73,7 @@ public class UserProfileFragment extends Fragment
             if (profileHomeLayout != null)
             {
                 fetchProfileProgress.dismiss();
-                displayUserDetail(profileHomeLayout);
+                displayUserDetail();
             }
         }
     };
@@ -89,12 +83,15 @@ public class UserProfileFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        User intentForUser = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
+        if (user == null)
+        {
+            User intentForUser = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-        registerUserProfileReceiver();
-        registerUserAccountsReceiver();
+            registerUserProfileReceiver();
+            registerUserAccountsReceiver();
 
-        startUserProfileService(intentForUser.id, intentForUser.accessToken);
+            startUserProfileService(intentForUser.id, intentForUser.accessToken);
+        }
     }
 
     @Override
@@ -111,7 +108,9 @@ public class UserProfileFragment extends Fragment
         }
         else
         {
-            displayUserDetail(profileHomeLayout);
+            Log.d(TAG, "Not fetching, display existing user");
+            displayUserDetail();
+            displayUserAccounts();
         }
 
         return profileHomeLayout;
@@ -133,6 +132,16 @@ public class UserProfileFragment extends Fragment
         stopServiceAndUnregsiterReceivers();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        if (user != null)
+        {
+            outState.putSerializable(StringConstants.USER, user);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
     private void stopServiceAndUnregsiterReceivers()
     {
         if (userProfileIntent != null)
@@ -151,29 +160,29 @@ public class UserProfileFragment extends Fragment
         }
     }
 
-    private void displayUserDetail(RelativeLayout relativeLayout)
+    private void displayUserDetail()
     {
         if (user != null)
         {
-            updateProfileInfo(relativeLayout);
+            updateProfileInfo();
 
-            TextView textView = (TextView) relativeLayout.findViewById(R.id.questionCount);
+            TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
             textView.append(" " + String.valueOf(user.questionCount));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.answerCount);
+            textView = (TextView) profileHomeLayout.findViewById(R.id.answerCount);
             textView.append(" " + String.valueOf(user.answerCount));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.upvoteCount);
+            textView = (TextView) profileHomeLayout.findViewById(R.id.upvoteCount);
             textView.append(" " + String.valueOf(user.upvoteCount));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.downvoteCount);
+            textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
             textView.append(" " + String.valueOf(user.downvoteCount));
         }
     }
 
-    private void updateProfileInfo(RelativeLayout relativeLayout)
+    private void updateProfileInfo()
     {
-        ImageView userProfileImage = (ImageView) relativeLayout.findViewById(R.id.profileUserImage);
+        ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
         if (userProfileImage.getDrawable() == null)
         {
             FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(
@@ -181,28 +190,28 @@ public class UserProfileFragment extends Fragment
             fetchImageAsyncTask.execute(user.profileImageLink);
         }
 
-        TextView textView = (TextView) relativeLayout.findViewById(R.id.profileDisplayName);
+        TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(user.displayName);
 
-        textView = (TextView) relativeLayout.findViewById(R.id.profileUserReputation);
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
         textView.setText(AppUtils.formatReputation(user.reputation));
 
         if (user.badgeCounts != null && user.badgeCounts.length == 3)
         {
-            textView = (TextView) relativeLayout.findViewById(R.id.profileUserGoldNum);
+            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserGoldNum);
             textView.setText(String.valueOf(user.badgeCounts[0]));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.profileUserSilverNum);
+            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserSilverNum);
             textView.setText(String.valueOf(user.badgeCounts[1]));
 
-            textView = (TextView) relativeLayout.findViewById(R.id.profileUserBronzeNum);
+            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserBronzeNum);
             textView.setText(String.valueOf(user.badgeCounts[2]));
         }
 
-        textView = (TextView) relativeLayout.findViewById(R.id.profileViews);
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
         textView.append(" " + user.profileViews);
 
-        textView = (TextView) relativeLayout.findViewById(R.id.profileUserLastSeen);
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
         textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
@@ -227,5 +236,16 @@ public class UserProfileFragment extends Fragment
         IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         getActivity().registerReceiver(userProfileReceiver, filter);
+    }
+
+    private void displayUserAccounts()
+    {
+        for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
+        {
+            TextView textView = (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor,
+                    null);
+            textView.setText(user.accounts.get(usersAccountCursor).siteName);
+            userAccountList.addView(textView);
+        }
     }
 }

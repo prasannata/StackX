@@ -1,6 +1,5 @@
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -35,11 +34,14 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     {
         super.onCreate(savedInstanceState);
 
-        user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
+        if (items == null || items.isEmpty() == true)
+        {
+            user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-        registerForQuestionsByUserReceiver();
+            registerForQuestionsByUserReceiver();
 
-        startIntentService();
+            startIntentService();
+        }
     }
 
     @Override
@@ -48,8 +50,6 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
         Log.d(TAG, "Creating question fragment");
 
         super.onCreateView(inflater, container, savedInstanceState);
-
-        loadingDialog = ProgressDialog.show(getActivity(), "", "Loading questions");
 
         scrollViewContainer = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
         itemScroller = (ScrollViewWithNotifier) scrollViewContainer.findViewById(R.id.itemScroller);
@@ -72,6 +72,11 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
                 startIntentService();
             }
         });
+
+        if (items != null || items.isEmpty() == false)
+        {
+            displayItems();
+        }
 
         return scrollViewContainer;
     }

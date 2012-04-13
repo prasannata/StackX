@@ -97,13 +97,6 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
         }
     }
 
-    private void registerReceiverAndStartService(Object lastSavedObject)
-    {
-        registerQuestionsReceiver();
-
-        loadIfLastInstanceWasSaved(lastSavedObject);
-    }
-
     @Override
     protected void startQuestionsService()
     {
@@ -118,9 +111,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     @Override
     public void refresh()
     {
-        stopServiceAndUnregisterReceiver();
-        questionsLinearLayout.removeAllViews();
-        registerReceiverAndStartService(null);
+        //TODO:
     }
 
     @Override
