@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.graphics.Point;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -71,6 +72,7 @@ public class PopupBuilder
         RelativeLayout itemRowLayout = (RelativeLayout) layoutInflater.inflate(R.layout.popup_item_row, null);
 
         TextView textView = (TextView) itemRowLayout.findViewById(R.id.popupItemContent);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setText(Html.fromHtml(item.body));
 
         if (item.score != -1)

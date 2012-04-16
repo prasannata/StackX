@@ -48,84 +48,76 @@
             android:textSize="15dp" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/questionTitleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:layout_marginTop="4dp"
-        android:orientation="vertical" >
+        android:background="@drawable/rounded_border_delft" >
 
-        <RelativeLayout
-            android:id="@+id/questionTitleLayout"
+        <TextView
+            android:id="@+id/questionTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_border_delft" >
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/black"
+            android:textSize="14dp" />
 
-            <TextView
-                android:id="@+id/questionTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="5dp"
-                android:textColor="@color/black"
-                android:textSize="14dp" />
+        <Button
+            android:id="@+id/questionOwner"
+            android:layout_width="wrap_content"
+            android:layout_height="18dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/questionTitle"
+            android:background="@drawable/user_button_selector"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="10.5dp" />
 
-            <Button
-                android:id="@+id/questionOwner"
-                android:layout_width="wrap_content"
-                android:layout_height="20dp"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/questionTitle"
-                android:layout_gravity="right"
-                android:background="@drawable/button"
-                android:gravity="center"
-                android:textColor="@color/delft"
-                android:textSize="12dp"
-                android:textStyle="bold" />
+        <View
+            android:id="@+id/hrInQuestionTitle"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@id/questionOwner"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/lightGrey" />
 
-            <View
-                android:id="@+id/hrInQuestionTitle"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_below="@id/questionOwner"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:background="@color/lightGrey" />
+        <TextView
+            android:id="@+id/questionScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/hrInQuestionTitle"
+            android:textColor="@color/black"
+            android:textSize="9dp" />
 
-            <TextView
-                android:id="@+id/questionScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/hrInQuestionTitle"
-                android:textColor="@color/black"
-                android:textSize="9dp" />
+        <TextView
+            android:id="@+id/questionViews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/questionScore"
+            android:layout_gravity="left"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/questionScore"
+            android:text="@string/labelViews"
+            android:textColor="@color/black"
+            android:textSize="9dp" />
 
-            <TextView
-                android:id="@+id/questionViews"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/questionScore"
-                android:layout_gravity="left"
-                android:layout_marginLeft="5dp"
-                android:layout_toRightOf="@id/questionScore"
-                android:text="@string/labelViews"
-                android:textColor="@color/black"
-                android:textSize="9dp" />
-
-            <TextView
-                android:id="@+id/questionTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@id/questionScore"
-                android:layout_gravity="right"
-                android:gravity="right"
-                android:textColor="@color/black"
-                android:textSize="9dp" />
-        </RelativeLayout>
-    </LinearLayout>
+        <TextView
+            android:id="@+id/questionTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/questionScore"
+            android:layout_gravity="right"
+            android:gravity="right"
+            android:textColor="@color/black"
+            android:textSize="9dp" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -145,25 +137,27 @@
             android:layout_marginTop="1dp"
             android:visibility="gone" >
 
-            <ImageView
-                android:id="@+id/acceptedAnswerLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:contentDescription="@string/answers"
-                android:src="@drawable/tick_accept"
-                android:visibility="gone" />
-
             <TextView
                 android:id="@+id/currentAnswerOfTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="left"
                 android:layout_marginRight="4dp"
-                android:layout_toRightOf="@id/acceptedAnswerLogo"
-                android:gravity="right"
+                android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="12dp" />
+
+            <Button
+                android:id="@+id/currentAnswerAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="18dp"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="right"
+                android:background="@drawable/user_button_selector"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="10dp" />
 
             <View
                 android:id="@+id/answerAuthorDetailDivider"
@@ -175,37 +169,26 @@
                 android:background="@color/lightGrey" />
 
             <ImageView
-                android:id="@+id/viewAnswerAuthorProfile"
+                android:id="@+id/acceptedAnswerLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/answerAuthorDetailDivider"
                 android:layout_gravity="right"
-                android:src="@drawable/click_to_view" />
-
-            <TextView
-                android:id="@+id/currentAnswerAuthor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/currentAnswerOfTotal"
-                android:layout_gravity="right"
-                android:layout_marginRight="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_toLeftOf="@id/viewAnswerAuthorProfile"
+                android:contentDescription="@string/answers"
                 android:gravity="right"
-                android:text="@string/by"
-                android:textColor="@color/black"
-                android:textSize="11dp" />
+                android:src="@drawable/tick_accept"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/currentAnswerScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_alignTop="@id/currentAnswerAuthor"
                 android:layout_below="@id/answerAuthorDetailDivider"
                 android:layout_gravity="left"
                 android:layout_marginLeft="1dp"
+                android:layout_toRightOf="@id/acceptedAnswerLogo"
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:textSize="11dp" />

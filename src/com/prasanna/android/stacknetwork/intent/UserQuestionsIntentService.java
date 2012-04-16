@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserService;
@@ -13,6 +14,8 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserQuestionsIntentService extends IntentService
 {
+    private static final String TAG = UserQuestionsIntentService.class.getSimpleName();
+
     private UserService userService = UserService.getInstance();
 
     public UserQuestionsIntentService()
@@ -59,7 +62,10 @@ public class UserQuestionsIntentService extends IntentService
 
     private void getFrontPageQuestionsAndBroadcast(String accessToken, int page)
     {
+        Log.d(TAG, "Fetching questions for page: " + page);
         ArrayList<Question> questions = userService.getAllQuestions(page);
+
+        Log.d(TAG, "Questions fetched, broadcasting ");
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

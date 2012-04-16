@@ -46,7 +46,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private ImageView acceptedAnswerLogo;
     private Question question;
     private FlingScrollView flingScrollView;
-    private TextView currentAnswerAuthor;
+    private Button currentAnswerAuthor;
     private RelativeLayout answerHeader;
     private View hrInQuestionTitle;
     private int currentAnswerCount = -1;
@@ -136,36 +136,39 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                 updateViewForAnswer();
             }
         }
-
-        private void updateViewForAnswer()
-        {
-            detailLinearLayout.removeAllViews();
-            displayBody(question.answers.get(currentAnswerCount).body);
-
-            if (question.answers.get(currentAnswerCount).comments == null)
-            {
-                commentsCickableTextView.setText("Comments (0)");
-            }
-            else
-            {
-                commentsCickableTextView.setText("Comments ("
-                        + question.answers.get(currentAnswerCount).comments.size() + ")");
-            }
-
-            currentAnswerOfTotalTextView.setText((currentAnswerCount + 1) + " of " + question.answerCount);
-            currentAnswerAuthor.setText(Html.fromHtml(question.answers.get(currentAnswerCount).owner.displayName));
-            currentAnswerScore.setText(getString(R.string.score) + ": "
-                    + question.answers.get(currentAnswerCount).score);
-            if (question.answers.get(currentAnswerCount).accepted == true)
-            {
-                acceptedAnswerLogo.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                acceptedAnswerLogo.setVisibility(View.GONE);
-            }
-        }
     };
+
+    private void updateViewForAnswer()
+    {
+        detailLinearLayout.removeAllViews();
+        displayBody(question.answers.get(currentAnswerCount).body);
+
+        if (question.answers.get(currentAnswerCount).comments == null)
+        {
+            commentsCickableTextView.setText("Comments (0)");
+            commentsCickableTextView.setClickable(false);
+        }
+        else
+        {
+            commentsCickableTextView.setText("Comments (" + question.answers.get(currentAnswerCount).comments.size()
+                    + ")");
+            commentsCickableTextView.setClickable(true);
+        }
+
+        currentAnswerOfTotalTextView.setText((currentAnswerCount + 1) + " of " + question.answerCount);
+        User answerAuthor = question.answers.get(currentAnswerCount).owner;
+        currentAnswerAuthor.setText(Html.fromHtml(answerAuthor.displayName) + " ("
+                + AppUtils.formatReputation(answerAuthor.reputation) + ")");
+        currentAnswerScore.setText(getString(R.string.score) + ": " + question.answers.get(currentAnswerCount).score);
+        if (question.answers.get(currentAnswerCount).accepted == true)
+        {
+            acceptedAnswerLogo.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            acceptedAnswerLogo.setVisibility(View.GONE);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -180,7 +183,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         answerHeader = (RelativeLayout) findViewById(R.id.answerHeader);
         acceptedAnswerLogo = (ImageView) findViewById(R.id.acceptedAnswerLogo);
         currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
-        currentAnswerAuthor = (TextView) findViewById(R.id.currentAnswerAuthor);
+        currentAnswerAuthor = (Button) findViewById(R.id.currentAnswerAuthor);
         currentAnswerScore = (TextView) findViewById(R.id.currentAnswerScore);
         hrInQuestionTitle = findViewById(R.id.hrInQuestionTitle);
         currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
@@ -358,16 +361,15 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private static String getOwnerString(User user)
     {
         String userDetails = "" + Html.fromHtml(user.displayName);
-        
-        userDetails += " {" + AppUtils.formatReputation(user.reputation);
+
+        userDetails += " (" + AppUtils.formatReputation(user.reputation);
 
         if (user.acceptRate != -1)
         {
-            userDetails += "," + user.acceptRate +"%";
+            userDetails += "," + user.acceptRate + "%";
         }
-        
-        userDetails += "}";
-        
+
+        userDetails += ")";
         return userDetails;
     }
 
@@ -423,35 +425,9 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
                         Log.d(TAG, "Accepted: " + question.answers.get(currentAnswerCount).accepted);
                         viewingAnswer = true;
-                        currentAnswerOfTotalTextView.setText((currentAnswerCount + 1) + " of " + question.answerCount);
-                        currentAnswerAuthor.setText(getString(R.string.by)
-                                + question.answers.get(currentAnswerCount).owner.displayName
-                                + AppUtils.formatReputation(question.answers.get(currentAnswerCount).owner.reputation));
-                        currentAnswerScore.setText(String.valueOf(question.answers.get(currentAnswerCount).score));
-
-                        if (question.answers.get(currentAnswerCount).comments == null)
-                        {
-                            commentsCickableTextView.setClickable(false);
-                            commentsCickableTextView.setText("Comments (0)");
-                        }
-                        else
-                        {
-                            commentsCickableTextView.setText("Comments ("
-                                    + question.answers.get(currentAnswerCount).comments.size() + ")");
-                            commentsCickableTextView.setClickable(true);
-                        }
-
                         answerHeader.setVisibility(View.VISIBLE);
-                        body = question.answers.get(currentAnswerCount).body;
 
-                        if (question.answers.get(currentAnswerCount).accepted)
-                        {
-                            acceptedAnswerLogo.setVisibility(View.VISIBLE);
-                        }
-                        else
-                        {
-                            acceptedAnswerLogo.setVisibility(View.GONE);
-                        }
+                        updateViewForAnswer();
                     }
                     else
                     {
@@ -474,10 +450,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                             commentsCickableTextView.setText("Comments (" + question.comments.size() + ")");
                             commentsCickableTextView.setClickable(true);
                         }
+
+                        detailLinearLayout.removeAllViews();
+                        displayBody(body);
                     }
 
-                    detailLinearLayout.removeAllViews();
-                    displayBody(body);
                     answersOrQuestion.setText(label);
                 }
             });

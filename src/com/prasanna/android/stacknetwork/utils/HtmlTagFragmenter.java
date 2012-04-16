@@ -11,6 +11,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -57,6 +58,8 @@ public class HtmlTagFragmenter
                         TextView textView = new TextView(context);
                         textView.setTextColor(Color.BLACK);
                         textView.setLayoutParams(params);
+                        textView.setLinksClickable(true);
+                        textView.setMovementMethod(LinkMovementMethod.getInstance());
 
                         if (codeFound)
                         {
