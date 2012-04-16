@@ -139,7 +139,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void updateViewForAnswer()
     {
-        detailLinearLayout.removeAllViews();
         displayBody(question.answers.get(currentAnswerCount).body);
 
         if (question.answers.get(currentAnswerCount).comments == null)
@@ -425,7 +424,8 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                         Log.d(TAG, "Accepted: " + question.answers.get(currentAnswerCount).accepted);
                         viewingAnswer = true;
                         answerHeader.setVisibility(View.VISIBLE);
-
+                        
+                        detailLinearLayout.removeAllViews();
                         updateViewForAnswer();
                     }
                     else

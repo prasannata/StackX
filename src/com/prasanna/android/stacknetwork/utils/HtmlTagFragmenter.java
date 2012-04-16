@@ -58,8 +58,8 @@ public class HtmlTagFragmenter
                         TextView textView = new TextView(context);
                         textView.setTextColor(Color.BLACK);
                         textView.setLayoutParams(params);
-                        textView.setLinksClickable(true);
-                        textView.setMovementMethod(LinkMovementMethod.getInstance());
+//                        textView.setLinksClickable(true);
+//                        textView.setMovementMethod(LinkMovementMethod.getInstance());
 
                         if (codeFound)
                         {

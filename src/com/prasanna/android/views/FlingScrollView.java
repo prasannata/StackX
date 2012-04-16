@@ -36,7 +36,7 @@ public class FlingScrollView extends ScrollView
 
     private GestureDetector.SimpleOnGestureListener sogl = new GestureDetector.SimpleOnGestureListener()
     {
-        private static final int SWIPE_THRESHOLD_VELOCITY = 150;
+        private static final int SWIPE_THRESHOLD_VELOCITY = 50;
         private static final int SWIPE_MIN_DISTANCE = 120;
         private static final int SWIPE_MAX_OFF_PATH = 250;
 
@@ -44,16 +44,15 @@ public class FlingScrollView extends ScrollView
         {
             Log.d(TAG, "onFling invoked: " + event1 + ", " + event2);
 
-            if (event1 != null && event2 != null && Math.abs(event1.getY() - event2.getY()) > SWIPE_MAX_OFF_PATH)
+            if (Math.abs(event1.getY() - event2.getY()) > SWIPE_MAX_OFF_PATH)
             {
                 return false;
             }
 
-            float downMotionEventX = event1 != null ? event1.getRawX() : 0;
-            float triggerMotionEventX = event2 != null ? event2.getRawX() : 0;
-            float distance = downMotionEventX - triggerMotionEventX;
-
+            float distance = event1.getRawX() - event2.getRawX();
             boolean enoughSpeed = Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY;
+
+            Log.d(TAG, "distance: " + distance + ", velocityX:" + velocityX + ", enoughSpeed:" + enoughSpeed);
             if (distance < -SWIPE_MIN_DISTANCE && enoughSpeed)
             {
                 Log.d(TAG, "Swiped left to right.");

@@ -155,38 +155,31 @@ public class HttpHelper
         }
         catch (ClientProtocolException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (KeyManagementException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (UnrecoverableKeyException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (KeyStoreException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (NoSuchAlgorithmException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (CertificateException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         return bitmap;
     }
@@ -217,43 +210,35 @@ public class HttpHelper
 
         catch (ClientProtocolException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (JSONException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (KeyManagementException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (UnrecoverableKeyException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (KeyStoreException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (NoSuchAlgorithmException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
         catch (CertificateException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG, e.getMessage());
         }
 
         return jsonObject;
@@ -303,33 +288,27 @@ public class HttpHelper
                                 }
                                 catch (IllegalArgumentException e)
                                 {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.getMessage());
                                 }
                                 catch (SecurityException e)
                                 {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.getMessage());
                                 }
                                 catch (InstantiationException e)
                                 {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.getMessage());
                                 }
                                 catch (IllegalAccessException e)
                                 {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.getMessage());
                                 }
                                 catch (InvocationTargetException e)
                                 {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.getMessage());
                                 }
                                 catch (NoSuchMethodException e)
                                 {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    Log.e(TAG, e.getMessage());
                                 }
                             }
                         }
