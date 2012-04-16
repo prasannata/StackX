@@ -36,6 +36,8 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         @Override
         public void onReceive(Context context, Intent intent)
         {
+            Log.d(getLogTag(), "Receiver invoked: " + intent.getExtras());
+
             items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName().getExtra()));
 
             displayItems();

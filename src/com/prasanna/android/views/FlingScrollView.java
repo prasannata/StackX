@@ -42,13 +42,17 @@ public class FlingScrollView extends ScrollView
 
         public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY)
         {
-            Log.d(TAG, "onFling invoked");
+            Log.d(TAG, "onFling invoked: " + event1 + ", " + event2);
 
-            if (Math.abs(event1.getY() - event1.getY()) > SWIPE_MAX_OFF_PATH)
+            if (event1 != null && event2 != null && Math.abs(event1.getY() - event2.getY()) > SWIPE_MAX_OFF_PATH)
             {
                 return false;
             }
-            float distance = event1.getRawX() - event2.getRawX();
+
+            float downMotionEventX = event1 != null ? event1.getRawX() : 0;
+            float triggerMotionEventX = event2 != null ? event2.getRawX() : 0;
+            float distance = downMotionEventX - triggerMotionEventX;
+
             boolean enoughSpeed = Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY;
             if (distance < -SWIPE_MIN_DISTANCE && enoughSpeed)
             {

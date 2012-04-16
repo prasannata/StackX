@@ -46,6 +46,15 @@ public class FrontPageFragment extends AbstractQuestionsFragment
         }
     }
 
+    
+    @Override
+    public void onResume()
+    {
+        registerReceiver();
+        super.onResume();
+    }
+
+
     @Override
     public void onSaveInstanceState(Bundle outState)
     {

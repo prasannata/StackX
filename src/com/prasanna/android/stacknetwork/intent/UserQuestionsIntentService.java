@@ -62,15 +62,15 @@ public class UserQuestionsIntentService extends IntentService
 
     private void getFrontPageQuestionsAndBroadcast(String accessToken, int page)
     {
-        Log.d(TAG, "Fetching questions for page: " + page);
         ArrayList<Question> questions = userService.getAllQuestions(page);
 
-        Log.d(TAG, "Questions fetched, broadcasting ");
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTIONS.getExtra(), questions);
         sendBroadcast(broadcastIntent);
+
+        Log.d(TAG, "Questions fetched and broadcasted");
     }
 
     private void broadcastIntent(ArrayList<Question> questions)
