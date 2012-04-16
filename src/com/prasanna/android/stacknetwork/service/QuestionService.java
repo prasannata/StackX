@@ -132,7 +132,7 @@ public class QuestionService extends AbstractBaseService
 
     private Map<String, String> getDefaultQueryParams()
     {
-	Map<String, String> queryParams = new HashMap<String, String>();
+	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
 	return queryParams;

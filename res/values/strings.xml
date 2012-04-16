@@ -57,5 +57,6 @@
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
     <string name="dragAndDropHint">"Long press and drag"</string>
+    <string name="accepted">Accepted</string>
 
 </resources>

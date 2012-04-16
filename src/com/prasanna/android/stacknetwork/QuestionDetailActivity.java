@@ -13,7 +13,6 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -43,7 +42,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private TextView commentsCickableTextView;
     private TextView currentAnswerOfTotalTextView;
     private TextView currentAnswerScore;
-    private ImageView acceptedAnswerLogo;
+    private TextView acceptedAnswerLogo;
     private Question question;
     private FlingScrollView flingScrollView;
     private Button currentAnswerAuthor;
@@ -181,7 +180,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
         detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
         answerHeader = (RelativeLayout) findViewById(R.id.answerHeader);
-        acceptedAnswerLogo = (ImageView) findViewById(R.id.acceptedAnswerLogo);
+        acceptedAnswerLogo = (TextView) findViewById(R.id.acceptedAnswerLogo);
         currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
         currentAnswerAuthor = (Button) findViewById(R.id.currentAnswerAuthor);
         currentAnswerScore = (TextView) findViewById(R.id.currentAnswerScore);

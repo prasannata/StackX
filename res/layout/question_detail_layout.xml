@@ -168,16 +168,18 @@
                 android:layout_marginTop="2dp"
                 android:background="@color/lightGrey" />
 
-            <ImageView
+            <TextView
                 android:id="@+id/acceptedAnswerLogo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/answerAuthorDetailDivider"
                 android:layout_gravity="right"
-                android:contentDescription="@string/answers"
                 android:gravity="right"
-                android:src="@drawable/tick_accept"
+                android:text="@string/accepted"
+                android:textColor="@color/darkGreen"
+                android:textSize="10dp"
+                android:textStyle="bold"
                 android:visibility="gone" />
 
             <TextView
