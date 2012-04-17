@@ -90,7 +90,7 @@ public class StackNetworkListActivity extends ListActivity
                 if (siteListAdapter != null)
                 {
                     // Poor to just overwrite from cache.
-                    siteListAdapter.overwriteDataset(CacheUtils.fetchFromSiteListCache(getApplicationContext()));
+                    siteListAdapter.overwriteDataset(CacheUtils.fetchSiteListFromCache(getApplicationContext()));
 
                     reorder = siteListAdapter.toggleReorderFlag();
                     v.setVisibility(View.INVISIBLE);
@@ -119,7 +119,7 @@ public class StackNetworkListActivity extends ListActivity
             }
             else
             {
-                sites = CacheUtils.fetchFromSiteListCache(getApplicationContext());
+                sites = CacheUtils.fetchSiteListFromCache(getApplicationContext());
                 updateView(sites);
             }
         }

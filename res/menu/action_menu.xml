@@ -34,11 +34,11 @@
                 android:showAsAction="always"
                 android:title="@string/menu_option_inbox"/>
             <item
-                android:id="@+id/menu_option_tags"
-                android:icon="@drawable/labels"
+                android:id="@+id/menu_option_archive"
+                android:icon="@drawable/save_light"
                 android:orderInCategory="3"
                 android:showAsAction="always"
-                android:title="@string/menu_option_tags"/>
+                android:title="@string/menu_option_archive"/>
             <item
                 android:id="@+id/menu_option_change_site"
                 android:icon="@drawable/labels"

@@ -4,8 +4,8 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="25" />
+        android:minSdkVersion="11"
+        android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -77,6 +77,9 @@
         </activity>
         <activity
             android:name=".QuestionDetailActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".ArchiveDisplayActivity"
             android:configChanges="orientation|screenSize" />
     </application>
 

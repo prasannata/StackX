@@ -52,106 +52,106 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            questions.addAll((ArrayList<Question>) intent.getSerializableExtra(getReceiverIntentAction().getExtra()));
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    questions.addAll((ArrayList<Question>) intent.getSerializableExtra(getReceiverIntentAction().getExtra()));
 
-            Log.d(getLogTag(), "Questions received: " + questions.size());
+	    Log.d(getLogTag(), "Questions received: " + questions.size());
 
-            processQuestions();
-        }
+	    processQuestions();
+	}
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.items_scroll_layout);
+	setContentView(R.layout.items_scroll_layout);
 
-        scrollView = (ScrollViewWithNotifier) findViewById(R.id.itemScroller);
-        scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-        {
-            @Override
-            public void onScrollToBottom(View view)
-            {
-                AbstractQuestionsDisplayActivity.this.onScrollToBottom();
-            }
-        });
+	scrollView = (ScrollViewWithNotifier) findViewById(R.id.itemScroller);
+	scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	{
+	    @Override
+	    public void onScrollToBottom(View view)
+	    {
+		AbstractQuestionsDisplayActivity.this.onScrollToBottom();
+	    }
+	});
     }
 
     @SuppressWarnings("unchecked")
     protected void loadIfLastInstanceWasSaved(Object lastSavedObject)
     {
-        if (lastSavedObject == null)
-        {
-            startQuestionsService();
-        }
-        else
-        {
-            questions = (ArrayList<Question>) lastSavedObject;
-            page = questions.size() / Integer.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE);
-            processQuestions();
-        }
+	if (lastSavedObject == null)
+	{
+	    startQuestionsService();
+	}
+	else
+	{
+	    questions = (ArrayList<Question>) lastSavedObject;
+	    page = questions.size() / Integer.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE);
+	    processQuestions();
+	}
     }
 
     @Override
     protected void onDestroy()
     {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
+	super.onDestroy();
+	stopServiceAndUnregisterReceiver();
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceiver();
     }
 
     protected void stopServiceAndUnregisterReceiver()
     {
-        if (questionsIntent != null)
-        {
-            stopService(questionsIntent);
-        }
+	if (questionsIntent != null)
+	{
+	    stopService(questionsIntent);
+	}
 
-        try
-        {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(getLogTag(), e.getMessage());
-        }
+	try
+	{
+	    unregisterReceiver(receiver);
+	}
+	catch (IllegalArgumentException e)
+	{
+	    Log.d(getLogTag(), e.getMessage());
+	}
     }
 
     protected void processQuestions()
     {
-        if (fetchingQuestionsDialog != null)
-        {
-            fetchingQuestionsDialog.dismiss();
-            fetchingQuestionsDialog = null;
-        }
+	if (fetchingQuestionsDialog != null)
+	{
+	    fetchingQuestionsDialog.dismiss();
+	    fetchingQuestionsDialog = null;
+	}
 
-        if (loadingProgressView != null)
-        {
-            questionsLinearLayout.removeView(loadingProgressView);
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
+	if (loadingProgressView != null)
+	{
+	    questionsLinearLayout.removeView(loadingProgressView);
+	    loadingProgressView.setVisibility(View.GONE);
+	    loadingProgressView = null;
+	}
 
-        for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
-        {
-            LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(getLayoutInflater(), this,
-                    questions.get(lastDisplayQuestionIndex));
-            questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT));
-        }
+	for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
+	{
+	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(getLayoutInflater(), this,
+		            false, questions.get(lastDisplayQuestionIndex));
+	    questionsLinearLayout.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		            LayoutParams.WRAP_CONTENT));
+	}
 
-        serviceRunning = false;
+	serviceRunning = false;
     }
 }

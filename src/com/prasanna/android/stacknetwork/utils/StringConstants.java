@@ -14,4 +14,5 @@ public class StringConstants
     public static final String FRONT_PAGE = "Front page";
     public static final String TAGS = "tags";
     public static final String ITEM_POSITION = "item_position";
+    public static final String CACHED = "cached";
 }

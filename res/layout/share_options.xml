@@ -18,6 +18,13 @@
         android:src="@drawable/important_dark" />
 
     <ImageView
+        android:id="@+id/saveQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:src="@drawable/save_dark" />
+
+    <ImageView
         android:id="@+id/returnToTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

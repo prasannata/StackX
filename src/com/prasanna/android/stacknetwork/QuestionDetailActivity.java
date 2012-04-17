@@ -1,5 +1,6 @@
 package com.prasanna.android.stacknetwork;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.content.BroadcastReceiver;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prasanna.android.listener.FlingActionListener;
 import com.prasanna.android.stacknetwork.intent.QuestionDetailsIntentService;
@@ -32,11 +34,15 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.task.CacheWriteObjectAsyncTask;
 import com.prasanna.android.views.FlingScrollView;
 
+/* TODO: Refactor and simplify this class */
 public class QuestionDetailActivity extends AbstractUserActionBarActivity
 {
     private static final String TAG = QuestionDetailActivity.class.getSimpleName();
+    private static final String COMMENTS = "Comments";
+    private static final String ZERO_COMMENTS_LABEL = COMMENTS + " (0)";
 
     private Intent questionIntent;
     private LinearLayout detailLinearLayout;
@@ -54,6 +60,8 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private int currentAnswerCount = -1;
     private boolean viewingAnswer = false;
     private boolean fetchFullDetails;
+    private LinearLayout questionOptionsLayout;
+    private Button questionOwnerButton;
 
     private BroadcastReceiver questionBodyReceiver = new BroadcastReceiver()
     {
@@ -91,7 +99,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 		numComments = question.comments.size();
 	    }
 
-	    commentsCickableTextView.setText("Comments (" + numComments + ")");
+	    commentsCickableTextView.setText(COMMENTS + " (" + numComments + ")");
 
 	}
     };
@@ -110,20 +118,9 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    question.answers.addAll((ArrayList<Answer>) intent
 		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra()));
 
-	    answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
-	    answersOrQuestion.setTextColor(Color.WHITE);
-
-	    if (question.answers != null)
-	    {
-		answersOrQuestion.setClickable(true);
-		answersOrQuestion.setEnabled(true);
-	    }
+	    enableAnswersView();
 	}
     };
-
-    private LinearLayout questionOptionsLayout;
-
-    private Button questionOwnerButton;
 
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
     {
@@ -156,12 +153,12 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
 	if (question.answers.get(currentAnswerCount).comments == null)
 	{
-	    commentsCickableTextView.setText("Comments (0)");
+	    commentsCickableTextView.setText(ZERO_COMMENTS_LABEL);
 	    commentsCickableTextView.setClickable(false);
 	}
 	else
 	{
-	    commentsCickableTextView.setText("Comments (" + question.answers.get(currentAnswerCount).comments.size()
+	    commentsCickableTextView.setText(COMMENTS + " (" + question.answers.get(currentAnswerCount).comments.size()
 		            + ")");
 	    commentsCickableTextView.setClickable(true);
 	}
@@ -213,7 +210,36 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
 	registerReceivers();
 
-	fetchQuestionDetail();
+	boolean cached = getIntent().getBooleanExtra(StringConstants.CACHED, false);
+
+	if (cached == false)
+	{
+	    fetchQuestionDetail();
+	}
+	else
+	{
+	    displayCachedQuestion();
+	}
+    }
+
+    private void displayCachedQuestion()
+    {
+	question = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
+
+	displayQuestionMetaData(question);
+
+	displayBody(question.body);
+
+	enableAnswersView();
+
+	if (question.comments != null)
+	{
+	    commentsCickableTextView.setText(COMMENTS + " (" + question.comments.size() + ")");
+	}
+	else
+	{
+	    commentsCickableTextView.setText(ZERO_COMMENTS_LABEL);
+	}
     }
 
     private void setupQuestionOptions()
@@ -224,13 +250,22 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    @Override
 	    public void onClick(View paramView)
 	    {
-		questionOptionsLayout.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
-		                android.R.anim.slide_out_right));
-		questionOptionsLayout.setVisibility(View.INVISIBLE);
-		questionOwnerButton.setVisibility(View.VISIBLE);
-		questionTitle.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
-		                android.R.anim.slide_in_left));
-		questionTitle.setVisibility(View.VISIBLE);
+		showQuestionTitleOptions(false);
+	    }
+	});
+
+	imageView = (ImageView) questionOptionsLayout.findViewById(R.id.saveQuestion);
+	imageView.setOnClickListener(new View.OnClickListener()
+	{
+	    @Override
+	    public void onClick(View paramView)
+	    {
+		File directory = new File(getCacheDir(), StringConstants.QUESTIONS);
+		CacheWriteObjectAsyncTask cacheTask = new CacheWriteObjectAsyncTask(directory, String
+		                .valueOf(question.id));
+		cacheTask.execute(question);
+
+		Toast.makeText(QuestionDetailActivity.this, "Question saved", Toast.LENGTH_SHORT).show();
 	    }
 	});
 
@@ -240,16 +275,41 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    @Override
 	    public boolean onLongClick(View paramView)
 	    {
-		paramView.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
-		                android.R.anim.slide_out_right));
-		paramView.setVisibility(View.INVISIBLE);
-		questionOwnerButton.setVisibility(View.GONE);
-		questionOptionsLayout.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
-		                android.R.anim.slide_in_left));
-		questionOptionsLayout.setVisibility(View.VISIBLE);
+		showQuestionTitleOptions(true);
 		return true;
 	    }
 	});
+    }
+
+    private void showQuestionTitleOptions(boolean show)
+    {
+	int expectedTitleVisibility = show ? View.VISIBLE : View.INVISIBLE;
+	int titleVisibility = View.INVISIBLE;
+	int optionsVisibility = View.VISIBLE;
+	int titleAnimation = android.R.anim.slide_out_right;
+	int optionsAnimation = android.R.anim.slide_in_left;
+
+	if (questionTitle.getVisibility() == expectedTitleVisibility)
+	{
+	    if (show == false)
+	    {
+		titleVisibility = View.VISIBLE;
+		optionsVisibility = View.INVISIBLE;
+		titleAnimation = android.R.anim.slide_in_left;
+		optionsAnimation = android.R.anim.slide_out_right;
+	    }
+	    
+	    questionOptionsLayout.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
+		            optionsAnimation));
+	    questionOptionsLayout.setVisibility(optionsVisibility);
+
+	    questionTitle.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this, titleAnimation));
+	    questionTitle.setVisibility(titleVisibility);
+
+	    questionOwnerButton.startAnimation(AnimationUtils
+		            .loadAnimation(QuestionDetailActivity.this, titleAnimation));
+	    questionOwnerButton.setVisibility(titleVisibility);
+	}
     }
 
     private void fetchQuestionDetail()
@@ -338,6 +398,14 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	stopServiceAndUnregsiterReceiver();
     }
 
+    @Override
+    protected void onStop()
+    {
+	super.onStop();
+
+	stopServiceAndUnregsiterReceiver();
+    }
+
     private void stopServiceAndUnregsiterReceiver()
     {
 	if (questionIntent != null)
@@ -370,14 +438,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	{
 	    Log.d(TAG, e.getMessage());
 	}
-    }
-
-    @Override
-    protected void onStop()
-    {
-	super.onStop();
-
-	stopServiceAndUnregsiterReceiver();
     }
 
     private void displayQuestionMetaData(final Question question)
@@ -473,21 +533,20 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 		    String label = null;
 		    String body = null;
 
+		    showQuestionTitleOptions(false);
+
 		    if (viewingAnswer == false)
 		    {
+			viewingAnswer = true;
 			label = getString(R.string.question);
 
-			if (currentAnswerCount == -1)
+			if (currentAnswerCount == -1 && question.answers.isEmpty() == false)
 			{
 			    currentAnswerCount = 0;
+			    answerHeader.setVisibility(View.VISIBLE);
+			    detailLinearLayout.removeAllViews();
+			    updateViewForAnswer();
 			}
-
-			Log.d(TAG, "Accepted: " + question.answers.get(currentAnswerCount).accepted);
-			viewingAnswer = true;
-			answerHeader.setVisibility(View.VISIBLE);
-
-			detailLinearLayout.removeAllViews();
-			updateViewForAnswer();
 		    }
 		    else
 		    {
@@ -503,11 +562,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 			if (question.comments == null)
 			{
 			    commentsCickableTextView.setClickable(false);
-			    commentsCickableTextView.setText("Comments (0)");
+			    commentsCickableTextView.setText(ZERO_COMMENTS_LABEL);
 			}
 			else
 			{
-			    commentsCickableTextView.setText("Comments (" + question.comments.size() + ")");
+			    commentsCickableTextView.setText(COMMENTS + " (" + question.comments.size() + ")");
 			    commentsCickableTextView.setClickable(true);
 			}
 
@@ -518,6 +577,18 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 		    answersOrQuestion.setText(label);
 		}
 	    });
+	}
+    }
+
+    private void enableAnswersView()
+    {
+	answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
+	answersOrQuestion.setTextColor(Color.WHITE);
+	answersOrQuestion.setEnabled(true);
+
+	if (question.answers != null)
+	{
+	    answersOrQuestion.setClickable(true);
 	}
     }
 }

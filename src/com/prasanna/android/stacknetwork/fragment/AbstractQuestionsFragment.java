@@ -43,7 +43,7 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
         for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
         {
             LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-                    getActivity().getLayoutInflater(), getActivity(), items.get(itemDisplayCursor));
+                    getActivity().getLayoutInflater(), getActivity(), false,items.get(itemDisplayCursor));
             itemsContainer.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }

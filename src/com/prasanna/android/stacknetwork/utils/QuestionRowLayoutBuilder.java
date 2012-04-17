@@ -26,7 +26,7 @@ public class QuestionRowLayoutBuilder
 	return builder;
     }
 
-    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, Question question)
+    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, boolean cached, Question question)
     {
 	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
 	if (question.hasAcceptedAnswer == true)
@@ -35,13 +35,13 @@ public class QuestionRowLayoutBuilder
 	}
 
 	createCountsView(questionRowLayout, question);
-	createQuestionSnippetView(questionRowLayout, context, question);
+	createQuestionSnippetView(questionRowLayout, context, cached, question);
 	setupViewForTags(questionRowLayout, context, question);
 
 	return questionRowLayout;
     }
 
-    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context,
+    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context, final boolean cached,
 	            final Question question)
     {
 	TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
@@ -52,6 +52,7 @@ public class QuestionRowLayoutBuilder
 	    {
 		Intent displayQuestionIntent = new Intent(view.getContext(), QuestionDetailActivity.class);
 		displayQuestionIntent.putExtra(StringConstants.QUESTION, question);
+		displayQuestionIntent.putExtra(StringConstants.CACHED, cached);
 		context.startActivity(displayQuestionIntent);
 	    }
 	});

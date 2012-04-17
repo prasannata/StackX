@@ -17,7 +17,7 @@ public class Question extends BaseStackExchangeItem implements Serializable
 
     public String relativeLink;
 
-    public ArrayList<Answer> answers = new ArrayList<Answer>();
+    public ArrayList<Answer> answers;
 
     public ArrayList<Comment> comments;
 
