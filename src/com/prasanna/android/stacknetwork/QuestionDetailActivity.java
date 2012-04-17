@@ -631,13 +631,16 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void enableAnswersView()
     {
-        answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
-        answersOrQuestion.setTextColor(Color.WHITE);
-        answersOrQuestion.setEnabled(true);
-
-        if (question.answers != null)
+        if (answersOrQuestion.isEnabled() == false)
         {
-            answersOrQuestion.setClickable(true);
+            answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
+            answersOrQuestion.setTextColor(Color.WHITE);
+            answersOrQuestion.setEnabled(true);
+
+            if (question.answers != null)
+            {
+                answersOrQuestion.setClickable(true);
+            }
         }
     }
 }
