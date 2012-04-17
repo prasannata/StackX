@@ -6,11 +6,13 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionService;
 import com.prasanna.android.stacknetwork.service.QuestionsLRUService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionDetailsIntentService extends IntentService
@@ -48,9 +50,9 @@ public class QuestionDetailsIntentService extends IntentService
                 {
                     broadcastQuestionBody(cachedQuestion);
 
-                    broadcoastQuestionComments(cachedQuestion.comments);
+                    broadcoastComments(cachedQuestion.comments);
 
-                    broadcastQuestionAnswers(cachedQuestion);
+                    broadcastAnswers(cachedQuestion.answers);
                 }
             }
         }
@@ -69,28 +71,41 @@ public class QuestionDetailsIntentService extends IntentService
 
         broadcastQuestionBody(question);
 
-        broadcoastQuestionComments(questionService.getComments(StringConstants.QUESTIONS, question.id));
+        broadcoastComments(questionService.getComments(StringConstants.QUESTIONS, question.id));
+
+        if (question.answers == null)
+        {
+            question.answers = new ArrayList<Answer>();
+        }
 
         if (question.answerCount > 0)
         {
-            question.answers = questionService.getAnswersForQuestion(question.id);
+            int numPages = (question.answerCount / StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE) + 1;
+            for (int page = 1; page <= numPages; page++)
+            {
+                ArrayList<Answer> answers = questionService.getAnswersForQuestion(question.id, page);
+                question.answers.addAll(answers);
+                broadcastAnswers(answers);
+            }
         }
-
-        broadcastQuestionAnswers(question);
+        else
+        {
+            broadcastAnswers(question.answers);
+        }
 
         QuestionsLRUService.add(question);
     }
 
-    private void broadcastQuestionAnswers(Question question)
+    private void broadcastAnswers(ArrayList<Answer> answers)
     {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra(), question.answers);
+        broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra(), answers);
         sendBroadcast(broadcastIntent);
     }
 
-    private void broadcoastQuestionComments(ArrayList<Comment> comments)
+    private void broadcoastComments(ArrayList<Comment> comments)
     {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.name());

@@ -98,8 +98,13 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            question.answers = (ArrayList<Answer>) intent
-                    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra());
+            if (question.answers == null)
+            {
+                question.answers = new ArrayList<Answer>();
+            }
+
+            question.answers.addAll((ArrayList<Answer>) intent
+                    .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra()));
 
             answersOrQuestion.setBackgroundResource(R.drawable.square_bottom_edges);
             answersOrQuestion.setTextColor(Color.WHITE);
@@ -424,7 +429,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                         Log.d(TAG, "Accepted: " + question.answers.get(currentAnswerCount).accepted);
                         viewingAnswer = true;
                         answerHeader.setVisibility(View.VISIBLE);
-                        
+
                         detailLinearLayout.removeAllViews();
                         updateViewForAnswer();
                     }

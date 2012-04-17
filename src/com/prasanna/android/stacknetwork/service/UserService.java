@@ -106,7 +106,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
         return getQuestions(restEndPoint, queryParams);
     }
@@ -120,7 +120,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
         return getQuestions(restEndPoint, queryParams);
     }
@@ -180,7 +180,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
         JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
                 restEndPoint, queryParams);
@@ -237,7 +237,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
 
         return getAnswers(restEndPoint, queryParams);
@@ -252,7 +252,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
         return getAnswers(restEndPoint, queryParams);
     }
@@ -266,7 +266,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_INBOX_FILTER);
 
         return getInboxItems(restEndPoint, queryParams);
@@ -322,7 +322,7 @@ public class UserService extends AbstractBaseService
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.NETWORK_USER_TYPE_FILTER);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
         return getAccounts(restEndPoint, queryParams);
     }
@@ -332,7 +332,7 @@ public class UserService extends AbstractBaseService
         String restEndPoint = "/users/" + userId + "/associated";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
         return getAccounts(restEndPoint, queryParams);
     }
@@ -400,7 +400,7 @@ public class UserService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_POPULAR);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, StackUri.QueryParamDefaultValues.PAGE_SIZE);
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
         JSONObjectWrapper jsonObjectWrapper = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
                 queryParams);
