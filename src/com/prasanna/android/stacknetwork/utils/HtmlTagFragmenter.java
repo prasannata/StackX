@@ -68,7 +68,9 @@ public class HtmlTagFragmenter
                             textView.setPadding(0, 0, 0, 0);
                         }
                         else
+                        {
                             textView.setText(Html.fromHtml(xmlPullParser.getText()));
+                        }
 
                         codeSnippet.add(textView);
                     }

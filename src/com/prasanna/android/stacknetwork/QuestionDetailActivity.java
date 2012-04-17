@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -43,6 +44,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private TextView currentAnswerOfTotalTextView;
     private TextView currentAnswerScore;
     private TextView acceptedAnswerLogo;
+    private TextView questionTitle;
     private Question question;
     private FlingScrollView flingScrollView;
     private Button currentAnswerAuthor;
@@ -117,6 +119,8 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         }
     };
 
+    private LinearLayout questionOptionsLayout;
+
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
     {
         public void flingedToLeft()
@@ -180,6 +184,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
         setContentView(R.layout.question_detail_layout);
 
+        questionOptionsLayout = (LinearLayout) findViewById(R.id.questionOptions);
         flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
         flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
         detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
@@ -198,11 +203,47 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             }
         });
 
+        setupQuestionOptions();
+
         setupCommentsPopup();
 
         registerReceivers();
 
         fetchQuestionDetail();
+    }
+
+    private void setupQuestionOptions()
+    {
+        TextView returnToTitle = (TextView) questionOptionsLayout.findViewById(R.id.returnToTitle);
+        returnToTitle.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View paramView)
+            {
+                questionOptionsLayout.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
+                        android.R.anim.slide_out_right));
+                questionOptionsLayout.setVisibility(View.INVISIBLE);
+                questionTitle.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
+                        android.R.anim.slide_in_left));
+                questionTitle.setVisibility(View.VISIBLE);
+            }
+        });
+
+        questionTitle = (TextView) findViewById(R.id.questionTitle);
+        questionTitle.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View paramView)
+            {
+                paramView.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
+                        android.R.anim.slide_out_right));
+                paramView.setVisibility(View.INVISIBLE);
+                questionOptionsLayout.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
+                        android.R.anim.slide_in_left));
+                questionOptionsLayout.setVisibility(View.VISIBLE);
+                return true;
+            }
+        });
     }
 
     private void fetchQuestionDetail()
@@ -340,8 +381,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         TextView textView = (TextView) findViewById(R.id.questionScore);
         textView.setText("Score: " + String.valueOf(question.score));
 
-        textView = (TextView) findViewById(R.id.questionTitle);
-        textView.setText(Html.fromHtml(question.title));
+        questionTitle.setText(Html.fromHtml(question.title));
 
         Button button = (Button) findViewById(R.id.questionOwner);
         button.setText(getOwnerString(question.owner));

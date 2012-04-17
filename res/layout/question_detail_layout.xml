@@ -57,6 +57,10 @@
         android:layout_marginTop="4dp"
         android:background="@drawable/rounded_border_delft" >
 
+        <include
+            android:id="@+id/questionOptions"
+            layout="@layout/share_options" />
+
         <TextView
             android:id="@+id/questionTitle"
             android:layout_width="match_parent"
