@@ -41,5 +41,6 @@ public class StackUri
         public static final String SORT_BY_ACTIVITY = "activity";
         public static final String SORT_BY_POPULAR = "popular";
         public static final String SORT_BY_NAME = "name";
+        public static final String SORT_BY_VOTES = "votes";
     }
 }

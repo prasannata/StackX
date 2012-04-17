@@ -41,6 +41,7 @@ public class QuestionService extends AbstractBaseService
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE,
                 String.valueOf(StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE));
+        queryParams.put(StackUri.QueryParams.SORT, String.valueOf(StackUri.Sort.SORT_BY_VOTES));
 
         JSONObjectWrapper answersJson = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
                 queryParams);
