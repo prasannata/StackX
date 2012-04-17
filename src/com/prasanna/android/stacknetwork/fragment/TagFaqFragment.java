@@ -34,7 +34,7 @@ public class TagFaqFragment extends AbstractQuestionsFragment
 
         if (qTag != null)
         {
-            registerTagFaqReceiver();
+            registerReceiver();
 
             loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
 
@@ -56,7 +56,8 @@ public class TagFaqFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
-        tagFaqIntent = new Intent(getActivity().getApplicationContext(), TagFaqIntentService.class);
+	
+        tagFaqIntent = getIntentForService(TagFaqIntentService.class, IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
         tagFaqIntent.setAction(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
         tagFaqIntent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), qTag);
         tagFaqIntent.putExtra(StringConstants.PAGE, ++currentPage);
@@ -64,7 +65,8 @@ public class TagFaqFragment extends AbstractQuestionsFragment
         serviceRunning = true;
     }
 
-    protected void registerTagFaqReceiver()
+    @Override
+    protected void registerReceiver()
     {
         IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);

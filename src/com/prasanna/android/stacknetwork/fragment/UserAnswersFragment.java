@@ -49,7 +49,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
         {
             user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-            registerForAnwersByUserReceiver();
+            registerReceiver();
 
             startIntentService();
         }
@@ -94,39 +94,6 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
         }
 
         return layoutContainer;
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-
-        stopServiceAndUnregsiterReceivers();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-
-        stopServiceAndUnregsiterReceivers();
-    }
-
-    private void stopServiceAndUnregsiterReceivers()
-    {
-        if (intent != null)
-        {
-            getActivity().stopService(intent);
-        }
-
-        try
-        {
-            getActivity().unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
     }
 
     private void addAnswersToView()
@@ -174,7 +141,8 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
         }
     }
 
-    private void registerForAnwersByUserReceiver()
+    @Override
+    protected void registerReceiver()
     {
         IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -190,7 +158,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     public void startIntentService()
     {
-        intent = new Intent(getActivity(), UserAnswersIntentService.class);
+        intent = getIntentForService(UserAnswersIntentService.class, IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
         intent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
         intent.putExtra(StringConstants.USER_ID, user.id);
         intent.putExtra(StringConstants.PAGE, ++page);

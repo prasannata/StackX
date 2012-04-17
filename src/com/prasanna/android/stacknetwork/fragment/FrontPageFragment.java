@@ -48,14 +48,6 @@ public class FrontPageFragment extends AbstractQuestionsFragment
 
     
     @Override
-    public void onResume()
-    {
-        registerReceiver();
-        super.onResume();
-    }
-
-
-    @Override
     public void onSaveInstanceState(Bundle outState)
     {
         Log.d(TAG, "Saving instance state");
@@ -70,14 +62,15 @@ public class FrontPageFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
-        frontPageQuestionsIntent = new Intent(getActivity().getApplicationContext(), UserQuestionsIntentService.class);
+        frontPageQuestionsIntent = getIntentForService(UserQuestionsIntentService.class, IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         frontPageQuestionsIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         frontPageQuestionsIntent.putExtra(StringConstants.PAGE, ++currentPage);
         getActivity().startService(frontPageQuestionsIntent);
         serviceRunning = true;
     }
 
-    private void registerReceiver()
+    @Override
+    protected void registerReceiver()
     {
         IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);

@@ -32,4 +32,14 @@ public class IntentUtils
 	Intent listStackNetworkIntent = new Intent(context, StackNetworkListActivity.class);
 	return listStackNetworkIntent.putExtra("allSites", true);
     }
+
+    public static Intent createEmailIntent(String subject, String body)
+    {
+	String type = "plain/text";
+	Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+	emailIntent.setType(type);
+	emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+	emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+	return emailIntent;
+    }
 }

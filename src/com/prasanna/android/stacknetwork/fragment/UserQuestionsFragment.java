@@ -25,7 +25,6 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     private static final String TAG = UserQuestionsFragment.class.getSimpleName();
     private LinearLayout scrollViewContainer;
     private ScrollViewWithNotifier itemScroller;
-    private LinearLayout loadingProgressView;
     private User user;
     private Intent intent;
     private int page = 0;
@@ -34,12 +33,13 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
+        page = 0;
+        
         if (items == null || items.isEmpty() == true)
         {
             user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-            registerForQuestionsByUserReceiver();
+            registerReceiver();
 
             startIntentService();
         }
@@ -84,40 +84,9 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
         return scrollViewContainer;
     }
 
+    
     @Override
-    public void onStop()
-    {
-        super.onStop();
-
-        stopServiceAndUnregsiterReceivers();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-
-        stopServiceAndUnregsiterReceivers();
-    }
-
-    private void stopServiceAndUnregsiterReceivers()
-    {
-        if (intent != null)
-        {
-            getActivity().stopService(intent);
-        }
-
-        try
-        {
-            getActivity().unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-    }
-
-    private void registerForQuestionsByUserReceiver()
+    protected void registerReceiver()
     {
         IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);
@@ -133,8 +102,7 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
-        intent = new Intent(getActivity(), UserQuestionsIntentService.class);
-        intent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+        intent = getIntentForService(UserQuestionsIntentService.class, IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
         intent.putExtra(StringConstants.USER_ID, user.id);
         intent.putExtra(StringConstants.PAGE, ++page);
         intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);

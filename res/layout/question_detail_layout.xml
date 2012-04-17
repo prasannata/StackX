@@ -59,6 +59,10 @@
 
         <include
             android:id="@+id/questionOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/questionTitle"
+            android:layout_centerHorizontal="true"
             layout="@layout/share_options" />
 
         <TextView

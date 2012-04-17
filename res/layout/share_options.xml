@@ -1,35 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:background="@color/white"
     android:orientation="horizontal"
-    android:visibility="gone" >
+    android:visibility="invisible" >
 
-    <TextView
+    <ImageView
         android:id="@+id/emailQuestion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Email"
-        android:textColor="@color/black" />
+        android:src="@drawable/email_dark" />
 
-    <TextView
+    <ImageView
         android:id="@+id/bookmarkQuestion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginLeft="5dp"
-        android:text="Bookmark"
-        android:textColor="@color/black" />
+        android:src="@drawable/important_dark" />
 
-    <TextView
+    <ImageView
         android:id="@+id/returnToTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginLeft="5dp"
-        android:text="Return"
-        android:textColor="@color/black" />
+        android:src="@drawable/back_dark" />
 
 </LinearLayout>

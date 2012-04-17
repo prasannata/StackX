@@ -91,6 +91,7 @@ public abstract class AbstractBaseService
         question.viewCount = jsonObject.getInt(JsonFields.Question.VIEW_COUNT);
         question.tags = getTags(jsonObject);
         question.creationDate = jsonObject.getLong(JsonFields.Question.CREATION_DATE);
+        question.link = jsonObject.getString(JsonFields.Question.LINK);
 
         if (jsonObject.has(JsonFields.Question.ACCEPTED_ANSWER_ID))
         {

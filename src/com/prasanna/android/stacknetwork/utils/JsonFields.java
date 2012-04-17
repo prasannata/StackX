@@ -11,6 +11,7 @@ public class JsonFields
 	public static final String BODY = "body";
 	public static final String TITLE = "title";
 	public static final String CREATION_DATE = "creation_date";
+	public static final String LINK = "link";
     }
 
     public static class Question extends BaseUserContribFields

@@ -16,6 +16,8 @@ public abstract class BaseStackExchangeItem implements Serializable
 
     public String body;
 
+    public String link;
+    
     public long creationDate;
 
 }

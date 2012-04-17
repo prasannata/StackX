@@ -51,6 +51,8 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     public abstract IntentAction getReceiverExtraName();
 
     public abstract void startIntentService();
+    
+    protected abstract void registerReceiver();
 
     protected abstract void displayItems();
 
@@ -71,6 +73,13 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         return itemsContainer;
     }
 
+    @Override
+    public void onResume()
+    {
+        registerReceiver();
+        super.onResume();
+    }
+    
     @Override
     public void onDestroy()
     {
