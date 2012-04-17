@@ -12,7 +12,7 @@ public class AppUtils
         if (reputation > 10000)
         {
             float reputationInThousands = ((float) reputation) / 1000f;
-            reputationString += " " + String.format("%.1fk", reputationInThousands);
+            reputationString += String.format("%.1fk", reputationInThousands);
         }
         else
         {
