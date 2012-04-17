@@ -230,8 +230,10 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
 	displayBody(question.body);
 
+	setupAnswersOnClick();
+	
 	enableAnswersView();
-
+	
 	if (question.comments != null)
 	{
 	    commentsCickableTextView.setText(COMMENTS + " (" + question.comments.size() + ")");
@@ -298,7 +300,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 		titleAnimation = android.R.anim.slide_in_left;
 		optionsAnimation = android.R.anim.slide_out_right;
 	    }
-	    
+
 	    questionOptionsLayout.startAnimation(AnimationUtils.loadAnimation(QuestionDetailActivity.this,
 		            optionsAnimation));
 	    questionOptionsLayout.setVisibility(optionsVisibility);
@@ -540,9 +542,13 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 			viewingAnswer = true;
 			label = getString(R.string.question);
 
-			if (currentAnswerCount == -1 && question.answers.isEmpty() == false)
+			if (currentAnswerCount == -1)
 			{
 			    currentAnswerCount = 0;
+			}
+
+			if (question.answers.isEmpty() == false)
+			{
 			    answerHeader.setVisibility(View.VISIBLE);
 			    detailLinearLayout.removeAllViews();
 			    updateViewForAnswer();

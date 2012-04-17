@@ -104,6 +104,7 @@ public class CacheUtils
 	return (ArrayList<Site>) readCachedObject(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
     }
 
+    /* TODO: recursive reading based on directory depth */
     public static ArrayList<Object> readCachedObjectDir(File directory)
     {
 	ArrayList<Object> objects = null;
