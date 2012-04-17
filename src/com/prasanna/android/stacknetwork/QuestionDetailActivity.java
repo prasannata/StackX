@@ -121,6 +121,8 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
             question.answers.addAll((ArrayList<Answer>) intent
                     .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra()));
 
+            Log.d(TAG, "num received answers:" + question.answers.size());
+
             enableAnswersView();
         }
     };
@@ -152,6 +154,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void updateViewForAnswer()
     {
+        detailLinearLayout.removeAllViews();
         displayBody(question.answers.get(currentAnswerCount).body);
 
         if (question.answers.get(currentAnswerCount).comments == null)
@@ -593,7 +596,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                         if (question.answers.isEmpty() == false)
                         {
                             answerHeader.setVisibility(View.VISIBLE);
-                            detailLinearLayout.removeAllViews();
                             updateViewForAnswer();
                         }
                     }
