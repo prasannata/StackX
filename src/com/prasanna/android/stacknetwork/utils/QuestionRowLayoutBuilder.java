@@ -23,73 +23,82 @@ public class QuestionRowLayoutBuilder
 
     public static QuestionRowLayoutBuilder getInstance()
     {
-	return builder;
+        return builder;
     }
 
-    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, boolean cached, Question question)
+    public LinearLayout build(final LayoutInflater layoutInflater,
+            final Context context,
+            boolean cached,
+            Question question)
     {
-	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
-	if (question.hasAcceptedAnswer == true)
-	{
-	    questionRowLayout.setBackgroundResource(R.drawable.question_answered_shape);
-	}
+        LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
+        if (question.hasAcceptedAnswer == true)
+        {
+            questionRowLayout.setBackgroundResource(R.drawable.question_answered_shape);
+        }
 
-	createCountsView(questionRowLayout, question);
-	createQuestionSnippetView(questionRowLayout, context, cached, question);
-	setupViewForTags(questionRowLayout, context, question);
+        createCountsView(questionRowLayout, question);
+        createQuestionSnippetView(questionRowLayout, context, cached, question);
+        setupViewForTags(questionRowLayout, context, question);
 
-	return questionRowLayout;
+        return questionRowLayout;
     }
 
-    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context, final boolean cached,
-	            final Question question)
+    private void createQuestionSnippetView(final LinearLayout parentLayout,
+            final Context context,
+            final boolean cached,
+            final Question question)
     {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
-	textView.setText(Html.fromHtml(question.title));
-	textView.setOnClickListener(new View.OnClickListener()
-	{
-	    public void onClick(View view)
-	    {
-		Intent displayQuestionIntent = new Intent(view.getContext(), QuestionDetailActivity.class);
-		displayQuestionIntent.putExtra(StringConstants.QUESTION, question);
-		displayQuestionIntent.putExtra(StringConstants.CACHED, cached);
-		context.startActivity(displayQuestionIntent);
-	    }
-	});
+        TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
+        textView.setText(Html.fromHtml(question.title));
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                Intent displayQuestionIntent = new Intent(view.getContext(), QuestionDetailActivity.class);
+                displayQuestionIntent.putExtra(StringConstants.QUESTION, question);
+                displayQuestionIntent.putExtra(StringConstants.CACHED, cached);
+                if (cached == true)
+                {
+                    displayQuestionIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                }
+                context.startActivity(displayQuestionIntent);
+            }
+        });
     }
 
     private void setupViewForTags(final LinearLayout parentLayout, final Context context, final Question question)
     {
-	LinearLayout tagsParentLayout = (LinearLayout) parentLayout.findViewById(R.id.questionSnippetTags);
+        LinearLayout tagsParentLayout = (LinearLayout) parentLayout.findViewById(R.id.questionSnippetTags);
 
-	if (question.tags != null && question.tags.length > 0)
-	{
-	    for (int i = 0; i < question.tags.length; i++)
-	    {
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-		                LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(3, 0, 3, 0);
-		TextView tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
-		tagTextView.setText(question.tags[i]);
-		tagsParentLayout.addView(tagTextView, params);
-	    }
-	}
+        if (question.tags != null && question.tags.length > 0)
+        {
+            for (int i = 0; i < question.tags.length; i++)
+            {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(3, 0, 3, 0);
+                TextView tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
+                tagTextView.setText(question.tags[i]);
+                tagsParentLayout.addView(tagTextView, params);
+            }
+        }
     }
 
     private void createCountsView(final LinearLayout parentLayout, Question question)
     {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
-	textView.append(AppUtils.formatNumber(question.viewCount));
+        TextView textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
+        textView.append(AppUtils.formatNumber(question.viewCount));
 
-	textView = (TextView) parentLayout.findViewById(R.id.questionScoreValue);
-	textView.append(AppUtils.formatNumber(question.score));
+        textView = (TextView) parentLayout.findViewById(R.id.questionScoreValue);
+        textView.append(AppUtils.formatNumber(question.score));
 
-	textView = (TextView) parentLayout.findViewById(R.id.questionAnswersValue);
-	textView.append(AppUtils.formatNumber(question.answerCount));
+        textView = (TextView) parentLayout.findViewById(R.id.questionAnswersValue);
+        textView.append(AppUtils.formatNumber(question.answerCount));
     }
 
     private LayoutInflater getInflater(Context context)
     {
-	return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        return (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 }

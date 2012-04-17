@@ -6,12 +6,12 @@ import android.os.AsyncTask;
 
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 
-public class CacheWriteObjectAsyncTask extends AsyncTask<Object, Void, Void>
+public class WriteObjectAsyncTask extends AsyncTask<Object, Void, Void>
 {
     private final File directory;
     private final String fileName;
 
-    public CacheWriteObjectAsyncTask(File directory, String fileName)
+    public WriteObjectAsyncTask(File directory, String fileName)
     {
 	this.directory = directory;
 	this.fileName = fileName;

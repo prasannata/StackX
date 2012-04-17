@@ -27,189 +27,245 @@ public class CacheUtils
 
     public static class CacheFileName
     {
-	public static final String SITE_CACHE_FILE_NAME = "sites";
+        public static final String SITE_CACHE_FILE_NAME = "sites";
     }
 
     public static boolean hasSiteListCache(Context context)
     {
-	boolean present = false;
-	File file = new File(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
+        boolean present = false;
+        File file = new File(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
 
-	if (file != null)
-	{
-	    present = file.exists();
-	}
+        if (file != null)
+        {
+            present = file.exists();
+        }
 
-	Log.d(TAG, "Sites cached: " + present);
-	return present;
+        Log.d(TAG, "Sites cached: " + present);
+        return present;
     }
 
     public static void cacheSiteList(Context context, ArrayList<Site> sites)
     {
-	if (context != null && sites != null && sites.isEmpty() == false)
-	{
-	    Log.d(TAG, "Caching sites");
+        if (context != null && sites != null && sites.isEmpty() == false)
+        {
+            Log.d(TAG, "Caching sites");
 
-	    cacheObject(sites, context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
-	}
+            cacheObject(sites, context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
+        }
     }
 
     public static void cacheQuestion(Context context, Question question)
     {
-	Log.d(TAG, "Caching question");
+        Log.d(TAG, "Caching question");
 
-	if (question != null && question.id > 0)
-	{
-	    File directory = new File(context.getCacheDir(), "questions");
+        if (question != null && question.id > 0)
+        {
+            File directory = new File(context.getCacheDir(), "questions");
 
-	    cacheObject(question, directory, String.valueOf(question.id));
-	}
+            cacheObject(question, directory, String.valueOf(question.id));
+        }
     }
 
     public static void cacheObject(Object object, File directory, String fileName)
     {
-	if (object != null && directory != null && fileName != null)
-	{
-	    if (directory.exists() == false)
-	    {
-		directory.mkdir();
-	    }
+        if (object != null && directory != null && fileName != null)
+        {
+            if (directory.exists() == false)
+            {
+                directory.mkdir();
+            }
 
-	    File cacheFile = new File(directory, fileName);
+            File cacheFile = new File(directory, fileName);
 
-	    if (cacheFile != null)
-	    {
-		try
-		{
-		    ObjectOutputStream oo = new ObjectOutputStream(new FileOutputStream(cacheFile));
-		    oo.writeObject(object);
-		    oo.close();
-		}
-		catch (FileNotFoundException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-		catch (IOException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-	    }
-	}
+            if (cacheFile != null)
+            {
+                try
+                {
+                    ObjectOutputStream oo = new ObjectOutputStream(new FileOutputStream(cacheFile));
+                    oo.writeObject(object);
+                    oo.close();
+                }
+                catch (FileNotFoundException e)
+                {
+                    Log.e(TAG, e.getMessage());
+                }
+                catch (IOException e)
+                {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
     public static ArrayList<Site> fetchSiteListFromCache(Context context)
     {
-	Log.d(TAG, context.getCacheDir().toString());
-	return (ArrayList<Site>) readCachedObject(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
+        Log.d(TAG, context.getCacheDir().toString());
+        return (ArrayList<Site>) readObject(new File(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME));
     }
 
-    /* TODO: recursive reading based on directory depth */
-    public static ArrayList<Object> readCachedObjectDir(File directory)
+    /**
+     * Recursively reads the directory using {@link java.io.ObjectOutputStream
+     * ObjectInputStream}
+     * 
+     * @param directory
+     *            - Directory to read
+     * @return
+     */
+    public static ArrayList<Object> readObjects(File directory)
     {
-	ArrayList<Object> objects = null;
-	
-	if(directory != null && directory.isDirectory() && directory.exists() == true)
-	{
-	    objects = new ArrayList<Object>();
-	    String[] fileNames = directory.list();
-	    for(String fileName: fileNames)
-	    {
-		objects.add(readCachedObject(directory, fileName));
-	    }
-	}
-	
-	return objects;
+        return readObjects(directory, null);
     }
 
-    public static Object readCachedObject(File directory, String fileName)
+    /**
+     * Recursively reads the directory using {@link java.io.ObjectOutputStream
+     * ObjectInputStream}
+     * 
+     * @param directory
+     *            - Directory to read
+     * @param maxDepth
+     *            - Maximum depth to recurse
+     * @return
+     */
+    public static ArrayList<Object> readObjects(File directory, Integer maxDepth)
     {
-	Object object = null;
-	if (directory != null && directory.isDirectory() && fileName != null)
-	{
-	    File file = new File(directory, fileName);
+        ArrayList<Object> objects = null;
 
-	    if (file != null && file.exists() == true)
-	    {
-		Log.d(TAG, "Fetch cached objects");
+        if (directory != null && directory.isDirectory() && directory.exists() == true)
+        {
+            objects = readObjectsInDir(directory, maxDepth);
+        }
 
-		try
-		{
-		    ObjectInputStream oi = new ObjectInputStream(new FileInputStream(file));
-		    object = oi.readObject();
-		    oi.close();
-		}
-		catch (StreamCorruptedException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-		catch (FileNotFoundException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-		catch (IOException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-		catch (ClassNotFoundException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-	    }
-	}
-	return object;
+        return objects;
+    }
+
+    private static ArrayList<Object> readObjectsInDir(File directory, Integer depth)
+    {
+        ArrayList<Object> objects = null;
+
+        if (depth == null || depth > 0)
+        {
+            objects = new ArrayList<Object>();
+
+            String[] fileNames = directory.list();
+
+            for (String fileName : fileNames)
+            {
+                File file = new File(directory, fileName);
+                if (file.isDirectory())
+                {
+                    ArrayList<Object> childObjects = readObjects(directory, depth != null ? --depth : depth);
+                    if (childObjects != null)
+                    {
+                        objects.addAll(childObjects);
+                    }
+                }
+                else
+                {
+                    objects.add(readObject(file));
+                }
+            }
+        }
+        return objects;
+    }
+
+    public static Object readObject(File file)
+    {
+        Object object = null;
+
+        if (file != null && file.exists() == true && file.isFile() == true)
+        {
+            Log.d(TAG, "Fetch cached objects");
+
+            try
+            {
+                ObjectInputStream oi = new ObjectInputStream(new FileInputStream(file));
+                object = oi.readObject();
+                oi.close();
+            }
+            catch (StreamCorruptedException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            catch (FileNotFoundException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            catch (ClassNotFoundException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+
+        return object;
     }
 
     public static void clear(Context context)
     {
-	if (context != null)
-	{
-	    Log.d(TAG, "Clearing cache");
+        if (context != null)
+        {
+            Log.d(TAG, "Clearing cache");
 
-	    File cacheDir = context.getCacheDir();
-	    if (cacheDir != null && cacheDir.isDirectory())
-	    {
-		deleteDir(cacheDir);
-	    }
+            File cacheDir = context.getCacheDir();
+            if (cacheDir != null && cacheDir.isDirectory())
+            {
+                deleteDir(cacheDir);
+            }
 
-	    Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	    prefEditor.remove(StringConstants.ACCESS_TOKEN);
-	    prefEditor.commit();
-	}
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.remove(StringConstants.ACCESS_TOKEN);
+            prefEditor.commit();
+        }
+    }
+
+    public static boolean deleteFile(File file)
+    {
+        boolean deleted = false;
+
+        if (file != null && file.exists() == true && file.isFile())
+        {
+            deleted = file.delete();
+        }
+
+        return deleted;
     }
 
     public static boolean deleteDir(File dir)
     {
-	if (dir != null && dir.isDirectory())
-	{
-	    String[] children = dir.list();
-	    for (int i = 0; i < children.length; i++)
-	    {
-		deleteDir(new File(dir, children[i]));
-	    }
-	}
-	return dir.delete();
+        if (dir != null && dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++)
+            {
+                deleteDir(new File(dir, children[i]));
+            }
+        }
+        return dir.delete();
     }
 
     public static void cacheAccessToken(Context context, String accessToken)
     {
-	if (accessToken != null)
-	{
-	    Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	    prefEditor.putString(StringConstants.ACCESS_TOKEN, accessToken);
-	    prefEditor.commit();
-	    userAccessToken = accessToken;
-	}
+        if (accessToken != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.putString(StringConstants.ACCESS_TOKEN, accessToken);
+            prefEditor.commit();
+            userAccessToken = accessToken;
+        }
     }
 
     public static String getAccessToken(Context context)
     {
-	if (userAccessToken == null && context != null)
-	{
-	    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	    userAccessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-	}
+        if (userAccessToken == null && context != null)
+        {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            userAccessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
+        }
 
-	return userAccessToken;
+        return userAccessToken;
     }
 }
