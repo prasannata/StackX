@@ -15,8 +15,6 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.IntentAction;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
@@ -91,12 +89,6 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
         IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         getActivity().registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public IntentAction getReceiverExtraName()
-    {
-        return UserIntentAction.QUESTIONS_BY_USER;
     }
 
     @Override

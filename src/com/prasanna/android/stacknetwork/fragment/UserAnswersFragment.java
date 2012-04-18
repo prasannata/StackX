@@ -22,7 +22,6 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.IntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -150,15 +149,16 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     }
 
     @Override
-    public IntentAction getReceiverExtraName()
+    public String getReceiverExtraName()
     {
-        return UserIntentAction.ANSWERS_BY_USER;
+        return UserIntentAction.ANSWERS_BY_USER.getExtra();
     }
 
     @Override
     public void startIntentService()
     {
-        intent = getIntentForService(UserAnswersIntentService.class, IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+        intent = getIntentForService(UserAnswersIntentService.class,
+                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
         intent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
         intent.putExtra(StringConstants.USER_ID, user.id);
         intent.putExtra(StringConstants.PAGE, ++page);

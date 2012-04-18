@@ -17,7 +17,6 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.IntentAction;
 
 public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> extends Fragment implements
         ScrollableFragment
@@ -38,7 +37,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         {
             Log.d(getLogTag(), "Receiver invoked: " + intent.getExtras());
 
-            items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName().getExtra()));
+            items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName()));
 
             displayItems();
         }
@@ -48,10 +47,10 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
     private Intent intentForService;
 
-    public abstract IntentAction getReceiverExtraName();
+    public abstract String getReceiverExtraName();
 
     public abstract void startIntentService();
-    
+
     protected abstract void registerReceiver();
 
     protected abstract void displayItems();
@@ -79,7 +78,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         registerReceiver();
         super.onResume();
     }
-    
+
     @Override
     public void onDestroy()
     {

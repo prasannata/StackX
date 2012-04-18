@@ -12,7 +12,6 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class FrontPageFragment extends AbstractQuestionsFragment
@@ -75,12 +74,6 @@ public class FrontPageFragment extends AbstractQuestionsFragment
         IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         getActivity().registerReceiver(receiver, filter);
-    }
-
-    @Override
-    public QuestionIntentAction getReceiverExtraName()
-    {
-        return QuestionIntentAction.QUESTIONS;
     }
 
     @Override

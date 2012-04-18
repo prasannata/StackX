@@ -56,8 +56,9 @@ public class TagFaqFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
-	
-        tagFaqIntent = getIntentForService(TagFaqIntentService.class, IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
+
+        tagFaqIntent = getIntentForService(TagFaqIntentService.class,
+                IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
         tagFaqIntent.setAction(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
         tagFaqIntent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), qTag);
         tagFaqIntent.putExtra(StringConstants.PAGE, ++currentPage);
@@ -81,12 +82,6 @@ public class TagFaqFragment extends AbstractQuestionsFragment
     public void setqTag(String qTag)
     {
         this.qTag = qTag;
-    }
-
-    @Override
-    public QuestionIntentAction getReceiverExtraName()
-    {
-        return QuestionIntentAction.TAGS_FAQ;
     }
 
     @Override

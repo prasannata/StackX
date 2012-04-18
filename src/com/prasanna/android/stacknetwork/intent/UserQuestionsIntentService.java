@@ -67,7 +67,7 @@ public class UserQuestionsIntentService extends IntentService
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTIONS.getExtra(), questions);
+        broadcastIntent.putExtra(StringConstants.QUESTIONS, questions);
         sendBroadcast(broadcastIntent);
 
         Log.d(TAG, "Questions fetched and broadcasted");
@@ -78,7 +78,7 @@ public class UserQuestionsIntentService extends IntentService
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.getExtra(), questions);
+        broadcastIntent.putExtra(StringConstants.QUESTIONS, questions);
         sendBroadcast(broadcastIntent);
     }
 }

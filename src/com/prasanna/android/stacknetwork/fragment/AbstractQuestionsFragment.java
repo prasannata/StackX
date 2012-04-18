@@ -10,6 +10,7 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Question>
 {
@@ -37,17 +38,23 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
             loadingProgressView.setVisibility(View.GONE);
             loadingProgressView = null;
         }
-        
+
         Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
 
         for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
         {
             LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-                    getActivity().getLayoutInflater(), getActivity(), false,items.get(itemDisplayCursor));
+                    getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
             itemsContainer.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
                     LayoutParams.WRAP_CONTENT));
         }
 
         serviceRunning = false;
+    }
+
+    @Override
+    public String getReceiverExtraName()
+    {
+        return StringConstants.QUESTIONS;
     }
 }
