@@ -550,10 +550,10 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void displayBody(String text)
     {
-        ArrayList<TextView> detailFragments = HtmlTagFragmenter.parse(getApplicationContext(), text);
-        for (TextView detailFragment : detailFragments)
+        ArrayList<TextView> questionBodyTextViews = HtmlTagFragmenter.parse(getApplicationContext(), text);
+        for (TextView questionBodyTextView : questionBodyTextViews)
         {
-            detailLinearLayout.addView(detailFragment);
+            detailLinearLayout.addView(questionBodyTextView);
         }
     }
 
