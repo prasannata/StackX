@@ -19,9 +19,6 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
     protected static final String POSITION = "POSITION";
     protected static final String DRAG = "DRAG";
 
-    private int numRowsPassed = 0;
-    private int lastRecordedY = -1;
-    private int startOffset = 0;
     protected final ListView listView;
     protected List<T> dataSet;
 
@@ -30,13 +27,15 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 
     protected abstract String getTag();
 
+    private int startOffset = 0;
+    private int droppedViewBottom = 0;
+
     protected class ListViewDragListener implements View.OnDragListener
     {
 	@Override
 	public boolean onDrag(View paramView, DragEvent paramDragEvent)
 	{
 	    Log.d(getTag(), "on Drag");
-
 	    if (reorder == true)
 	    {
 		switch (paramDragEvent.getAction())
@@ -46,8 +45,6 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 			return true;
 		    case DragEvent.ACTION_DRAG_ENDED:
 			Log.d(getTag(), "ACTION_DRAG_ENDED");
-			numRowsPassed = 0;
-			lastRecordedY = -1;
 			notifyDataSetChanged();
 			return true;
 		    case DragEvent.ACTION_DROP:
@@ -55,30 +52,29 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 			Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
 			Intent intent = clipDataItem.getIntent();
 			int draggedListItemPosition = intent.getIntExtra(POSITION, -1);
-			if (draggedListItemPosition != -1)
+			int distance = droppedViewBottom - startOffset;
+			if (draggedListItemPosition != -1 && Math.abs(distance) > paramView.getHeight())
 			{
-			    int currentRowX = (int) paramDragEvent.getX();
-			    int currentRowY = startOffset + (numRowsPassed * paramView.getHeight());
-			    int currentRowPosition = listView.pointToPosition(currentRowX, currentRowY);
-			    dataSet.add(currentRowPosition + 1, dataSet.get(draggedListItemPosition));
-			    dataSet.remove(draggedListItemPosition);
+			    int currentRowPosition = listView.pointToPosition((int) paramDragEvent.getX(),
+				            droppedViewBottom - 1);
+			    
+			    Log.d(getTag(), "distance: " + distance);
+			    Log.d(getTag(), "draggedListItemPosition: " + draggedListItemPosition);
+			    Log.d(getTag(), "currentRowPosition: " + currentRowPosition);
+
+			    dataSet.add(currentRowPosition, dataSet.remove(draggedListItemPosition));
+
 			    changed = true;
 			}
 			return true;
-		    case DragEvent.ACTION_DRAG_LOCATION:
-			Log.d(getTag(), "ACTION_DRAG_LOCATION");
+		    case DragEvent.ACTION_DRAG_ENTERED:
+			Log.d(getTag(), "ACTION_DRAG_ENTERED");
 
-			int y = (int) paramDragEvent.getY();
+			droppedViewBottom = paramView.getBottom();
+			Log.d(getTag(), "startOffset: " + startOffset + ", " + "droppedViewBottom: "
+			                + droppedViewBottom);
 
 			paramView.setBackgroundColor(Color.GRAY);
-
-			if (y < lastRecordedY)
-			{
-			    numRowsPassed++;
-			    lastRecordedY = -1;
-			}
-
-			lastRecordedY = y;
 			return true;
 		}
 	    }
