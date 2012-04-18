@@ -32,129 +32,136 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 
     protected class ListViewDragListener implements View.OnDragListener
     {
-	@Override
-	public boolean onDrag(View paramView, DragEvent paramDragEvent)
-	{
-	    if (reorder == true)
-	    {
-		switch (paramDragEvent.getAction())
-		{
-		    case DragEvent.ACTION_DRAG_STARTED:
-			Log.d(getTag(), "ACTION_DRAG_STARTED");
-			return true;
-		    case DragEvent.ACTION_DRAG_ENDED:
-			Log.d(getTag(), "ACTION_DRAG_ENDED");
-			notifyDataSetChanged();
-			return true;
-		    case DragEvent.ACTION_DROP:
-			Log.d(getTag(), "ACTION_DROP");
-			dropItem(paramView, paramDragEvent);
-			return true;
-		    case DragEvent.ACTION_DRAG_ENTERED:
-			Log.d(getTag(), "ACTION_DRAG_ENTERED");
+        @Override
+        public boolean onDrag(View paramView, DragEvent paramDragEvent)
+        {
+            if (reorder == true)
+            {
+                switch (paramDragEvent.getAction())
+                {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        Log.d(getTag(), "ACTION_DRAG_STARTED");
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        Log.d(getTag(), "ACTION_DRAG_ENDED");
+                        notifyDataSetChanged();
+                        return true;
+                    case DragEvent.ACTION_DROP:
+                        Log.d(getTag(), "ACTION_DROP");
+                        dropItem(paramView, paramDragEvent);
+                        return true;
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        Log.d(getTag(), "ACTION_DRAG_ENTERED");
 
-			lastVisitedViewBottom = paramView.getBottom();
-			paramView.setBackgroundColor(Color.GRAY);
+                        paramView.setBackgroundColor(Color.GRAY);
+                        lastVisitedViewBottom = paramView.getBottom();
+                        Log.d(getTag(), "lastVisitedViewBottom: " + lastVisitedViewBottom);
 
-			Log.d(getTag(), "droppedViewBottom: " + lastVisitedViewBottom);
-			Log.d(getTag(), "listView.getHeight(): " + listView.getHeight());
-			if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 2.9 * paramView.getHeight())
-			{
-			    listView.smoothScrollBy(paramView.getHeight(), 5000);
-			}
-			return true;
-		}
-	    }
+                        if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 2.9 * paramView.getHeight())
+                        {
+                            listView.smoothScrollBy(paramView.getHeight(), 300);
+                        }
+                        return true;
+                    case DragEvent.ACTION_DRAG_EXITED:
+                        Log.d(getTag(), "ACTION_DRAG_EXITED");
+                        return true;
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        return true;
+                }
+            }
 
-	    return false;
-	}
+            return false;
+        }
 
-	private void dropItem(View paramView, DragEvent paramDragEvent)
-	{
-	    Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
-	    Intent intent = clipDataItem.getIntent();
-	    int draggedItemPosition = intent.getIntExtra(POSITION, -1);
-	    int distance = lastVisitedViewBottom - startOffset;
-	    if (draggedItemPosition != -1 && Math.abs(distance) > paramView.getHeight())
-	    {
-		int currentRowPosition = listView.pointToPosition((int) paramDragEvent.getX(),
-		                lastVisitedViewBottom - 1);
+        private void dropItem(View paramView, DragEvent paramDragEvent)
+        {
+            Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
+            Intent intent = clipDataItem.getIntent();
+            int draggedItemPosition = intent.getIntExtra(POSITION, -1);
+            int distance = lastVisitedViewBottom - startOffset;
 
-		if (currentRowPosition != ListView.INVALID_POSITION)
-		{
-		    Log.d(getTag(), "distance: " + distance);
-		    Log.d(getTag(), "draggedItemPosition: " + draggedItemPosition);
-		    Log.d(getTag(), "currentRowPosition: " + currentRowPosition);
+            Log.d(getTag(), "distance: " + distance);
+            Log.d(getTag(), "draggedItemPosition: " + draggedItemPosition);
 
-		    dataSet.add(currentRowPosition, dataSet.remove(draggedItemPosition));
+            if (draggedItemPosition != ListView.INVALID_POSITION && Math.abs(distance) > paramView.getHeight())
+            {
+                int currentItemPosition = listView.pointToPosition((int) paramDragEvent.getX(),
+                        lastVisitedViewBottom - 1);
 
-		    changed = true;
-		}
-	    }
-	}
+                if (currentItemPosition != ListView.INVALID_POSITION)
+                {
+                    Log.d(getTag(), "currentItemPosition: " + currentItemPosition);
+
+                    dataSet.add(currentItemPosition, dataSet.remove(draggedItemPosition));
+
+                    changed = true;
+                }
+            }
+        }
     }
 
     public AbstractDraggableArrayListAdpater(Context context, int textViewResourceId, List<T> dataSet, ListView listView)
     {
-	super(context, textViewResourceId, dataSet);
-	this.dataSet = dataSet;
-	this.listView = listView;
+        super(context, textViewResourceId, dataSet);
+        this.dataSet = dataSet;
+        this.listView = listView;
     }
 
     public boolean wasReordered()
     {
-	return changed;
+        return changed;
     }
 
     protected void enableDragAndDrop(View view, final int itemPosition, final String clipDataLabel)
     {
-	view.setOnDragListener(new ListViewDragListener());
+        view.setOnDragListener(new ListViewDragListener());
 
-	view.setOnLongClickListener(new View.OnLongClickListener()
-	{
-	    @Override
-	    public boolean onLongClick(View paramView)
-	    {
-		if (reorder == true)
-		{
-		    Intent intent = new Intent(DRAG);
-		    intent.putExtra(POSITION, itemPosition);
-		    ClipData.Item clipDataItem = new ClipData.Item(intent);
+        view.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View paramView)
+            {
+                if (reorder == true)
+                {
+                    Intent intent = new Intent(DRAG);
+                    intent.putExtra(POSITION, itemPosition);
+                    ClipData.Item clipDataItem = new ClipData.Item(intent);
 
-		    ClipData dragData = new ClipData(clipDataLabel, new String[] { "text/plain" }, clipDataItem);
+                    ClipData dragData = new ClipData(clipDataLabel, new String[]
+                    { "text/plain" }, clipDataItem);
 
-		    startOffset = paramView.getBottom();
+                    startOffset = paramView.getBottom();
 
-		    paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
+                    paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
 
-		    return true;
-		}
+                    return true;
+                }
 
-		return false;
-	    }
-	});
+                return false;
+            }
+        });
     }
 
     public void overwriteDataset(List<T> dataSet)
     {
-	Log.d(getTag(), "Overwriting");
+        Log.d(getTag(), "Overwriting");
 
-	this.dataSet = dataSet;
+        this.dataSet = dataSet;
 
-	notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public boolean toggleReorderFlag()
     {
-	reorder = !reorder;
+        reorder = !reorder;
 
-	if (reorder == true)
-	{
-	    changed = false;
-	}
+        if (reorder == true)
+        {
+            changed = false;
+        }
 
-	Log.d(getTag(), "Reorder = " + reorder);
+        Log.d(getTag(), "Reorder = " + reorder);
 
-	return reorder;
+        return reorder;
     }
 }
