@@ -28,14 +28,13 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
     protected abstract String getTag();
 
     private int startOffset = 0;
-    private int droppedViewBottom = 0;
+    private int lastVisitedViewBottom = 0;
 
     protected class ListViewDragListener implements View.OnDragListener
     {
 	@Override
 	public boolean onDrag(View paramView, DragEvent paramDragEvent)
 	{
-	    Log.d(getTag(), "on Drag");
 	    if (reorder == true)
 	    {
 		switch (paramDragEvent.getAction())
@@ -49,37 +48,49 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 			return true;
 		    case DragEvent.ACTION_DROP:
 			Log.d(getTag(), "ACTION_DROP");
-			Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
-			Intent intent = clipDataItem.getIntent();
-			int draggedListItemPosition = intent.getIntExtra(POSITION, -1);
-			int distance = droppedViewBottom - startOffset;
-			if (draggedListItemPosition != -1 && Math.abs(distance) > paramView.getHeight())
-			{
-			    int currentRowPosition = listView.pointToPosition((int) paramDragEvent.getX(),
-				            droppedViewBottom - 1);
-			    
-			    Log.d(getTag(), "distance: " + distance);
-			    Log.d(getTag(), "draggedListItemPosition: " + draggedListItemPosition);
-			    Log.d(getTag(), "currentRowPosition: " + currentRowPosition);
-
-			    dataSet.add(currentRowPosition, dataSet.remove(draggedListItemPosition));
-
-			    changed = true;
-			}
+			dropItem(paramView, paramDragEvent);
 			return true;
 		    case DragEvent.ACTION_DRAG_ENTERED:
 			Log.d(getTag(), "ACTION_DRAG_ENTERED");
 
-			droppedViewBottom = paramView.getBottom();
-			Log.d(getTag(), "startOffset: " + startOffset + ", " + "droppedViewBottom: "
-			                + droppedViewBottom);
-
+			lastVisitedViewBottom = paramView.getBottom();
 			paramView.setBackgroundColor(Color.GRAY);
+
+			Log.d(getTag(), "droppedViewBottom: " + lastVisitedViewBottom);
+			Log.d(getTag(), "listView.getHeight(): " + listView.getHeight());
+			if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 2.9 * paramView.getHeight())
+			{
+			    listView.smoothScrollBy(paramView.getHeight(), 5000);
+			}
 			return true;
 		}
 	    }
 
 	    return false;
+	}
+
+	private void dropItem(View paramView, DragEvent paramDragEvent)
+	{
+	    Item clipDataItem = paramDragEvent.getClipData().getItemAt(0);
+	    Intent intent = clipDataItem.getIntent();
+	    int draggedItemPosition = intent.getIntExtra(POSITION, -1);
+	    int distance = lastVisitedViewBottom - startOffset;
+	    if (draggedItemPosition != -1 && Math.abs(distance) > paramView.getHeight())
+	    {
+		int currentRowPosition = listView.pointToPosition((int) paramDragEvent.getX(),
+		                lastVisitedViewBottom - 1);
+
+		if (currentRowPosition != ListView.INVALID_POSITION)
+		{
+		    Log.d(getTag(), "distance: " + distance);
+		    Log.d(getTag(), "draggedItemPosition: " + draggedItemPosition);
+		    Log.d(getTag(), "currentRowPosition: " + currentRowPosition);
+
+		    dataSet.add(currentRowPosition, dataSet.remove(draggedItemPosition));
+
+		    changed = true;
+		}
+	    }
 	}
     }
 
