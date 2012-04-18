@@ -56,8 +56,7 @@
             android:layout_marginLeft="2dp"
             android:layout_weight="0.85"
             android:textColor="@color/black"
-            android:textSize="15dp" >
-        </TextView>
+            android:textSize="15dp" />
     </LinearLayout>
 
     <View

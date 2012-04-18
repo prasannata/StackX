@@ -1,11 +1,11 @@
 package com.prasanna.android.stacknetwork.intent;
 
+import android.app.IntentService;
+import android.content.Intent;
+
 import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-
-import android.app.IntentService;
-import android.content.Intent;
 
 public class UserDeauthenticateAppIntentService extends IntentService
 {

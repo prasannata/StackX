@@ -51,9 +51,9 @@ public class ArchiveDisplayActivity extends Activity
             {
                 FrameLayout emptyDisplayLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.empty_items, null);
                 TextView textView = (TextView) emptyDisplayLayout.findViewById(R.id.emptyStatus);
-                textView.setText("No saved questions. Long press on title while viewing a question.");
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+                textView.setText("Empty. Long press on title while viewing a question.");
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT);
                 params.gravity = Gravity.CENTER;
                 container.addView(emptyDisplayLayout, params);
             }

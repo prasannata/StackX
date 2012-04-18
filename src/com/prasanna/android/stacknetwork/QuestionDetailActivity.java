@@ -66,6 +66,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private boolean fetchFullDetails;
     private LinearLayout questionOptionsLayout;
     private Button questionOwnerButton;
+    private LinearLayout questionBodyProgress;
 
     private BroadcastReceiver questionBodyReceiver = new BroadcastReceiver()
     {
@@ -154,7 +155,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void updateViewForAnswer()
     {
-        detailLinearLayout.removeAllViews();
         displayBody(question.answers.get(currentAnswerCount).body);
 
         if (question.answers.get(currentAnswerCount).comments == null)
@@ -365,6 +365,9 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
         fetchFullDetails = getIntent().getBooleanExtra(
                 IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), false);
 
+        questionBodyProgress = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
+        detailLinearLayout.addView(questionBodyProgress);
+
         if (fetchFullDetails == false)
         {
             displayQuestionMetaData((Question) getIntent().getSerializableExtra(StringConstants.QUESTION));
@@ -550,6 +553,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
     private void displayBody(String text)
     {
+        detailLinearLayout.removeAllViews();
         ArrayList<TextView> questionBodyTextViews = HtmlTagFragmenter.parse(getApplicationContext(), text);
         for (TextView questionBodyTextView : questionBodyTextViews)
         {
@@ -621,7 +625,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
                             commentsCickableTextView.setClickable(true);
                         }
 
-                        detailLinearLayout.removeAllViews();
                         displayBody(body);
                     }
 
