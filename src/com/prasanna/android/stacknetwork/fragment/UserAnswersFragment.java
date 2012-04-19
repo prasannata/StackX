@@ -1,6 +1,5 @@
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
@@ -31,7 +30,6 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 {
     private static final String TAG = UserAnswersFragment.class.getSimpleName();
     private int answerDisplayCursor = 0;
-    private ProgressDialog progress;
     private LinearLayout layoutContainer;
     private ScrollViewWithNotifier scroller;
     private LinearLayout loadingProgressView;
@@ -63,7 +61,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 
         Log.d(TAG, "Creating answer fragment");
 
-        progress = ProgressDialog.show(getActivity(), "", "Loading answers");
+        showLoadingDialog();
 
         layoutContainer = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
         scroller = (ScrollViewWithNotifier) layoutContainer.findViewById(R.id.itemScroller);
@@ -169,11 +167,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     protected void displayItems()
     {
-        if (progress != null)
-        {
-            progress.dismiss();
-            progress = null;
-        }
+        dismissLoadingDialog();
 
         if (loadingProgressView != null)
         {

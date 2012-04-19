@@ -100,7 +100,10 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     @Override
     protected void startQuestionsService()
     {
-        currentFragment.startIntentService();
+        if (currentFragment != null)
+        {
+            currentFragment.startIntentService();
+        }
     }
 
     @Override
@@ -111,7 +114,10 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     @Override
     public void refresh()
     {
-        //TODO:
+        if (currentFragment != null)
+        {
+            currentFragment.refresh();
+        }
     }
 
     @Override

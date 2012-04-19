@@ -27,11 +27,7 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
     @Override
     protected void displayItems()
     {
-        if (loadingDialog != null)
-        {
-            loadingDialog.dismiss();
-            loadingDialog = null;
-        }
+        dismissLoadingDialog();
 
         if (loadingProgressView != null)
         {

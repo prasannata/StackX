@@ -21,13 +21,27 @@ import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
 public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> extends Fragment implements
         ScrollableFragment
 {
+    private Intent intentForService;
+
     protected boolean serviceRunning = false;
 
     protected LinearLayout itemsContainer;
 
     protected ArrayList<T> items = new ArrayList<T>();
 
-    protected ProgressDialog loadingDialog;
+    private ProgressDialog loadingDialog;
+
+    protected LinearLayout loadingProgressView;
+
+    public abstract String getReceiverExtraName();
+
+    public abstract void startIntentService();
+
+    protected abstract void registerReceiver();
+
+    protected abstract void displayItems();
+
+    protected abstract String getLogTag();
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -42,20 +56,6 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
             displayItems();
         }
     };
-
-    protected LinearLayout loadingProgressView;
-
-    private Intent intentForService;
-
-    public abstract String getReceiverExtraName();
-
-    public abstract void startIntentService();
-
-    protected abstract void registerReceiver();
-
-    protected abstract void displayItems();
-
-    protected abstract String getLogTag();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -126,10 +126,39 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         }
     }
 
+    protected void showLoadingDialog()
+    {
+        if (loadingDialog == null || loadingDialog.isShowing() == false)
+        {
+            loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
+        }
+    }
+
+    protected void dismissLoadingDialog()
+    {
+        if (loadingDialog != null && loadingDialog.isShowing() == true)
+        {
+            loadingDialog.dismiss();
+        }
+    }
+
     protected Intent getIntentForService(Class<?> clazz, String action)
     {
         intentForService = new Intent(getActivity().getApplicationContext(), clazz);
         intentForService.setAction(action);
         return intentForService;
+    }
+
+    public void refresh()
+    {
+        stopServiceAndUnregisterReceiver();
+
+        itemsContainer.removeAllViews();
+
+        registerReceiver();
+
+        showLoadingDialog();
+
+        startIntentService();
     }
 }

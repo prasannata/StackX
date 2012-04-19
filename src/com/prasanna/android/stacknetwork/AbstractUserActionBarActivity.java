@@ -127,8 +127,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
         Intent intent = new Intent(this, QuestionSearchResultsActivity.class);
         intent.putExtra(SearchManager.QUERY, query);
         startActivity(intent);
-
-        return false;
+        return true;
     }
 
     @Override

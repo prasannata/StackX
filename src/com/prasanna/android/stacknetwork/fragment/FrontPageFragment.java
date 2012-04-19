@@ -2,13 +2,11 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
@@ -33,7 +31,8 @@ public class FrontPageFragment extends AbstractQuestionsFragment
         if (savedInstanceState == null)
         {
             Log.d(TAG, "onCreate not savedInstanceState");
-            loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
+
+            showLoadingDialog();
 
             startIntentService();
         }
@@ -45,7 +44,6 @@ public class FrontPageFragment extends AbstractQuestionsFragment
         }
     }
 
-    
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
@@ -61,7 +59,8 @@ public class FrontPageFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
-        frontPageQuestionsIntent = getIntentForService(UserQuestionsIntentService.class, IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+        frontPageQuestionsIntent = getIntentForService(UserQuestionsIntentService.class,
+                IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         frontPageQuestionsIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
         frontPageQuestionsIntent.putExtra(StringConstants.PAGE, ++currentPage);
         getActivity().startService(frontPageQuestionsIntent);

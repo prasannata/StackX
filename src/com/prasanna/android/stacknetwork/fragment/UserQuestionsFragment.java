@@ -1,6 +1,5 @@
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -72,7 +71,7 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
             }
         });
 
-        loadingDialog = ProgressDialog.show(getActivity(), "", "Loading questions");
+        showLoadingDialog();
         
         if (items != null && items.isEmpty() == false)
         {

@@ -3,7 +3,7 @@ package com.prasanna.android.stacknetwork;
 import java.io.File;
 import java.util.ArrayList;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,7 +17,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.ReadObjectAsyncTask;
 
-public class ArchiveDisplayActivity extends Activity
+public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
 {
     private static final String TAG = ArchiveDisplayActivity.class.getSimpleName();
 
@@ -67,8 +67,21 @@ public class ArchiveDisplayActivity extends Activity
         setContentView(R.layout.ll_whitebg_vertical);
 
         container = (LinearLayout) findViewById(R.id.fragmentContainer);
+
+        refresh();
+    }
+
+    @Override
+    public void refresh()
+    {
         File directory = new File(getCacheDir(), StringConstants.QUESTIONS);
         ReadObjectAsyncTask asyncTask = new ReadObjectAsyncTask(directory, null, new CacheReadCompletionNotifier());
         asyncTask.execute((Void) null);
+    }
+
+    @Override
+    public Context getCurrentContext()
+    {
+        return ArchiveDisplayActivity.this;
     }
 }

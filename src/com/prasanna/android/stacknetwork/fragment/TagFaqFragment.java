@@ -1,11 +1,9 @@
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 
-import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.intent.TagFaqIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
@@ -36,7 +34,7 @@ public class TagFaqFragment extends AbstractQuestionsFragment
         {
             registerReceiver();
 
-            loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
+            showLoadingDialog();
 
             startIntentService();
         }

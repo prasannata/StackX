@@ -16,6 +16,7 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
+/* TODO: Replace this with fragment */
 public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActivity
 {
     private static final String TAG = QuestionSearchResultsActivity.class.getSimpleName();
