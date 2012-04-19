@@ -1,6 +1,7 @@
 package com.prasanna.android.stacknetwork.adapter;
 
 import java.util.List;
+import java.util.Stack;
 
 import android.content.ClipData;
 import android.content.ClipData.Item;
@@ -23,12 +24,16 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
     protected List<T> dataSet;
 
     protected boolean reorder = false;
-    protected boolean changed;
+    protected boolean changed = false;
+    protected int autoScrollDistance = 0;
 
     protected abstract String getTag();
 
+    private boolean scrolled = false;
     private int startOffset = 0;
     private int lastVisitedViewBottom = 0;
+
+    private Stack<Integer> visitedPositionStack = new Stack<Integer>();
 
     protected class ListViewDragListener implements View.OnDragListener
     {
@@ -40,30 +45,36 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
                 switch (paramDragEvent.getAction())
                 {
                     case DragEvent.ACTION_DRAG_STARTED:
-                        Log.d(getTag(), "ACTION_DRAG_STARTED");
+                        autoScrollDistance = paramView.getHeight();
                         return true;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        Log.d(getTag(), "ACTION_DRAG_ENDED");
                         notifyDataSetChanged();
+                        scrolled = false;
                         return true;
                     case DragEvent.ACTION_DROP:
-                        Log.d(getTag(), "ACTION_DROP");
                         dropItem(paramView, paramDragEvent);
                         return true;
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        Log.d(getTag(), "ACTION_DRAG_ENTERED");
-
-                        paramView.setBackgroundColor(Color.GRAY);
+                    case DragEvent.ACTION_DRAG_EXITED:
                         lastVisitedViewBottom = paramView.getBottom();
+
                         Log.d(getTag(), "lastVisitedViewBottom: " + lastVisitedViewBottom);
 
-                        if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 2.9 * paramView.getHeight())
+                        paramView.setBackgroundColor(Color.GRAY);
+
+                        if (listView.getLastVisiblePosition() != dataSet.size() - 1)
                         {
-                            listView.smoothScrollBy(paramView.getHeight(), 300);
+                            if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 3.5 * paramView.getHeight())
+                            {
+                                listView.smoothScrollBy(autoScrollDistance, 1500);
+
+                                scrolled = true;
+                            }
                         }
                         return true;
-                    case DragEvent.ACTION_DRAG_EXITED:
-                        Log.d(getTag(), "ACTION_DRAG_EXITED");
+                    case DragEvent.ACTION_DRAG_ENTERED:
+                        int currentPosition = listView.pointToPosition((int) paramDragEvent.getX(),
+                                (int) paramDragEvent.getY());
+                        visitedPositionStack.push(currentPosition);
                         return true;
                     case DragEvent.ACTION_DRAG_LOCATION:
                         return true;
@@ -86,7 +97,7 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
             if (draggedItemPosition != ListView.INVALID_POSITION && Math.abs(distance) > paramView.getHeight())
             {
                 int currentItemPosition = listView.pointToPosition((int) paramDragEvent.getX(),
-                        lastVisitedViewBottom - 1);
+                        scrolled ? (lastVisitedViewBottom - autoScrollDistance - 1) : lastVisitedViewBottom - 1);
 
                 if (currentItemPosition != ListView.INVALID_POSITION)
                 {
@@ -114,32 +125,35 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 
     protected void enableDragAndDrop(View view, final int itemPosition, final String clipDataLabel)
     {
-        view.setOnDragListener(new ListViewDragListener());
-
-        view.setOnLongClickListener(new View.OnLongClickListener()
+        if (view != null)
         {
-            @Override
-            public boolean onLongClick(View paramView)
+            view.setOnDragListener(new ListViewDragListener());
+
+            view.setOnLongClickListener(new View.OnLongClickListener()
             {
-                if (reorder == true)
+                @Override
+                public boolean onLongClick(View paramView)
                 {
-                    Intent intent = new Intent(DRAG);
-                    intent.putExtra(POSITION, itemPosition);
-                    ClipData.Item clipDataItem = new ClipData.Item(intent);
+                    if (reorder == true)
+                    {
+                        Intent intent = new Intent(DRAG);
+                        intent.putExtra(POSITION, itemPosition);
+                        ClipData.Item clipDataItem = new ClipData.Item(intent);
 
-                    ClipData dragData = new ClipData(clipDataLabel, new String[]
-                    { "text/plain" }, clipDataItem);
+                        ClipData dragData = new ClipData(clipDataLabel, new String[]
+                        { "text/plain" }, clipDataItem);
 
-                    startOffset = paramView.getBottom();
+                        startOffset = paramView.getBottom();
 
-                    paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
+                        paramView.startDrag(dragData, new DragShadowBuilder(paramView), null, 0);
 
-                    return true;
+                        return true;
+                    }
+
+                    return false;
                 }
-
-                return false;
-            }
-        });
+            });
+        }
     }
 
     public void overwriteDataset(List<T> dataSet)
