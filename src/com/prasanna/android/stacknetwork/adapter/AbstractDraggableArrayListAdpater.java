@@ -61,9 +61,9 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
 
                         if (listView.getLastVisiblePosition() != dataSet.size() - 1)
                         {
-                            if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 3.5 * paramView.getHeight())
+                            if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 1.5 * paramView.getHeight())
                             {
-                                listView.smoothScrollBy(autoScrollDistance, 1500);
+                                listView.smoothScrollBy(autoScrollDistance, 500);
                                 scrolled = true;
                             }
                         }

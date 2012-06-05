@@ -332,6 +332,6 @@ public class HttpHelper
             }
         }
 
-        return Uri.decode(uriBuilder.build().toString());
+        return uriBuilder.build().toString();
     }
 }
