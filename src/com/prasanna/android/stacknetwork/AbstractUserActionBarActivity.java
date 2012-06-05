@@ -14,6 +14,7 @@ import android.view.SubMenu;
 import android.widget.SearchView;
 
 import com.prasanna.android.stacknetwork.model.User.UserType;
+import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -42,17 +43,21 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Search in title");
 
+        MenuItem menuOptions = menu.findItem(R.id.menu_options);
+        SubMenu subMenu = menuOptions.getSubMenu();
+
         if (isAuthenticatedRealm() == false || OperatingSite.getSite().userType == null
                 || OperatingSite.getSite().userType.equals(UserType.REGISTERED) == false)
         {
             Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
 
-            MenuItem menuOptions = menu.findItem(R.id.menu_options);
-            SubMenu subMenu = menuOptions.getSubMenu();
-
             subMenu.removeItem(R.id.menu_profile);
             subMenu.removeItem(R.id.menu_option_inbox);
             subMenu.removeItem(R.id.menu_option_logout);
+        }
+        else
+        {
+            subMenu.removeItem(R.id.menu_option_login);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -94,6 +99,12 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
             case R.id.menu_option_change_site:
                 Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
                 startActivity(siteListIntent);
+                break;
+
+            case R.id.menu_option_login:
+                Intent oAuthIntent = new Intent(this, OAuthActivity.class);
+                CacheUtils.clear(getApplicationContext());
+                startActivity(oAuthIntent);
                 break;
 
             case R.id.menu_option_logout:

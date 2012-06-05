@@ -39,6 +39,7 @@
     <string name="menu_option_tags">Tags</string>
     <string name="menu_option_archive">Archive</string>
     <string name="menu_option_change_site">Change site</string>
+    <string name="menu_option_login">Login</string>
     <string name="menu_option_logout">Logout</string>
     <string name="score">Score</string>
     <string name="Enter">Enter</string>

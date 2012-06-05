@@ -21,11 +21,12 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class OAuthActivity extends Activity
 {
     private static final String TAG = OAuthActivity.class.getName();
-    private ProgressDialog progressDialog;
-    private String oauthUrl;
     private static final String YAHOO_LOGIN_URL = "https://login.yahoo.com";
     private static final String PROGRESS_BAR_TEXT = "to stackexchange.com...";
     private static final String LOGIN = "Login";
+
+    private ProgressDialog progressDialog;
+    private String oauthUrl;
 
     private class OAuthWebViewClient extends WebViewClient
     {
@@ -98,7 +99,21 @@ public class OAuthActivity extends Activity
         super.onCreate(savedInstanceState);
         progressDialog = ProgressDialog.show(OAuthActivity.this, "", PROGRESS_BAR_TEXT);
         setContentView(R.layout.webview);
-        WebView webview = (WebView) findViewById(R.id.web_view);
+        WebView webview = initWebview();
+
+        Builder uriBuilder = Uri.parse(StackUri.OAUTH_DIALOG_URL).buildUpon();
+        uriBuilder.appendQueryParameter(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
+        uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
+        uriBuilder.appendQueryParameter(StackUri.QueryParams.REDIRECT_URI,
+                StackUri.QueryParamDefaultValues.REDIRECT_URI);
+
+        oauthUrl = uriBuilder.build().toString();
+        webview.loadUrl(oauthUrl);
+    }
+
+    private WebView initWebview()
+    {
+	WebView webview = (WebView) findViewById(R.id.web_view);
         webview.setVerticalScrollBarEnabled(true);
         webview.setHorizontalScrollBarEnabled(true);
         webview.getSettings().setJavaScriptEnabled(true);
@@ -122,14 +137,6 @@ public class OAuthActivity extends Activity
         });
         webview.setWebViewClient(new OAuthWebViewClient());
         webview.requestFocus(View.FOCUS_DOWN);
-
-        Builder uriBuilder = Uri.parse(StackUri.OAUTH_DIALOG_URL).buildUpon();
-        uriBuilder.appendQueryParameter(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
-        uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
-        uriBuilder.appendQueryParameter(StackUri.QueryParams.REDIRECT_URI,
-                StackUri.QueryParamDefaultValues.REDIRECT_URI);
-
-        oauthUrl = uriBuilder.build().toString();
-        webview.loadUrl(oauthUrl);
+	return webview;
     }
 }

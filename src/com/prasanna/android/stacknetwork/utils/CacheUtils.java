@@ -219,6 +219,7 @@ public class CacheUtils
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             prefEditor.remove(StringConstants.ACCESS_TOKEN);
             prefEditor.commit();
+            userAccessToken = null;
         }
     }
 

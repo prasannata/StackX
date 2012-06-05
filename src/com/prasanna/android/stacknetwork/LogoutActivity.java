@@ -104,6 +104,12 @@ public class LogoutActivity extends Activity
         registerReceiver(receiver, filter);
     }
 
+    private void startLoginActivity()
+    {
+	Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginIntent);
+    }
+    
     private void processLogoutResponse(StackExchangeHttpError error)
     {
         if (error != null && error.id == -1)
@@ -114,8 +120,7 @@ public class LogoutActivity extends Activity
 
             CacheUtils.clear(getApplicationContext());
 
-            Intent loginIntent = new Intent(LogoutActivity.this, LoginActivity.class);
-            startActivity(loginIntent);
+            startLoginActivity();
         }
         else if (error != null && error.id > 0)
         {

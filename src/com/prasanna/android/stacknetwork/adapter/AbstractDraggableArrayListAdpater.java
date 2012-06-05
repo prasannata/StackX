@@ -1,7 +1,6 @@
 package com.prasanna.android.stacknetwork.adapter;
 
 import java.util.List;
-import java.util.Stack;
 
 import android.content.ClipData;
 import android.content.ClipData.Item;
@@ -33,7 +32,6 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
     private int startOffset = 0;
     private int lastVisitedViewBottom = 0;
 
-    private Stack<Integer> visitedPositionStack = new Stack<Integer>();
 
     protected class ListViewDragListener implements View.OnDragListener
     {
@@ -66,15 +64,11 @@ public abstract class AbstractDraggableArrayListAdpater<T> extends ArrayAdapter<
                             if (Math.abs(listView.getHeight() - lastVisitedViewBottom) < 3.5 * paramView.getHeight())
                             {
                                 listView.smoothScrollBy(autoScrollDistance, 1500);
-
                                 scrolled = true;
                             }
                         }
                         return true;
                     case DragEvent.ACTION_DRAG_ENTERED:
-                        int currentPosition = listView.pointToPosition((int) paramDragEvent.getX(),
-                                (int) paramDragEvent.getY());
-                        visitedPositionStack.push(currentPosition);
                         return true;
                     case DragEvent.ACTION_DRAG_LOCATION:
                         return true;

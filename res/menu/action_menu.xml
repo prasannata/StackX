@@ -46,6 +46,12 @@
                 android:showAsAction="always"
                 android:title="@string/menu_option_change_site"/>
             <item
+                android:id="@+id/menu_option_login"
+                android:icon="@drawable/login"
+                android:orderInCategory="5"
+                android:showAsAction="always"
+                android:title="@string/menu_option_login"/>
+            <item
                 android:id="@+id/menu_option_logout"
                 android:icon="@drawable/logout"
                 android:orderInCategory="5"

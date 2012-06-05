@@ -20,6 +20,16 @@ import com.prasanna.android.views.ScrollViewWithNotifier;
 
 public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActionBarActivity
 {
+    protected abstract void startQuestionsService();
+
+    protected abstract void registerQuestionsReceiver();
+
+    protected abstract void onScrollToBottom();
+
+    protected abstract String getLogTag();
+
+    protected abstract QuestionIntentAction getReceiverIntentAction();
+
     protected boolean serviceRunning = false;
 
     protected Intent questionsIntent;
@@ -35,16 +45,6 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
     protected ArrayList<Question> questions = new ArrayList<Question>();
 
     protected int lastDisplayQuestionIndex = 0;
-
-    protected abstract void startQuestionsService();
-
-    protected abstract void registerQuestionsReceiver();
-
-    protected abstract void onScrollToBottom();
-
-    protected abstract String getLogTag();
-
-    protected abstract QuestionIntentAction getReceiverIntentAction();
 
     protected int page = 0;
 
