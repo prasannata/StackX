@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,10 +15,11 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 package com.prasanna.android.stacknetwork;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -130,6 +131,7 @@ public class OAuthActivity extends Activity
         webview.loadUrl(oauthUrl);
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private WebView initWebview()
     {
 	WebView webview = (WebView) findViewById(R.id.web_view);

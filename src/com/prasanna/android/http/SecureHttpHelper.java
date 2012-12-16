@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -58,14 +58,18 @@ import android.net.Uri.Builder;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.Validate;
 
-public class HttpHelper
+public final class SecureHttpHelper
 {
-    private final String TAG = HttpHelper.class.getSimpleName();
+    private final String TAG = SecureHttpHelper.class.getSimpleName();
 
-    private String host;
+    private static final int HTTP_PORT = 80;
+    private static final int HTTPS_PORT = 443;
+    private static final String SCHEME_HTTP = "http";
+    private static final String SCHEME_HTTPS = "https";
     private static final String GZIP = "gzip";
-    private static final GzipHttpResponseInterceptor gzipHttpInterceptor = new GzipHttpResponseInterceptor(GZIP,
+    private static final HttpGzipResponseInterceptor gzipHttpInterceptor = new HttpGzipResponseInterceptor(GZIP,
 	            GzipDecompressingEntity.class);
 
     private static class GzipDecompressingEntity extends HttpEntityWrapper
@@ -88,20 +92,15 @@ public class HttpHelper
 	}
     }
 
-    private static HttpHelper httpHelper = new HttpHelper();
+    private static SecureHttpHelper httpHelper = new SecureHttpHelper();
 
-    private HttpHelper()
+    private SecureHttpHelper()
     {
     }
 
-    public static HttpHelper getInstance()
+    public static SecureHttpHelper getInstance()
     {
 	return httpHelper;
-    }
-
-    public void setHost(String host)
-    {
-	this.host = host;
     }
 
     public Bitmap fetchImage(String absoluteUrl)
@@ -149,27 +148,36 @@ public class HttpHelper
 	return bitmap;
     }
 
-    public JSONObjectWrapper getRequestForJsonWithGzipEncoding(String path, Map<String, String> queryParams)
+    public JSONObjectWrapper executeForGzipResponse(String host, String path, Map<String, String> queryParams)
     {
 	JSONObjectWrapper jsonObject = null;
 	try
 	{
 	    DefaultHttpClient client = getClientForGzipResponse();
-	    HttpGet request = new HttpGet(buildDecodedUri(path, queryParams));
+	    HttpGet request = new HttpGet(buildUri(host, path, queryParams));
 	    request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+
 	    Log.d(TAG, "HTTP request to: " + request.getURI().toString());
+
 	    HttpResponse httpResponse = client.execute(request);
 	    HttpEntity entity = httpResponse.getEntity();
 	    String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
+	    int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-	    if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+	    if (statusCode == HttpStatus.SC_OK)
 	    {
 		jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
 	    }
 	    else
 	    {
-		Log.d(TAG, "Http request failed: " + httpResponse.getStatusLine().getStatusCode());
+		Log.d(TAG, "Http request failed: " + statusCode);
 		Log.d(TAG, "Http request failure message: " + jsonText);
+
+		JSONObject error = new JSONObject();
+		error.put("error", true);
+		error.put("status", statusCode);
+		error.put("text", jsonText);
+		jsonObject = new JSONObjectWrapper(error);
 	    }
 	}
 
@@ -230,15 +238,17 @@ public class HttpHelper
 	HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
 	HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
 	SchemeRegistry schemeRegistry = new SchemeRegistry();
-	schemeRegistry.register(new Scheme("https", sf, 443));
-	schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+	schemeRegistry.register(new Scheme(SCHEME_HTTPS, sf, HTTPS_PORT));
+	schemeRegistry.register(new Scheme(SCHEME_HTTP, PlainSocketFactory.getSocketFactory(), HTTP_PORT));
 
 	SingleClientConnManager mgr = new SingleClientConnManager(params, schemeRegistry);
 	return new DefaultHttpClient(mgr, params);
     }
 
-    public String buildDecodedUri(String path, Map<String, String> queryParams)
+    public static String buildUri(String host, String path, Map<String, String> queryParams)
     {
+	Validate.notNull(host, path);
+
 	Builder uriBuilder = Uri.parse(host).buildUpon();
 	uriBuilder = uriBuilder.appendPath(path);
 	if (queryParams != null)

@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.utils;
 
@@ -33,159 +33,175 @@ public class JSONObjectWrapper
 
     public static JSONObjectWrapper wrap(JSONObject jsonObject)
     {
-        JSONObjectWrapper wrap = null;
+	JSONObjectWrapper wrap = null;
 
-        if (jsonObject != null)
-        {
-            wrap = new JSONObjectWrapper(jsonObject);
-        }
+	if (jsonObject != null)
+	{
+	    wrap = new JSONObjectWrapper(jsonObject);
+	}
 
-        return wrap;
+	return wrap;
     }
 
     public JSONObjectWrapper(JSONObject jsonObject)
     {
-        this.jsonObject = jsonObject;
+	this.jsonObject = jsonObject;
     }
 
     public JSONObjectWrapper getJSONObject(String name)
     {
-        JSONObjectWrapper value = null;
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = new JSONObjectWrapper(jsonObject.getJSONObject(name));
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
+	JSONObjectWrapper value = null;
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = new JSONObjectWrapper(jsonObject.getJSONObject(name));
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
 
-        return value;
+	return value;
     }
 
     public JSONArray getJSONArray(String name)
     {
-        JSONArray value = null;
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = jsonObject.getJSONArray(name);
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
+	JSONArray value = null;
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = jsonObject.getJSONArray(name);
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
 
-        return value;
+	return value;
     }
 
     public long getLong(String name)
     {
-        long value = ERROR;
+	long value = ERROR;
 
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = jsonObject.getLong(name);
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = jsonObject.getLong(name);
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
 
-        return value;
+	return value;
     }
 
     public int getInt(String name)
     {
-        int value = ERROR;
+	int value = ERROR;
 
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = jsonObject.getInt(name);
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = jsonObject.getInt(name);
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
 
-        return value;
+	return value;
     }
 
     public double getDouble(String name)
     {
-        double value = ERROR;
+	double value = ERROR;
 
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = jsonObject.getDouble(name);
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = jsonObject.getDouble(name);
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
 
-        return value;
+	return value;
     }
 
     public boolean getBoolean(String name)
     {
-        boolean value = false;
+	boolean value = false;
 
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = jsonObject.getBoolean(name);
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = jsonObject.getBoolean(name);
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
 
-        return value;
+	return value;
     }
 
     public String getString(String name)
     {
-        String value = null;
-        if (jsonObject != null && jsonObject.has(name))
-        {
-            try
-            {
-                value = jsonObject.getString(name);
-            }
-            catch (JSONException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-        }
-        return value;
+	String value = null;
+	if (jsonObject != null && jsonObject.has(name))
+	{
+	    try
+	    {
+		value = jsonObject.getString(name);
+	    }
+	    catch (JSONException e)
+	    {
+		Log.d(TAG, e.getMessage());
+	    }
+	}
+	return value;
+    }
+
+    public boolean isErrorResponse()
+    {
+	return has("error");
     }
 
     public boolean has(String name)
     {
-        if (jsonObject != null)
-        {
-            return jsonObject.has(name);
-        }
-        else
-        {
-            return false;
-        }
+	if (jsonObject != null)
+	{
+	    return jsonObject.has(name);
+	}
+	else
+	{
+	    return false;
+	}
+    }
+    
+    @Override
+    public String toString()
+    {
+	if(jsonObject != null)
+	{
+	    jsonObject.toString();
+	}
+	
+	return null;
     }
 }

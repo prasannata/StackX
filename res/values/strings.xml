@@ -67,5 +67,6 @@
     <string name="title">Title</string>
     <string name="views">Views</string>
     <string name="skip">Skip</string>
+    <string name="viewMessage">View message</string>
 
 </resources>

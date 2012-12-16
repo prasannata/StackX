@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 package com.prasanna.android.stacknetwork;
 
@@ -48,16 +48,16 @@ public class LogoutActivity extends Activity
 
     private BroadcastReceiver receiver = new BroadcastReceiver()
     {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            progressDialog.dismiss();
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    progressDialog.dismiss();
 
-            StackExchangeHttpError error = (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT
-                    .getExtra());
+	    StackExchangeHttpError error = (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT
+		            .getExtra());
 
-            processLogoutResponse(error);
-        }
+	    processLogoutResponse(error);
+	}
 
     };
 
@@ -66,90 +66,92 @@ public class LogoutActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        setContentView(new LinearLayout(this));
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-        registerReceiver();
-        startIntentService(accessToken);
+	setContentView(new LinearLayout(this));
+	sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	String accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
+	registerReceiver();
+	startIntentService(accessToken);
     }
 
     @Override
     protected void onDestroy()
     {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
+	super.onDestroy();
+	stopServiceAndUnregisterReceiver();
     }
 
     private void stopServiceAndUnregisterReceiver()
     {
-        if (accessTokenDeauthenticateIntent != null)
-        {
-            stopService(accessTokenDeauthenticateIntent);
-        }
+	if (accessTokenDeauthenticateIntent != null)
+	{
+	    stopService(accessTokenDeauthenticateIntent);
+	}
 
-        try
-        {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
+	try
+	{
+	    unregisterReceiver(receiver);
+	}
+	catch (IllegalArgumentException e)
+	{
+	    Log.d(TAG, e.getMessage());
+	}
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceiver();
     }
 
     private void startIntentService(String accessToken)
     {
-        progressDialog = ProgressDialog.show(LogoutActivity.this, "", "Logging out");
+	progressDialog = ProgressDialog.show(LogoutActivity.this, "", "Logging out");
 
-        accessTokenDeauthenticateIntent = new Intent(this, UserDeauthenticateAppIntentService.class);
-        accessTokenDeauthenticateIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
-        startService(accessTokenDeauthenticateIntent);
+	accessTokenDeauthenticateIntent = new Intent(this, UserDeauthenticateAppIntentService.class);
+	accessTokenDeauthenticateIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
+	startService(accessTokenDeauthenticateIntent);
     }
 
     private void registerReceiver()
     {
-        IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.name());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
+	IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	registerReceiver(receiver, filter);
     }
 
     private void startLoginActivity()
     {
 	Intent loginIntent = new Intent(this, LoginActivity.class);
-        startActivity(loginIntent);
+	loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	startActivity(loginIntent);
     }
-    
+
     private void processLogoutResponse(StackExchangeHttpError error)
     {
-        if (error != null && error.id == -1)
-        {
-            Editor editor = sharedPreferences.edit();
-            editor.remove(StringConstants.ACCESS_TOKEN);
-            editor.commit();
+	if (error != null && error.id == -1)
+	{
+	    Editor editor = sharedPreferences.edit();
+	    editor.remove(StringConstants.ACCESS_TOKEN);
+	    editor.commit();
 
-            CacheUtils.clear(getApplicationContext());
+	    CacheUtils.clear(getApplicationContext());
 
-            startLoginActivity();
-        }
-        else if (error != null && error.id > 0)
-        {
-            Log.d(TAG, "Logout failed with " + error.message);
-            finish();
-        }
-        else
-        {
-            Log.d(TAG, "Logout failed for unknown reason");
-            finish();
-        }
+	    startLoginActivity();
+	}
+	else if (error != null && error.id > 0)
+	{
+	    Log.d(TAG, "Logout failed with " + error.message);
+	    finish();
+	}
+	else
+	{
+	    Log.d(TAG, "Logout failed for unknown reason");
+	    finish();
+	}
     }
 }

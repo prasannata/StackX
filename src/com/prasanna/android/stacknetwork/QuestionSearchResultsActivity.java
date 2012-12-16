@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -54,7 +54,7 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
         questionsLinearLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.items_fragment_container, null);
         scrollView.addView(questionsLinearLayout);
 
-        registerQuestionsReceiver();
+        registerQuestionsSearchReceiver();
 
         fetchingQuestionsDialog = ProgressDialog.show(QuestionSearchResultsActivity.this, "",
                 getString(R.string.loading));
@@ -116,7 +116,7 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
     }
 
     @Override
-    protected void registerQuestionsReceiver()
+    protected void registerQuestionsSearchReceiver()
     {
         IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
         filter.addCategory(Intent.CATEGORY_DEFAULT);

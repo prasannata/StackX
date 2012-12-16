@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,21 +15,21 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.intent;
 
 import java.util.ArrayList;
 
-import android.app.IntentService;
 import android.content.Intent;
 
+import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserAnswersIntentService extends IntentService
+public class UserAnswersIntentService extends AbstractIntentService
 {
     private UserService userService = UserService.getInstance();
 
@@ -46,20 +46,27 @@ public class UserAnswersIntentService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	int page = intent.getIntExtra(StringConstants.PAGE, 1);
-
-	String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
-	if (accessToken == null)
+	try
 	{
-	    long userId = intent.getLongExtra(StringConstants.USER_ID, -1);
-	    if (userId > 0)
+	    int page = intent.getIntExtra(StringConstants.PAGE, 1);
+
+	    String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
+	    if (accessToken == null)
 	    {
-		broadcastIntent(userService.getAnswersByUser(userId, page));
+		long userId = intent.getLongExtra(StringConstants.USER_ID, -1);
+		if (userId > 0)
+		{
+		    broadcastIntent(userService.getAnswersByUser(userId, page));
+		}
+	    }
+	    else
+	    {
+		broadcastIntent(userService.getMyAnswers(page));
 	    }
 	}
-	else
+	catch (HttpErrorException e)
 	{
-	    broadcastIntent(userService.getMyAnswers(page));
+	    broadcastHttpErrorIntent(e.getCode(), e.getMessage());
 	}
     }
 

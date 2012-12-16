@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,21 +15,21 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.intent;
 
 import java.util.ArrayList;
 
-import android.app.IntentService;
 import android.content.Intent;
 
+import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserInboxIntentService extends IntentService
+public class UserInboxIntentService extends AbstractIntentService
 {
     private UserService userService = UserService.getInstance();
 
@@ -46,19 +46,26 @@ public class UserInboxIntentService extends IntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	ArrayList<InboxItem> inboxItems = null;
-	String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
-	int page = intent.getIntExtra(StringConstants.PAGE, 1);
-
-	if (accessToken != null)
+	try
 	{
-	    inboxItems = userService.getInbox(page);
-	}
+	    ArrayList<InboxItem> inboxItems = null;
+	    String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
+	    int page = intent.getIntExtra(StringConstants.PAGE, 1);
 
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.UserIntentAction.INBOX.name());
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(IntentActionEnum.UserIntentAction.INBOX.getExtra(), inboxItems);
-	sendBroadcast(broadcastIntent);
+	    if (accessToken != null)
+	    {
+		inboxItems = userService.getInbox(page);
+	    }
+
+	    Intent broadcastIntent = new Intent();
+	    broadcastIntent.setAction(IntentActionEnum.UserIntentAction.INBOX.name());
+	    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+	    broadcastIntent.putExtra(IntentActionEnum.UserIntentAction.INBOX.getExtra(), inboxItems);
+	    sendBroadcast(broadcastIntent);
+	}
+	catch (HttpErrorException e)
+	{
+	    broadcastHttpErrorIntent(e.getCode(), e.getMessage());
+	}
     }
 }

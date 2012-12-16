@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.service;
 
@@ -30,7 +30,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.prasanna.android.http.HttpHelper;
+import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
@@ -58,12 +58,18 @@ public class UserService extends AbstractBaseService
 	return userService;
     }
 
+    @Override
+    protected String getLogTag()
+    {
+	return TAG;
+    }
+    
     public LinkedHashMap<String, Site> getAllSitesInNetwork()
     {
 	String restEndPoint = StringConstants.SITES;
 	LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
-	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
-	                AppUtils.getDefaultQueryParams());
+	JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
+	                restEndPoint, AppUtils.getDefaultQueryParams());
 	try
 	{
 	    if (jsonObject != null)
@@ -104,8 +110,7 @@ public class UserService extends AbstractBaseService
 
     private ArrayList<Question> getQuestions(String restEndPoint, Map<String, String> queryParams)
     {
-	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
-	                restEndPoint, queryParams);
+	JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
 
 	if (questionsJsonResponse != null)
 	{
@@ -121,7 +126,7 @@ public class UserService extends AbstractBaseService
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
@@ -135,7 +140,7 @@ public class UserService extends AbstractBaseService
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
@@ -149,7 +154,8 @@ public class UserService extends AbstractBaseService
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding("/me", queryParams);
+	JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST, "/me",
+	                queryParams);
 	JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
 	JSONObject userJsonObject = getIndexFromArray(jsonArray, 0, JSONObject.class);
 
@@ -165,7 +171,7 @@ public class UserService extends AbstractBaseService
 
 	if (userId != -1)
 	{
-	    JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
+	    JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
 		            "/users/" + userId, queryParams);
 	    if (jsonObject != null)
 	    {
@@ -195,13 +201,12 @@ public class UserService extends AbstractBaseService
 	String restEndPoint = "questions";
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-	JSONObjectWrapper questionsJsonResponse = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(
-	                restEndPoint, queryParams);
+	JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
 	if (questionsJsonResponse != null)
 	{
 	    questions = getQuestionModel(questionsJsonResponse);
@@ -210,18 +215,11 @@ public class UserService extends AbstractBaseService
 	return questions;
     }
 
-    @Override
-    protected String getLogTag()
-    {
-	return TAG;
-    }
-
     private ArrayList<Answer> getAnswers(String restEndPoint, Map<String, String> queryParams)
     {
 	ArrayList<Answer> answers = new ArrayList<Answer>();
 
-	JSONObjectWrapper answersJsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
-	                queryParams);
+	JSONObjectWrapper answersJsonObject = executeHttpRequest(restEndPoint, queryParams);
 
 	if (answersJsonObject != null)
 	{
@@ -252,7 +250,7 @@ public class UserService extends AbstractBaseService
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
@@ -267,7 +265,7 @@ public class UserService extends AbstractBaseService
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
@@ -282,7 +280,7 @@ public class UserService extends AbstractBaseService
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_INBOX_FILTER);
@@ -294,8 +292,7 @@ public class UserService extends AbstractBaseService
     {
 	ArrayList<InboxItem> inboxItems = null;
 
-	JSONObjectWrapper jsonOfInboxItems = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
-	                queryParams);
+	JSONObjectWrapper jsonOfInboxItems = executeHttpRequest(restEndPoint, queryParams);
 	if (jsonOfInboxItems != null)
 	{
 	    JSONArray itemsArray = jsonOfInboxItems.getJSONArray(JsonFields.ITEMS);
@@ -358,8 +355,7 @@ public class UserService extends AbstractBaseService
     private HashMap<String, Account> getAccounts(String restEndPoint, Map<String, String> queryParams)
     {
 	HashMap<String, Account> accounts = null;
-	JSONObjectWrapper accountsJsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
-	                queryParams);
+	JSONObjectWrapper accountsJsonObject = executeHttpRequest(restEndPoint, queryParams);
 	if (accountsJsonObject != null)
 	{
 	    JSONArray jsonArray = accountsJsonObject.getJSONArray(JsonFields.ITEMS);
@@ -396,7 +392,8 @@ public class UserService extends AbstractBaseService
 	error.id = -1;
 
 	String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
-	JSONObjectWrapper jsonObject = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint, null);
+	JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
+	                restEndPoint, null);
 	boolean success = jsonObject != null && jsonObject.getJSONArray(JsonFields.ITEMS) != null
 	                && jsonObject.getJSONArray(JsonFields.ITEMS).length() == 0;
 	if (success == false)
@@ -415,13 +412,12 @@ public class UserService extends AbstractBaseService
 	String restEndPoint = "/tags";
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.SORT_BY_POPULAR);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.POPULAR);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-	JSONObjectWrapper jsonObjectWrapper = HttpHelper.getInstance().getRequestForJsonWithGzipEncoding(restEndPoint,
-	                queryParams);
+	JSONObjectWrapper jsonObjectWrapper = executeHttpRequest(restEndPoint, queryParams);
 
 	if (jsonObjectWrapper != null)
 	{

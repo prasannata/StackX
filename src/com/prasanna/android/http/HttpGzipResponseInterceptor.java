@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -35,9 +35,9 @@ import org.apache.http.protocol.HttpContext;
 
 import android.util.Log;
 
-public class GzipHttpResponseInterceptor implements HttpResponseInterceptor
+public class HttpGzipResponseInterceptor implements HttpResponseInterceptor
 {
-    private final String TAG = GzipHttpResponseInterceptor.class.getSimpleName();
+    private final String TAG = HttpGzipResponseInterceptor.class.getSimpleName();
     private final Class<? extends HttpEntityWrapper> entityWrapper;
     private final String contentEncoding;
 
@@ -61,7 +61,7 @@ public class GzipHttpResponseInterceptor implements HttpResponseInterceptor
 	}
     }
 
-    public GzipHttpResponseInterceptor(final String contentEncoding, final Class<? extends HttpEntityWrapper> entityWrapper)
+    public HttpGzipResponseInterceptor(final String contentEncoding, final Class<? extends HttpEntityWrapper> entityWrapper)
     {
 	this.contentEncoding = contentEncoding;
 	this.entityWrapper = entityWrapper;

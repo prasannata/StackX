@@ -22,7 +22,7 @@ package com.prasanna.android.task;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
-import com.prasanna.android.http.HttpHelper;
+import com.prasanna.android.http.SecureHttpHelper;
 
 public class FetchImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 {
@@ -40,7 +40,7 @@ public class FetchImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 	Bitmap bitmap = null;
 	if (urls != null && urls.length == 1)
 	{
-	    bitmap = HttpHelper.getInstance().fetchImage((String) urls[0]);
+	    bitmap = SecureHttpHelper.getInstance().fetchImage((String) urls[0]);
 	}
 	return bitmap;
     }

@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.utils;
 
@@ -23,50 +23,68 @@ public class IntentActionEnum
 {
     public interface IntentAction
     {
-        String getExtra();
+	String getExtra();
     }
 
     public enum QuestionIntentAction implements IntentAction
     {
-        QUESTIONS("questions"),
-        QUESTION_BODY("questioBody"),
-        QUESTION_FULL_DETAILS("questionFullDetails"),
-        QUESTION_ANSWERS("questionAnswers"),
-        QUESTION_COMMENTS("questionComments"),
-        QUESTION_SEARCH("questionSearch"),
-        TAGS_FAQ("tagsFaq");
-        private final String extra;
+	QUESTIONS("com.prasanna.stacknetwork.questions"),
+	QUESTION_BODY("com.prasanna.stacknetwork.questionBody"),
+	QUESTION_FULL_DETAILS("com.prasanna.stacknetwork.questionFullDetails"),
+	QUESTION_ANSWERS("com.prasanna.stacknetwork.questionAnswers"),
+	QUESTION_COMMENTS("com.prasanna.stacknetwork.questionComments"),
+	QUESTION_SEARCH("com.prasanna.stacknetwork.questionSearch"),
+	TAGS_FAQ("com.prasanna.stacknetwork.tagsFaq");
+	private final String extra;
 
-        private QuestionIntentAction(String extra)
-        {
-            this.extra = extra;
-        }
+	private QuestionIntentAction(String extra)
+	{
+	    this.extra = extra;
+	}
 
-        public String getExtra()
-        {
-            return extra;
-        }
+	public String getExtra()
+	{
+	    return extra;
+	}
     }
 
     public enum UserIntentAction implements IntentAction
     {
-        INBOX("inbox"),
-        ALL_USERS("users"),
-        USER_DETAIL("userDetail"),
-        USER_ACCOUNTS("userAccounts"),
-        QUESTIONS_BY_USER("questionsByUser"),
-        ANSWERS_BY_USER("answersByUser"),
-        LOGOUT("logout");
-        private final String extra;
+	INBOX("com.prasanna.stacknetwork.inbox"),
+	ALL_USERS("com.prasanna.stacknetwork.users"),
+	USER_DETAIL("com.prasanna.stacknetwork.userDetail"),
+	USER_ACCOUNTS("com.prasanna.stacknetwork.userAccounts"),
+	QUESTIONS_BY_USER("com.prasanna.stacknetwork.questionsByUser"),
+	ANSWERS_BY_USER("com.prasanna.stacknetwork.answersByUser"),
+	LOGOUT("com.prasanna.stacknetwork.logout");
+	private final String extra;
 
-        private UserIntentAction(String extra)
-        {
-            this.extra = extra;
-        }
+	private UserIntentAction(String extra)
+	{
+	    this.extra = extra;
+	}
 
-        public String getExtra()
-        {
-            return extra;
-        }
+	public String getExtra()
+	{
+	    return extra;
+	}
+    }
+
+    public enum ErrorIntentAction implements IntentAction
+    {
+	HTTP_ERROR("com.prasanna.stacknetwork.http.error");
+
+	private final String extra;
+
+	private ErrorIntentAction(String extra)
+	{
+	    this.extra = extra;
+	}
+
+	@Override
+	public String getExtra()
+	{
+	    return extra;
+	}
     }
 }

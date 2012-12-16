@@ -94,6 +94,8 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
         super.onCreate(savedInstanceState);
         int lastSavedPosition = -1;
 
+        registerHttpErrorReceiver(null);
+        
         if (savedInstanceState != null)
         {
             tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
@@ -126,7 +128,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     }
 
     @Override
-    protected void registerQuestionsReceiver()
+    protected void registerQuestionsSearchReceiver()
     {
     }
 

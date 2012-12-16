@@ -5,22 +5,15 @@
     android:background="@drawable/question_unanswered_shape"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/questionSnippetTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="4dp"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/questionSnippetTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:layout_marginLeft="2dp"
-            android:textColor="@color/black"
-            android:textSize="15sp" />
-    </LinearLayout>
+        android:layout_marginRight="4dp"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <!--
          <View

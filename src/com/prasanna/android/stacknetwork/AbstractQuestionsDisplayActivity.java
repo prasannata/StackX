@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -41,7 +41,7 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 {
     protected abstract void startQuestionsService();
 
-    protected abstract void registerQuestionsReceiver();
+    protected abstract void registerQuestionsSearchReceiver();
 
     protected abstract void onScrollToBottom();
 
@@ -124,7 +124,7 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
     }
 
     @Override
-    public void onStop()
+    protected void onStop()
     {
 	super.onStop();
 

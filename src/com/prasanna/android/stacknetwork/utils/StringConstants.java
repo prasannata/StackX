@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.utils;
 
@@ -34,4 +34,10 @@ public class StringConstants
     public static final String TAGS = "tags";
     public static final String ITEM_POSITION = "item_position";
     public static final String CACHED = "cached";
+
+    public static final class HttpError
+    {
+	public static final String CODE = "code";
+	public static final String TEXT = "text";
+    }
 }
