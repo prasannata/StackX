@@ -1,0 +1,98 @@
+package com.prasanna.android.http;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.protocol.HttpContext;
+
+import android.util.Log;
+
+public class GzipHttpResponseInterceptor implements HttpResponseInterceptor
+{
+    private final String TAG = GzipHttpResponseInterceptor.class.getSimpleName();
+    private final Class<? extends HttpEntityWrapper> entityWrapper;
+    private final String contentEncoding;
+
+    static class GzipDecompressingEntity extends HttpEntityWrapper
+    {
+	public GzipDecompressingEntity(final HttpEntity entity)
+	{
+	    super(entity);
+	}
+
+	@Override
+	public InputStream getContent() throws IOException, IllegalStateException
+	{
+	    return new GZIPInputStream(wrappedEntity.getContent());
+	}
+
+	@Override
+	public long getContentLength()
+	{
+	    return -1;
+	}
+    }
+
+    public GzipHttpResponseInterceptor(final String contentEncoding, final Class<? extends HttpEntityWrapper> entityWrapper)
+    {
+	this.contentEncoding = contentEncoding;
+	this.entityWrapper = entityWrapper;
+    }
+
+    @Override
+    public void process(HttpResponse response, HttpContext context) throws HttpException, IOException
+    {
+	HttpEntity entity = response.getEntity();
+	Header encodingHeader = entity.getContentEncoding();
+	if (encodingHeader != null)
+	{
+	    HeaderElement[] codecs = encodingHeader.getElements();
+	    for (int i = 0; i < codecs.length; i++)
+	    {
+		if (codecs[i].getName().equalsIgnoreCase(contentEncoding))
+		{
+		    try
+		    {
+			entityWrapper.getConstructor(HttpEntity.class).newInstance(entity);
+			response.setEntity(new GzipDecompressingEntity(entity));
+			return;
+		    }
+		    catch (IllegalArgumentException e)
+		    {
+			Log.e(TAG, e.getMessage());
+		    }
+		    catch (SecurityException e)
+		    {
+			Log.e(TAG, e.getMessage());
+		    }
+		    catch (InstantiationException e)
+		    {
+			Log.e(TAG, e.getMessage());
+		    }
+		    catch (IllegalAccessException e)
+		    {
+			Log.e(TAG, e.getMessage());
+		    }
+		    catch (InvocationTargetException e)
+		    {
+			Log.e(TAG, e.getMessage());
+		    }
+		    catch (NoSuchMethodException e)
+		    {
+			Log.e(TAG, e.getMessage());
+		    }
+		}
+	    }
+	}
+    }
+
+}

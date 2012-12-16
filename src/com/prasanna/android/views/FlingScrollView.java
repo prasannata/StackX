@@ -14,18 +14,21 @@ public class FlingScrollView extends ScrollView
     private GestureDetector gestureDetector;
     public FlingActionListener flingActionListener;
 
+    @SuppressWarnings("deprecation")
     public FlingScrollView(Context context)
     {
         super(context);
         gestureDetector = new GestureDetector(sogl);
     }
 
+    @SuppressWarnings("deprecation")
     public FlingScrollView(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
         gestureDetector = new GestureDetector(sogl);
     }
 
+    @SuppressWarnings("deprecation")
     public FlingScrollView(Context context, AttributeSet attrs)
     {
         super(context, attrs);

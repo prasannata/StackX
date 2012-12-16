@@ -8,7 +8,7 @@
         android:color="@color/delft" />
 
     <padding
-        android:bottom="5dp"
+        android:bottom="1dp"
         android:top="5dp" />
 
     <corners android:radius="3dp" />

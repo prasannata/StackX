@@ -13,9 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.prasanna.android.http.HttpHelper;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
@@ -36,15 +34,15 @@ public class StackNetworkListActivity extends ListActivity
 
     private ArrayList<Site> sites;
 
-    private Button reorderDoneToggleButton;
-
     private SiteListAdapter siteListAdapter;
-
-    private Button cancelReorderButton;
-
-    private boolean reorder = false;
-
-    private TextView dragDropHint;
+    
+//    private Button reorderDoneToggleButton;
+//
+//    private Button cancelReorderButton;
+//
+//    private boolean reorder = false;
+//
+//    private TextView dragDropHint;
 
     private BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -62,42 +60,7 @@ public class StackNetworkListActivity extends ListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sitelist);
 
-        reorderDoneToggleButton = (Button) findViewById(R.id.reorderDoneToggle);
-        dragDropHint = (TextView) findViewById(R.id.dragAndDropHint);
-        cancelReorderButton = (Button) findViewById(R.id.cancelSiteListReorder);
-
-        reorderDoneToggleButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (siteListAdapter != null)
-                {
-                    reorder = siteListAdapter.toggleReorderFlag();
-                    toggleReorderDoneButtonText();
-                }
-            }
-        });
-
-        cancelReorderButton.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v)
-            {
-                Log.d(TAG, "Cancelling ");
-
-                if (siteListAdapter != null)
-                {
-                    // Poor to just overwrite from cache.
-                    siteListAdapter.overwriteDataset(CacheUtils.fetchSiteListFromCache(getApplicationContext()));
-
-                    reorder = siteListAdapter.toggleReorderFlag();
-                    v.setVisibility(View.INVISIBLE);
-                    toggleReorderDoneButtonText();
-                }
-            }
-        });
+//        setupSiteSorting();
 
         Object lastSavedInstance = null;
         if (savedInstanceState != null)
@@ -124,6 +87,46 @@ public class StackNetworkListActivity extends ListActivity
             }
         }
     }
+//
+//    private void setupSiteSorting()
+//    {
+//	reorderDoneToggleButton = (Button) findViewById(R.id.reorderDoneToggle);
+//        dragDropHint = (TextView) findViewById(R.id.dragAndDropHint);
+//        cancelReorderButton = (Button) findViewById(R.id.cancelSiteListReorder);
+//
+//        reorderDoneToggleButton.setOnClickListener(new View.OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View v)
+//            {
+//                if (siteListAdapter != null)
+//                {
+//                    reorder = siteListAdapter.toggleReorderFlag();
+//                    toggleReorderDoneButtonText();
+//                }
+//            }
+//        });
+//
+//        cancelReorderButton.setOnClickListener(new View.OnClickListener()
+//        {
+//
+//            @Override
+//            public void onClick(View v)
+//            {
+//                Log.d(TAG, "Cancelling ");
+//
+//                if (siteListAdapter != null)
+//                {
+//                    // Poor to just overwrite from cache.
+//                    siteListAdapter.overwriteDataset(CacheUtils.fetchSiteListFromCache(getApplicationContext()));
+//
+//                    reorder = siteListAdapter.toggleReorderFlag();
+//                    v.setVisibility(View.INVISIBLE);
+//                    toggleReorderDoneButtonText();
+//                }
+//            }
+//        });
+//    }
 
     /*
      * (non-Javadoc)
@@ -233,18 +236,18 @@ public class StackNetworkListActivity extends ListActivity
         }
     }
 
-    private void toggleReorderDoneButtonText()
-    {
-        if (siteListAdapter.wasReordered() == true)
-        {
-            Log.d(TAG, "Persisting change to cache");
-            CacheUtils.cacheSiteList(getApplicationContext(), (ArrayList<Site>) siteListAdapter.getSites());
-        }
-
-        dragDropHint.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
-        cancelReorderButton.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
-        reorderDoneToggleButton.setBackgroundResource(reorder ? R.drawable.accept_white : R.drawable.sort_white);
-    }
+//    private void toggleReorderDoneButtonText()
+//    {
+//        if (siteListAdapter.wasReordered() == true)
+//        {
+//            Log.d(TAG, "Persisting change to cache");
+//            CacheUtils.cacheSiteList(getApplicationContext(), (ArrayList<Site>) siteListAdapter.getSites());
+//        }
+//
+//        dragDropHint.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
+//        cancelReorderButton.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
+//        reorderDoneToggleButton.setBackgroundResource(reorder ? R.drawable.accept_white : R.drawable.sort_white);
+//    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)

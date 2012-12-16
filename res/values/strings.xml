@@ -64,5 +64,6 @@
     <string name="sureQuestion">"Sure ?"</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-
+    <string name="title">Title</string>
+    <string name="views">Views</string>
 </resources>

@@ -10,67 +10,79 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="4dp"
-        android:orientation="horizontal"
-        android:weightSum="1" >
-
-        <LinearLayout
-            android:id="@+id/questionCountLinearLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.15"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/questionScoreValue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="1dp"
-                android:text="@string/questionScore"
-                android:textColor="@color/delft"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/questionViewsValue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="1dp"
-                android:text="@string/questionViews"
-                android:textColor="@color/delft"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/questionAnswersValue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="1dp"
-                android:text="@string/questionAnswers"
-                android:textColor="@color/delft"
-                android:textSize="10dp" />
-        </LinearLayout>
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/questionSnippetTitle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="2dp"
             android:layout_marginLeft="2dp"
-            android:layout_weight="0.85"
             android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
     </LinearLayout>
 
-    <View
+    <!--
+         <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/veryLightGrey" />
+    -->
 
     <LinearLayout
         android:id="@+id/questionSnippetTags"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
         android:layout_marginTop="3dp"
         android:orientation="horizontal" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/questionCountLinearLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/silver"
+        android:orientation="horizontal"
+        android:weightSum="3" >
+
+        <TextView
+            android:id="@+id/questionScoreValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/score"
+            android:textColor="@color/delft"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/questionViewsValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/views"
+            android:textAlignment="center"
+            android:textColor="@color/delft"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/questionAnswersValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="1dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/answers"
+            android:textColor="@color/delft"
+            android:textSize="10sp" />
     </LinearLayout>
 
 </LinearLayout>

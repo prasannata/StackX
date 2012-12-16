@@ -15,7 +15,7 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
 {
     public class TabListener implements ActionBar.TabListener
     {
-        private Fragment fragment;
+        private final Fragment fragment;
 
         public TabListener(Fragment fragment)
         {
