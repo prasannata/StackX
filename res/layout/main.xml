@@ -23,7 +23,7 @@
             android:background="@drawable/rounded_border_grey_min_padding"
             android:text="@string/login"
             android:textColor="@color/delft"
-            android:textSize="30dp" />
+            android:textSize="30sp" />
 
         <Button
             android:id="@+id/noLogin"
@@ -35,7 +35,7 @@
             android:background="@drawable/rounded_border_grey_min_padding"
             android:text="@string/skipLogin"
             android:textColor="@color/delft"
-            android:textSize="30dp" />
+            android:textSize="30sp" />
     </RelativeLayout>
 
     <View
