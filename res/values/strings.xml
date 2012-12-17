@@ -39,6 +39,7 @@
     <string name="menu_option_tags">Tags</string>
     <string name="menu_option_archive">Archive</string>
     <string name="menu_option_change_site">Change site</string>
+    <string name="menu_option_settings">Settings</string>
     <string name="menu_option_login">Login</string>
     <string name="menu_option_logout">Logout</string>
     <string name="score">Score</string>
@@ -68,5 +69,24 @@
     <string name="views">Views</string>
     <string name="skip">Skip</string>
     <string name="viewMessage">View message</string>
+    <string name="notification">Notification</string>
+    <string name="about">About</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="ringtone">Ringtone</string>
+
+    <string-array name="pref_refreshInterval_default_values">
+        <item>-1</item>
+        <item>30</item>
+        <item>60</item>
+        <item>720</item>
+        <item>1440</item>
+    </string-array>
+    <string-array name="pref_refreshInterval_default_entries">
+        <item>Manual</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+        <item>Every 12 hours</item>
+        <item>Every day</item>
+    </string-array>
 
 </resources>

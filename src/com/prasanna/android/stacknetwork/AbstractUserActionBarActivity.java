@@ -41,7 +41,6 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public abstract class AbstractUserActionBarActivity extends Activity implements SearchView.OnQueryTextListener
 {
     protected SearchView searchView;
-    private SharedPreferences sharedPreferences;
     private String accessToken;
 
     public abstract void refresh();
@@ -92,24 +91,19 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 		break;
-
 	    case R.id.menu_refresh:
 		refresh();
 		break;
-
 	    case R.id.menu_search:
 		break;
-
 	    case R.id.menu_profile:
 		Intent userProfileIntent = IntentUtils.createUserProfileIntent(getCurrentContext(), getAccessToken());
 		startActivity(userProfileIntent);
 		break;
-
 	    case R.id.menu_option_archive:
 		Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
 		startActivity(archiveIntent);
 		break;
-
 	    case R.id.menu_option_inbox:
 		Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
 		userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
@@ -119,13 +113,15 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
 		startActivity(siteListIntent);
 		break;
-
+	    case R.id.menu_option_settings:
+		Intent settingsIntent = new Intent(this, SettingsActivity.class);
+		startActivity(settingsIntent);
+		break;
 	    case R.id.menu_option_login:
 		Intent oAuthIntent = new Intent(this, OAuthActivity.class);
 		CacheUtils.clear(getApplicationContext());
 		startActivity(oAuthIntent);
 		break;
-
 	    case R.id.menu_option_logout:
 		Intent logoutIntent = new Intent(this, LogoutActivity.class);
 		startActivity(logoutIntent);
@@ -137,11 +133,8 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 
     public boolean isAuthenticatedRealm()
     {
-	if (sharedPreferences == null)
-	{
-	    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	    accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-	}
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
 
 	return (accessToken != null);
     }
