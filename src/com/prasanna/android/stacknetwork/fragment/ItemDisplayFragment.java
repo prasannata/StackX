@@ -86,7 +86,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
     protected void registerHttpErrorReceiver()
     {
-	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(getActivity(), this);
+	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
 
 	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.name());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);

@@ -84,7 +84,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 	setContentView(R.layout.sitelist);
 
 	// setupSiteSorting();
-	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this, this);
+	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
 
 	Object lastSavedInstance = null;
 	if (savedInstanceState != null)

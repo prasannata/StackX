@@ -32,13 +32,10 @@ public class HttpErrorBroadcastReceiver extends BroadcastReceiver
 {
     private static final String TAG = HttpErrorBroadcastReceiver.class.getSimpleName();
 
-    private Context activityContext;
-
     private HttpErrorListener httpErrorListener;
 
-    public HttpErrorBroadcastReceiver(final Context context, final HttpErrorListener httpErrorListener)
+    public HttpErrorBroadcastReceiver(final HttpErrorListener httpErrorListener)
     {
-	this.activityContext = context;
 	this.httpErrorListener = httpErrorListener;
     }
 
