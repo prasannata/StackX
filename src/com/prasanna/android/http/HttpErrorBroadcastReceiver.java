@@ -22,12 +22,10 @@ package com.prasanna.android.http;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.util.Log;
 
 import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.model.StackXError;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class HttpErrorBroadcastReceiver extends BroadcastReceiver
@@ -42,15 +40,6 @@ public class HttpErrorBroadcastReceiver extends BroadcastReceiver
     {
 	this.activityContext = context;
 	this.httpErrorListener = httpErrorListener;
-
-	registerReceiver();
-    }
-
-    private void registerReceiver()
-    {
-	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.name());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	activityContext.registerReceiver(this, filter);
     }
 
     @Override

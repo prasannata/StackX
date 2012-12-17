@@ -26,6 +26,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,9 +41,10 @@ import com.prasanna.android.http.HttpErrorBroadcastReceiver;
 import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.ErrorIntentAction;
 
 public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> extends Fragment implements
-        ScrollableFragment, HttpErrorListener
+                ScrollableFragment, HttpErrorListener
 {
     private Intent intentForService;
 
@@ -67,145 +69,158 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     protected abstract String getLogTag();
 
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
-    
+
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            Log.d(getLogTag(), "Receiver invoked: " + intent.getExtras());
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    Log.d(getLogTag(), "Receiver invoked: " + intent.getExtras());
 
-            items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName()));
+	    items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName()));
 
-            displayItems();
-        }
+	    displayItems();
+	}
     };
+
+    protected void registerHttpErrorReceiver()
+    {
+	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(getActivity(), this);
+
+	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+	super.onCreate(savedInstanceState);
+
+	registerHttpErrorReceiver();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        if (container == null)
-        {
-            Log.d(getLogTag(), "onCreateView return null");
-            return null;
-        }
-        
-        httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(getActivity(), this);
-        
-        itemsContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.items_fragment_container,
-                null);
+	if (container == null)
+	{
+	    Log.d(getLogTag(), "onCreateView return null");
+	    return null;
+	}
 
-        return itemsContainer;
+	itemsContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.items_fragment_container,
+	                null);
+
+	return itemsContainer;
     }
 
     @Override
     public void onResume()
     {
-        registerReceiver();
-        super.onResume();
+	registerReceiver();
+	super.onResume();
     }
 
     @Override
     public void onDestroy()
     {
-        super.onDestroy();
-        
-        getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
-        
-        stopServiceAndUnregisterReceiver();
+	super.onDestroy();
+
+	stopServiceAndUnregisterReceiver();
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
-        
-        stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceiver();
     }
 
     private void stopServiceAndUnregisterReceiver()
     {
-        if (intentForService != null)
-        {
-            getActivity().stopService(intentForService);
-        }
+	if (intentForService != null)
+	{
+	    getActivity().stopService(intentForService);
+	}
 
-        try
-        {
-            getActivity().unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(getLogTag(), e.getMessage());
-        }
+	try
+	{
+	    getActivity().unregisterReceiver(receiver);
+	    getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
+	}
+	catch (IllegalArgumentException e)
+	{
+	    Log.d(getLogTag(), e.getMessage());
+	}
     }
 
     @Override
     public void onScrollToBottom()
     {
-        if (serviceRunning == false)
-        {
-            loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.loading_progress,
-                    null);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(0, 15, 0, 15);
-            itemsContainer.addView(loadingProgressView, layoutParams);
-            startIntentService();
-        }
+	if (serviceRunning == false)
+	{
+	    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.loading_progress,
+		            null);
+	    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		            LayoutParams.WRAP_CONTENT);
+	    layoutParams.setMargins(0, 15, 0, 15);
+	    itemsContainer.addView(loadingProgressView, layoutParams);
+	    startIntentService();
+	}
     }
 
     protected void showLoadingDialog()
     {
-        if (loadingDialog == null || loadingDialog.isShowing() == false)
-        {
-            loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
-        }
+	if (loadingDialog == null || loadingDialog.isShowing() == false)
+	{
+	    loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
+	}
     }
 
     protected void dismissLoadingDialog()
     {
-        if (loadingDialog != null && loadingDialog.isShowing() == true)
-        {
-            loadingDialog.dismiss();
-        }
+	if (loadingDialog != null && loadingDialog.isShowing() == true)
+	{
+	    loadingDialog.dismiss();
+	}
     }
 
     protected Intent getIntentForService(Class<?> clazz, String action)
     {
-        intentForService = new Intent(getActivity().getApplicationContext(), clazz);
-        intentForService.setAction(action);
-        return intentForService;
+	intentForService = new Intent(getActivity().getApplicationContext(), clazz);
+	intentForService.setAction(action);
+	return intentForService;
     }
 
     public void refresh()
     {
-        stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceiver();
 
-        itemsContainer.removeAllViews();
+	itemsContainer.removeAllViews();
 
-        registerReceiver();
+	registerReceiver();
 
-        showLoadingDialog();
+	showLoadingDialog();
 
-        startIntentService();
+	startIntentService();
     }
-    
+
     @Override
     public void onHttpError(int code, String text)
     {
 	Log.d(getLogTag(), "Http error " + code + " " + text);
-	
+
 	dismissLoadingDialog();
-	
-	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error, null);
+
+	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
+	                null);
 	TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
 
 	textView.setText(code + " " + text);
-	
+
 	itemsContainer.removeAllViews();
 	itemsContainer.addView(errorDisplayLayout);
     }
