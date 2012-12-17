@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceScreen
+        android:key="inboxPreference"
+        android:persistent="false"
+        android:title="@string/menu_option_inbox" >
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/pref_refreshInterval_default_entries"
+            android:entryValues="@array/pref_refreshInterval_default_values"
+            android:key="pref_inboxRefreshInterval"
+            android:title="@string/menu_refresh" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_newNotification"
+            android:title="@string/notification" />
+        <CheckBoxPreference
+            android:dependency="pref_newNotification"
+            android:key="pref_vibrate"
+            android:title="@string/vibrate" />
+
+        <RingtonePreference
+            android:dependency="pref_newNotification"
+            android:key="pref_notificationTone"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            android:title="@string/ringtone" />
+    </PreferenceScreen>
+
+    <ListPreference
+        android:key="pref_about"
+        android:title="@string/about" />
+
+</PreferenceScreen>
