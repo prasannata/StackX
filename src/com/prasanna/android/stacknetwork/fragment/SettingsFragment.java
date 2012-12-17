@@ -11,7 +11,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
 import android.preference.RingtonePreference;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
 
@@ -74,8 +73,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
-	Toast.makeText(getActivity(), key, Toast.LENGTH_LONG).show();
-
 	if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
 	{
 	    refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
