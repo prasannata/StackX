@@ -27,14 +27,16 @@ import org.json.JSONException;
 
 import android.util.Log;
 
+import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.http.SecureHttpHelper;
-import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractBaseService
 {
@@ -200,7 +202,12 @@ public abstract class AbstractBaseService
 	if (response.isErrorResponse())
 	{
 	    Log.d(getLogTag(), "Error " + response);
-	    throw new HttpErrorException(response.getInt("status"), response.getString("text"));
+	    StackXError error = new StackXError();
+	    error.statusCode = response.getInt(StringConstants.STATUS_CODE);
+	    error.id = response.getInt(StringConstants.HttpError.ERROR_ID);
+	    error.name = response.getString(StringConstants.HttpError.ERROR_NAME);
+	    error.msg = response.getString(StringConstants.HttpError.ERROR_MESSAGE);
+	    throw new HttpErrorException(error);
 	}
 
 	return response;

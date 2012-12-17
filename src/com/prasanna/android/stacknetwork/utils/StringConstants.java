@@ -34,10 +34,14 @@ public class StringConstants
     public static final String TAGS = "tags";
     public static final String ITEM_POSITION = "item_position";
     public static final String CACHED = "cached";
+    public static final String STATUS_CODE = "statusCode";
+    public static final String ERROR = "error";
 
     public static final class HttpError
     {
 	public static final String CODE = "code";
-	public static final String TEXT = "text";
+	public static final String ERROR_ID = "error_id";
+	public static final String ERROR_NAME = "error_name";
+	public static final String ERROR_MESSAGE = "error_message";
     }
 }

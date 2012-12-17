@@ -179,7 +179,7 @@ public class JSONObjectWrapper
 
     public boolean isErrorResponse()
     {
-	return has("error");
+	return has(StringConstants.ERROR);
     }
 
     public boolean has(String name)

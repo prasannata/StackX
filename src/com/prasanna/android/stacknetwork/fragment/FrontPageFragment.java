@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -38,7 +38,7 @@ public class FrontPageFragment extends AbstractQuestionsFragment
     private Intent frontPageQuestionsIntent;
 
     private int currentPage = 0;
-
+    
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)

@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -33,12 +33,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.prasanna.android.http.HttpErrorBroadcastReceiver;
+import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
 
 public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> extends Fragment implements
-        ScrollableFragment
+        ScrollableFragment, HttpErrorListener
 {
     private Intent intentForService;
 
@@ -62,6 +66,8 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
     protected abstract String getLogTag();
 
+    private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
+    
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
         @SuppressWarnings("unchecked")
@@ -84,7 +90,9 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
             Log.d(getLogTag(), "onCreateView return null");
             return null;
         }
-
+        
+        httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(getActivity(), this);
+        
         itemsContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.items_fragment_container,
                 null);
 
@@ -102,6 +110,9 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     public void onDestroy()
     {
         super.onDestroy();
+        
+        getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
+        
         stopServiceAndUnregisterReceiver();
     }
 
@@ -110,6 +121,8 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     {
         super.onStop();
 
+        getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
+        
         stopServiceAndUnregisterReceiver();
     }
 
@@ -179,5 +192,21 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
         showLoadingDialog();
 
         startIntentService();
+    }
+    
+    @Override
+    public void onHttpError(int code, String text)
+    {
+	Log.d(getLogTag(), "Http error " + code + " " + text);
+	
+	dismissLoadingDialog();
+	
+	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error, null);
+	TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
+
+	textView.setText(code + " " + text);
+	
+	itemsContainer.removeAllViews();
+	itemsContainer.addView(errorDisplayLayout);
     }
 }

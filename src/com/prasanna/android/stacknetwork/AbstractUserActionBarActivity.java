@@ -19,14 +19,10 @@
 
 package com.prasanna.android.stacknetwork;
 
-import org.apache.http.HttpStatus;
-
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -36,10 +32,8 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.SearchView;
 
-import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -53,35 +47,6 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     public abstract void refresh();
 
     public abstract Context getCurrentContext();
-
-    protected BroadcastReceiver httpErrorReceiver;
-
-    protected void registerHttpErrorReceiver(final HttpErrorListener errorListener)
-    {
-	httpErrorReceiver = new BroadcastReceiver()
-	{
-	    @Override
-	    public void onReceive(Context context, Intent intent)
-	    {
-		int code = intent.getIntExtra(StringConstants.HttpError.CODE, HttpStatus.SC_NOT_FOUND);
-		String text = intent.getStringExtra(StringConstants.HttpError.TEXT);
-		if (errorListener != null)
-		{
-		    errorListener.onHttpError(code, text);
-		}
-	    }
-	};
-
-	registerReceiver(httpErrorReceiver, new IntentFilter(ErrorIntentAction.HTTP_ERROR.name()));
-    }
-
-    protected void unRegisterHttpErrorReceiver()
-    {
-	if (httpErrorReceiver != null)
-	{
-	    unregisterReceiver(httpErrorReceiver);
-	}
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -199,19 +164,5 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     public boolean onQueryTextChange(String paramString)
     {
 	return false;
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-	super.onDestroy();
-	unRegisterHttpErrorReceiver();
-    }
-
-    @Override
-    protected void onStop()
-    {
-	super.onStop();
-	unRegisterHttpErrorReceiver();
     }
 }

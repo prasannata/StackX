@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import android.content.Intent;
 
-import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
+import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.service.UserService;
@@ -53,7 +53,7 @@ public class UserDetailsIntentService extends AbstractIntentService
 	}
 	catch (HttpErrorException e)
 	{
-	    broadcastHttpErrorIntent(e.getCode(), e.getMessage());
+	    broadcastHttpErrorIntent(e.getError());
 	}
     }
 

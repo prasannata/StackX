@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -33,7 +33,11 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.prasanna.android.http.HttpErrorBroadcastReceiver;
+import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.intent.UserSitesIntentService;
 import com.prasanna.android.stacknetwork.model.Site;
@@ -41,7 +45,7 @@ import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class StackNetworkListActivity extends ListActivity
+public class StackNetworkListActivity extends ListActivity implements HttpErrorListener
 {
     private static final String TAG = StackNetworkListActivity.class.getSimpleName();
 
@@ -70,6 +74,8 @@ public class StackNetworkListActivity extends ListActivity
 	}
     };
 
+    private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
+
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -78,6 +84,7 @@ public class StackNetworkListActivity extends ListActivity
 	setContentView(R.layout.sitelist);
 
 	// setupSiteSorting();
+	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this, this);
 
 	Object lastSavedInstance = null;
 	if (savedInstanceState != null)
@@ -163,15 +170,9 @@ public class StackNetworkListActivity extends ListActivity
 
 	Site site = sites.get(position);
 	OperatingSite.setSite(site);
+	unregisterReceiver(httpErrorBroadcastReceiver);
 	Intent startQuestionActivityIntent = new Intent(this, QuestionsActivity.class);
 	startActivity(startQuestionActivityIntent);
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-	super.onDestroy();
-	stopServiceAndUnregisterReceiver();
     }
 
     private void stopServiceAndUnregisterReceiver()
@@ -184,11 +185,19 @@ public class StackNetworkListActivity extends ListActivity
 	try
 	{
 	    unregisterReceiver(receiver);
+	    unregisterReceiver(httpErrorBroadcastReceiver);
 	}
 	catch (IllegalArgumentException e)
 	{
 	    Log.d(TAG, e.getMessage());
 	}
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+	super.onDestroy();
+	stopServiceAndUnregisterReceiver();
     }
 
     @Override
@@ -274,5 +283,14 @@ public class StackNetworkListActivity extends ListActivity
     {
 	outState.putSerializable(StringConstants.SITES, sites);
 	super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onHttpError(int code, String text)
+    {
+	RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.error, null);
+	TextView textView = (TextView) relativeLayout.findViewById(R.id.errorMsg);
+
+	textView.setText(code + " " + text);
     }
 }

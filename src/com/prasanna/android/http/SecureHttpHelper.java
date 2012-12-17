@@ -58,6 +58,7 @@ import android.net.Uri.Builder;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.Validate;
 
 public final class SecureHttpHelper
@@ -173,10 +174,9 @@ public final class SecureHttpHelper
 		Log.d(TAG, "Http request failed: " + statusCode);
 		Log.d(TAG, "Http request failure message: " + jsonText);
 
-		JSONObject error = new JSONObject();
-		error.put("error", true);
-		error.put("status", statusCode);
-		error.put("text", jsonText);
+		JSONObject error = new JSONObject(jsonText);
+		error.put(StringConstants.ERROR, true);
+		error.put(StringConstants.STATUS_CODE, statusCode);
 		jsonObject = new JSONObjectWrapper(error);
 	    }
 	}

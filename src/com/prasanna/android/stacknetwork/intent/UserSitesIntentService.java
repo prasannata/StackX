@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import android.content.Intent;
 import android.util.Log;
 
-import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
+import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserService;
@@ -55,7 +55,7 @@ public class UserSitesIntentService extends AbstractIntentService
 	}
 	catch (HttpErrorException e)
 	{
-	    broadcastHttpErrorIntent(e.getCode(), e.getMessage());
+	    broadcastHttpErrorIntent(e.getError());
 	}
     }
 

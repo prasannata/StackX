@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 
-import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
+import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
@@ -66,7 +66,7 @@ public class UserAnswersIntentService extends AbstractIntentService
 	}
 	catch (HttpErrorException e)
 	{
-	    broadcastHttpErrorIntent(e.getCode(), e.getMessage());
+	    broadcastHttpErrorIntent(e.getError());
 	}
     }
 

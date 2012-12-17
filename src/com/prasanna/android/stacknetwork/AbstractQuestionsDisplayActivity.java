@@ -150,18 +150,9 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 
     protected void processQuestions()
     {
-	if (fetchingQuestionsDialog != null)
-	{
-	    fetchingQuestionsDialog.dismiss();
-	    fetchingQuestionsDialog = null;
-	}
+	dismissLoadingProgressDialog();
 
-	if (loadingProgressView != null)
-	{
-	    questionsLinearLayout.removeView(loadingProgressView);
-	    loadingProgressView.setVisibility(View.GONE);
-	    loadingProgressView = null;
-	}
+	dismissLoadingQuestionsProgressView();
 
 	for (; lastDisplayQuestionIndex < questions.size(); lastDisplayQuestionIndex++)
 	{
@@ -172,5 +163,24 @@ public abstract class AbstractQuestionsDisplayActivity extends AbstractUserActio
 	}
 
 	serviceRunning = false;
+    }
+
+    protected void dismissLoadingProgressDialog()
+    {
+	if (fetchingQuestionsDialog != null)
+	{
+	    fetchingQuestionsDialog.dismiss();
+	    fetchingQuestionsDialog = null;
+	}
+    }
+
+    protected void dismissLoadingQuestionsProgressView()
+    {
+	if (loadingProgressView != null)
+	{
+	    questionsLinearLayout.removeView(loadingProgressView);
+	    loadingProgressView.setVisibility(View.GONE);
+	    loadingProgressView = null;
+	}
     }
 }

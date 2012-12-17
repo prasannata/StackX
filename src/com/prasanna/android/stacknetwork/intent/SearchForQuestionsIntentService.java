@@ -23,7 +23,7 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.util.Log;
 
-import com.prasanna.android.stacknetwork.exceptions.HttpErrorException;
+import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.service.QuestionService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -61,7 +61,7 @@ public class SearchForQuestionsIntentService extends AbstractIntentService
 	}
 	catch (HttpErrorException e)
 	{
-	    broadcastHttpErrorIntent(e.getCode(), e.getMessage());
+	    broadcastHttpErrorIntent(e.getError());
 	}
     }
 }
