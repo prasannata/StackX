@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -27,11 +27,11 @@ import com.prasanna.android.stacknetwork.service.UserService;
 
 public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<String>>
 {
-    private final AsyncTaskCompletionNotifier<ArrayList<String>> fetchUserTagsCompletionNotifier;
+    private final AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier;
 
-    public FetchTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> fetchUserTagsCompletionNotifier)
+    public FetchTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier)
     {
-	this.fetchUserTagsCompletionNotifier = fetchUserTagsCompletionNotifier;
+	this.taskCompletionNotifier = taskCompletionNotifier;
     }
 
     @Override
@@ -43,9 +43,9 @@ public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<Strin
     @Override
     protected void onPostExecute(ArrayList<String> result)
     {
-	if (fetchUserTagsCompletionNotifier != null)
+	if (taskCompletionNotifier != null)
 	{
-	    fetchUserTagsCompletionNotifier.notifyOnCompletion(result);
+	    taskCompletionNotifier.notifyOnCompletion(result);
 	}
 	
 	super.onPostExecute(result);
