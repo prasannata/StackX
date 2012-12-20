@@ -38,7 +38,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,12 +72,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private TextView commentsCickableTextView;
     private TextView currentAnswerOfTotalTextView;
     private TextView currentAnswerScore;
-    private TextView acceptedAnswerLogo;
     private TextView questionTitle;
     private Question question;
     private FlingScrollView flingScrollView;
     private Button currentAnswerAuthor;
-    private RelativeLayout answerHeader;
+    private LinearLayout answerHeader;
     private View hrInQuestionTitle;
     private int currentAnswerCount = -1;
     private boolean viewingAnswer = false;
@@ -196,11 +194,11 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	currentAnswerScore.setText(getString(R.string.score) + ": " + question.answers.get(currentAnswerCount).score);
 	if (question.answers.get(currentAnswerCount).accepted == true)
 	{
-	    acceptedAnswerLogo.setVisibility(View.VISIBLE);
+	    answerHeader.setBackgroundResource(R.color.lichen);
 	}
 	else
 	{
-	    acceptedAnswerLogo.setVisibility(View.GONE);
+	    answerHeader.setBackgroundResource(R.color.lightGrey);
 	}
     }
 
@@ -215,8 +213,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
 	flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
 	detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
-	answerHeader = (RelativeLayout) findViewById(R.id.answerHeader);
-	acceptedAnswerLogo = (TextView) findViewById(R.id.acceptedAnswerLogo);
+	answerHeader = (LinearLayout) findViewById(R.id.answerHeader);
 	currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
 	currentAnswerAuthor = (Button) findViewById(R.id.currentAnswerAuthor);
 	currentAnswerScore = (TextView) findViewById(R.id.currentAnswerScore);

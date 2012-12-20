@@ -26,7 +26,7 @@
             android:gravity="top|center"
             android:text="@string/answers"
             android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/spaceSeparator"
@@ -45,7 +45,7 @@
             android:gravity="top|center"
             android:text="@string/comments"
             android:textColor="@color/white"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
     </LinearLayout>
 
     <RelativeLayout
@@ -73,7 +73,7 @@
             android:layout_marginBottom="5dp"
             android:layout_marginLeft="5dp"
             android:textColor="@color/black"
-            android:textSize="14dp" />
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/questionOwner"
@@ -84,7 +84,7 @@
             android:background="@drawable/user_button_selector"
             android:gravity="center"
             android:textColor="@color/white"
-            android:textSize="10.5dp" />
+            android:textSize="10.5sp" />
 
         <View
             android:id="@+id/hrInQuestionTitle"
@@ -102,7 +102,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@id/hrInQuestionTitle"
             android:textColor="@color/black"
-            android:textSize="9dp" />
+            android:textSize="9sp" />
 
         <TextView
             android:id="@+id/questionViews"
@@ -114,7 +114,7 @@
             android:layout_toRightOf="@id/questionScore"
             android:text="@string/labelViews"
             android:textColor="@color/black"
-            android:textSize="9dp" />
+            android:textSize="9sp" />
 
         <TextView
             android:id="@+id/questionTime"
@@ -125,85 +125,58 @@
             android:layout_gravity="right"
             android:gravity="right"
             android:textColor="@color/black"
-            android:textSize="9dp" />
+            android:textSize="9sp" />
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/qDetails"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:layout_marginTop="2dp"
-        android:background="@drawable/rounded_border_delft"
+        android:background="@drawable/border_delft_min_padding"
         android:orientation="vertical" >
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/answerHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginTop="1dp"
-            android:visibility="gone" >
+            android:background="@color/lightGrey"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="3" >
 
             <TextView
                 android:id="@+id/currentAnswerOfTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_gravity="left"
-                android:layout_marginRight="4dp"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="12dp" />
-
-            <Button
-                android:id="@+id/currentAnswerAuthor"
-                android:layout_width="wrap_content"
-                android:layout_height="18dp"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:background="@drawable/user_button_selector"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:textSize="10dp" />
-
-            <View
-                android:id="@+id/answerAuthorDetailDivider"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_below="@id/currentAnswerOfTotal"
-                android:layout_marginBottom="2dp"
-                android:layout_marginTop="2dp"
-                android:background="@color/lightGrey" />
-
-            <TextView
-                android:id="@+id/acceptedAnswerLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/answerAuthorDetailDivider"
-                android:layout_gravity="right"
-                android:gravity="right"
-                android:text="@string/accepted"
-                android:textColor="@color/darkGreen"
-                android:textSize="10dp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/currentAnswerScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@id/answerAuthorDetailDivider"
-                android:layout_gravity="left"
-                android:layout_marginLeft="1dp"
-                android:layout_toRightOf="@id/acceptedAnswerLogo"
-                android:gravity="left"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="11dp" />
-        </RelativeLayout>
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/currentAnswerAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="18dp"
+                android:layout_weight="1"
+                android:background="@drawable/user_button_selector"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="10sp" />
+        </LinearLayout>
 
         <com.prasanna.android.views.FlingScrollView
             android:id="@+id/questionDisplayFlingScrollView"
