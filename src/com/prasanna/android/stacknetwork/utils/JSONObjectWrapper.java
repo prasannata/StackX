@@ -199,7 +199,7 @@ public class JSONObjectWrapper
     {
 	if(jsonObject != null)
 	{
-	    jsonObject.toString();
+	    return jsonObject.toString();
 	}
 	
 	return null;
