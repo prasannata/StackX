@@ -8,6 +8,7 @@
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -23,6 +24,15 @@
         <service android:name=".intent.UserInboxIntentService" />
         <service android:name=".intent.UserSitesIntentService" />
         <service android:name=".intent.TagFaqIntentService" />
+
+        <receiver
+            android:name=".receiver.NewMsgNotificationReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="NEW_MSG" >
+                </action>
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".LoginActivity"
@@ -85,6 +95,9 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".SettingsActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".InboxRefreshActivity"
             android:configChanges="orientation|screenSize" />
     </application>
 

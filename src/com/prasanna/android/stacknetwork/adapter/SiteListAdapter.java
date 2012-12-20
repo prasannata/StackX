@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -29,8 +29,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionsActivity;
@@ -56,20 +56,19 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
     {
-        LinearLayout linearLayoutForSites = (LinearLayout) convertView;
+        RelativeLayout layoutForSites = (RelativeLayout) convertView;
 
         if (dataSet != null && position >= 0 && position < dataSet.size())
         {
-            linearLayoutForSites = (LinearLayout) layoutInflater.inflate(R.layout.sitelist_row, null);
-
-            TextView textView = (TextView) linearLayoutForSites.findViewById(R.id.siteName);
+            layoutForSites = (RelativeLayout) layoutInflater.inflate(R.layout.sitelist_row, null);
+            TextView textView = (TextView) layoutForSites.findViewById(R.id.siteName);
             textView.setGravity(Gravity.LEFT);
             textView.setId(dataSet.get(position).name.hashCode());
             textView.setText(dataSet.get(position).name);
 
             if (dataSet.get(position).userType.equals(UserType.REGISTERED))
             {
-                textView = (TextView) linearLayoutForSites.findViewById(R.id.siteUserTypeRegistered);
+                textView = (TextView) layoutForSites.findViewById(R.id.siteUserTypeRegistered);
                 textView.setVisibility(View.VISIBLE);
             }
 
@@ -77,7 +76,7 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
              * Not able to make onListItemClick work when onLongClickListener is
              * set for linearLayoutForSites.
              */
-            linearLayoutForSites.setOnClickListener(new View.OnClickListener()
+            layoutForSites.setOnClickListener(new View.OnClickListener()
             {
                 public void onClick(View v)
                 {
@@ -93,10 +92,10 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
                 }
             });
 
-            enableDragAndDrop(linearLayoutForSites, position, dataSet.get(position).name);
+            enableDragAndDrop(layoutForSites, position, dataSet.get(position).name);
         }
 
-        return linearLayoutForSites;
+        return layoutForSites;
     }
 
     public List<Site> getSites()

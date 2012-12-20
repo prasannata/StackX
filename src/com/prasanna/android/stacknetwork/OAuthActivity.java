@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork;
 
@@ -34,6 +34,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -77,7 +78,10 @@ public class OAuthActivity extends Activity
                     }
                 }
 
+                setAlarmForInboxSync();
+
                 startActivity(listStackNetworkIntent);
+
                 finish();
             }
             else
@@ -85,6 +89,11 @@ public class OAuthActivity extends Activity
                 view.loadUrl(url);
             }
             return true;
+        }
+
+        private void setAlarmForInboxSync()
+        {
+            AlarmUtils.createRepeatingAlarm(getApplicationContext(), InboxRefreshActivity.class, 1000 * 1800, 0);
         }
 
         @Override
@@ -134,7 +143,7 @@ public class OAuthActivity extends Activity
     @SuppressLint("SetJavaScriptEnabled")
     private WebView initWebview()
     {
-	WebView webview = (WebView) findViewById(R.id.web_view);
+        WebView webview = (WebView) findViewById(R.id.web_view);
         webview.setVerticalScrollBarEnabled(true);
         webview.setHorizontalScrollBarEnabled(true);
         webview.getSettings().setJavaScriptEnabled(true);
@@ -158,6 +167,6 @@ public class OAuthActivity extends Activity
         });
         webview.setWebViewClient(new OAuthWebViewClient());
         webview.requestFocus(View.FOCUS_DOWN);
-	return webview;
+        return webview;
     }
 }

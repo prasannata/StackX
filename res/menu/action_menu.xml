@@ -63,6 +63,12 @@
                 android:orderInCategory="7"
                 android:showAsAction="always"
                 android:title="@string/menu_option_logout"/>
+            <item
+                android:id="@+id/menu_option_test_gen_notify"
+                android:icon="@drawable/new_msg_notify"
+                android:orderInCategory="8"
+                android:showAsAction="always"
+                android:title="Notify Test"/>
         </menu>
     </item>
 

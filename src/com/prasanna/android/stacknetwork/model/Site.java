@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
@@ -33,9 +33,13 @@ public class Site implements Serializable
 
     public String link;
 
+    public int headerResId;
+
     public String logoUrl;
 
-    public int headerResId;
+    public String iconUrl;
+
+    public String faviconUrl;
 
     public UserType userType = UserType.DOES_NOT_EXIST;
 }

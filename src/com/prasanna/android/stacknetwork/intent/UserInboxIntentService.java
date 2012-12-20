@@ -28,6 +28,7 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 
 public class UserInboxIntentService extends AbstractIntentService
 {
@@ -35,37 +36,42 @@ public class UserInboxIntentService extends AbstractIntentService
 
     public UserInboxIntentService()
     {
-	this(UserInboxIntentService.class.getSimpleName());
+        this(UserInboxIntentService.class.getSimpleName());
     }
 
     public UserInboxIntentService(String name)
     {
-	super(name);
+        super(name);
     }
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	try
-	{
-	    ArrayList<InboxItem> inboxItems = null;
-	    String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
-	    int page = intent.getIntExtra(StringConstants.PAGE, 1);
+        try
+        {
+            int page = intent.getIntExtra(StringConstants.PAGE, 1);
+            String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
+            if (accessToken != null)
+            {
+                if (intent.hasExtra(UserIntentAction.NEW_MSG.getExtra()))
+                    broadcastIntent(userService.getInbox(page), IntentActionEnum.UserIntentAction.INBOX.name());
+                else
+                    broadcastIntent(userService.getUnreadItemsInInbox(page),
+                            IntentActionEnum.UserIntentAction.NEW_MSG.name());
+            }
+        }
+        catch (HttpErrorException e)
+        {
+            broadcastHttpErrorIntent(e.getError());
+        }
+    }
 
-	    if (accessToken != null)
-	    {
-		inboxItems = userService.getInbox(page);
-	    }
-
-	    Intent broadcastIntent = new Intent();
-	    broadcastIntent.setAction(IntentActionEnum.UserIntentAction.INBOX.name());
-	    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	    broadcastIntent.putExtra(IntentActionEnum.UserIntentAction.INBOX.getExtra(), inboxItems);
-	    sendBroadcast(broadcastIntent);
-	}
-	catch (HttpErrorException e)
-	{
-	    broadcastHttpErrorIntent(e.getError());
-	}
+    private void broadcastIntent(ArrayList<InboxItem> inboxItems, String action)
+    {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(action);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(IntentActionEnum.UserIntentAction.INBOX.getExtra(), inboxItems);
+        sendBroadcast(broadcastIntent);
     }
 }
