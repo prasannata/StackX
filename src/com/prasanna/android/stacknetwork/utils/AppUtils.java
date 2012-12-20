@@ -70,7 +70,7 @@ public class AppUtils
         String accessToken = CacheUtils.getAccessToken(null);
         if (accessToken != null)
         {
-            queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, CacheUtils.getAccessToken(null));
+            queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);
             queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
         }
 

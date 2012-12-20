@@ -425,6 +425,12 @@ public class UserService extends AbstractBaseService
     {
         ArrayList<String> tags = null;
         String restEndPoint = "/tags";
+
+        if (AppUtils.inAuthenticatedRealm())
+        {
+            restEndPoint = "/me/tags";
+        }
+
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.POPULAR);
