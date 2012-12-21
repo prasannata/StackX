@@ -35,7 +35,9 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Vibrator;
+import android.util.Log;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.UserInboxActivity;
@@ -45,6 +47,8 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction
 
 public class NewMsgNotificationReceiver extends BroadcastReceiver
 {
+    private static final String TAG = NewMsgNotificationReceiver.class.getSimpleName();
+
     private static final String NEW_MSG_NOTIF_TITLE = "%d new messages";
     private static final int VIBRATE_DURATION = 300;
 
@@ -64,6 +68,8 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
+		Log.d(TAG, "Ringer mode: " + audioManager.getRingerMode());
+
 		vibrateIfEnabled(context, audioManager.getRingerMode());
 
 		playNotificationTone(context, audioManager.getRingerMode());
@@ -76,6 +82,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 	if (SettingsFragment.isVibrateEnabled(context)
 	                && (ringerMode == AudioManager.RINGER_MODE_VIBRATE || ringerMode == AudioManager.RINGER_MODE_NORMAL))
 	{
+	    Log.d(TAG, "Vibrate enabled");
 	    Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 	    vibrator.vibrate(VIBRATE_DURATION);
 	}
@@ -85,8 +92,12 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     {
 	if (ringerMode == AudioManager.RINGER_MODE_NORMAL)
 	{
-	    Ringtone ringtone = RingtoneManager.getRingtone(context, SettingsFragment.getRingtone(context));
-	    ringtone.play();
+	    Uri uri = SettingsFragment.getRingtone(context);
+	    if (uri != null)
+	    {
+		Ringtone ringtone = RingtoneManager.getRingtone(context, uri);
+		ringtone.play();
+	    }
 	}
     }
 

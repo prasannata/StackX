@@ -40,15 +40,21 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 	return sharedPreferences.getBoolean(KEY_PREF_INBOX_NOTIFICATION, false);
     }
-    
+
     public static boolean isVibrateEnabled(Context context)
     {
+	if (!isNotificationEnabled(context))
+	    return false;
+
 	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 	return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
     }
 
     public static Uri getRingtone(Context context)
     {
+	if (!isNotificationEnabled(context))
+	    return null;
+
 	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 	return Uri.parse(sharedPreferences.getString(KEY_PREF_NOTIF_RINGTONE, ""));
     }
