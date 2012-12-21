@@ -1,5 +1,6 @@
 package com.prasanna.android.stacknetwork.fragment;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.media.Ringtone;
@@ -10,9 +11,11 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
 {
@@ -25,6 +28,30 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     private ListPreference refreshIntervalPref;
     private RingtonePreference notifRingTonePref;
+
+    public static int getInboxRefreshInterval(Context context)
+    {
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+	return Integer.parseInt(sharedPreferences.getString(KEY_PREF_INBOX_REFRESH_INTERVAL, "-1"));
+    }
+
+    public static boolean isNotificationEnabled(Context context)
+    {
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+	return sharedPreferences.getBoolean(KEY_PREF_INBOX_NOTIFICATION, false);
+    }
+    
+    public static boolean isVibrateEnabled(Context context)
+    {
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+	return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
+    }
+
+    public static Uri getRingtone(Context context)
+    {
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+	return Uri.parse(sharedPreferences.getString(KEY_PREF_NOTIF_RINGTONE, ""));
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -76,6 +103,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
 	{
 	    refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
+	    AlarmUtils.rescheduleInboxRefreshAlarm(getActivity());
 	}
     }
 

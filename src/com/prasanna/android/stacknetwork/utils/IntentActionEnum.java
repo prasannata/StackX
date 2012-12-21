@@ -57,7 +57,9 @@ public class IntentActionEnum
         QUESTIONS_BY_USER("com.prasanna.stacknetwork.questionsByUser"),
         ANSWERS_BY_USER("com.prasanna.stacknetwork.answersByUser"),
         LOGOUT("com.prasanna.stacknetwork.logout"),
-        NEW_MSG("com.prasanna.stacknetwork.newMsg");
+        SITES("com.prasanna.stacknetwork.userSites"),
+        NEW_MSG("com.prasanna.stacknetwork.newMsg"),
+        TOTAL_NEW_MSGS("com.prasanna.stacknetwork.newMsgTotal");
         private final String extra;
 
         private UserIntentAction(String extra)

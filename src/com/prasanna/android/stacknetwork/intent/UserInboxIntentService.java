@@ -20,15 +20,16 @@
 package com.prasanna.android.stacknetwork.intent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.Intent;
 
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.InboxItem;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserInboxIntentService extends AbstractIntentService
 {
@@ -36,42 +37,67 @@ public class UserInboxIntentService extends AbstractIntentService
 
     public UserInboxIntentService()
     {
-        this(UserInboxIntentService.class.getSimpleName());
+	this(UserInboxIntentService.class.getSimpleName());
     }
 
     public UserInboxIntentService(String name)
     {
-        super(name);
+	super(name);
     }
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        try
-        {
-            int page = intent.getIntExtra(StringConstants.PAGE, 1);
-            String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
-            if (accessToken != null)
-            {
-                if (intent.hasExtra(UserIntentAction.NEW_MSG.getExtra()))
-                    broadcastIntent(userService.getInbox(page), IntentActionEnum.UserIntentAction.INBOX.name());
-                else
-                    broadcastIntent(userService.getUnreadItemsInInbox(page),
-                            IntentActionEnum.UserIntentAction.NEW_MSG.name());
-            }
-        }
-        catch (HttpErrorException e)
-        {
-            broadcastHttpErrorIntent(e.getError());
-        }
+	try
+	{
+	    int page = intent.getIntExtra(StringConstants.PAGE, 1);
+	    String accessToken = intent.getStringExtra(StringConstants.ACCESS_TOKEN);
+	    if (accessToken != null)
+	    {
+		if (intent.hasExtra(UserIntentAction.NEW_MSG.getExtra()))
+		{
+		    getUnreadInboxItems(intent, page);
+		}
+		else
+		{
+		    broadcastIntent(UserIntentAction.INBOX.name(), UserIntentAction.INBOX.getExtra(),
+			            userService.getInbox(page));
+		}
+	    }
+	}
+	catch (HttpErrorException e)
+	{
+	    broadcastHttpErrorIntent(e.getError());
+	}
     }
 
-    private void broadcastIntent(ArrayList<InboxItem> inboxItems, String action)
+    @SuppressWarnings("unchecked")
+    private void getUnreadInboxItems(Intent intent, int page)
     {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(action);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(IntentActionEnum.UserIntentAction.INBOX.getExtra(), inboxItems);
-        sendBroadcast(broadcastIntent);
+	int totalNewMsgs = 0;
+	HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
+	ArrayList<Site> sites = (ArrayList<Site>) intent.getSerializableExtra(UserIntentAction.SITES.getExtra());
+
+	for (Site site : sites)
+	{
+	    ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page, site);
+	    if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
+	    {
+		newMsgCount.put(site.name, unreadInboxItems.size());
+		totalNewMsgs += unreadInboxItems.size();
+	    }
+	}
+
+	broadcastUnreadItemsCount(totalNewMsgs, newMsgCount);
+    }
+
+    private void broadcastUnreadItemsCount(int totalNewMsgs, HashMap<String, Integer> newMsgCount)
+    {
+	Intent broadcastIntent = new Intent();
+	broadcastIntent.setAction(UserIntentAction.NEW_MSG.name());
+	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
+	broadcastIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), totalNewMsgs);
+	sendBroadcast(broadcastIntent);
     }
 }

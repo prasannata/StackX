@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -20,8 +20,10 @@
 package com.prasanna.android.stacknetwork;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -31,12 +33,22 @@ import com.prasanna.android.stacknetwork.utils.IntentUtils;
 
 public class LoginActivity extends Activity
 {
+    private static Context context;
 
+    public static Context getAppContext()
+    {
+	return LoginActivity.context;
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
+        context = getApplicationContext();
+        
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        
         if (CacheUtils.getAccessToken(getApplicationContext()) == null)
         {
             setContentView(R.layout.main);

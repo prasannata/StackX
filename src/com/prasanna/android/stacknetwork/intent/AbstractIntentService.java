@@ -18,6 +18,8 @@
  */
 package com.prasanna.android.stacknetwork.intent;
 
+import java.io.Serializable;
+
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -39,6 +41,15 @@ public abstract class AbstractIntentService extends IntentService
 	broadcastIntent.setAction(IntentActionEnum.ErrorIntentAction.HTTP_ERROR.name());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 	broadcastIntent.putExtra(StringConstants.ERROR, error);
+	sendBroadcast(broadcastIntent);
+    }
+
+    protected void broadcastIntent(String action, String extraName, Serializable extra)
+    {
+	Intent broadcastIntent = new Intent();
+	broadcastIntent.setAction(action);
+	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+	broadcastIntent.putExtra(extraName, extra);
 	sendBroadcast(broadcastIntent);
     }
 }

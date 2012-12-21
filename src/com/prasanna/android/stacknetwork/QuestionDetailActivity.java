@@ -30,6 +30,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -209,39 +210,48 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 
 	setContentView(R.layout.question_detail_layout);
 
-	questionOptionsLayout = (LinearLayout) findViewById(R.id.questionOptions);
-	flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
-	flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
-	detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
-	answerHeader = (LinearLayout) findViewById(R.id.answerHeader);
-	currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
-	currentAnswerAuthor = (Button) findViewById(R.id.currentAnswerAuthor);
-	currentAnswerScore = (TextView) findViewById(R.id.currentAnswerScore);
-	hrInQuestionTitle = findViewById(R.id.hrInQuestionTitle);
-	currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
+	Uri clickedUri = getIntent().getData();
+
+	if (clickedUri != null)
 	{
-	    public void onClick(View view)
-	    {
-		startActivity(IntentUtils.createUserProfileIntent(view.getContext(),
-		                question.answers.get(currentAnswerCount).owner.id));
-	    }
-	});
-
-	setupQuestionOptions();
-
-	setupCommentsPopup();
-
-	registerReceivers();
-
-	boolean cached = getIntent().getBooleanExtra(StringConstants.CACHED, false);
-
-	if (cached == false)
-	{
-	    fetchQuestionDetail();
+	    Toast.makeText(this, "You clicked " + clickedUri, Toast.LENGTH_LONG).show();
 	}
 	else
 	{
-	    displayCachedQuestion();
+	    questionOptionsLayout = (LinearLayout) findViewById(R.id.questionOptions);
+	    flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
+	    flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
+	    detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
+	    answerHeader = (LinearLayout) findViewById(R.id.answerHeader);
+	    currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
+	    currentAnswerAuthor = (Button) findViewById(R.id.currentAnswerAuthor);
+	    currentAnswerScore = (TextView) findViewById(R.id.currentAnswerScore);
+	    hrInQuestionTitle = findViewById(R.id.hrInQuestionTitle);
+	    currentAnswerAuthor.setOnClickListener(new View.OnClickListener()
+	    {
+		public void onClick(View view)
+		{
+		    startActivity(IntentUtils.createUserProfileIntent(view.getContext(),
+			            question.answers.get(currentAnswerCount).owner.id));
+		}
+	    });
+
+	    setupQuestionOptions();
+
+	    setupCommentsPopup();
+
+	    registerReceivers();
+
+	    boolean cached = getIntent().getBooleanExtra(StringConstants.CACHED, false);
+
+	    if (cached == false)
+	    {
+		fetchQuestionDetail();
+	    }
+	    else
+	    {
+		displayCachedQuestion();
+	    }
 	}
     }
 

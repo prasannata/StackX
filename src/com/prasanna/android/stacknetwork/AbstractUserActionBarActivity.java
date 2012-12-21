@@ -19,6 +19,8 @@
 
 package com.prasanna.android.stacknetwork;
 
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -129,6 +131,11 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
                 break;
             case R.id.menu_option_test_gen_notify:
                 Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.name());
+                HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
+                newMsgCount.put("stackoverflow", 2);
+                newMsgCount.put("serverfault", 2);
+                notifyIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
+                notifyIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), 4);
                 sendBroadcast(notifyIntent);
                 break;
         }

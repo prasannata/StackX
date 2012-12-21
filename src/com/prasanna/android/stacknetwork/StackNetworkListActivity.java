@@ -248,8 +248,8 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 
 	if (sites != null)
 	{
-	    updateView(sites);
 	    CacheUtils.cacheSiteList(getApplicationContext(), sites);
+	    updateView(sites);
 	}
     }
 

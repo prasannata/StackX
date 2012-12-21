@@ -23,31 +23,65 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
+import com.prasanna.android.stacknetwork.InboxRefreshActivity;
+import com.prasanna.android.stacknetwork.LoginActivity;
+import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.receiver.NewMsgNotificationReceiver;
 
 public class AlarmUtils
 {
+    private static final String TAG = AlarmUtils.class.getSimpleName();
+
+    public static void createInboxRefreshAlarm(Context context)
+    {
+	int interval = SettingsFragment.getInboxRefreshInterval(context);
+
+	if (interval > 0)
+	{
+	    interval = interval * 60 * 1000;
+	    Log.d(TAG, "Inbox refreshing set to " + interval + " minutes");
+	}
+	else
+	{
+	    Log.d(TAG, "Inbox refreshing set to manual");
+	}
+
+	createRepeatingAlarm(LoginActivity.getAppContext(), InboxRefreshActivity.class, interval, 0);
+    }
+
+    public static void cancelInboxRefreshAlarm()
+    {
+	cancelAlarm(LoginActivity.getAppContext(), 0);
+    }
+
+    public static void rescheduleInboxRefreshAlarm(Context context)
+    {
+	cancelInboxRefreshAlarm();
+	createInboxRefreshAlarm(context);
+    }
+
     public static void createRepeatingAlarm(Context context, Class<?> clazz, int intervalInMs, int flags)
     {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, clazz);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, flags);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalInMs, pendingIntent);
+	AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+	Intent intent = new Intent(context, clazz);
+	PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, flags);
+	alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalInMs, pendingIntent);
     }
 
     public static void cancelAlarm(Context context, int flags)
     {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, NewMsgNotificationReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, flags);
-        pendingIntent.cancel();
-        alarmManager.cancel(pendingIntent);
+	AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+	Intent intent = new Intent(context, NewMsgNotificationReceiver.class);
+	PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, flags);
+	pendingIntent.cancel();
+	alarmManager.cancel(pendingIntent);
     }
 
     public static void rescheduleRepeatingAlarm(Context context, Class<?> clazz, int newIntervalInMs, int flags)
     {
-        cancelAlarm(context, flags);
-        createRepeatingAlarm(context, clazz, newIntervalInMs, flags);
+	cancelAlarm(context, flags);
+	createRepeatingAlarm(context, clazz, newIntervalInMs, flags);
     }
 }

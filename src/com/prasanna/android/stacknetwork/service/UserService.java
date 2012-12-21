@@ -290,12 +290,12 @@ public class UserService extends AbstractBaseService
         return getInboxItems(restEndPoint, queryParams);
     }
 
-    public ArrayList<InboxItem> getUnreadItemsInInbox(int page)
+    public ArrayList<InboxItem> getUnreadItemsInInbox(int page, Site site)
     {
         String restEndPoint = "/me/inbox/unread";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.SITE, site.apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_INBOX_FILTER);
