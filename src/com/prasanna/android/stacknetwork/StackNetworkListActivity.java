@@ -92,7 +92,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 	    lastSavedInstance = savedInstanceState.getSerializable(StringConstants.SITES);
 	}
 
-	if (lastSavedInstance == null && CacheUtils.hasSiteListCache(getApplicationContext()) == false)
+	if (lastSavedInstance == null && CacheUtils.hasSiteListCache(getCacheDir()) == false)
 	{
 	    registerReceiverAndStartService();
 	}
@@ -105,7 +105,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 	    }
 	    else
 	    {
-		sites = CacheUtils.fetchSiteListFromCache(getApplicationContext());
+		sites = CacheUtils.fetchSiteListFromCache(getCacheDir());
 		updateView(sites);
 	    }
 	}
@@ -248,7 +248,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 
 	if (sites != null)
 	{
-	    CacheUtils.cacheSiteList(getApplicationContext(), sites);
+	    CacheUtils.cacheSiteList(getCacheDir(), sites);
 	    updateView(sites);
 	}
     }

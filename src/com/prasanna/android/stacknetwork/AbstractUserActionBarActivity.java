@@ -26,6 +26,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -34,17 +36,22 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.SearchView;
 
+import com.prasanna.android.cache.LRU;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.FetchImageAsyncTask;
 
 public abstract class AbstractUserActionBarActivity extends Activity implements SearchView.OnQueryTextListener
 {
     protected SearchView searchView;
     private String accessToken;
+
+    private static LRU<String, Bitmap> iconCache = new LRU<String, Bitmap>(3);
 
     public abstract void refresh();
 
@@ -53,121 +60,151 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        getActionBar().setHomeButtonEnabled(true);
-        getActionBar().setTitle(OperatingSite.getSite().name);
+	getActionBar().setTitle(OperatingSite.getSite().name);
 
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.action_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
+	if (iconCache.containsKey(OperatingSite.getSite().name))
+	{
+	    setActionBarIcon(iconCache.get(OperatingSite.getSite().name));
+	}
+	else
+	{
+	    loadIcon();
+	}
 
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
-        searchView.setQueryHint("Search in title");
+	MenuInflater menuInflater = getMenuInflater();
+	menuInflater.inflate(R.menu.action_menu, menu);
+	MenuItem searchItem = menu.findItem(R.id.menu_search);
 
-        MenuItem menuOptions = menu.findItem(R.id.menu_options);
-        SubMenu subMenu = menuOptions.getSubMenu();
+	searchView = (SearchView) searchItem.getActionView();
+	searchView.setOnQueryTextListener(this);
+	searchView.setQueryHint("Search in title");
 
-        if (isAuthenticatedRealm() == false || OperatingSite.getSite().userType == null
-                || OperatingSite.getSite().userType.equals(UserType.REGISTERED) == false)
-        {
-            Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
+	MenuItem menuOptions = menu.findItem(R.id.menu_options);
+	SubMenu subMenu = menuOptions.getSubMenu();
 
-            subMenu.removeItem(R.id.menu_profile);
-            subMenu.removeItem(R.id.menu_option_inbox);
-            subMenu.removeItem(R.id.menu_option_logout);
-        }
-        else
-        {
-            subMenu.removeItem(R.id.menu_option_login);
-        }
+	if (isAuthenticatedRealm() == false || OperatingSite.getSite().userType == null
+	                || OperatingSite.getSite().userType.equals(UserType.REGISTERED) == false)
+	{
+	    Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
 
-        return super.onCreateOptionsMenu(menu);
+	    subMenu.removeItem(R.id.menu_profile);
+	    subMenu.removeItem(R.id.menu_option_inbox);
+	    subMenu.removeItem(R.id.menu_option_logout);
+	}
+	else
+	{
+	    subMenu.removeItem(R.id.menu_option_login);
+	}
+
+	return super.onCreateOptionsMenu(menu);
+    }
+
+    private void loadIcon()
+    {
+	FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+	{
+	    @Override
+	    public void notifyOnCompletion(Bitmap result)
+	    {
+		setActionBarIcon(result);
+		iconCache.put(OperatingSite.getSite().name, result);
+	    }
+
+	});
+
+	fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
+    }
+
+    private void setActionBarIcon(Bitmap result)
+    {
+	getActionBar().setIcon(new BitmapDrawable(getResources(), result));
+	getActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-                Intent intent = new Intent(this, QuestionsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                break;
-            case R.id.menu_refresh:
-                refresh();
-                break;
-            case R.id.menu_search:
-                break;
-            case R.id.menu_profile:
-                Intent userProfileIntent = IntentUtils.createUserProfileIntent(getCurrentContext(), getAccessToken());
-                startActivity(userProfileIntent);
-                break;
-            case R.id.menu_option_archive:
-                Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
-                startActivity(archiveIntent);
-                break;
-            case R.id.menu_option_inbox:
-                Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
-                userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
-                startActivity(userInboxIntent);
-                break;
-            case R.id.menu_option_change_site:
-                Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
-                startActivity(siteListIntent);
-                break;
-            case R.id.menu_option_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                break;
-            case R.id.menu_option_login:
-                Intent oAuthIntent = new Intent(this, OAuthActivity.class);
-                CacheUtils.clear(getApplicationContext());
-                startActivity(oAuthIntent);
-                break;
-            case R.id.menu_option_logout:
-                Intent logoutIntent = new Intent(this, LogoutActivity.class);
-                startActivity(logoutIntent);
-                break;
-            case R.id.menu_option_test_gen_notify:
-                Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.name());
-                HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
-                newMsgCount.put("stackoverflow", 2);
-                newMsgCount.put("serverfault", 2);
-                notifyIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
-                notifyIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), 4);
-                sendBroadcast(notifyIntent);
-                break;
-        }
+	switch (item.getItemId())
+	{
+	    case android.R.id.home:
+		Intent intent = new Intent(this, QuestionsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(intent);
+		break;
+	    case R.id.menu_refresh:
+		refresh();
+		break;
+	    case R.id.menu_search:
+		break;
+	    case R.id.menu_profile:
+		Intent userProfileIntent = IntentUtils.createUserProfileIntent(getCurrentContext(), getAccessToken());
+		startActivity(userProfileIntent);
+		break;
+	    case R.id.menu_option_archive:
+		Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
+		startActivity(archiveIntent);
+		break;
+	    case R.id.menu_option_inbox:
+		Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
+		userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
+		startActivity(userInboxIntent);
+		break;
+	    case R.id.menu_option_change_site:
+		Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
+		startActivity(siteListIntent);
+		break;
+	    case R.id.menu_option_settings:
+		Intent settingsIntent = new Intent(this, SettingsActivity.class);
+		startActivity(settingsIntent);
+		break;
+	    case R.id.menu_option_login:
+		Intent oAuthIntent = new Intent(this, OAuthActivity.class);
+		CacheUtils.clear(getApplicationContext());
+		startActivity(oAuthIntent);
+		break;
+	    case R.id.menu_option_logout:
+		Intent logoutIntent = new Intent(this, LogoutActivity.class);
+		startActivity(logoutIntent);
+		break;
+	    case R.id.menu_option_test_gen_notify:
+		Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.name());
+		HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
+		newMsgCount.put("stackoverflow", 2);
+		newMsgCount.put("serverfault", 2);
+		notifyIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
+		notifyIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), 4);
+		sendBroadcast(notifyIntent);
+		break;
+	}
 
-        return super.onOptionsItemSelected(item);
+	return super.onOptionsItemSelected(item);
     }
 
     public boolean isAuthenticatedRealm()
     {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
+	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+	accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
 
-        return (accessToken != null);
+	return (accessToken != null);
     }
 
     public String getAccessToken()
     {
-        return accessToken;
+	return accessToken;
     }
 
     @Override
     public boolean onQueryTextSubmit(String query)
     {
-        Intent intent = new Intent(this, QuestionSearchResultsActivity.class);
-        intent.putExtra(SearchManager.QUERY, query);
-        startActivity(intent);
-        return true;
+	Intent intent = new Intent(this, QuestionSearchResultsActivity.class);
+	intent.putExtra(SearchManager.QUERY, query);
+	startActivity(intent);
+	return true;
     }
 
     @Override
     public boolean onQueryTextChange(String paramString)
     {
-        return false;
+	return false;
     }
 }

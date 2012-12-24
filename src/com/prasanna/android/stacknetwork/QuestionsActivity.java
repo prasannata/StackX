@@ -34,6 +34,7 @@ import com.prasanna.android.stacknetwork.fragment.ItemDisplayFragment;
 import com.prasanna.android.stacknetwork.fragment.TagFaqFragment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.FetchTagsAsyncTask;
@@ -90,7 +91,7 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
     public void onCreate(Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
-	
+
 	int lastSavedPosition = -1;
 
 	if (savedInstanceState != null)
@@ -101,7 +102,8 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 
 	if (tags == null || tags.isEmpty())
 	{
-	    FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(new FetchUserTagsCompletionNotifier());
+	    FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(new FetchUserTagsCompletionNotifier(),
+		            AppUtils.inRegisteredSite(getCacheDir()));
 	    fetchUserAsyncTask.execute(1);
 	}
 	else

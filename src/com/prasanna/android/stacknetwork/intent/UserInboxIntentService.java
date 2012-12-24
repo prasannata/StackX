@@ -76,9 +76,9 @@ public class UserInboxIntentService extends AbstractIntentService
     {
 	int totalNewMsgs = 0;
 	HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
-	ArrayList<Site> sites = (ArrayList<Site>) intent.getSerializableExtra(UserIntentAction.SITES.getExtra());
+	HashMap<String, Site> sites = (HashMap<String, Site>) intent.getSerializableExtra(UserIntentAction.SITES.getExtra());
 
-	for (Site site : sites)
+	for (Site site : sites.values())
 	{
 	    ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page, site);
 	    if (unreadInboxItems != null && !unreadInboxItems.isEmpty())

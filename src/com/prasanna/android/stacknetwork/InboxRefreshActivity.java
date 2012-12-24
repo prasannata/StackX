@@ -28,7 +28,7 @@ public class InboxRefreshActivity extends Activity
 		            sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null));
 
 	    fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), Boolean.TRUE);
-	    fetchInboxIntent.putExtra(UserIntentAction.SITES.getExtra(), CacheUtils.getRegisteredSitesForUser(this));
+	    fetchInboxIntent.putExtra(UserIntentAction.SITES.getExtra(), CacheUtils.getRegisteredSitesForUser(getCacheDir()));
 
 	    startService(fetchInboxIntent);
 	}

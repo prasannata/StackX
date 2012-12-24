@@ -28,16 +28,20 @@ import com.prasanna.android.stacknetwork.service.UserService;
 public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<String>>
 {
     private final AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier;
+    private final boolean registeredForSite;
 
-    public FetchTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier)
+    public FetchTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier, boolean registeredForSite)
     {
+	super();
+	
 	this.taskCompletionNotifier = taskCompletionNotifier;
+	this.registeredForSite = registeredForSite;
     }
 
     @Override
     protected ArrayList<String> doInBackground(Integer... params)
     {
-	return UserService.getInstance().getTags(1);
+	return UserService.getInstance().getTags(1, registeredForSite);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -26,10 +26,10 @@ import com.prasanna.android.http.SecureHttpHelper;
 
 public class FetchImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 {
-    private final ImageFetchAsyncTaskCompleteNotifierImpl imageFetchAsyncTaskCompleteNotiferImpl;
+    private final AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl;
 
     public FetchImageAsyncTask(
-	    ImageFetchAsyncTaskCompleteNotifierImpl imageFetchAsyncTaskCompleteNotiferImpl)
+		    AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl)
     {
 	this.imageFetchAsyncTaskCompleteNotiferImpl = imageFetchAsyncTaskCompleteNotiferImpl;
     }

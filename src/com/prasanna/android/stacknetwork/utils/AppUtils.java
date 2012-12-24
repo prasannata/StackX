@@ -19,6 +19,7 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
+import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,6 +66,12 @@ public class AppUtils
     public static boolean inAuthenticatedRealm()
     {
 	return CacheUtils.getAccessToken(null) == null ? false : true;
+    }
+
+    public static boolean inRegisteredSite(File cacheDir)
+    {
+	return inAuthenticatedRealm()
+	                && CacheUtils.getRegisteredSitesForUser(cacheDir).containsKey(OperatingSite.getSite().name);
     }
 
     public static Map<String, String> getDefaultQueryParams()

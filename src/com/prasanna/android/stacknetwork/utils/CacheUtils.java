@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -29,6 +29,7 @@ import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -52,10 +53,10 @@ public class CacheUtils
 	public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
     }
 
-    public static boolean hasSiteListCache(Context context)
+    public static boolean hasSiteListCache(File cacheDir)
     {
 	boolean present = false;
-	File file = new File(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
+	File file = new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
 
 	if (file != null)
 	{
@@ -66,13 +67,13 @@ public class CacheUtils
 	return present;
     }
 
-    public static void cacheSiteList(Context context, ArrayList<Site> sites)
+    public static void cacheSiteList(File cacheDir, ArrayList<Site> sites)
     {
-	if (context != null && sites != null && sites.isEmpty() == false)
+	if (cacheDir != null && sites != null && sites.isEmpty() == false)
 	{
 	    Log.d(TAG, "Caching sites");
 
-	    cacheObject(sites, context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME);
+	    cacheObject(sites, cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
 
 	    ArrayList<Site> registeredSites = new ArrayList<Site>();
 
@@ -88,18 +89,18 @@ public class CacheUtils
 		            registeredSites);
 
 	    if (!registeredSites.isEmpty())
-		cacheRegisteredSites(context, registeredSitesSoftReference.get());
+		cacheRegisteredSites(cacheDir, registeredSitesSoftReference.get());
 
 	}
     }
 
-    public static void cacheQuestion(Context context, Question question)
+    public static void cacheQuestion(File cacheDir, Question question)
     {
 	Log.d(TAG, "Caching question");
 
 	if (question != null && question.id > 0)
 	{
-	    File directory = new File(context.getCacheDir(), "questions");
+	    File directory = new File(cacheDir, "questions");
 
 	    cacheObject(question, directory, String.valueOf(question.id));
 	}
@@ -136,25 +137,32 @@ public class CacheUtils
 	}
     }
 
-    public static void cacheRegisteredSites(Context context, ArrayList<Site> sites)
+    public static void cacheRegisteredSites(File cacheDir, ArrayList<Site> sites)
     {
 	Log.d(TAG, "Caching registered sites");
 
-	cacheObject(sites, context.getCacheDir(), CacheFileName.REGD_SITE_CACHE_FILE_NAME);
+	HashMap<String, Site> sitesMap = new HashMap<String, Site>();
+
+	for (Site site : sites)
+	{
+	    sitesMap.put(site.name, site);
+	}
+
+	cacheObject(sitesMap, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
     }
 
     @SuppressWarnings("unchecked")
-    public static ArrayList<Site> fetchSiteListFromCache(Context context)
+    public static ArrayList<Site> fetchSiteListFromCache(File cacheDir)
     {
-	Log.d(TAG, context.getCacheDir().toString());
-	return (ArrayList<Site>) readObject(new File(context.getCacheDir(), CacheFileName.SITE_CACHE_FILE_NAME));
+	Log.d(TAG, cacheDir.toString());
+	return (ArrayList<Site>) readObject(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
     }
 
     @SuppressWarnings("unchecked")
-    public static ArrayList<Site> getRegisteredSitesForUser(Context context)
+    public static HashMap<String, Site> getRegisteredSitesForUser(File cacheDir)
     {
-	Log.d(TAG, context.getCacheDir().toString());
-	return (ArrayList<Site>) readObject(new File(context.getCacheDir(), CacheFileName.REGD_SITE_CACHE_FILE_NAME));
+	Log.d(TAG, cacheDir.toString());
+	return (HashMap<String, Site>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
     }
 
     /**
@@ -257,6 +265,11 @@ public class CacheUtils
 	return object;
     }
 
+    /**
+     * Clears application cache.
+     * 
+     * @param context
+     */
     public static void clear(Context context)
     {
 	if (context != null)
@@ -264,16 +277,22 @@ public class CacheUtils
 	    Log.d(TAG, "Clearing cache");
 
 	    File cacheDir = context.getCacheDir();
+
 	    if (cacheDir != null && cacheDir.isDirectory())
 	    {
 		deleteDir(cacheDir);
 	    }
 
-	    Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	    prefEditor.remove(StringConstants.ACCESS_TOKEN);
-	    prefEditor.commit();
-	    userAccessToken = null;
+	    removeAccessToken(context);
 	}
+    }
+
+    public static void removeAccessToken(Context context)
+    {
+	Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+	prefEditor.remove(StringConstants.ACCESS_TOKEN);
+	prefEditor.commit();
+	userAccessToken = null;
     }
 
     public static boolean deleteFile(File file)
@@ -312,6 +331,12 @@ public class CacheUtils
 	}
     }
 
+    /**
+     * Returns the access token for current logged in user.
+     * 
+     * @param context
+     * @return access token
+     */
     public static String getAccessToken(Context context)
     {
 	if (userAccessToken == null && context != null)
@@ -321,5 +346,34 @@ public class CacheUtils
 	}
 
 	return userAccessToken;
+    }
+
+    /**
+     * Returns current cache size in bytes.
+     * 
+     * @param cacheDir
+     * @return cache size in bytes.
+     */
+    public long size(File cacheDir)
+    {
+	long size = 0;
+	File[] files = cacheDir.listFiles();
+
+	for (File file : files)
+	{
+	    if (file.isFile())
+	    {
+		size += file.length();
+	    }
+	    else
+	    {
+		if (file.isDirectory())
+		{
+		    size += size(file);
+		}
+	    }
+	}
+
+	return size;
     }
 }
