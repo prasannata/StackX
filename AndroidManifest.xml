@@ -84,11 +84,6 @@
             android:launchMode="singleTask" >
         </activity>
         <activity
-            android:name=".UserTabsWidget"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
             android:name=".QuestionDetailActivity"
             android:configChanges="orientation|screenSize" />
         <activity
