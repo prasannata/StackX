@@ -283,14 +283,14 @@ public class CacheUtils
 		deleteDir(cacheDir);
 	    }
 
-	    removeAccessToken(context);
+	    clearSharedPreferences(context);
 	}
     }
 
-    public static void removeAccessToken(Context context)
+    public static void clearSharedPreferences(Context context)
     {
 	Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	prefEditor.remove(StringConstants.ACCESS_TOKEN);
+	prefEditor.clear();
 	prefEditor.commit();
 	userAccessToken = null;
     }

@@ -294,7 +294,8 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    @Override
 	    public void onClick(View paramView)
 	    {
-		yesNoDialog = DialogBuilder.yesNoDialog(QuestionDetailActivity.this, dialogClickListener);
+		yesNoDialog = DialogBuilder.yesNoDialog(QuestionDetailActivity.this, R.string.sureQuestion,
+		                dialogClickListener);
 		yesNoDialog.show();
 	    }
 	});

@@ -11,6 +11,7 @@
     <string name="userName">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="usersUri">/users</string>
     <string name="usersByIdUri">/users/{id}</string>
     <string name="questionsUri">/questions</string>
@@ -73,6 +74,11 @@
     <string name="about">About</string>
     <string name="vibrate">Vibrate</string>
     <string name="ringtone">Ringtone</string>
+    <string name="cacheMaxSizeInMb">Cache Max Size (MB)</string>
+    <string name="MB">MB</string>
+    <string name="storage">Storage</string>
+    <string name="account">Account</string>
+    <string name="logoutMsg">All your saved preferences, archives etc. will be lost. Okay?</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

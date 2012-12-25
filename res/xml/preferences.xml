@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceScreen
-        android:key="inboxPreference"
+    <PreferenceCategory
+        android:key="pref_storage"
+        android:persistent="false"
+        android:title="@string/storage" >
+        <EditTextPreference
+            android:defaultValue="2"
+            android:inputType="numberDecimal"
+            android:key="pref_cacheMaxSize"
+            android:title="@string/cacheMaxSizeInMb" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="pref_inbox"
         android:persistent="false"
         android:title="@string/menu_option_inbox" >
         <ListPreference
@@ -28,10 +38,12 @@
             android:showDefault="true"
             android:showSilent="true"
             android:title="@string/ringtone" />
-    </PreferenceScreen>
-
-    <ListPreference
-        android:key="pref_about"
-        android:title="@string/about" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="pref_account"
+        android:persistent="false"
+        android:title="@string/account" >
+        <ListPreference android:key="pref_accountAction" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

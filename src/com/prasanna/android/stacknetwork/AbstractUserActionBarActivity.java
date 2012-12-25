@@ -127,9 +127,12 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	switch (item.getItemId())
 	{
 	    case android.R.id.home:
-		Intent intent = new Intent(this, QuestionsActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(intent);
+		if (!getClass().getSimpleName().equals("QuestionsActivity"))
+		{
+		    Intent intent = new Intent(this, QuestionsActivity.class);
+		    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		    startActivity(intent);
+		}
 		break;
 	    case R.id.menu_refresh:
 		refresh();

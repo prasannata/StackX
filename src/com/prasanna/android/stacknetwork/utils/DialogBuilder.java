@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -27,10 +27,10 @@ import com.prasanna.android.stacknetwork.R;
 
 public class DialogBuilder
 {
-    public static AlertDialog yesNoDialog(Context context, DialogInterface.OnClickListener listener)
+    public static AlertDialog yesNoDialog(Context context, int msgResId, DialogInterface.OnClickListener listener)
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        return alertDialogBuilder.setMessage(R.string.sureQuestion).setPositiveButton(R.string.yes, listener)
+        return alertDialogBuilder.setMessage(msgResId).setPositiveButton(R.string.yes, listener)
                 .setNegativeButton(R.string.no, listener).create();
     }
 }

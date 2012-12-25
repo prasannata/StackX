@@ -1,33 +1,68 @@
+/*
+    Copyright (C) 2012 Prasanna Thirumalai
+    
+    This file is part of StackX.
+
+    StackX is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    StackX is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with StackX.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.prasanna.android.stacknetwork.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 
+import com.prasanna.android.stacknetwork.LogoutActivity;
+import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
 {
+    public static final String KEY_PREF_INBOX = "pref_inbox";
     public static final String KEY_PREF_INBOX_REFRESH_INTERVAL = "pref_inboxRefreshInterval";
     public static final String KEY_PREF_INBOX_NOTIFICATION = "pref_newNotification";
     public static final String KEY_PREF_NOTIF_VIBRATE = "pref_vibrate";
     public static final String KEY_PREF_NOTIF_RINGTONE = "pref_notificationTone";
+    public static final String KEY_PREF_CACHE_MAX_SIZE = "pref_cacheMaxSize";
+    public static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
 
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
     private ListPreference refreshIntervalPref;
+    private ListPreference accountActionPref;
     private RingtonePreference notifRingTonePref;
+    private EditTextPreference cacheMaxSizePreference;
+    private PreferenceCategory inboxPrefCategory;
 
     public static int getInboxRefreshInterval(Context context)
     {
@@ -66,8 +101,101 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
 	addPreferencesFromResource(R.xml.preferences);
 
+	setupAccountPreference();
+
+	setupInboxPreference();
+
+	setupCacheMaxSizePreference();
+    }
+
+    private void setupAccountPreference()
+    {
+	accountActionPref = (ListPreference) findPreference(KEY_PREF_ACCOUNT_ACTION);
+	accountActionPref.setEntryValues(new String[0]);
+	accountActionPref.setEntries(new String[0]);
+
+	if (AppUtils.inAuthenticatedRealm())
+	{
+	    setupLogoutPreference();
+	}
+	else
+	{
+	    setupLoginPreference();
+	}
+    }
+
+    private void setupLogoutPreference()
+    {
+	accountActionPref.setTitle(getString(R.string.logout));
+	accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+	{
+	    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+	    {
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+		    switch (which)
+		    {
+			case DialogInterface.BUTTON_POSITIVE:
+			    Intent logoutIntent = new Intent(getActivity(), LogoutActivity.class);
+			    logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			    logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			    startActivity(logoutIntent);
+			    break;
+
+			case DialogInterface.BUTTON_NEGATIVE:
+			    dialog.dismiss();
+			    break;
+		    }
+		}
+	    };
+
+	    @Override
+	    public boolean onPreferenceClick(Preference preference)
+	    {
+		accountActionPref.getDialog().dismiss();
+
+		AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg,
+		                dialogClickListener);
+		yesNoDialog.show();
+
+		return true;
+	    }
+	});
+    }
+
+    private void setupLoginPreference()
+    {
+	accountActionPref.setTitle(getString(R.string.login));
+	accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+	{
+	    @Override
+	    public boolean onPreferenceClick(Preference preference)
+	    {
+		accountActionPref.getDialog().dismiss();
+
+		Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
+		CacheUtils.clear(getActivity());
+		startActivity(oAuthIntent);
+		return true;
+	    }
+	});
+    }
+
+    private void setupInboxPreference()
+    {
+	inboxPrefCategory = (PreferenceCategory) findPreference(KEY_PREF_INBOX);
+	inboxPrefCategory.setEnabled(AppUtils.inAuthenticatedRealm());
 	refreshIntervalPref = (ListPreference) findPreference(KEY_PREF_INBOX_REFRESH_INTERVAL);
+	refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
+
 	setupRingtonePreference();
+    }
+
+    private void setupCacheMaxSizePreference()
+    {
+	cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
+	cacheMaxSizePreference.setSummary(cacheMaxSizePreference.getText());
     }
 
     private void setupRingtonePreference()
@@ -82,7 +210,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 		return true;
 	    }
 	});
-	refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
 
 	Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
 	                DEFAULT_RINGTONE));
@@ -110,6 +237,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	{
 	    refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
 	    AlarmUtils.rescheduleInboxRefreshAlarm(getActivity());
+	}
+	else if (key.equals(KEY_PREF_CACHE_MAX_SIZE))
+	{
+	    String cacheSize = sharedPreferences.getString(key, "");
+	    findPreference(KEY_PREF_CACHE_MAX_SIZE).setSummary(cacheSize);
 	}
     }
 
