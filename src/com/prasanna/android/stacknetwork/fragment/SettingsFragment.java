@@ -194,8 +194,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     private void setupCacheMaxSizePreference()
     {
-	String currentCacheSize = CacheUtils.getHumanReadableCacheSize(getActivity().getCacheDir());
-	
+	String currentCacheSize = CacheUtils.getQuestionDirSize(getActivity().getCacheDir());
+
 	cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
 	cacheMaxSizePreference.setSummary(cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: "
 	                + currentCacheSize);

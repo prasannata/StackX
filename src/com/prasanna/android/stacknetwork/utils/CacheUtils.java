@@ -382,6 +382,12 @@ public class CacheUtils
 	return size;
     }
 
+    /**
+     * Returns size of the specified cache directory in human readable form.
+     * 
+     * @param cacheDir
+     * @return size of the directory
+     */
     public static String getHumanReadableCacheSize(File cacheDir)
     {
 	long size = size(cacheDir);
@@ -394,6 +400,11 @@ public class CacheUtils
 	int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
 
 	return String.format("%.1f %sB", size / Math.pow(BYTE_UNIT, exp), sizeUnit[exp - 1]);
+    }
+
+    public static String getQuestionDirSize(File cacheDir)
+    {
+	return getHumanReadableCacheSize(new File(cacheDir, StringConstants.QUESTIONS));
     }
 
     public static void deleteQuestion(File cacheDir, long questionId)
