@@ -40,6 +40,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -147,6 +148,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    enableAnswersView();
 	}
     };
+    private RelativeLayout questionTitleLayout;
 
     private class QuestionDetailActivityFlingActionListenerImpl implements FlingActionListener
     {
@@ -223,6 +225,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	    flingScrollView = (FlingScrollView) findViewById(R.id.questionDisplayFlingScrollView);
 	    flingScrollView.flingActionListener = new QuestionDetailActivityFlingActionListenerImpl();
 	    detailLinearLayout = (LinearLayout) findViewById(R.id.questionAnswerDetail);
+	    questionTitleLayout = (RelativeLayout)findViewById(R.id.questionTitleLayout);
 	    answerHeader = (LinearLayout) findViewById(R.id.answerHeader);
 	    currentAnswerOfTotalTextView = (TextView) findViewById(R.id.currentAnswerOfTotal);
 	    currentAnswerAuthor = (Button) findViewById(R.id.currentAnswerAuthor);
@@ -346,7 +349,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	});
 
 	questionTitle = (TextView) findViewById(R.id.questionTitle);
-	questionTitle.setOnLongClickListener(new View.OnLongClickListener()
+	questionTitleLayout.setOnLongClickListener(new View.OnLongClickListener()
 	{
 	    @Override
 	    public boolean onLongClick(View paramView)

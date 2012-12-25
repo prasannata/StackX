@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.utils;
 
@@ -45,11 +45,12 @@ public class QuestionRowLayoutBuilder
 	return builder;
     }
 
-    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, boolean cached,
-	            Question question)
+    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, final boolean cached,
+	            final Question question)
     {
 	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
 	questionRowLayout.setId((int) question.id);
+
 	if (question.hasAcceptedAnswer == true)
 	{
 	    questionRowLayout.setBackgroundResource(R.drawable.question_answered_shape);
@@ -59,15 +60,7 @@ public class QuestionRowLayoutBuilder
 	createQuestionSnippetView(questionRowLayout, context, cached, question);
 	setupViewForTags(questionRowLayout, context, question);
 
-	return questionRowLayout;
-    }
-
-    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context,
-	            final boolean cached, final Question question)
-    {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
-	textView.setText(Html.fromHtml(question.title));
-	textView.setOnClickListener(new View.OnClickListener()
+	questionRowLayout.setOnClickListener(new View.OnClickListener()
 	{
 	    public void onClick(View view)
 	    {
@@ -81,6 +74,15 @@ public class QuestionRowLayoutBuilder
 		context.startActivity(displayQuestionIntent);
 	    }
 	});
+
+	return questionRowLayout;
+    }
+
+    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context,
+	            final boolean cached, final Question question)
+    {
+	TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
+	textView.setText(Html.fromHtml(question.title));
     }
 
     private void setupViewForTags(final LinearLayout parentLayout, final Context context, final Question question)

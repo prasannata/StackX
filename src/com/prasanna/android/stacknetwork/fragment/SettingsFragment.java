@@ -197,8 +197,13 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	String currentCacheSize = CacheUtils.getQuestionDirSize(getActivity().getCacheDir());
 
 	cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
-	cacheMaxSizePreference.setSummary(cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: "
-	                + currentCacheSize);
+	cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
+    }
+
+    private String getCacheSizeSummary(String currentCacheSize)
+    {
+	return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: "
+	                + currentCacheSize;
     }
 
     private void setupRingtonePreference()
@@ -244,7 +249,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	else if (key.equals(KEY_PREF_CACHE_MAX_SIZE))
 	{
 	    String cacheSize = sharedPreferences.getString(key, "");
-	    findPreference(KEY_PREF_CACHE_MAX_SIZE).setSummary(cacheSize);
+	    findPreference(KEY_PREF_CACHE_MAX_SIZE).setSummary(getCacheSizeSummary(cacheSize));
 	}
     }
 
