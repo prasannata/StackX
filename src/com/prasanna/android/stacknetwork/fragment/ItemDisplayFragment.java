@@ -29,9 +29,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
@@ -99,14 +96,6 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	super.onCreate(savedInstanceState);
 
 	registerHttpErrorReceiver();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-	itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
-
-	return itemsContainer;
     }
 
     @Override

@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/itemScrollContainer"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/white"
     android:orientation="vertical" >
 
     <com.prasanna.android.views.ScrollViewWithNotifier
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/itemScroller"
+        android:id="@+id/scroller_with_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <fragment
-            android:id="@+id/questionsFragment"
-            android:name="com.prasanna.android.stacknetwork.fragment.QuestionsFragment"
+        <LinearLayout
+            android:id="@+id/ll_in_scroller"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
     </com.prasanna.android.views.ScrollViewWithNotifier>
 
 </LinearLayout>

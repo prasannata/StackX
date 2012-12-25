@@ -57,7 +57,7 @@ public class TagFaqIntentService extends AbstractIntentService
 	    Intent broadcastIntent = new Intent();
 	    broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
 	    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	    broadcastIntent.putExtra(StringConstants.QUESTIONS, questions);
+	    broadcastIntent.putExtra(QuestionIntentAction.QUESTIONS.getExtra(), questions);
 	    sendBroadcast(broadcastIntent);
 	}
 	catch (HttpErrorException e)

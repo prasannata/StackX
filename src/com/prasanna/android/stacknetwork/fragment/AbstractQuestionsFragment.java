@@ -29,18 +29,25 @@ import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 
 public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Question>
 {
     private int itemDisplayCursor = 0;
 
+    protected abstract LinearLayout getQuestionsParentLayout();
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
 	itemDisplayCursor = 0;
-
 	return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public String getReceiverExtraName()
+    {
+	return QuestionIntentAction.QUESTIONS.getExtra();
     }
 
     @Override
@@ -60,16 +67,11 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
 	{
 	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
 		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
-	    itemsContainer.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+	    getQuestionsParentLayout().addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
 		            LayoutParams.WRAP_CONTENT));
 	}
 
 	serviceRunning = false;
     }
 
-    @Override
-    public String getReceiverExtraName()
-    {
-	return StringConstants.QUESTIONS;
-    }
 }

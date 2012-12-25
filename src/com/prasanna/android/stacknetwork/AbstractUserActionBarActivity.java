@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork;
 import java.util.HashMap;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -207,10 +206,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     @Override
     public boolean onQueryTextSubmit(String query)
     {
-	Intent intent = new Intent(this, QuestionSearchResultsActivity.class);
-	intent.putExtra(SearchManager.QUERY, query);
-	startActivity(intent);
-	return true;
+	return false;
     }
 
     @Override

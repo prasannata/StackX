@@ -26,7 +26,7 @@ import android.util.Log;
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -95,9 +95,9 @@ public class UserQuestionsIntentService extends AbstractIntentService
 	ArrayList<Question> questions = userService.getAllQuestions(page);
 
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+	broadcastIntent.setAction(QuestionIntentAction.QUESTIONS.name());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(StringConstants.QUESTIONS, questions);
+	broadcastIntent.putExtra(QuestionIntentAction.QUESTIONS.getExtra(), questions);
 	sendBroadcast(broadcastIntent);
 
 	Log.d(TAG, "Questions fetched and broadcasted");
@@ -106,9 +106,9 @@ public class UserQuestionsIntentService extends AbstractIntentService
     private void broadcastIntent(ArrayList<Question> questions)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	broadcastIntent.setAction(UserIntentAction.QUESTIONS_BY_USER.name());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(StringConstants.QUESTIONS, questions);
+	broadcastIntent.putExtra(QuestionIntentAction.QUESTIONS.getExtra(), questions);
 	sendBroadcast(broadcastIntent);
     }
 }

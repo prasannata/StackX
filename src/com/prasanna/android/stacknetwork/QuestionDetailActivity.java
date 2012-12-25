@@ -491,7 +491,6 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     @Override
     protected void onCreateOptionsMenuPostProcess(Menu menu)
     {
-	menu.removeItem(R.id.menu_search);
     }
 
     private void stopServiceAndUnregsiterReceiver()

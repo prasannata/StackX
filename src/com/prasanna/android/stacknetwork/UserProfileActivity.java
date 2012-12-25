@@ -26,12 +26,14 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.view.Menu;
 
+import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.QuestionAction;
 import com.prasanna.android.stacknetwork.fragment.UserAnswersFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionsFragment;
+import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnGetQuestionsListener;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
-public class UserProfileActivity extends AbstractUserActionBarActivity
+public class UserProfileActivity extends AbstractUserActionBarActivity implements OnGetQuestionsListener
 {
     public class TabListener implements ActionBar.TabListener
     {
@@ -103,7 +105,13 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     @Override
     protected void onCreateOptionsMenuPostProcess(Menu menu)
     {
-	menu.removeItem(R.id.menu_search);
 	menu.removeItem(R.id.menu_my_profile);
+    }
+
+    @Override
+    public void onGetQuestions(QuestionAction questionAction, String tag)
+    {
+	// TODO Auto-generated method stub
+	
     }
 }

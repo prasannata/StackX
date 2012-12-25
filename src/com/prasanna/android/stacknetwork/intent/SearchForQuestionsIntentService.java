@@ -55,7 +55,7 @@ public class SearchForQuestionsIntentService extends AbstractIntentService
 	    Intent broadcastIntent = new Intent();
 	    broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
 	    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	    broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.getExtra(), QuestionService
+	    broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTIONS.getExtra(), QuestionService
 		            .getInstance().search(query, page));
 	    sendBroadcast(broadcastIntent);
 	}

@@ -155,7 +155,6 @@ public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
     protected void onCreateOptionsMenuPostProcess(final Menu menu)
     {
 	this.menu = menu;
-	menu.removeItem(R.id.menu_search);
 	menu.removeItem(R.id.menu_refresh);
 	setOnDiscardOptionClick(new OnDiscardOptionListener()
 	{

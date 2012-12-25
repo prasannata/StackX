@@ -24,25 +24,33 @@ import java.util.ArrayList;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.ArrayAdapter;
 
-import com.prasanna.android.stacknetwork.fragment.ItemDisplayFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment;
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnTagSelectedListener;
-import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnGetQuestionsListener;
+import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.QuestionAction;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.FetchTagsAsyncTask;
+import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class QuestionsActivity extends AbstractQuestionsDisplayActivity implements OnTagSelectedListener
+public class QuestionsActivity extends AbstractUserActionBarActivity implements OnGetQuestionsListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
 
-    private ItemDisplayFragment<Question> currentFragment = null;
+    protected boolean serviceRunning = false;
+
+    protected Intent questionsIntent;
+
+    private ScrollViewWithNotifier scrollView;
+
+    private ArrayList<String> tags = new ArrayList<String>();
 
     private int itemPosition;
 
@@ -74,7 +82,11 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity implemen
 	    {
 		if (itemPosition >= 0 && itemPosition < tags.size())
 		{
-		    onTagSelected(itemPosition == 0, tags.get(itemPosition));
+		    if (itemPosition == 0)
+			onGetQuestions(QuestionAction.FRONT_PAGE, null);
+		    else
+			onGetQuestions(QuestionAction.FAQS_TAG, tags.get(itemPosition));
+
 		    return true;
 		}
 
@@ -92,7 +104,19 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity implemen
     {
 	super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.questions);
+	setContentView(R.layout.items_scroll_layout);
+
+	scrollView = (ScrollViewWithNotifier) findViewById(R.id.itemScroller);
+	scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	{
+	    @Override
+	    public void onScrollToBottom(View view)
+	    {
+		QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+		                R.id.questionsFragment);
+		questionsFragment.onScrollToBottom();
+	    }
+	});
 
 	int lastSavedPosition = -1;
 
@@ -116,62 +140,27 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity implemen
     }
 
     @Override
-    protected void startQuestionsService()
-    {
-	if (currentFragment != null)
-	{
-	    currentFragment.startIntentService();
-	}
-    }
-
-    @Override
-    protected void registerQuestionsSearchReceiver()
-    {
-    }
-
-    @Override
     public void refresh()
     {
-	if (currentFragment != null)
-	{
-	    currentFragment.refresh();
-	}
+	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+	                R.id.questionsFragment);
+	questionsFragment.refresh();
     }
 
     @Override
     public Context getCurrentContext()
     {
-	return QuestionsActivity.this;
-    }
-
-    @Override
-    protected String getLogTag()
-    {
-	return TAG;
-    }
-
-    @Override
-    protected QuestionIntentAction getReceiverIntentAction()
-    {
-	return QuestionIntentAction.QUESTIONS;
+	return this;
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
+	Log.d(TAG, "Saving activity instance");
 	outState.putSerializable(StringConstants.TAGS, tags);
 	outState.putInt(StringConstants.ITEM_POSITION, itemPosition);
 
 	super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onScrollToBottom()
-    {
-	if (currentFragment != null)
-	{
-	    currentFragment.onScrollToBottom();
-	}
     }
 
     @Override
@@ -180,13 +169,32 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity implemen
     }
 
     @Override
-    public void onTagSelected(boolean frontPage, String tag)
+    public boolean onQueryTextSubmit(String query)
+    {
+	onGetQuestions(QuestionAction.SEARCH, query);
+	return true;
+    }
+
+    @Override
+    public void onGetQuestions(QuestionAction questionAction, String term)
     {
 	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
-	                R.id.questionsFragmnet);
-	if (frontPage)
-	    questionsFragment.loadFrontPage();
-	else
-	    questionsFragment.loadFaqsForTag(tag);
+	                R.id.questionsFragment);
+
+	switch (questionAction)
+	{
+	    case FRONT_PAGE:
+		questionsFragment.loadFrontPage();
+		break;
+	    case FAQS_TAG:
+		questionsFragment.getFaqsForTag(term);
+		break;
+	    case SEARCH:
+		questionsFragment.search(term);
+		break;
+	    default:
+		break;
+	}
+
     }
 }

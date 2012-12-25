@@ -39,89 +39,94 @@ import com.prasanna.android.views.ScrollViewWithNotifier;
 public class UserQuestionsFragment extends AbstractQuestionsFragment
 {
     private static final String TAG = UserQuestionsFragment.class.getSimpleName();
-    private LinearLayout scrollViewContainer;
-    private ScrollViewWithNotifier itemScroller;
+    private ScrollViewWithNotifier scroller;
     private User user;
     private Intent intent;
     private int page = 0;
+    private LinearLayout parentLayout;
+    private LinearLayout itemsLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        page = 0;
-        
-        if (items == null || items.isEmpty() == true)
-        {
-            user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
+	super.onCreate(savedInstanceState);
+	page = 0;
 
-            registerReceiver();
+	if (items == null || items.isEmpty() == true)
+	{
+	    user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-            startIntentService();
-        }
+	    registerReceiver();
+
+	    startIntentService();
+	}
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "Creating question fragment");
+	Log.d(TAG, "Creating question fragment");
 
-        super.onCreateView(inflater, container, savedInstanceState);
+	parentLayout = (LinearLayout) inflater.inflate(R.layout.scroll_linear_layout, null);
+	scroller = (ScrollViewWithNotifier) parentLayout.findViewById(R.id.scroller_with_linear_layout);
+	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
+	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	{
+	    @Override
+	    public void onScrollToBottom(View view)
+	    {
+		if (loadingProgressView == null)
+		{
+		    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(
+			            R.layout.loading_progress, null);
+		    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+			            LayoutParams.WRAP_CONTENT);
+		    layoutParams.setMargins(0, 15, 0, 15);
+		    parentLayout.addView(loadingProgressView, layoutParams);
+		}
 
-        scrollViewContainer = (LinearLayout) inflater.inflate(R.layout.items_scroll_layout, null);
-        itemScroller = (ScrollViewWithNotifier) scrollViewContainer.findViewById(R.id.itemScroller);
-        itemScroller.addView(itemsContainer);
-        itemScroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-        {
-            @Override
-            public void onScrollToBottom(View view)
-            {
-                if (loadingProgressView == null)
-                {
-                    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(
-                            R.layout.loading_progress, null);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                            LayoutParams.WRAP_CONTENT);
-                    layoutParams.setMargins(0, 15, 0, 15);
-                    itemsContainer.addView(loadingProgressView, layoutParams);
-                }
+		startIntentService();
+	    }
+	});
 
-                startIntentService();
-            }
-        });
+	showLoadingDialog();
 
-        showLoadingDialog();
-        
-        if (items != null && items.isEmpty() == false)
-        {
-            displayItems();
-        }
+	if (items != null && items.isEmpty() == false)
+	{
+	    displayItems();
+	}
 
-        return scrollViewContainer;
+	return parentLayout;
     }
 
-    
     @Override
     protected void registerReceiver()
     {
-        IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(receiver, filter);
+	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	getActivity().registerReceiver(receiver, filter);
     }
 
     @Override
     public void startIntentService()
     {
-        intent = getIntentForService(UserQuestionsIntentService.class, IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
-        intent.putExtra(StringConstants.USER_ID, user.id);
-        intent.putExtra(StringConstants.PAGE, ++page);
-        intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
-        getActivity().startService(intent);
+	intent = getIntentForService(UserQuestionsIntentService.class,
+	                IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	intent.putExtra(StringConstants.USER_ID, user.id);
+	intent.putExtra(StringConstants.PAGE, ++page);
+	intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
+	getActivity().startService(intent);
     }
 
     @Override
     public String getLogTag()
     {
-        return TAG;
+	return TAG;
+    }
+
+    @Override
+    protected LinearLayout getQuestionsParentLayout()
+    {
+	return itemsLayout;
     }
 }

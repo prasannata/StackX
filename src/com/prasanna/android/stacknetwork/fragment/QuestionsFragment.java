@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -29,13 +30,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.intent.SearchForQuestionsIntentService;
 import com.prasanna.android.stacknetwork.intent.TagFaqIntentService;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsFragment extends AbstractQuestionsFragment
 {
@@ -47,9 +51,16 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 
     private IntentFilter filter;
 
-    public interface OnTagSelectedListener
+    public enum QuestionAction
     {
-	void onTagSelected(boolean frontPage, String tag);
+	FRONT_PAGE,
+	FAQS_TAG,
+	SEARCH;
+    }
+
+    public interface OnGetQuestionsListener
+    {
+	void onGetQuestions(QuestionAction questionAction, String tag);
     }
 
     @Override
@@ -57,16 +68,18 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     {
 	super.onAttach(activity);
 
-	if (!(activity instanceof OnTagSelectedListener))
-	    throw new ClassCastException(activity.toString() + " must implement OnTagSelectedListener");
+	if (!(activity instanceof OnGetQuestionsListener))
+	    throw new ClassCastException(activity.toString() + " must implement OnGetQuestionsListener");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	return super.onCreateView(inflater, container, savedInstanceState);
-    }
+	itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
 
+	return itemsContainer;
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -76,8 +89,11 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 	if (savedInstanceState != null)
 	{
 	    Log.d(TAG, "onCreate savedInstanceState");
+
 	    items = (ArrayList<Question>) savedInstanceState.getSerializable(StringConstants.QUESTIONS);
-	    displayItems();
+
+	    if (items != null)
+		displayItems();
 	}
     }
 
@@ -96,6 +112,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
+	intent.putExtra(StringConstants.PAGE, ++currentPage);
 	getActivity().startService(intent);
 	serviceRunning = true;
     }
@@ -103,7 +120,6 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     @Override
     protected void registerReceiver()
     {
-
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	getActivity().registerReceiver(receiver, filter);
     }
@@ -137,10 +153,8 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     {
 	clean();
 
-	intent = getIntentForService(UserQuestionsIntentService.class,
-	                IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
-	intent.setAction(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
-	intent.putExtra(StringConstants.PAGE, ++currentPage);
+	intent = getIntentForService(UserQuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
+	intent.setAction(QuestionIntentAction.QUESTIONS.name());
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
 	showLoadingDialog();
@@ -150,14 +164,13 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 	startIntentService();
     }
 
-    public void loadFaqsForTag(String tag)
+    public void getFaqsForTag(String tag)
     {
 	clean();
 
-	intent = getIntentForService(TagFaqIntentService.class, IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
-	intent.setAction(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
+	intent = getIntentForService(TagFaqIntentService.class, QuestionIntentAction.TAGS_FAQ.name());
+	intent.setAction(QuestionIntentAction.TAGS_FAQ.name());
 	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), tag);
-	intent.putExtra(StringConstants.PAGE, ++currentPage);
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
 
 	showLoadingDialog();
@@ -165,5 +178,28 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 	registerReceiver();
 
 	startIntentService();
+    }
+
+    public void search(String query)
+    {
+	clean();
+
+	intent = getIntentForService(SearchForQuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.name());
+	intent.putExtra(SearchManager.QUERY, query);
+
+	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
+
+	showLoadingDialog();
+
+	registerReceiver();
+
+	startIntentService();
+
+    }
+
+    @Override
+    protected LinearLayout getQuestionsParentLayout()
+    {
+	return itemsContainer;
     }
 }
