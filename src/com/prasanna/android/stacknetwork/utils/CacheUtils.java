@@ -44,8 +44,9 @@ import com.prasanna.android.stacknetwork.model.User.UserType;
 public class CacheUtils
 {
     private static final String TAG = CacheUtils.class.getSimpleName();
-
+    private static final int BYTE_UNIT = 1024;
     private static String userAccessToken;
+    private static final String[] sizeUnit = { "K", "M" };
 
     public static class CacheFileName
     {
@@ -100,7 +101,7 @@ public class CacheUtils
 
 	if (question != null && question.id > 0)
 	{
-	    File directory = new File(cacheDir, "questions");
+	    File directory = new File(cacheDir, StringConstants.QUESTIONS);
 
 	    cacheObject(question, directory, String.valueOf(question.id));
 	}
@@ -354,26 +355,50 @@ public class CacheUtils
      * @param cacheDir
      * @return cache size in bytes.
      */
-    public long size(File cacheDir)
+    public static long size(File cacheDir)
     {
 	long size = 0;
-	File[] files = cacheDir.listFiles();
 
-	for (File file : files)
+	if (cacheDir != null && cacheDir.isDirectory())
 	{
-	    if (file.isFile())
+	    File[] files = cacheDir.listFiles();
+
+	    for (File file : files)
 	    {
-		size += file.length();
-	    }
-	    else
-	    {
-		if (file.isDirectory())
+		if (file.isFile())
 		{
-		    size += size(file);
+		    size += file.length();
+		}
+		else
+		{
+		    if (file.isDirectory())
+		    {
+			size += size(file);
+		    }
 		}
 	    }
 	}
 
 	return size;
+    }
+
+    public static String getHumanReadableCacheSize(File cacheDir)
+    {
+	long size = size(cacheDir);
+
+	if (size < BYTE_UNIT)
+	{
+	    return size + " B";
+	}
+
+	int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
+
+	return String.format("%.1f %sB", size / Math.pow(BYTE_UNIT, exp), sizeUnit[exp - 1]);
+    }
+
+    public static void deleteQuestion(File cacheDir, long questionId)
+    {
+	File directory = new File(cacheDir, StringConstants.QUESTIONS);
+	deleteFile(new File(directory, String.valueOf(questionId)));
     }
 }

@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork;
 
@@ -30,6 +30,7 @@ import android.graphics.Point;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -220,6 +221,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 		            LayoutParams.WRAP_CONTENT));
 	}
 
+    }
+
+    @Override
+    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    {
+	menu.removeItem(R.id.menu_search);
+	menu.removeItem(R.id.menu_refresh);
     }
 
     @Override

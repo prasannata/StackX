@@ -428,7 +428,7 @@ public class UserService extends AbstractBaseService
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.POPULAR);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));

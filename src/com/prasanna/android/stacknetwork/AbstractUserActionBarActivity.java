@@ -31,12 +31,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.SearchView;
 
 import com.prasanna.android.cache.LRU;
+import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
@@ -48,14 +48,16 @@ import com.prasanna.android.task.FetchImageAsyncTask;
 
 public abstract class AbstractUserActionBarActivity extends Activity implements SearchView.OnQueryTextListener
 {
-    protected SearchView searchView;
     private String accessToken;
-
+    protected SearchView searchView;
     private static LRU<String, Bitmap> iconCache = new LRU<String, Bitmap>(3);
+    private OnDiscardOptionListener discardOptionListener;
 
-    public abstract void refresh();
+    protected abstract void refresh();
 
-    public abstract Context getCurrentContext();
+    protected abstract Context getCurrentContext();
+
+    protected abstract void onCreateOptionsMenuPostProcess(Menu menu);
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -71,13 +73,11 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	    loadIcon();
 	}
 
-	MenuInflater menuInflater = getMenuInflater();
-	menuInflater.inflate(R.menu.action_menu, menu);
-	MenuItem searchItem = menu.findItem(R.id.menu_search);
+	getMenuInflater().inflate(R.menu.action_menu, menu);
 
-	searchView = (SearchView) searchItem.getActionView();
+	searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
 	searchView.setOnQueryTextListener(this);
-	searchView.setQueryHint("Search in title");
+	searchView.setQueryHint(getString(R.string.searchInTitle));
 
 	MenuItem menuOptions = menu.findItem(R.id.menu_options);
 	SubMenu subMenu = menuOptions.getSubMenu();
@@ -87,14 +87,16 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	{
 	    Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
 
-	    subMenu.removeItem(R.id.menu_profile);
-	    subMenu.removeItem(R.id.menu_option_inbox);
+	    subMenu.removeItem(R.id.menu_my_profile);
+	    subMenu.removeItem(R.id.menu_my_inbox);
 	    subMenu.removeItem(R.id.menu_option_logout);
 	}
 	else
 	{
 	    subMenu.removeItem(R.id.menu_option_login);
 	}
+
+	onCreateOptionsMenuPostProcess(menu);
 
 	return super.onCreateOptionsMenu(menu);
     }
@@ -139,7 +141,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		break;
 	    case R.id.menu_search:
 		break;
-	    case R.id.menu_profile:
+	    case R.id.menu_my_profile:
 		Intent userProfileIntent = IntentUtils.createUserProfileIntent(getCurrentContext(), getAccessToken());
 		startActivity(userProfileIntent);
 		break;
@@ -147,7 +149,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
 		startActivity(archiveIntent);
 		break;
-	    case R.id.menu_option_inbox:
+	    case R.id.menu_my_inbox:
 		Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
 		userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
 		startActivity(userInboxIntent);
@@ -168,6 +170,12 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	    case R.id.menu_option_logout:
 		Intent logoutIntent = new Intent(this, LogoutActivity.class);
 		startActivity(logoutIntent);
+		break;
+	    case R.id.menu_discard:
+		if(discardOptionListener != null)
+		{
+		    discardOptionListener.onDiscardOptionClick();
+		}
 		break;
 	    case R.id.menu_option_test_gen_notify:
 		Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.name());
@@ -209,5 +217,10 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     public boolean onQueryTextChange(String paramString)
     {
 	return false;
+    }
+
+    protected void setOnDiscardOptionClick(OnDiscardOptionListener discardOptionListener)
+    {
+	this.discardOptionListener = discardOptionListener;
     }
 }

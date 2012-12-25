@@ -5,22 +5,32 @@
     android:background="@drawable/question_unanswered_shape"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/questionSnippetTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:textColor="@color/black"
-        android:textSize="18sp" />
-
-    <!--
-         <View
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/veryLightGrey" />
-    -->
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <CheckBox
+            android:id="@+id/deleteQuestionCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="2dp"
+            android:button="@drawable/checkbox"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/questionSnippetTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/questionSnippetTags"
@@ -29,8 +39,7 @@
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="2dp"
         android:layout_marginTop="3dp"
-        android:orientation="horizontal" >
-    </LinearLayout>
+        android:orientation="horizontal" />
 
     <LinearLayout
         android:id="@+id/questionCountLinearLayout"

@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -24,6 +24,7 @@ import android.app.ActionBar.Tab;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.view.Menu;
 
 import com.prasanna.android.stacknetwork.fragment.UserAnswersFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
@@ -34,68 +35,75 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
 {
     public class TabListener implements ActionBar.TabListener
     {
-        private final Fragment fragment;
+	private final Fragment fragment;
 
-        public TabListener(Fragment fragment)
-        {
-            this.fragment = fragment;
-        }
+	public TabListener(Fragment fragment)
+	{
+	    this.fragment = fragment;
+	}
 
-        public void onTabSelected(Tab tab, FragmentTransaction ft)
-        {
-            ft.add(R.id.fragmentContainer, fragment, null);
-        }
+	public void onTabSelected(Tab tab, FragmentTransaction ft)
+	{
+	    ft.add(R.id.fragmentContainer, fragment, null);
+	}
 
-        public void onTabUnselected(Tab tab, FragmentTransaction ft)
-        {
-            ft.remove(fragment);
-        }
+	public void onTabUnselected(Tab tab, FragmentTransaction ft)
+	{
+	    ft.remove(fragment);
+	}
 
-        public void onTabReselected(Tab tab, FragmentTransaction ft)
-        {
-            onTabUnselected(tab, ft);
-            onTabSelected(tab, ft);
-        }
+	public void onTabReselected(Tab tab, FragmentTransaction ft)
+	{
+	    onTabUnselected(tab, ft);
+	    onTabSelected(tab, ft);
+	}
     }
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.ll_whitebg_vertical);
+	setContentView(R.layout.ll_whitebg_vertical);
 
-        setupActionBarTabs();
+	setupActionBarTabs();
     }
 
     private void setupActionBarTabs()
     {
-        ActionBar actionBar = getActionBar();
-        getActionBar().setTitle(OperatingSite.getSite().name);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        Tab profileTab = actionBar.newTab();
-        profileTab.setIcon(R.drawable.person).setTabListener(new TabListener(new UserProfileFragment()));
-        actionBar.addTab(profileTab);
+	ActionBar actionBar = getActionBar();
+	getActionBar().setTitle(OperatingSite.getSite().name);
+	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+	Tab profileTab = actionBar.newTab();
+	profileTab.setIcon(R.drawable.person).setTabListener(new TabListener(new UserProfileFragment()));
+	actionBar.addTab(profileTab);
 
-        Tab questionsTab = actionBar.newTab();
-        questionsTab.setIcon(R.drawable.question_mark).setTabListener(new TabListener(new UserQuestionsFragment()));
-        actionBar.addTab(questionsTab);
+	Tab questionsTab = actionBar.newTab();
+	questionsTab.setIcon(R.drawable.question_mark).setTabListener(new TabListener(new UserQuestionsFragment()));
+	actionBar.addTab(questionsTab);
 
-        Tab answersTab = actionBar.newTab();
-        answersTab.setIcon(R.drawable.answers).setTabListener(new TabListener(new UserAnswersFragment()));
-        actionBar.addTab(answersTab);
+	Tab answersTab = actionBar.newTab();
+	answersTab.setIcon(R.drawable.answers).setTabListener(new TabListener(new UserAnswersFragment()));
+	actionBar.addTab(answersTab);
     }
 
     @Override
     public void refresh()
     {
-        // TODO: Find a way to inform the fragment within current selected tab
-        // to refresh
+	// TODO: Find a way to inform the fragment within current selected tab
+	// to refresh
     }
 
     @Override
     public Context getCurrentContext()
     {
-        return UserProfileActivity.this;
+	return UserProfileActivity.this;
+    }
+    
+    @Override
+    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    {
+	menu.removeItem(R.id.menu_search);
+	menu.removeItem(R.id.menu_my_profile);
     }
 }

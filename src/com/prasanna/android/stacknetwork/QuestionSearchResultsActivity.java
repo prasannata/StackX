@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -154,6 +155,11 @@ public class QuestionSearchResultsActivity extends AbstractQuestionsDisplayActiv
             questionsLinearLayout.addView(loadingProgressView, layoutParams);
             startQuestionsService();
         }
+    }
+
+    @Override
+    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    {
     }
 
 }

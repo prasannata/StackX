@@ -79,6 +79,7 @@
     <string name="storage">Storage</string>
     <string name="account">Account</string>
     <string name="logoutMsg">All your saved preferences, archives etc. will be lost. Okay?</string>
+    <string name="searchInTitle">Search in title</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

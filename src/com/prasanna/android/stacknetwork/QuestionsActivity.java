@@ -27,6 +27,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.widget.ArrayAdapter;
 
 import com.prasanna.android.stacknetwork.fragment.FrontPageFragment;
@@ -56,10 +57,13 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 	@Override
 	public void notifyOnCompletion(ArrayList<String> result)
 	{
-	    tags.add(StringConstants.FRONT_PAGE);
-	    tags.addAll(result);
+	    if (result != null)
+	    {
+		tags.add(StringConstants.FRONT_PAGE);
+		tags.addAll(result);
 
-	    initActionBarSpinner();
+		initActionBarSpinner();
+	    }
 	}
     }
 
@@ -204,5 +208,10 @@ public class QuestionsActivity extends AbstractQuestionsDisplayActivity
 	{
 	    currentFragment.onScrollToBottom();
 	}
+    }
+    
+    @Override
+    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    {
     }
 }

@@ -2,6 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/menu_discard"
+        android:icon="@drawable/discard"
+        android:orderInCategory="0"
+        android:showAsAction="always"
+        android:visible="false"
+        android:title="@string/delete"/>
+    <item
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/search"
@@ -9,64 +16,64 @@
         android:showAsAction="always"
         android:title="@string/menu_search"/>
     <item
+        android:id="@+id/menu_refresh"
+        android:icon="@drawable/refresh"
+        android:orderInCategory="1"
+        android:showAsAction="always"
+        android:title="@string/menu_refresh"/>
+    <item
+        android:id="@+id/menu_my_profile"
+        android:icon="@drawable/person"
+        android:orderInCategory="2"
+        android:showAsAction="always"
+        android:title="@string/menu_profile"/>
+    <item
+        android:id="@+id/menu_my_inbox"
+        android:icon="@drawable/email"
+        android:orderInCategory="3"
+        android:showAsAction="always"
+        android:title="@string/menu_option_inbox"/>
+    <item
         android:id="@+id/menu_options"
         android:icon="@drawable/expand"
-        android:orderInCategory="2"
+        android:orderInCategory="4"
         android:showAsAction="ifRoom"
         android:title="@string/menu_options">
         <menu>
             <item
-                android:id="@+id/menu_profile"
-                android:icon="@drawable/person"
-                android:orderInCategory="0"
-                android:showAsAction="always"
-                android:title="@string/menu_profile"/>
-            <item
-                android:id="@+id/menu_refresh"
-                android:icon="@drawable/refresh"
-                android:orderInCategory="1"
-                android:showAsAction="always"
-                android:title="@string/menu_refresh"/>
-            <item
-                android:id="@+id/menu_option_inbox"
-                android:icon="@drawable/email"
-                android:orderInCategory="2"
-                android:showAsAction="always"
-                android:title="@string/menu_option_inbox"/>
-            <item
                 android:id="@+id/menu_option_archive"
                 android:icon="@drawable/save_light"
-                android:orderInCategory="3"
+                android:orderInCategory="0"
                 android:showAsAction="always"
                 android:title="@string/menu_option_archive"/>
             <item
                 android:id="@+id/menu_option_change_site"
                 android:icon="@drawable/labels"
-                android:orderInCategory="4"
+                android:orderInCategory="1"
                 android:showAsAction="always"
                 android:title="@string/menu_option_change_site"/>
             <item
                 android:id="@+id/menu_option_settings"
                 android:icon="@drawable/settings_white"
-                android:orderInCategory="5"
+                android:orderInCategory="2"
                 android:showAsAction="always"
                 android:title="@string/menu_option_settings"/>
             <item
                 android:id="@+id/menu_option_login"
                 android:icon="@drawable/login"
-                android:orderInCategory="6"
+                android:orderInCategory="3"
                 android:showAsAction="always"
                 android:title="@string/menu_option_login"/>
             <item
                 android:id="@+id/menu_option_logout"
                 android:icon="@drawable/logout"
-                android:orderInCategory="7"
+                android:orderInCategory="4"
                 android:showAsAction="always"
                 android:title="@string/menu_option_logout"/>
             <item
                 android:id="@+id/menu_option_test_gen_notify"
                 android:icon="@drawable/new_msg_notify"
-                android:orderInCategory="8"
+                android:orderInCategory="5"
                 android:showAsAction="always"
                 android:title="Notify Test"/>
         </menu>

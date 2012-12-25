@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -49,6 +49,7 @@ public class QuestionRowLayoutBuilder
 	            Question question)
     {
 	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
+	questionRowLayout.setId((int) question.id);
 	if (question.hasAcceptedAnswer == true)
 	{
 	    questionRowLayout.setBackgroundResource(R.drawable.question_answered_shape);

@@ -34,6 +34,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -482,6 +483,12 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
 	super.onStop();
 
 	stopServiceAndUnregsiterReceiver();
+    }
+
+    @Override
+    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    {
+	menu.removeItem(R.id.menu_search);
     }
 
     private void stopServiceAndUnregsiterReceiver()
