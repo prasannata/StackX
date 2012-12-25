@@ -412,4 +412,10 @@ public class CacheUtils
 	File directory = new File(cacheDir, StringConstants.QUESTIONS);
 	deleteFile(new File(directory, String.valueOf(questionId)));
     }
+
+    public static void deleteAllQuestions(File cacheDir)
+    {
+	File directory = new File(cacheDir, StringConstants.QUESTIONS);
+	deleteDir(directory);
+    }
 }

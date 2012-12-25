@@ -6,70 +6,70 @@
         android:icon="@drawable/discard"
         android:orderInCategory="0"
         android:showAsAction="always"
-        android:visible="false"
-        android:title="@string/delete"/>
+        android:title="@string/delete"
+        android:visible="false"/>
     <item
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/search"
         android:orderInCategory="0"
         android:showAsAction="always"
-        android:title="@string/menu_search"/>
+        android:title="@string/search"/>
     <item
         android:id="@+id/menu_refresh"
         android:icon="@drawable/refresh"
         android:orderInCategory="1"
         android:showAsAction="always"
-        android:title="@string/menu_refresh"/>
+        android:title="@string/refresh"/>
     <item
         android:id="@+id/menu_my_profile"
         android:icon="@drawable/person"
         android:orderInCategory="2"
         android:showAsAction="always"
-        android:title="@string/menu_profile"/>
+        android:title="@string/profile"/>
     <item
         android:id="@+id/menu_my_inbox"
         android:icon="@drawable/email"
         android:orderInCategory="3"
         android:showAsAction="always"
-        android:title="@string/menu_option_inbox"/>
+        android:title="@string/inbox"/>
     <item
         android:id="@+id/menu_options"
         android:icon="@drawable/expand"
         android:orderInCategory="4"
         android:showAsAction="ifRoom"
-        android:title="@string/menu_options">
+        android:title="@string/options">
         <menu>
             <item
                 android:id="@+id/menu_option_archive"
                 android:icon="@drawable/save_light"
                 android:orderInCategory="0"
                 android:showAsAction="always"
-                android:title="@string/menu_option_archive"/>
+                android:title="@string/archive"/>
             <item
                 android:id="@+id/menu_option_change_site"
                 android:icon="@drawable/labels"
                 android:orderInCategory="1"
                 android:showAsAction="always"
-                android:title="@string/menu_option_change_site"/>
+                android:title="@string/changeSite"/>
             <item
                 android:id="@+id/menu_option_settings"
                 android:icon="@drawable/settings_white"
                 android:orderInCategory="2"
                 android:showAsAction="always"
-                android:title="@string/menu_option_settings"/>
+                android:title="@string/settings"/>
             <item
                 android:id="@+id/menu_option_login"
                 android:icon="@drawable/login"
                 android:orderInCategory="3"
                 android:showAsAction="always"
-                android:title="@string/menu_option_login"/>
+                android:title="@string/login"/>
             <item
                 android:id="@+id/menu_option_logout"
                 android:icon="@drawable/logout"
                 android:orderInCategory="4"
                 android:showAsAction="always"
-                android:title="@string/menu_option_logout"/>
+                android:title="@string/logout"/>
             <item
                 android:id="@+id/menu_option_test_gen_notify"
                 android:icon="@drawable/new_msg_notify"

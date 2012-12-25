@@ -37,7 +37,10 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.prasanna.android.preference.DialogPreferenceImpl;
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
@@ -48,6 +51,8 @@ import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
 {
+    private static final String TAG = SettingsFragment.class.getSimpleName();
+
     public static final String KEY_PREF_INBOX = "pref_inbox";
     public static final String KEY_PREF_INBOX_REFRESH_INTERVAL = "pref_inboxRefreshInterval";
     public static final String KEY_PREF_INBOX_NOTIFICATION = "pref_newNotification";
@@ -55,6 +60,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_NOTIF_RINGTONE = "pref_notificationTone";
     public static final String KEY_PREF_CACHE_MAX_SIZE = "pref_cacheMaxSize";
     public static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
+    public static final String KEY_PREF_CLEAR_CACHE = "pref_clearCache";
 
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
@@ -63,6 +69,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private RingtonePreference notifRingTonePref;
     private EditTextPreference cacheMaxSizePreference;
     private PreferenceCategory inboxPrefCategory;
+    private DialogPreferenceImpl clearCacheDialogPreference;
 
     public static int getInboxRefreshInterval(Context context)
     {
@@ -80,7 +87,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     {
 	if (!isNotificationEnabled(context))
 	    return false;
-
 	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 	return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
     }
@@ -105,7 +111,31 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
 	setupInboxPreference();
 
+	setupStoragePreferences();
+    }
+
+    private void setupStoragePreferences()
+    {
+	setupCacheClearPreference();
+
 	setupCacheMaxSizePreference();
+    }
+
+    private void setupCacheClearPreference()
+    {
+	clearCacheDialogPreference = (DialogPreferenceImpl) findPreference(KEY_PREF_CLEAR_CACHE);
+	clearCacheDialogPreference.setOnClickListener(new DialogInterface.OnClickListener()
+	{
+	    @Override
+	    public void onClick(DialogInterface dialog, int which)
+	    {
+		if (DialogInterface.BUTTON_POSITIVE == which)
+		{
+		    CacheUtils.deleteAllQuestions(getActivity().getCacheDir());
+		    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
+		}
+	    }
+	});
     }
 
     private void setupAccountPreference()
@@ -202,8 +232,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     private String getCacheSizeSummary(String currentCacheSize)
     {
-	return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: "
-	                + currentCacheSize;
+	return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: " + currentCacheSize;
     }
 
     private void setupRingtonePreference()
@@ -241,6 +270,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
+	Log.d(TAG, "Preference changed for " + key);
+
 	if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
 	{
 	    refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());

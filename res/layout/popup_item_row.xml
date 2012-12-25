@@ -24,9 +24,9 @@
             android:layout_gravity="center|top"
             android:layout_weight="0.15"
             android:gravity="center|top"
-            android:text="@string/zeroNumber"
+            android:text="@string/zero"
             android:textColor="@color/black"
-            android:textSize="9dp"
+            android:textSize="9sp"
             android:textStyle="bold"
             android:typeface="monospace" />
 
@@ -38,7 +38,7 @@
             android:layout_weight="0.85"
             android:linksClickable="true"
             android:textColor="@color/black"
-            android:textSize="10dp" />
+            android:textSize="10sp" />
     </LinearLayout>
 
     <TextView
@@ -48,7 +48,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/popupItemScoreAndContent"
         android:textColor="@color/black"
-        android:textSize="10dp" />
+        android:textSize="10sp" />
 
     <View
         android:layout_width="match_parent"

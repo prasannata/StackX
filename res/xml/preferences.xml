@@ -10,17 +10,26 @@
             android:inputType="numberDecimal"
             android:key="pref_cacheMaxSize"
             android:title="@string/cacheMaxSizeInMb" />
+
+        <com.prasanna.android.preference.DialogPreferenceImpl
+            android:dialogMessage="@string/sureQuestion"
+            android:key="pref_clearCache"
+            android:negativeButtonText="@android:string/cancel"
+            android:persistent="false"
+            android:positiveButtonText="@android:string/ok"
+            android:title="@string/clearCache" >
+        </com.prasanna.android.preference.DialogPreferenceImpl>
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_inbox"
         android:persistent="false"
-        android:title="@string/menu_option_inbox" >
+        android:title="@string/inbox" >
         <ListPreference
             android:defaultValue="-1"
             android:entries="@array/pref_refreshInterval_default_entries"
             android:entryValues="@array/pref_refreshInterval_default_values"
             android:key="pref_inboxRefreshInterval"
-            android:title="@string/menu_refresh" />
+            android:title="@string/refresh" />
 
         <CheckBoxPreference
             android:defaultValue="false"

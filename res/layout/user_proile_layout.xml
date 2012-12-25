@@ -35,7 +35,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -62,9 +62,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:gravity="center"
-                    android:text="@string/zeroNumber"
+                    android:text="@string/zero"
                     android:textColor="@color/black"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -81,9 +81,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:gravity="center"
-                    android:text="@string/zeroNumber"
+                    android:text="@string/zero"
                     android:textColor="@color/black"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -100,9 +100,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:gravity="center"
-                    android:text="@string/zeroNumber"
+                    android:text="@string/zero"
                     android:textColor="@color/black"
-                    android:textSize="10dp"
+                    android:textSize="10sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -121,7 +121,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -133,7 +133,7 @@
                 android:gravity="center"
                 android:text="@string/noEmail"
                 android:textColor="@color/black"
-                android:textSize="10dp" />
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/profileViews"
@@ -144,7 +144,7 @@
                 android:gravity="center"
                 android:text="@string/profileViews"
                 android:textColor="@color/black"
-                android:textSize="10dp" />
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/profileUserLastSeen"
@@ -155,7 +155,7 @@
                 android:gravity="center"
                 android:text="@string/lastSeen"
                 android:textColor="@color/black"
-                android:textSize="10dp" />
+                android:textSize="10sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -184,9 +184,9 @@
             android:layout_alignParentLeft="true"
             android:layout_gravity="left"
             android:gravity="left"
-            android:text="@string/questionCount"
+            android:text="@string/questions"
             android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/upvoteCount"
@@ -197,9 +197,9 @@
             android:layout_gravity="right"
             android:layout_toRightOf="@id/questionCount"
             android:gravity="right"
-            android:text="@string/upvoteCount"
+            android:text="@string/upvotes"
             android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/answerCount"
@@ -210,9 +210,9 @@
             android:layout_gravity="left"
             android:layout_marginTop="20dp"
             android:gravity="left"
-            android:text="@string/answerCount"
+            android:text="@string/answers"
             android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/downvoteCount"
@@ -223,9 +223,9 @@
             android:layout_below="@id/upvoteCount"
             android:layout_gravity="right"
             android:gravity="right"
-            android:text="@string/downvoteCount"
+            android:text="@string/downvotes"
             android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
     </RelativeLayout>
 
     <TextView
@@ -239,7 +239,7 @@
         android:gravity="left"
         android:text="@string/accounts"
         android:textColor="@color/black"
-        android:textSize="15dp" />
+        android:textSize="15sp" />
 
     <View
         android:id="@+id/accountsUnderline"
