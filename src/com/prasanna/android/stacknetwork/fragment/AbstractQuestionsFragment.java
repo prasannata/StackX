@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -38,38 +38,38 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        itemDisplayCursor = 0;
+	itemDisplayCursor = 0;
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+	return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     protected void displayItems()
     {
-        dismissLoadingDialog();
+	dismissLoadingDialog();
 
-        if (loadingProgressView != null)
-        {
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
+	if (loadingProgressView != null)
+	{
+	    loadingProgressView.setVisibility(View.GONE);
+	    loadingProgressView = null;
+	}
 
-        Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
+	Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
 
-        for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
-        {
-            LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-                    getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
-            itemsContainer.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    LayoutParams.WRAP_CONTENT));
-        }
+	for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
+	{
+	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
+		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
+	    itemsContainer.addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+		            LayoutParams.WRAP_CONTENT));
+	}
 
-        serviceRunning = false;
+	serviceRunning = false;
     }
 
     @Override
     public String getReceiverExtraName()
     {
-        return StringConstants.QUESTIONS;
+	return StringConstants.QUESTIONS;
     }
 }

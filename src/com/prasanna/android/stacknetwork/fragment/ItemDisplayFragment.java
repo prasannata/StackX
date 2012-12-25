@@ -104,23 +104,9 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	if (container == null)
-	{
-	    Log.d(getLogTag(), "onCreateView return null");
-	    return null;
-	}
-
-	itemsContainer = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.items_fragment_container,
-	                null);
+	itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
 
 	return itemsContainer;
-    }
-
-    @Override
-    public void onResume()
-    {
-	registerReceiver();
-	super.onResume();
     }
 
     @Override
@@ -139,7 +125,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	stopServiceAndUnregisterReceiver();
     }
 
-    private void stopServiceAndUnregisterReceiver()
+    protected void stopServiceAndUnregisterReceiver()
     {
 	if (intentForService != null)
 	{
