@@ -32,65 +32,74 @@ import android.view.Menu;
 import com.prasanna.android.stacknetwork.fragment.UserAnswersFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionsFragment;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity
 {
+    private static final String[] PAGES =
+    { "Profile", "Questions", "Answers" };
+
     public class TabListener implements ActionBar.TabListener
     {
-	private final Fragment fragment;
+        private final Fragment fragment;
 
-	public TabListener(Fragment fragment)
-	{
-	    this.fragment = fragment;
-	}
+        public TabListener(Fragment fragment)
+        {
+            this.fragment = fragment;
+        }
 
-	public void onTabSelected(Tab tab, FragmentTransaction ft)
-	{
-	    ft.add(R.id.fragmentContainer, fragment, null);
-	}
+        public void onTabSelected(Tab tab, FragmentTransaction ft)
+        {
+            ft.add(R.id.fragmentContainer, fragment, null);
+        }
 
-	public void onTabUnselected(Tab tab, FragmentTransaction ft)
-	{
-	    ft.remove(fragment);
-	}
+        public void onTabUnselected(Tab tab, FragmentTransaction ft)
+        {
+            ft.remove(fragment);
+        }
 
-	public void onTabReselected(Tab tab, FragmentTransaction ft)
-	{
-	    onTabUnselected(tab, ft);
-	    onTabSelected(tab, ft);
-	}
+        public void onTabReselected(Tab tab, FragmentTransaction ft)
+        {
+            onTabUnselected(tab, ft);
+            onTabSelected(tab, ft);
+        }
     }
 
     public static class ProfileViewPageAdapter extends FragmentPagerAdapter
     {
-	public ProfileViewPageAdapter(FragmentManager fm)
-	{
-	    super(fm);
-	}
+        public ProfileViewPageAdapter(FragmentManager fm)
+        {
+            super(fm);
+        }
 
-	@Override
-	public int getCount()
-	{
-	    return 3;
-	}
+        @Override
+        public int getCount()
+        {
+            return PAGES.length;
+        }
 
-	@Override
-	public Fragment getItem(int position)
-	{
-	    switch (position)
-	    {
-		case 0:
-		    return new UserProfileFragment();
-		case 1:
-		    return new UserQuestionsFragment();
-		case 2:
-		    return new UserAnswersFragment();
+        @Override
+        public CharSequence getPageTitle(int position)
+        {
+            return PAGES[position];
+        }
 
-		default:
-		    return null;
-	    }
-	}
+        @Override
+        public Fragment getItem(int position)
+        {
+            switch (position)
+            {
+                case 0:
+                    return new UserProfileFragment();
+                case 1:
+                    return new UserQuestionsFragment();
+                case 2:
+                    return new UserAnswersFragment();
+
+                default:
+                    return null;
+            }
+        }
     }
 
     private ProfileViewPageAdapter profileViewPageAdapter;
@@ -99,52 +108,36 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.user_profile_pager);
+        setContentView(R.layout.user_profile_pager);
 
-	profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
+        profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
 
-	viewPager = (ViewPager) findViewById(R.id.profilePager);
-	viewPager.setAdapter(profileViewPageAdapter);
+        viewPager = (ViewPager) findViewById(R.id.profilePager);
+        viewPager.setAdapter(profileViewPageAdapter);
 
-	// setupActionBarTabs();
-    }
-
-    private void setupActionBarTabs()
-    {
-	ActionBar actionBar = getActionBar();
-	getActionBar().setTitle(OperatingSite.getSite().name);
-	actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-	Tab profileTab = actionBar.newTab();
-	profileTab.setIcon(R.drawable.person).setTabListener(new TabListener(new UserProfileFragment()));
-	actionBar.addTab(profileTab);
-
-	Tab questionsTab = actionBar.newTab();
-	questionsTab.setIcon(R.drawable.question_mark).setTabListener(new TabListener(new UserQuestionsFragment()));
-	actionBar.addTab(questionsTab);
-
-	Tab answersTab = actionBar.newTab();
-	answersTab.setIcon(R.drawable.answers).setTabListener(new TabListener(new UserAnswersFragment()));
-	actionBar.addTab(answersTab);
+        TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        indicator.setViewPager(viewPager);
+        viewPager.setOnPageChangeListener(indicator);
     }
 
     @Override
     public void refresh()
     {
-	// TODO: Find a way to inform the fragment within current selected tab
-	// to refresh
+        // TODO: Find a way to inform the fragment within current selected tab
+        // to refresh
     }
 
     @Override
     public Context getCurrentContext()
     {
-	return UserProfileActivity.this;
+        return UserProfileActivity.this;
     }
 
     @Override
     protected void onCreateOptionsMenuPostProcess(Menu menu)
     {
-	menu.removeItem(R.id.menu_my_profile);
+        menu.removeItem(R.id.menu_my_profile);
     }
 }

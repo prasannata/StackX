@@ -5,17 +5,6 @@
     android:background="@color/white"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/hiddenFragmentTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/delft"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textStyle="bold"
-        android:typeface="monospace"
-        android:visibility="gone" />
-
     <com.prasanna.android.views.ScrollViewWithNotifier
         android:id="@+id/scroller_with_linear_layout"
         android:layout_width="match_parent"

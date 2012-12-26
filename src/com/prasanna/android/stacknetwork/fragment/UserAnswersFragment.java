@@ -60,149 +60,147 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	if (items == null || items.isEmpty() == true)
-	{
-	    user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
+        if (items == null || items.isEmpty() == true)
+        {
+            user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
 
-	    registerReceiver();
+            registerReceiver();
 
-	    startIntentService();
-	}
+            startIntentService();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	answerDisplayCursor = 0;
+        answerDisplayCursor = 0;
 
-	Log.d(TAG, "Creating answer fragment");
+        Log.d(TAG, "Creating answer fragment");
 
-	parentLayout = (LinearLayout) inflater.inflate(R.layout.scroll_linear_layout, null);
-	TextView fragmentTitle = (TextView) parentLayout.findViewById(R.id.hiddenFragmentTitle);
-	fragmentTitle.setText(getString(R.string.answers));
-	fragmentTitle.setVisibility(View.VISIBLE);
-	scroller = (ScrollViewWithNotifier) parentLayout.findViewById(R.id.scroller_with_linear_layout);
-	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
-	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-	{
-	    @Override
-	    public void onScrollToBottom(View view)
-	    {
-		UserAnswersFragment.this.onScrollToBottom();
-		
-		startIntentService();
-	    }
-	});
+        parentLayout = (LinearLayout) inflater.inflate(R.layout.scroll_linear_layout, null);
 
-	showLoadingSpinningWheel();
+        scroller = (ScrollViewWithNotifier) parentLayout.findViewById(R.id.scroller_with_linear_layout);
+        itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
+        scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+        {
+            @Override
+            public void onScrollToBottom(View view)
+            {
+                UserAnswersFragment.this.onScrollToBottom();
 
-	if (items != null && items.isEmpty() == false)
-	{
-	    displayItems();
-	}
+                startIntentService();
+            }
+        });
 
-	return parentLayout;
+        showLoadingSpinningWheel();
+
+        if (items != null && items.isEmpty() == false)
+        {
+            displayItems();
+        }
+
+        return parentLayout;
     }
 
     private void addAnswersToView()
     {
-	for (; answerDisplayCursor < items.size(); answerDisplayCursor++)
-	{
-	    final RelativeLayout answerRow = (RelativeLayout) getActivity().getLayoutInflater().inflate(
-		            R.layout.user_item_row, null);
-	    final Answer answer = items.get(answerDisplayCursor);
-	    TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
-	    textView.setText(Html.fromHtml(answer.title));
+        for (; answerDisplayCursor < items.size(); answerDisplayCursor++)
+        {
+            final RelativeLayout answerRow = (RelativeLayout) getActivity().getLayoutInflater().inflate(
+                    R.layout.user_item_row, null);
+            final Answer answer = items.get(answerDisplayCursor);
+            TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
+            textView.setText(Html.fromHtml(answer.title));
 
-	    textView = (TextView) answerRow.findViewById(R.id.viewItem);
-	    textView.setClickable(true);
-	    textView.setOnClickListener(new View.OnClickListener()
-	    {
-		@Override
-		public void onClick(View v)
-		{
-		    Point size = new Point();
-		    getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            textView = (TextView) answerRow.findViewById(R.id.viewItem);
+            textView.setClickable(true);
+            textView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Point size = new Point();
+                    getActivity().getWindowManager().getDefaultDisplay().getSize(size);
 
-		    PopupBuilder.build(getActivity().getLayoutInflater(), answerRow, answer, size);
-		}
-	    });
+                    PopupBuilder.build(getActivity().getLayoutInflater(), answerRow, answer, size);
+                }
+            });
 
-	    textView = (TextView) answerRow.findViewById(R.id.viewQuestion);
-	    textView.setClickable(true);
-	    textView.setOnClickListener(new View.OnClickListener()
-	    {
-		@Override
-		public void onClick(View v)
-		{
-		    Intent intent = new Intent(getActivity(), QuestionDetailActivity.class);
-		    Question question = new Question();
-		    question.id = answer.questionId;
-		    question.title = answer.title;
-		    intent.putExtra(StringConstants.QUESTION, question);
-		    intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
-		    startActivity(intent);
-		}
-	    });
-	    itemsLayout.addView(answerRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-		            LayoutParams.WRAP_CONTENT));
-	}
+            textView = (TextView) answerRow.findViewById(R.id.viewQuestion);
+            textView.setClickable(true);
+            textView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent intent = new Intent(getActivity(), QuestionDetailActivity.class);
+                    Question question = new Question();
+                    question.id = answer.questionId;
+                    question.title = answer.title;
+                    intent.putExtra(StringConstants.QUESTION, question);
+                    intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
+                    startActivity(intent);
+                }
+            });
+            itemsLayout.addView(answerRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                    LayoutParams.WRAP_CONTENT));
+        }
     }
 
     @Override
     protected void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.name());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	getActivity().registerReceiver(receiver, filter);
+        IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.name());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(receiver, filter);
     }
 
     @Override
     public String getReceiverExtraName()
     {
-	return UserIntentAction.ANSWERS_BY_USER.getExtra();
+        return UserIntentAction.ANSWERS_BY_USER.getExtra();
     }
 
     @Override
     public void startIntentService()
     {
-	intent = getIntentForService(UserAnswersIntentService.class,
-	                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-	intent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-	intent.putExtra(StringConstants.USER_ID, user.id);
-	intent.putExtra(StringConstants.PAGE, ++page);
-	intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
-	getActivity().startService(intent);
+        intent = getIntentForService(UserAnswersIntentService.class,
+                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+        intent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+        intent.putExtra(StringConstants.USER_ID, user.id);
+        intent.putExtra(StringConstants.PAGE, ++page);
+        intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
+        getActivity().startService(intent);
     }
 
     @Override
     protected void displayItems()
     {
-	dismissLoadingSpinningWheel();
+        dismissLoadingSpinningWheel();
 
-	if (loadingProgressView != null)
-	{
-	    loadingProgressView.setVisibility(View.GONE);
-	    loadingProgressView = null;
-	}
+        if (loadingProgressView != null)
+        {
+            loadingProgressView.setVisibility(View.GONE);
+            loadingProgressView = null;
+        }
 
-	if (items != null && scroller != null)
-	{
-	    addAnswersToView();
-	}
+        if (items != null && scroller != null)
+        {
+            addAnswersToView();
+        }
     }
 
     @Override
     protected String getLogTag()
     {
-	return TAG;
+        return TAG;
     }
 
     @Override
     protected LinearLayout getParentLayout()
     {
-	return parentLayout;
+        return parentLayout;
     }
 }
