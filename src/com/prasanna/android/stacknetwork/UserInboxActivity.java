@@ -92,10 +92,10 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     {
 	super.onCreate(savedInstanceState);
 
-	questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.items_scroll_layout, null);
-	questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.itemScroller);
-	questionsDisplayList = (LinearLayout) getLayoutInflater().inflate(R.layout.items_fragment_container, null);
-	questionsScroll.addView(questionsDisplayList);
+	questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.scroll_linear_layout, null);
+	questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.scroller_with_linear_layout);
+	questionsDisplayList = (LinearLayout) questionsScroll.findViewById(R.id.ll_in_scroller);
+	
 	questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
 	{
 	    @Override
@@ -107,7 +107,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 		    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
 			            LayoutParams.WRAP_CONTENT);
 		    layoutParams.setMargins(0, 15, 0, 15);
-		    questionsDisplayList.addView(loadingProgressView, layoutParams);
+
+		    questionsLayout.addView(loadingProgressView, layoutParams);
 		}
 
 		startIntentService();
@@ -226,7 +227,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     @Override
     protected void onCreateOptionsMenuPostProcess(Menu menu)
     {
-	menu.removeItem(R.id.menu_refresh);
     }
 
     @Override
