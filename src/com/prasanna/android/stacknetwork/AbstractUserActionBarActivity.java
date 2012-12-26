@@ -49,14 +49,12 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 {
     private String accessToken;
     protected SearchView searchView;
-    private static LRU<String, Bitmap> iconCache = new LRU<String, Bitmap>(3);
+    private static LRU<String, Bitmap> iconCache = new LRU<String, Bitmap>(5);
     private OnDiscardOptionListener discardOptionListener;
 
     protected abstract void refresh();
 
     protected abstract Context getCurrentContext();
-
-    protected abstract void onCreateOptionsMenuPostProcess(Menu menu);
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -81,8 +79,8 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	MenuItem menuOptions = menu.findItem(R.id.menu_options);
 	SubMenu subMenu = menuOptions.getSubMenu();
 
-	if (isAuthenticatedRealm() == false || OperatingSite.getSite().userType == null
-	                || OperatingSite.getSite().userType.equals(UserType.REGISTERED) == false)
+	if (!isAuthenticatedRealm() || OperatingSite.getSite().userType == null
+	                || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
 	{
 	    Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
 
@@ -171,7 +169,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		startActivity(logoutIntent);
 		break;
 	    case R.id.menu_discard:
-		if(discardOptionListener != null)
+		if (discardOptionListener != null)
 		{
 		    discardOptionListener.onDiscardOptionClick();
 		}
@@ -198,6 +196,17 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	return (accessToken != null);
     }
 
+    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    {
+	Log.d(getClass().getSimpleName(),
+	                "No post processing of menu options. Override this method if any post processing is necessary.");
+    }
+
+    protected void setOnDiscardOptionClick(OnDiscardOptionListener discardOptionListener)
+    {
+	this.discardOptionListener = discardOptionListener;
+    }
+
     public String getAccessToken()
     {
 	return accessToken;
@@ -213,10 +222,5 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     public boolean onQueryTextChange(String paramString)
     {
 	return false;
-    }
-
-    protected void setOnDiscardOptionClick(OnDiscardOptionListener discardOptionListener)
-    {
-	this.discardOptionListener = discardOptionListener;
     }
 }

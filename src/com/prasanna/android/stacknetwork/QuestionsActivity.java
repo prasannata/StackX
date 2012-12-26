@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
@@ -161,11 +160,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 	outState.putInt(StringConstants.ITEM_POSITION, itemPosition);
 
 	super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onCreateOptionsMenuPostProcess(Menu menu)
-    {
     }
 
     @Override
