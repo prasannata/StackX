@@ -80,6 +80,9 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 	Log.d(TAG, "Creating answer fragment");
 
 	parentLayout = (LinearLayout) inflater.inflate(R.layout.scroll_linear_layout, null);
+	TextView fragmentTitle = (TextView) parentLayout.findViewById(R.id.hiddenFragmentTitle);
+	fragmentTitle.setText(getString(R.string.answers));
+	fragmentTitle.setVisibility(View.VISIBLE);
 	scroller = (ScrollViewWithNotifier) parentLayout.findViewById(R.id.scroller_with_linear_layout);
 	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
 	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -87,21 +90,13 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 	    @Override
 	    public void onScrollToBottom(View view)
 	    {
-		if (loadingProgressView == null)
-		{
-		    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(
-			            R.layout.loading_progress, null);
-		    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-			            LayoutParams.WRAP_CONTENT);
-		    layoutParams.setMargins(0, 15, 0, 15);
-		    parentLayout.addView(loadingProgressView, layoutParams);
-		}
-
+		UserAnswersFragment.this.onScrollToBottom();
+		
 		startIntentService();
 	    }
 	});
 
-	showLoadingDialog();
+	showLoadingSpinningWheel();
 
 	if (items != null && items.isEmpty() == false)
 	{
@@ -185,7 +180,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     protected void displayItems()
     {
-	dismissLoadingDialog();
+	dismissLoadingSpinningWheel();
 
 	if (loadingProgressView != null)
 	{
@@ -203,5 +198,11 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     protected String getLogTag()
     {
 	return TAG;
+    }
+
+    @Override
+    protected LinearLayout getParentLayout()
+    {
+	return parentLayout;
     }
 }

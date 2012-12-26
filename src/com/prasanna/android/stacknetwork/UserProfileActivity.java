@@ -22,18 +22,19 @@ package com.prasanna.android.stacknetwork;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.QuestionAction;
 import com.prasanna.android.stacknetwork.fragment.UserAnswersFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionsFragment;
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnGetQuestionsListener;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
-public class UserProfileActivity extends AbstractUserActionBarActivity implements OnGetQuestionsListener
+public class UserProfileActivity extends AbstractUserActionBarActivity
 {
     public class TabListener implements ActionBar.TabListener
     {
@@ -61,14 +62,53 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
 	}
     }
 
+    public static class ProfileViewPageAdapter extends FragmentPagerAdapter
+    {
+	public ProfileViewPageAdapter(FragmentManager fm)
+	{
+	    super(fm);
+	}
+
+	@Override
+	public int getCount()
+	{
+	    return 3;
+	}
+
+	@Override
+	public Fragment getItem(int position)
+	{
+	    switch (position)
+	    {
+		case 0:
+		    return new UserProfileFragment();
+		case 1:
+		    return new UserQuestionsFragment();
+		case 2:
+		    return new UserAnswersFragment();
+
+		default:
+		    return null;
+	    }
+	}
+    }
+
+    private ProfileViewPageAdapter profileViewPageAdapter;
+    private ViewPager viewPager;
+
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
 	super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.ll_whitebg_vertical);
+	setContentView(R.layout.user_profile_pager);
 
-	setupActionBarTabs();
+	profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
+
+	viewPager = (ViewPager) findViewById(R.id.profilePager);
+	viewPager.setAdapter(profileViewPageAdapter);
+
+	// setupActionBarTabs();
     }
 
     private void setupActionBarTabs()
@@ -101,17 +141,10 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     {
 	return UserProfileActivity.this;
     }
-    
+
     @Override
     protected void onCreateOptionsMenuPostProcess(Menu menu)
     {
 	menu.removeItem(R.id.menu_my_profile);
-    }
-
-    @Override
-    public void onGetQuestions(QuestionAction questionAction, String tag)
-    {
-	// TODO Auto-generated method stub
-	
     }
 }

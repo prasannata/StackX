@@ -22,13 +22,14 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
@@ -51,8 +52,6 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
     protected ArrayList<T> items = new ArrayList<T>();
 
-    private ProgressDialog loadingDialog;
-
     protected LinearLayout loadingProgressView;
 
     public abstract String getReceiverExtraName();
@@ -64,6 +63,8 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     protected abstract void displayItems();
 
     protected abstract String getLogTag();
+
+    protected abstract LinearLayout getParentLayout();
 
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
 
@@ -137,29 +138,32 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     {
 	if (serviceRunning == false)
 	{
+	    showLoadingSpinningWheel();
+	    startIntentService();
+	}
+    }
+
+    protected void showLoadingSpinningWheel()
+    {
+	if (loadingProgressView == null)
+	{
 	    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.loading_progress,
 		            null);
 	    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
 		            LayoutParams.WRAP_CONTENT);
 	    layoutParams.setMargins(0, 15, 0, 15);
-	    itemsContainer.addView(loadingProgressView, layoutParams);
-	    startIntentService();
+	    layoutParams.gravity = Gravity.CENTER | Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
+	    getParentLayout().addView(loadingProgressView, layoutParams);
 	}
     }
 
-    protected void showLoadingDialog()
+    protected void dismissLoadingSpinningWheel()
     {
-	if (loadingDialog == null || loadingDialog.isShowing() == false)
+	if (loadingProgressView != null)
 	{
-	    loadingDialog = ProgressDialog.show(getActivity(), "", getString(R.string.loading));
-	}
-    }
-
-    protected void dismissLoadingDialog()
-    {
-	if (loadingDialog != null && loadingDialog.isShowing() == true)
-	{
-	    loadingDialog.dismiss();
+	    loadingProgressView.setVisibility(View.GONE);
+	    getParentLayout().removeView(loadingProgressView);
+	    loadingProgressView = null;
 	}
     }
 
@@ -178,7 +182,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
 	registerReceiver();
 
-	showLoadingDialog();
+	showLoadingSpinningWheel();
 
 	startIntentService();
     }
@@ -188,7 +192,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     {
 	Log.d(getLogTag(), "Http error " + code + " " + text);
 
-	dismissLoadingDialog();
+	dismissLoadingSpinningWheel();
 
 	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
 	                null);

@@ -79,7 +79,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 
 	return itemsContainer;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -157,7 +157,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 	intent.setAction(QuestionIntentAction.QUESTIONS.name());
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
-	showLoadingDialog();
+	showLoadingSpinningWheel();
 
 	registerReceiver();
 
@@ -173,7 +173,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), tag);
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
 
-	showLoadingDialog();
+	showLoadingSpinningWheel();
 
 	registerReceiver();
 
@@ -189,7 +189,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
 
-	showLoadingDialog();
+	showLoadingSpinningWheel();
 
 	registerReceiver();
 
@@ -198,7 +198,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     }
 
     @Override
-    protected LinearLayout getQuestionsParentLayout()
+    protected LinearLayout getParentLayout()
     {
 	return itemsContainer;
     }

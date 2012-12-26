@@ -34,49 +34,40 @@
         android:showAsAction="always"
         android:title="@string/inbox"/>
     <item
-        android:id="@+id/menu_options"
-        android:icon="@drawable/expand"
+        android:id="@+id/menu_option_archive"
+        android:icon="@drawable/save_light"
         android:orderInCategory="4"
         android:showAsAction="ifRoom"
-        android:title="@string/options">
-        <menu>
-            <item
-                android:id="@+id/menu_option_archive"
-                android:icon="@drawable/save_light"
-                android:orderInCategory="0"
-                android:showAsAction="always"
-                android:title="@string/archive"/>
-            <item
-                android:id="@+id/menu_option_change_site"
-                android:icon="@drawable/labels"
-                android:orderInCategory="1"
-                android:showAsAction="always"
-                android:title="@string/changeSite"/>
-            <item
-                android:id="@+id/menu_option_settings"
-                android:icon="@drawable/settings_white"
-                android:orderInCategory="2"
-                android:showAsAction="always"
-                android:title="@string/settings"/>
-            <item
-                android:id="@+id/menu_option_login"
-                android:icon="@drawable/login"
-                android:orderInCategory="3"
-                android:showAsAction="always"
-                android:title="@string/login"/>
-            <item
-                android:id="@+id/menu_option_logout"
-                android:icon="@drawable/logout"
-                android:orderInCategory="4"
-                android:showAsAction="always"
-                android:title="@string/logout"/>
-            <item
-                android:id="@+id/menu_option_test_gen_notify"
-                android:icon="@drawable/new_msg_notify"
-                android:orderInCategory="5"
-                android:showAsAction="always"
-                android:title="Notify Test"/>
-        </menu>
-    </item>
+        android:title="@string/archive"/>
+    <item
+        android:id="@+id/menu_option_change_site"
+        android:icon="@drawable/labels"
+        android:orderInCategory="5"
+        android:showAsAction="ifRoom"
+        android:title="@string/changeSite"/>
+    <item
+        android:id="@+id/menu_option_settings"
+        android:icon="@drawable/settings_white"
+        android:orderInCategory="6"
+        android:showAsAction="ifRoom"
+        android:title="@string/settings"/>
+    <item
+        android:id="@+id/menu_option_login"
+        android:icon="@drawable/login"
+        android:orderInCategory="7"
+        android:showAsAction="ifRoom"
+        android:title="@string/login"/>
+    <item
+        android:id="@+id/menu_option_logout"
+        android:icon="@drawable/logout"
+        android:orderInCategory="8"
+        android:showAsAction="ifRoom"
+        android:title="@string/logout"/>
+    <item
+        android:id="@+id/menu_option_test_gen_notify"
+        android:icon="@drawable/new_msg_notify"
+        android:orderInCategory="9"
+        android:showAsAction="ifRoom"
+        android:title="Notify Test"/>
 
 </menu>

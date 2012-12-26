@@ -35,8 +35,6 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
 {
     private int itemDisplayCursor = 0;
 
-    protected abstract LinearLayout getQuestionsParentLayout();
-    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -53,13 +51,7 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
     @Override
     protected void displayItems()
     {
-	dismissLoadingDialog();
-
-	if (loadingProgressView != null)
-	{
-	    loadingProgressView.setVisibility(View.GONE);
-	    loadingProgressView = null;
-	}
+	dismissLoadingSpinningWheel();
 
 	Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
 
@@ -67,11 +59,10 @@ public abstract class AbstractQuestionsFragment extends ItemDisplayFragment<Ques
 	{
 	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
 		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
-	    getQuestionsParentLayout().addView(questionLayout, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-		            LayoutParams.WRAP_CONTENT));
+	    getParentLayout().addView(questionLayout,
+		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 	}
 
 	serviceRunning = false;
     }
-
 }

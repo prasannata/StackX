@@ -27,7 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
@@ -68,6 +68,9 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
 	Log.d(TAG, "Creating question fragment");
 
 	parentLayout = (LinearLayout) inflater.inflate(R.layout.scroll_linear_layout, null);
+	TextView fragmentTitle = (TextView) parentLayout.findViewById(R.id.hiddenFragmentTitle);
+	fragmentTitle.setText(getString(R.string.questions));
+	fragmentTitle.setVisibility(View.VISIBLE);
 	scroller = (ScrollViewWithNotifier) parentLayout.findViewById(R.id.scroller_with_linear_layout);
 	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
 	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -75,21 +78,13 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
 	    @Override
 	    public void onScrollToBottom(View view)
 	    {
-		if (loadingProgressView == null)
-		{
-		    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(
-			            R.layout.loading_progress, null);
-		    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-			            LayoutParams.WRAP_CONTENT);
-		    layoutParams.setMargins(0, 15, 0, 15);
-		    parentLayout.addView(loadingProgressView, layoutParams);
-		}
+		UserQuestionsFragment.this.onScrollToBottom();
 
 		startIntentService();
 	    }
 	});
 
-	showLoadingDialog();
+	showLoadingSpinningWheel();
 
 	if (items != null && items.isEmpty() == false)
 	{
@@ -125,7 +120,7 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     }
 
     @Override
-    protected LinearLayout getQuestionsParentLayout()
+    protected LinearLayout getParentLayout()
     {
 	return itemsLayout;
     }

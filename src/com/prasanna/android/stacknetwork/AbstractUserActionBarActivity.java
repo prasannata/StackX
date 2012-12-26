@@ -31,7 +31,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.widget.SearchView;
 
 import com.prasanna.android.cache.LRU;
@@ -76,21 +75,24 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	searchView.setOnQueryTextListener(this);
 	searchView.setQueryHint(getString(R.string.searchInTitle));
 
-	MenuItem menuOptions = menu.findItem(R.id.menu_options);
-	SubMenu subMenu = menuOptions.getSubMenu();
-
-	if (!isAuthenticatedRealm() || OperatingSite.getSite().userType == null
-	                || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
+	if (isAuthenticatedRealm())
 	{
-	    Log.d("AbstractUserActionBarActivity", "Not in authenticated realm");
+	    Log.d("AbstractUserActionBarActivity", "In authenticated realm");
+	    menu.removeItem(R.id.menu_option_login);
 
-	    subMenu.removeItem(R.id.menu_my_profile);
-	    subMenu.removeItem(R.id.menu_my_inbox);
-	    subMenu.removeItem(R.id.menu_option_logout);
+	    if (OperatingSite.getSite().userType == null
+		            || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
+	    {
+		menu.removeItem(R.id.menu_my_profile);
+		menu.removeItem(R.id.menu_my_inbox);
+	    }
+
 	}
 	else
 	{
-	    subMenu.removeItem(R.id.menu_option_login);
+	    menu.removeItem(R.id.menu_my_profile);
+	    menu.removeItem(R.id.menu_my_inbox);
+	    menu.removeItem(R.id.menu_option_logout);
 	}
 
 	onCreateOptionsMenuPostProcess(menu);
