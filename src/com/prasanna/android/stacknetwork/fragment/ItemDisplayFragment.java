@@ -178,7 +178,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     {
 	stopServiceAndUnregisterReceiver();
 
-	itemsContainer.removeAllViews();
+	getParentLayout().removeAllViews();
 
 	registerReceiver();
 
