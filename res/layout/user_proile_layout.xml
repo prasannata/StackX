@@ -125,17 +125,6 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/profileUserEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
-                android:text="@string/noEmail"
-                android:textColor="@color/black"
-                android:textSize="10sp" />
-
-            <TextView
                 android:id="@+id/profileViews"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
