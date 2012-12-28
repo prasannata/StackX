@@ -52,7 +52,7 @@ import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
-import com.prasanna.android.stacknetwork.utils.HtmlTagFragmenter;
+import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
@@ -584,7 +584,7 @@ public class QuestionDetailActivity extends AbstractUserActionBarActivity
     private void displayBody(String text)
     {
 	detailLinearLayout.removeAllViews();
-	ArrayList<TextView> questionBodyTextViews = HtmlTagFragmenter.parse(getApplicationContext(), text);
+	ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.format(getApplicationContext(), text);
 	for (TextView questionBodyTextView : questionBodyTextViews)
 	{
 	    detailLinearLayout.addView(questionBodyTextView);

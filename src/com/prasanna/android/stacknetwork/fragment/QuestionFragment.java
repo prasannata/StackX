@@ -43,7 +43,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.HtmlTagFragmenter;
+import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
@@ -178,7 +178,7 @@ public class QuestionFragment extends Fragment
     public void displayBody(String text)
     {
         LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-        ArrayList<TextView> questionBodyTextViews = HtmlTagFragmenter.parse(getActivity(), text);
+        ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.format(getActivity(), text);
         for (TextView questionBodyTextView : questionBodyTextViews)
         {
             questionBodyLayout.addView(questionBodyTextView);

@@ -35,7 +35,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.HtmlTagFragmenter;
+import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 
 public class AnswerFragment extends Fragment
 {
@@ -69,7 +69,7 @@ public class AnswerFragment extends Fragment
         textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
         textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + answer.owner.displayName);
 
-        ArrayList<TextView> answerBodyTextViews = HtmlTagFragmenter.parse(getActivity(), answer.body);
+        ArrayList<TextView> answerBodyTextViews = MarkdownFormatter.format(getActivity(), answer.body);
         for (TextView answer : answerBodyTextViews)
         {
             answerBodyLayout.addView(answer);
