@@ -11,9 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.View;
 
 import com.prasanna.android.stacknetwork.fragment.AnswersFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
@@ -130,9 +127,50 @@ public class QuestionActivity extends AbstractUserActionBarActivity
         }
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    @Override
+    protected void onDestroy()
     {
-        super.onCreateContextMenu(menu, v, menuInfo);
+        super.onDestroy();
+        stopServiceAndUnregsiterReceiver();
+    }
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+
+        stopServiceAndUnregsiterReceiver();
+    }
+
+    private void stopServiceAndUnregsiterReceiver()
+    {
+        if (questionIntent != null)
+        {
+            stopService(questionIntent);
+        }
+
+        try
+        {
+            if (questionBodyReceiver != null)
+            {
+                unregisterReceiver(questionBodyReceiver);
+            }
+
+            if (questionAnswersReceiver != null)
+            {
+                unregisterReceiver(questionAnswersReceiver);
+            }
+
+            if (questionCommentsReceiver != null)
+            {
+                unregisterReceiver(questionCommentsReceiver);
+            }
+
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     private void setupActionBarTabs()
@@ -145,10 +183,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity
                 .setTabListener(new TabListener(questionFragment));
         actionBar.addTab(questionTab);
 
-        Tab answersTab = actionBar.newTab();
+        Tab answersTab = getActionBar().newTab();
         answersTab.setText(StringConstants.ANSWERS + " (" + question.answerCount + ")")
                 .setContentDescription(StringConstants.ANSWERS).setTabListener(new TabListener(answersFragment));
-        actionBar.addTab(answersTab);
+        getActionBar().addTab(answersTab);
     }
 
     private void startQuestionService(String intentAction)
