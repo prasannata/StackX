@@ -1,26 +1,46 @@
+/*
+ Copyright (C) 2012 Prasanna Thirumalai
+
+ This file is part of StackX.
+
+ StackX is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ StackX is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with StackX.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 
-import com.prasanna.android.stacknetwork.fragment.AnswersFragment;
+import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.intent.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity
 {
@@ -28,34 +48,53 @@ public class QuestionActivity extends AbstractUserActionBarActivity
 
     private Question question;
     private Intent questionIntent;
-    private AnswersFragment answersFragment;
     private QuestionFragment questionFragment;
+    private QuestionViewPageAdapter questionViewPageAdapter;
+    private ViewPager viewPager;
+    private TitlePageIndicator indicator;
 
-    public class TabListener implements ActionBar.TabListener
+    public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
-        private final Fragment fragment;
-
-        public TabListener(Fragment fragment)
+        public QuestionViewPageAdapter(FragmentManager fm)
         {
-            this.fragment = fragment;
+            super(fm);
         }
 
-        public void onTabSelected(Tab tab, FragmentTransaction ft)
+        @Override
+        public int getCount()
         {
-            Log.d(TAG, "Selected tab:" + tab.getText());
-
-            ft.add(R.id.fragmentContainer, fragment, null);
+            return question.answers == null ? 1 : 1 + question.answers.size();
         }
 
-        public void onTabUnselected(Tab tab, FragmentTransaction ft)
+        @Override
+        public CharSequence getPageTitle(int position)
         {
-            ft.remove(fragment);
+            if (position == 0)
+                return QuestionActivity.this.getString(R.string.question);
+            else
+            {
+                if (question.answers.get(position - 1).accepted)
+                    return QuestionActivity.this.getString(R.string.accepted) + " "
+                            + QuestionActivity.this.getString(R.string.answer);
+                else
+                    return QuestionActivity.this.getString(R.string.answer) + " " + position;
+            }
+
         }
 
-        public void onTabReselected(Tab tab, FragmentTransaction ft)
+        @Override
+        public Fragment getItem(int position)
         {
-            onTabUnselected(tab, ft);
-            onTabSelected(tab, ft);
+            if (position == 0)
+            {
+                return QuestionActivity.this.questionFragment;
+            }
+            else
+            {
+                AnswerFragment answerFragment = new AnswerFragment();
+                answerFragment.setAnswer(question.answers.get(position - 1));
+                return answerFragment;
+            }
         }
     }
 
@@ -99,24 +138,39 @@ public class QuestionActivity extends AbstractUserActionBarActivity
             ArrayList<Answer> answers = (ArrayList<Answer>) intent
                     .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra());
 
-            answersFragment.setAnswers(answers);
+            if (answers != null && !answers.isEmpty())
+            {
+                if (question.answers == null)
+                {
+                    question.answers = new ArrayList<Answer>();
+
+                }
+                question.answers.addAll(answers);
+                indicator.notifyDataSetChanged();
+                questionViewPageAdapter.notifyDataSetChanged();
+            }
         }
     };
 
     @Override
-    public void onCreate(android.os.Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.ll_whitebg_vertical);
+        setContentView(R.layout.viewpager_title_indicator);
+
+        questionViewPageAdapter = new QuestionViewPageAdapter(getFragmentManager());
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setAdapter(questionViewPageAdapter);
+
+        indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        indicator.setViewPager(viewPager);
 
         question = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
 
-        answersFragment = new AnswersFragment();
         questionFragment = new QuestionFragment();
         questionFragment.setQuestion(question);
-
-        setupActionBarTabs();
 
         boolean cached = getIntent().getBooleanExtra(StringConstants.CACHED, false);
 
@@ -171,22 +225,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity
         {
             Log.d(TAG, e.getMessage());
         }
-    }
-
-    private void setupActionBarTabs()
-    {
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(OperatingSite.getSite().name);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        Tab questionTab = actionBar.newTab();
-        questionTab.setText(StringConstants.QUESTION).setContentDescription(StringConstants.QUESTION)
-                .setTabListener(new TabListener(questionFragment));
-        actionBar.addTab(questionTab);
-
-        Tab answersTab = getActionBar().newTab();
-        answersTab.setText(StringConstants.ANSWERS + " (" + question.answerCount + ")")
-                .setContentDescription(StringConstants.ANSWERS).setTabListener(new TabListener(answersFragment));
-        getActionBar().addTab(answersTab);
     }
 
     private void startQuestionService(String intentAction)

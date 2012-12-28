@@ -33,43 +33,44 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity
 {
-    private static final String[] PAGES = { "Profile", "Questions", "Answers" };
+    private static final String[] PAGES =
+    { "Profile", "Questions", "Answers" };
 
     public static class ProfileViewPageAdapter extends FragmentPagerAdapter
     {
-	public ProfileViewPageAdapter(FragmentManager fm)
-	{
-	    super(fm);
-	}
+        public ProfileViewPageAdapter(FragmentManager fm)
+        {
+            super(fm);
+        }
 
-	@Override
-	public int getCount()
-	{
-	    return PAGES.length;
-	}
+        @Override
+        public int getCount()
+        {
+            return PAGES.length;
+        }
 
-	@Override
-	public CharSequence getPageTitle(int position)
-	{
-	    return PAGES[position];
-	}
+        @Override
+        public CharSequence getPageTitle(int position)
+        {
+            return PAGES[position];
+        }
 
-	@Override
-	public Fragment getItem(int position)
-	{
-	    switch (position)
-	    {
-		case 0:
-		    return new UserProfileFragment();
-		case 1:
-		    return new UserQuestionsFragment();
-		case 2:
-		    return new UserAnswersFragment();
+        @Override
+        public Fragment getItem(int position)
+        {
+            switch (position)
+            {
+                case 0:
+                    return new UserProfileFragment();
+                case 1:
+                    return new UserQuestionsFragment();
+                case 2:
+                    return new UserAnswersFragment();
 
-		default:
-		    return null;
-	    }
-	}
+                default:
+                    return null;
+            }
+        }
     }
 
     private ProfileViewPageAdapter profileViewPageAdapter;
@@ -78,35 +79,35 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.user_profile_pager);
+        setContentView(R.layout.viewpager_title_indicator);
 
-	profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
+        profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
 
-	viewPager = (ViewPager) findViewById(R.id.viewPager);
-	viewPager.setAdapter(profileViewPageAdapter);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setAdapter(profileViewPageAdapter);
 
-	TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
-	indicator.setViewPager(viewPager);
+        TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        indicator.setViewPager(viewPager);
     }
 
     @Override
     public void refresh()
     {
-	// TODO: Find a way to inform the fragment within current selected tab
-	// to refresh
+        // TODO: Find a way to inform the fragment within current selected tab
+        // to refresh
     }
 
     @Override
     public Context getCurrentContext()
     {
-	return UserProfileActivity.this;
+        return UserProfileActivity.this;
     }
 
     @Override
     protected void onCreateOptionsMenuPostProcess(Menu menu)
     {
-	menu.removeItem(R.id.menu_my_profile);
+        menu.removeItem(R.id.menu_my_profile);
     }
 }

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
-import android.app.ActionBar.Tab;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,14 +30,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
-import com.prasanna.android.stacknetwork.QuestionActivity.TabListener;
-import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment;
-import com.prasanna.android.stacknetwork.fragment.UserAnswersFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnGetQuestionsListener;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.QuestionAction;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.FetchTagsAsyncTask;

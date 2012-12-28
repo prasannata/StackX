@@ -1,18 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.prasanna.android.views.FlingScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/answerFlingScrollView"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="2dp"
     android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp"
-    android:layout_marginTop="3dp" >
+    android:background="@color/white"
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/answerBody"
+    <RelativeLayout
+        android:id="@+id/answerMetaInfo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginTop="2dp" >
 
-</com.prasanna.android.views.FlingScrollView>
+        <TextView
+            android:id="@+id/answerScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/rounded_border_delft"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/answerAuthor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/answerBodyScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp" >
+
+        <LinearLayout
+            android:id="@+id/answerBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
