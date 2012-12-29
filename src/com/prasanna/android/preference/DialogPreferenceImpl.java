@@ -23,9 +23,12 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class DialogPreferenceImpl extends DialogPreference
 {
+    private static final String TAG = DialogPreferenceImpl.class.getSimpleName();
+
     private OnClickListener onClickListener;
 
     public DialogPreferenceImpl(Context context, AttributeSet attrs)
@@ -41,7 +44,10 @@ public class DialogPreferenceImpl extends DialogPreference
     @Override
     public void onClick(DialogInterface dialog, int which)
     {
-	onClickListener.onClick(dialog, which);
+	Log.d(TAG, "onClick invoked for " + which);
+
+	if (onClickListener != null)
+	    onClickListener.onClick(dialog, which);
     }
 
     public void setOnClickListener(OnClickListener onClickListener)
