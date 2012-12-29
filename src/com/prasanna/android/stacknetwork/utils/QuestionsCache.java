@@ -19,26 +19,28 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 
 import com.prasanna.android.cache.LRU;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 
-public class QuestionsLru
+public class QuestionsCache
 {
-    private QuestionsLru()
+    private QuestionsCache()
     {
     }
 
     private static int CACHE_SIZE = 15;
-    private static final LRU<Long, Question> lru = new LRU<Long, Question>(CACHE_SIZE);
+    private static final LRU<Long, SoftReference<Question>> lru = new LRU<Long, SoftReference<Question>>(CACHE_SIZE);
 
     public static void add(Question question)
     {
 	if (question != null && question.id > 0)
 	{
-	    lru.put(question.id, question);
+
+	    lru.put(question.id, new SoftReference<Question>(question));
 	}
     }
 
@@ -46,9 +48,9 @@ public class QuestionsLru
     {
 	Question question = null;
 
-	if (id != null && id > 0)
+	if (id != null && id > 0 && lru.containsKey(id))
 	{
-	    question = lru.get(id);
+	    question = lru.get(id).get();
 	}
 
 	return question;
@@ -56,9 +58,9 @@ public class QuestionsLru
 
     public static void updateAnswersForQuestion(long questionId, ArrayList<Answer> answers)
     {
-	if (answers != null)
+	if (answers != null && lru.containsKey(questionId))
 	{
-	    Question question = lru.get(questionId);
+	    Question question = lru.get(questionId).get();
 	    if (question != null)
 	    {
 		if (question.answers == null)
@@ -67,7 +69,7 @@ public class QuestionsLru
 		}
 
 		question.answers.addAll(answers);
-		lru.put(questionId, question);
+		lru.put(questionId, new SoftReference<Question>(question));
 	    }
 	}
     }

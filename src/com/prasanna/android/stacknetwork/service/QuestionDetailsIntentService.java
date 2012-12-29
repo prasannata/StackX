@@ -29,7 +29,7 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.QuestionsLru;
+import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionDetailsIntentService extends AbstractIntentService
@@ -79,7 +79,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
 		    if (answers != null)
 		    {
-			QuestionsLru.updateAnswersForQuestion(questionId, answers);
+			QuestionsCache.updateAnswersForQuestion(questionId, answers);
 			broadcastAnswers(answers);
 		    }
 		}
@@ -98,7 +98,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void getQuestionDetail(Question question, String action)
     {
-	Question cachedQuestion = QuestionsLru.get(question.id);
+	Question cachedQuestion = QuestionsCache.get(question.id);
 
 	if (cachedQuestion == null)
 	{
@@ -138,7 +138,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	    broadcastAnswers(question.answers);
 	}
 
-	QuestionsLru.add(question);
+	QuestionsCache.add(question);
     }
 
     private void broadcastAnswers(ArrayList<Answer> answers)
