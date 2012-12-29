@@ -54,7 +54,7 @@
                     android:layout_gravity="center"
                     android:layout_marginLeft="10dp"
                     android:contentDescription="@string/badge"
-                    android:src="@drawable/gold_circle" />
+                    android:src="@drawable/circle_gold" />
 
                 <TextView
                     android:id="@+id/profileUserGoldNum"
@@ -73,7 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:contentDescription="@string/badge"
-                    android:src="@drawable/silver_circle" />
+                    android:src="@drawable/circle_silver" />
 
                 <TextView
                     android:id="@+id/profileUserSilverNum"
@@ -92,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:contentDescription="@string/badge"
-                    android:src="@drawable/bronze_circle" />
+                    android:src="@drawable/circle_bronze" />
 
                 <TextView
                     android:id="@+id/profileUserBronzeNum"
