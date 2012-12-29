@@ -37,7 +37,6 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionService extends AbstractBaseService
 {
@@ -58,7 +57,7 @@ public class QuestionService extends AbstractBaseService
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE,
 	                String.valueOf(StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE));
-	queryParams.put(StackUri.QueryParams.SORT, String.valueOf(StackUri.Sort.VOTES));
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.VOTES);
 
 	JSONObjectWrapper answersJson = executeHttpRequest(restEndPoint, queryParams);
 	if (answersJson != null)
@@ -72,9 +71,7 @@ public class QuestionService extends AbstractBaseService
 		    for (int i = 0; i < jsonArray.length(); i++)
 		    {
 			JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
-			Answer answer = getSerializedAnswerObject(jsonObject);
-			answer.comments = getComments(StringConstants.ANSWERS, answer.id);
-			answers.add(answer);
+			answers.add(getSerializedAnswerObject(jsonObject));
 		    }
 		}
 	    }
@@ -85,7 +82,7 @@ public class QuestionService extends AbstractBaseService
 	}
 	return answers;
     }
-    
+
     public String getQuestionBodyForId(long id)
     {
 	String restEndPoint = "questions/" + id;
@@ -113,10 +110,10 @@ public class QuestionService extends AbstractBaseService
 	return questionBody;
     }
 
-    public ArrayList<Comment> getComments(String parent, long id)
+    public ArrayList<Comment> getComments(String parent, long parentId)
     {
 	ArrayList<Comment> comments = null;
-	String restEndPoint = parent + "/" + id + "/comments";
+	String restEndPoint = parent + "/" + parentId + "/comments";
 	Map<String, String> queryParams = getDefaultQueryParams();
 	JSONObjectWrapper commentsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
 

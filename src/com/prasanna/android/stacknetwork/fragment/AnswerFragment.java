@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,39 +49,40 @@ public class AnswerFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        if (savedInstanceState == null)
-        {
-            parentLayout = (LinearLayout) inflater.inflate(R.layout.answers, null);
-            answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
+	if (savedInstanceState == null)
+	{
+	    parentLayout = (LinearLayout) inflater.inflate(R.layout.answers, null);
+	    answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
 
-            if (answer != null)
-                displayAnswer();
-        }
-        return parentLayout;
+	    if (answer != null)
+		displayAnswer();
+	}
+	return parentLayout;
     }
 
     private void displayAnswer()
     {
-        RelativeLayout answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
+	RelativeLayout answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
 
-        TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
-        textView.setText(AppUtils.formatNumber(answer.score));
+	TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
+	textView.setText(AppUtils.formatNumber(answer.score));
 
-        textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + answer.owner.displayName);
+	textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
+	textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by "
+	                + Html.fromHtml(answer.owner.displayName));
 
-        ArrayList<TextView> answerBodyTextViews = MarkdownFormatter.format(getActivity(), answer.body);
-        for (TextView answer : answerBodyTextViews)
-        {
-            answerBodyLayout.addView(answer);
-        }
+	ArrayList<TextView> answerBodyTextViews = MarkdownFormatter.format(getActivity(), answer.body);
+	for (TextView answer : answerBodyTextViews)
+	{
+	    answerBodyLayout.addView(answer);
+	}
     }
 
     public void setAnswer(Answer answer)
     {
-        Log.d(TAG, "answer set");
+	Log.d(TAG, "answer set");
 
-        this.answer = answer;
+	this.answer = answer;
     }
 
 }

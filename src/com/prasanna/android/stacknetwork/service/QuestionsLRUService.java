@@ -15,11 +15,14 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.service;
 
+import java.util.ArrayList;
+
 import com.prasanna.android.cache.LRU;
+import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 
 public class QuestionsLRUService
@@ -33,21 +36,39 @@ public class QuestionsLRUService
 
     public static void add(Question question)
     {
-        if (question != null && question.id > 0)
-        {
-            lru.put(question.id, question);
-        }
+	if (question != null && question.id > 0)
+	{
+	    lru.put(question.id, question);
+	}
     }
 
     public static Question get(Long id)
     {
-        Question question = null;
+	Question question = null;
 
-        if (id != null && id > 0)
-        {
-            question = lru.get(id);
-        }
-        
-        return question;
+	if (id != null && id > 0)
+	{
+	    question = lru.get(id);
+	}
+
+	return question;
+    }
+
+    public static void updateAnswersForQuestion(long questionId, ArrayList<Answer> answers)
+    {
+	if (answers != null)
+	{
+	    Question question = lru.get(questionId);
+	    if (question != null)
+	    {
+		if (question.answers == null)
+		{
+		    question.answers = new ArrayList<Answer>();
+		}
+
+		question.answers.addAll(answers);
+		lru.put(questionId, question);
+	    }
+	}
     }
 }

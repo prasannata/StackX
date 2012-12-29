@@ -44,7 +44,7 @@ public class StackUri
     public static class QueryParamDefaultValues
     {
         public static final int PAGE_SIZE = 15;
-        public static final int ANSWERS_PAGE_SIZE = 3;
+        public static final int ANSWERS_PAGE_SIZE = 10;
         public static final String ORDER = "desc";
         public static final String QUESTION_DETAIL_FILTER = "!3vWTEWZ2QQ3pULbNz";
         public static final String USER_DETAIL_FILTER = "!-q2RdWJy";

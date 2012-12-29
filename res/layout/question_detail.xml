@@ -44,7 +44,7 @@
         <TextView
             android:id="@+id/questionOwner"
             android:layout_width="wrap_content"
-            android:layout_height="15dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/titleAndScore"
             android:layout_marginTop="2dp"
@@ -55,7 +55,7 @@
         <TextView
             android:id="@+id/questionViews"
             android:layout_width="wrap_content"
-            android:layout_height="15dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@id/questionOwner"
             android:layout_below="@id/titleAndScore"
@@ -64,13 +64,27 @@
             android:text="@string/labelViews"
             android:textColor="@color/black"
             android:textSize="8sp" />
+
+        <TextView
+            android:id="@+id/questionComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/questionOwner"
+            android:layout_below="@id/titleAndScore"
+            android:layout_marginRight="2dp"
+            android:layout_toLeftOf="@+id/questionViews"
+            android:gravity="center"
+            android:text="@string/labelComments"
+            android:textColor="@color/black"
+            android:textSize="8sp"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <ScrollView
         android:id="@+id/questionBodyScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp" >
+        android:layout_marginTop="5dp" >
 
         <LinearLayout
             android:id="@+id/questionBody"

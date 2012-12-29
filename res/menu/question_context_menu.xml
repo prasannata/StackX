@@ -3,16 +3,26 @@
 
     <group android:id="@+id/qContextMenuGroup" >
         <item
-            android:id="@+id/q_ctx_menu_user_profile"
+            android:id="@+id/q_ctx_comments"
+            android:enabled="false"
             android:orderInCategory="0"
+            android:title="@string/comments"
+            android:visible="false"/>
+        <item
+            android:id="@+id/q_ctx_similar"
+            android:orderInCategory="1"
+            android:title="@string/similar"/>
+        <item
+            android:id="@+id/q_ctx_menu_user_profile"
+            android:orderInCategory="2"
             android:title=""/>
         <item
             android:id="@+id/q_ctx_menu_archive"
-            android:orderInCategory="1"
+            android:orderInCategory="3"
             android:title="@string/archive"/>
         <item
             android:id="@+id/q_ctx_menu_email"
-            android:orderInCategory="2"
+            android:orderInCategory="4"
             android:title="@string/email"/>
     </group>
 

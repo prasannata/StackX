@@ -79,9 +79,6 @@
             android:launchMode="singleTask" >
         </activity>
         <activity
-            android:name=".QuestionDetailActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".QuestionActivity"
             android:configChanges="orientation|screenSize" />
         <activity

@@ -29,7 +29,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
-import com.prasanna.android.stacknetwork.QuestionDetailActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Question;
 

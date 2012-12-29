@@ -209,7 +209,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 		@Override
 		public void onClick(View v)
 		{
-		    Intent intent = new Intent(getApplicationContext(), QuestionDetailActivity.class);
+		    Intent intent = new Intent(getApplicationContext(), QuestionActivity.class);
 		    Question question = new Question();
 		    question.id = inboxItem.questionId;
 		    question.title = inboxItem.title;

@@ -31,16 +31,17 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionService;
 import com.prasanna.android.stacknetwork.service.QuestionsLRUService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionDetailsIntentService extends AbstractIntentService
 {
+    private static final String TAG = QuestionDetailsIntentService.class.getSimpleName();
+
     private QuestionService questionService = QuestionService.getInstance();
 
     public QuestionDetailsIntentService()
     {
-	this("QuestionService");
+	this(TAG);
     }
 
     public QuestionDetailsIntentService(String name)
@@ -51,7 +52,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	Log.d("QuestionDetailsIntentService", "Action: " + intent.getAction());
+	Log.d(TAG, "Action: " + intent.getAction());
 
 	try
 	{
@@ -65,27 +66,50 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void handleIntent(Intent intent)
     {
-	Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
+	String action = intent.getAction();
 
-	if (question != null && question.id > 0)
+	if (action != null)
 	{
-	    String action = intent.getAction();
-	    if (action != null)
+	    if (action.equals(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name()))
 	    {
-		Question cachedQuestion = QuestionsLRUService.get(question.id);
-		if (cachedQuestion == null)
-		{
-		    getFromServer(question, action);
-		}
-		else
-		{
-		    broadcastQuestionBody(cachedQuestion);
+		long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0L);
+		int page = intent.getIntExtra(StringConstants.PAGE, 0);
 
-		    broadcoastComments(cachedQuestion.comments);
-
-		    broadcastAnswers(cachedQuestion.answers);
+		if (questionId > 0 && page > 0)
+		{
+		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
+		    if (answers != null)
+		    {
+			QuestionsLRUService.updateAnswersForQuestion(questionId, answers);
+			broadcastAnswers(answers);
+		    }
 		}
 	    }
+	    else
+	    {
+		Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
+
+		if (question != null && question.id > 0)
+		{
+		    getQuestionDetail(question, action);
+		}
+	    }
+	}
+    }
+
+    private void getQuestionDetail(Question question, String action)
+    {
+	Question cachedQuestion = QuestionsLRUService.get(question.id);
+
+	if (cachedQuestion == null)
+	{
+	    getFromServer(question, action);
+	}
+	else
+	{
+	    Log.d(TAG, "Question " + question.id + " recovered from cache.");
+
+	    broadcastQuestionBody(cachedQuestion);
 	}
     }
 
@@ -111,16 +135,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
 	if (question.answerCount > 0)
 	{
-	    int numPages = (question.answerCount / StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE) + 1;
-	    for (int page = 1; page <= numPages; page++)
-	    {
-		ArrayList<Answer> answers = questionService.getAnswersForQuestion(question.id, page);
-		question.answers.addAll(answers);
-		broadcastAnswers(answers);
-	    }
-	}
-	else
-	{
+	    question.answers = questionService.getAnswersForQuestion(question.id, 1);
 	    broadcastAnswers(question.answers);
 	}
 

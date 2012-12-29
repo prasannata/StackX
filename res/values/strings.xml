@@ -19,7 +19,7 @@
     <string name="question">Question</string>
     <string name="answer">Answer</string>
     <string name="answers">Answers</string>
-    <string name="comments">"Comments (…)"</string>
+    <string name="comments">Comments</string>
     <string name="upvotes">Upvotes</string>
     <string name="downvotes">Downvotes</string>
     <string name="profileViews">Profile views</string>
@@ -70,6 +70,7 @@
     <string name="searchInTitle">Search in title</string>
     <string name="clearCache">Clear cache</string>
     <string name="email">Email</string>
+    <string name="similar">Similar</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

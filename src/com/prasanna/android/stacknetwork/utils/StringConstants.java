@@ -23,6 +23,7 @@ public class StringConstants
 {
     public static final String SITES = "sites";
     public static final String QUESTION = "question";
+    public static final String QUESTION_ID = "question_id";
     public static final String QUESTIONS = "questions";
     public static final String ANSWERS = "answers";
     public static final String USER = "user";
