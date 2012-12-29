@@ -47,13 +47,13 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserService extends AbstractBaseService
+public class UserServiceHelper extends AbstractBaseServiceHelper
 {
-    private final String TAG = UserService.class.getSimpleName();
+    private final String TAG = UserServiceHelper.class.getSimpleName();
 
-    private static final UserService userService = new UserService();
+    private static final UserServiceHelper userService = new UserServiceHelper();
 
-    public static UserService getInstance()
+    public static UserServiceHelper getInstance()
     {
 	return userService;
     }

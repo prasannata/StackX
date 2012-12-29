@@ -17,7 +17,7 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.stacknetwork.intent;
+package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -46,7 +45,7 @@ public class UserIntentService extends AbstractIntentService
     public static final int GET_USER_SITES = 6;
     public static final int DEAUTH_APP = 7;
 
-    private UserService userService = UserService.getInstance();
+    private UserServiceHelper userService = UserServiceHelper.getInstance();
 
     public UserIntentService()
     {

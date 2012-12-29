@@ -34,8 +34,8 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.intent.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;

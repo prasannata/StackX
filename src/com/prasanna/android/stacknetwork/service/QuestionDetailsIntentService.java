@@ -17,7 +17,7 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.stacknetwork.intent;
+package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
 
@@ -28,16 +28,15 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.service.QuestionService;
-import com.prasanna.android.stacknetwork.service.QuestionsLRUService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.QuestionsLru;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionDetailsIntentService extends AbstractIntentService
 {
     private static final String TAG = QuestionDetailsIntentService.class.getSimpleName();
 
-    private QuestionService questionService = QuestionService.getInstance();
+    private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
     public QuestionDetailsIntentService()
     {
@@ -80,7 +79,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
 		    if (answers != null)
 		    {
-			QuestionsLRUService.updateAnswersForQuestion(questionId, answers);
+			QuestionsLru.updateAnswersForQuestion(questionId, answers);
 			broadcastAnswers(answers);
 		    }
 		}
@@ -99,7 +98,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void getQuestionDetail(Question question, String action)
     {
-	Question cachedQuestion = QuestionsLRUService.get(question.id);
+	Question cachedQuestion = QuestionsLru.get(question.id);
 
 	if (cachedQuestion == null)
 	{
@@ -139,7 +138,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	    broadcastAnswers(question.answers);
 	}
 
-	QuestionsLRUService.add(question);
+	QuestionsLru.add(question);
     }
 
     private void broadcastAnswers(ArrayList<Answer> answers)

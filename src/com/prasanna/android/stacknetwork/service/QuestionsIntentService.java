@@ -16,15 +16,13 @@
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.prasanna.android.stacknetwork.intent;
+package com.prasanna.android.stacknetwork.service;
 
 import android.app.SearchManager;
 import android.content.Intent;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
-import com.prasanna.android.stacknetwork.service.QuestionService;
-import com.prasanna.android.stacknetwork.service.UserService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -35,8 +33,8 @@ public class QuestionsIntentService extends AbstractIntentService
     public static final int GET_FAQ_FOR_TAG = 2;
     public static final int SEARCH = 3;
 
-    private UserService userService = UserService.getInstance();
-    private QuestionService questionService = QuestionService.getInstance();
+    private UserServiceHelper userService = UserServiceHelper.getInstance();
+    private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
     public QuestionsIntentService()
     {

@@ -39,9 +39,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.intent.UserIntentService;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;

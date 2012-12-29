@@ -17,7 +17,7 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.stacknetwork.service;
+package com.prasanna.android.stacknetwork.utils;
 
 import java.util.ArrayList;
 
@@ -25,9 +25,9 @@ import com.prasanna.android.cache.LRU;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 
-public class QuestionsLRUService
+public class QuestionsLru
 {
-    private QuestionsLRUService()
+    private QuestionsLru()
     {
     }
 

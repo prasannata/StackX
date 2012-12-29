@@ -25,7 +25,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
-import com.prasanna.android.stacknetwork.service.UserService;
+import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 
 public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<String>>
 {
@@ -49,7 +49,7 @@ public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<Strin
 	ArrayList<String> tags = null;
 	try
 	{
-	    tags = UserService.getInstance().getTags(1, registeredForSite);
+	    tags = UserServiceHelper.getInstance().getTags(1, registeredForSite);
 	}
 	catch (HttpErrorException e)
 	{

@@ -35,9 +35,9 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.intent.UserIntentService;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;

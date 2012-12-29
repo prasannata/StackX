@@ -38,13 +38,13 @@ import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 
-public class QuestionService extends AbstractBaseService
+public class QuestionServiceHelper extends AbstractBaseServiceHelper
 {
-    private static final String TAG = QuestionService.class.getSimpleName();
+    private static final String TAG = QuestionServiceHelper.class.getSimpleName();
 
-    private static final QuestionService questionService = new QuestionService();
+    private static final QuestionServiceHelper questionService = new QuestionServiceHelper();
 
-    public static QuestionService getInstance()
+    public static QuestionServiceHelper getInstance()
     {
 	return questionService;
     }

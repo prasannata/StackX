@@ -38,7 +38,7 @@ import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public abstract class AbstractBaseService
+public abstract class AbstractBaseServiceHelper
 {
     protected abstract String getLogTag();
 
