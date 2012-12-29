@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -37,6 +37,9 @@ public class StringConstants
     public static final String CACHED = "cached";
     public static final String STATUS_CODE = "statusCode";
     public static final String ERROR = "error";
+    public static final String ME = "me";
+    public static final String ACCOUNTS = "accounts";
+    public static final String ACTION = "action";
 
     public static final class HttpError
     {

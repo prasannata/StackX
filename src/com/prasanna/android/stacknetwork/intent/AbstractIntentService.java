@@ -44,7 +44,7 @@ public abstract class AbstractIntentService extends IntentService
 	sendBroadcast(broadcastIntent);
     }
 
-    protected void broadcastIntent(String action, String extraName, Serializable extra)
+    protected void broadcastSerializableExtra(String action, String extraName, Serializable extra)
     {
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.setAction(action);

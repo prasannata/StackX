@@ -71,6 +71,7 @@
     <string name="clearCache">Clear cache</string>
     <string name="email">Email</string>
     <string name="similar">Similar</string>
+    <string name="acceptRate">Accept Rate</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

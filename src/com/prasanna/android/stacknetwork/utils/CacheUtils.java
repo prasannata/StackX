@@ -37,8 +37,10 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 
 public class CacheUtils
@@ -418,4 +420,50 @@ public class CacheUtils
 	File directory = new File(cacheDir, StringConstants.QUESTIONS);
 	deleteDir(directory);
     }
+
+    public static void cacheMe(File cacheDir, User user)
+    {
+	if (cacheDir != null && user != null)
+	{
+	    File dir = new File(cacheDir, StringConstants.ME);
+	    cacheObject(user, dir, OperatingSite.getSite().name + "." + StringConstants.ME);
+	}
+    }
+
+    public static User getMe(File cacheDir)
+    {
+	if (cacheDir != null)
+	{
+	    File dir = new File(cacheDir, StringConstants.ME);
+	    File file = new File(dir, OperatingSite.getSite().name + "." + StringConstants.ME);
+	    if (file.exists())
+		return (User) readObject(file);
+	}
+
+	return null;
+    }
+
+    public static void cacheMeAccounts(File cacheDir, ArrayList<Account> accounts)
+    {
+	if (cacheDir != null && accounts != null)
+	{
+	    File dir = new File(cacheDir, StringConstants.ME);
+	    cacheObject(accounts, dir, StringConstants.ACCOUNTS);
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    public static ArrayList<Account> getMeAccounts(File cacheDir)
+    {
+	if (cacheDir != null)
+	{
+	    File dir = new File(cacheDir, StringConstants.ME);
+	    File file = new File(dir, StringConstants.ACCOUNTS);
+	    if (file.exists())
+		return (ArrayList<Account>) readObject(file);
+	}
+
+	return null;
+    }
+
 }

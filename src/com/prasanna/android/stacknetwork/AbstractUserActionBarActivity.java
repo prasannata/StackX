@@ -38,7 +38,6 @@ import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -141,7 +140,8 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	    case R.id.menu_search:
 		break;
 	    case R.id.menu_my_profile:
-		Intent userProfileIntent = IntentUtils.createUserProfileIntent(getCurrentContext(), getAccessToken());
+		Intent userProfileIntent = new Intent(getCurrentContext(), UserProfileActivity.class);
+		userProfileIntent.putExtra(StringConstants.ME, true);
 		startActivity(userProfileIntent);
 		break;
 	    case R.id.menu_option_archive:

@@ -150,7 +150,7 @@ public class UserService extends AbstractBaseService
 	return getQuestions(restEndPoint, queryParams);
     }
 
-    public User getLoggedInUser()
+    public User getMe()
     {
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);

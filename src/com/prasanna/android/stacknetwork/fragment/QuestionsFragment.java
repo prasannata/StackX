@@ -31,25 +31,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.intent.SearchForQuestionsIntentService;
-import com.prasanna.android.stacknetwork.intent.TagFaqIntentService;
-import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
+import com.prasanna.android.stacknetwork.intent.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class QuestionsFragment extends AbstractQuestionsFragment
+public class QuestionsFragment extends ItemDisplayFragment<Question>
 {
     private static final String TAG = QuestionsFragment.class.getSimpleName();
 
     private Intent intent;
-
-    private int currentPage = 0;
-
     private IntentFilter filter;
+    private int itemDisplayCursor = 0;
+    private int currentPage = 0;
 
     public enum QuestionAction
     {
@@ -75,6 +74,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+	itemDisplayCursor = 0;
 	itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
 
 	return itemsContainer;
@@ -147,14 +147,18 @@ public class QuestionsFragment extends AbstractQuestionsFragment
 	itemsContainer.removeAllViews();
 
 	currentPage = 0;
+
+	itemDisplayCursor = 0;
+
+	items.clear();
     }
 
     public void loadFrontPage()
     {
 	clean();
 
-	intent = getIntentForService(UserQuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
-	intent.setAction(QuestionIntentAction.QUESTIONS.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
 	showLoadingSpinningWheel();
@@ -168,10 +172,10 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     {
 	clean();
 
-	intent = getIntentForService(TagFaqIntentService.class, QuestionIntentAction.TAGS_FAQ.name());
-	intent.setAction(QuestionIntentAction.TAGS_FAQ.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.name());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
 	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), tag);
-	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.TAGS_FAQ.name());
+	filter = new IntentFilter(QuestionIntentAction.TAGS_FAQ.name());
 
 	showLoadingSpinningWheel();
 
@@ -184,10 +188,11 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     {
 	clean();
 
-	intent = getIntentForService(SearchForQuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.name());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH);
 	intent.putExtra(SearchManager.QUERY, query);
 
-	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_SEARCH.name());
+	filter = new IntentFilter(QuestionIntentAction.QUESTION_SEARCH.name());
 
 	showLoadingSpinningWheel();
 
@@ -198,8 +203,33 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     }
 
     @Override
+    protected void displayItems()
+    {
+	dismissLoadingSpinningWheel();
+
+	Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
+
+	for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
+	{
+	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
+		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
+	    getParentLayout().addView(questionLayout,
+		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+	}
+
+	serviceRunning = false;
+    }
+
+    @Override
+    public String getReceiverExtraName()
+    {
+	return QuestionIntentAction.QUESTIONS.getExtra();
+    }
+
+    @Override
     protected ViewGroup getParentLayout()
     {
 	return itemsContainer;
     }
+
 }

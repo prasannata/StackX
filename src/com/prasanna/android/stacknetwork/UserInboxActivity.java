@@ -37,7 +37,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.prasanna.android.stacknetwork.intent.UserInboxIntentService;
+import com.prasanna.android.stacknetwork.intent.UserIntentService;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
@@ -51,8 +51,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     private static final String TAG = UserInboxActivity.class.getSimpleName();
 
     private Intent fetchInboxIntent = null;
-
-    private LinearLayout questionsLayout;
 
     private LinearLayout questionsDisplayList;
 
@@ -92,8 +90,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     {
 	super.onCreate(savedInstanceState);
 
-	questionsLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.scroll_linear_layout, null);
-	questionsScroll = (ScrollViewWithNotifier) questionsLayout.findViewById(R.id.scroller_with_linear_layout);
+	questionsScroll = (ScrollViewWithNotifier) getLayoutInflater().inflate(R.layout.scroll_linear_layout, null);
 	questionsDisplayList = (LinearLayout) questionsScroll.findViewById(R.id.ll_in_scroller);
 
 	questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -108,14 +105,14 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 			            LayoutParams.WRAP_CONTENT);
 		    layoutParams.setMargins(0, 15, 0, 15);
 
-		    questionsLayout.addView(loadingProgressView, layoutParams);
+		    questionsDisplayList.addView(loadingProgressView, layoutParams);
 		}
 
 		startIntentService();
 	    }
 	});
 
-	setContentView(questionsLayout);
+	setContentView(questionsScroll);
 
 	registerReceiver();
 
@@ -139,14 +136,12 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 
     private void startIntentService()
     {
-	fetchInboxIntent = new Intent(this, UserInboxIntentService.class);
+	fetchInboxIntent = new Intent(this, UserIntentService.class);
 
 	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
 	{
-	    fetchInboxIntent.putExtra(StringConstants.ACCESS_TOKEN,
-		            sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null));
-
+	    fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
 	    fetchInboxIntent.putExtra(StringConstants.PAGE, ++page);
 
 	    startService(fetchInboxIntent);

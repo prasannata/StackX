@@ -27,22 +27,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.intent.UserQuestionsIntentService;
-import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.intent.UserIntentService;
+import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserQuestionsFragment extends AbstractQuestionsFragment
+public class UserQuestionsFragment extends ItemDisplayFragment<Question>
 {
     private static final String TAG = UserQuestionsFragment.class.getSimpleName();
     private ScrollViewWithNotifier scroller;
-    private User user;
     private Intent intent;
     private int page = 0;
     private LinearLayout itemsLayout;
+    private int itemDisplayCursor = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -52,8 +55,6 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
 
 	if (items == null || items.isEmpty() == true)
 	{
-	    user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
-
 	    registerReceiver();
 
 	    startIntentService();
@@ -65,6 +66,7 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     {
 	Log.d(TAG, "Creating question fragment");
 
+	itemDisplayCursor = 0;
 	scroller = (ScrollViewWithNotifier) inflater.inflate(R.layout.scroll_linear_layout, null);
 	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
 	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
@@ -99,11 +101,12 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     @Override
     public void startIntentService()
     {
-	intent = getIntentForService(UserQuestionsIntentService.class,
+	intent = getIntentForService(UserIntentService.class,
 	                IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
-	intent.putExtra(StringConstants.USER_ID, user.id);
+	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
+	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
 	intent.putExtra(StringConstants.PAGE, ++page);
-	intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
 	getActivity().startService(intent);
     }
 
@@ -117,5 +120,29 @@ public class UserQuestionsFragment extends AbstractQuestionsFragment
     protected ViewGroup getParentLayout()
     {
 	return itemsLayout;
+    }
+
+    @Override
+    public String getReceiverExtraName()
+    {
+	return UserIntentAction.QUESTIONS_BY_USER.getExtra();
+    }
+
+    @Override
+    protected void displayItems()
+    {
+	dismissLoadingSpinningWheel();
+
+	Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
+
+	for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
+	{
+	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
+		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
+	    getParentLayout().addView(questionLayout,
+		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+	}
+
+	serviceRunning = false;
     }
 }

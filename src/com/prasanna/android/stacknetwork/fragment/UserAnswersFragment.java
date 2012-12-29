@@ -35,10 +35,9 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.intent.UserAnswersIntentService;
+import com.prasanna.android.stacknetwork.intent.UserIntentService;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
@@ -51,7 +50,6 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     private int answerDisplayCursor = 0;
     private ScrollViewWithNotifier scroller;
     private LinearLayout loadingProgressView;
-    private User user;
     private Intent intent;
     private int page = 0;
     private LinearLayout itemsLayout;
@@ -63,8 +61,6 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 
 	if (items == null || items.isEmpty() == true)
 	{
-	    user = (User) getActivity().getIntent().getSerializableExtra(StringConstants.USER);
-
 	    registerReceiver();
 
 	    startIntentService();
@@ -163,12 +159,13 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     public void startIntentService()
     {
-	intent = getIntentForService(UserAnswersIntentService.class,
+	intent = getIntentForService(UserIntentService.class,
 	                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-	intent.setAction(IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-	intent.putExtra(StringConstants.USER_ID, user.id);
+	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
+	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
 	intent.putExtra(StringConstants.PAGE, ++page);
-	intent.putExtra(StringConstants.ACCESS_TOKEN, user.accessToken);
+
 	getActivity().startService(intent);
     }
 

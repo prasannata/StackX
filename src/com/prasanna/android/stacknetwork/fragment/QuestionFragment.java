@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.UserProfileActivity;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -134,7 +135,9 @@ public class QuestionFragment extends Fragment
 		    Toast.makeText(getActivity(), "Fetch similar questions", Toast.LENGTH_LONG).show();
 		    return true;
 		case R.id.q_ctx_menu_user_profile:
-		    startActivity(IntentUtils.createUserProfileIntent(getActivity(), question.owner.id));
+		    Intent userProfileIntent = new Intent(getActivity(), UserProfileActivity.class);
+		    userProfileIntent.putExtra(StringConstants.USER_ID, question.owner.id);
+		    startActivity(userProfileIntent);
 		    return true;
 		case R.id.q_ctx_menu_archive:
 		    archiveQuestion();

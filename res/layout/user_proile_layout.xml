@@ -125,6 +125,18 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/profileAcceptRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/acceptRate"
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:visibility="gone" />
+
+            <TextView
                 android:id="@+id/profileViews"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
