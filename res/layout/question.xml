@@ -8,8 +8,8 @@
         android:id="@+id/questionTitleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:layout_marginTop="4dp"
         android:clickable="true" >
 
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="3dp"
+                android:layout_marginLeft="5dp"
                 android:layout_toRightOf="@id/questionScore"
                 android:textColor="@color/black"
                 android:textSize="12sp" />
@@ -47,10 +47,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/titleAndScore"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="3dp"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="8sp" />
+            android:textSize="9sp" />
 
         <TextView
             android:id="@+id/questionViews"
@@ -59,11 +59,10 @@
             android:layout_alignParentRight="true"
             android:layout_alignTop="@id/questionOwner"
             android:layout_below="@id/titleAndScore"
-            android:layout_marginRight="3dp"
             android:gravity="center"
             android:text="@string/labelViews"
             android:textColor="@color/black"
-            android:textSize="8sp" />
+            android:textSize="9sp" />
 
         <TextView
             android:id="@+id/questionComments"
@@ -76,7 +75,7 @@
             android:gravity="center"
             android:text="@string/labelComments"
             android:textColor="@color/black"
-            android:textSize="8sp"
+            android:textSize="9sp"
             android:visibility="gone" />
     </RelativeLayout>
 
@@ -84,14 +83,14 @@
         android:id="@+id/questionBodyScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:layout_marginTop="5dp" >
 
         <LinearLayout
             android:id="@+id/questionBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
             android:orientation="vertical" >
         </LinearLayout>
     </ScrollView>

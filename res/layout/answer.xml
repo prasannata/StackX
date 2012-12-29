@@ -11,8 +11,8 @@
         android:id="@+id/answerMetaInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:layout_marginTop="2dp" >
 
         <TextView
@@ -37,6 +37,8 @@
         android:id="@+id/answerBodyScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:layout_marginTop="2dp" >
 
         <LinearLayout

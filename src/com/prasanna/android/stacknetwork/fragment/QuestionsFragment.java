@@ -198,7 +198,7 @@ public class QuestionsFragment extends AbstractQuestionsFragment
     }
 
     @Override
-    protected LinearLayout getParentLayout()
+    protected ViewGroup getParentLayout()
     {
 	return itemsContainer;
     }

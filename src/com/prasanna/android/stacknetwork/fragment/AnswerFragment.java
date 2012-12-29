@@ -51,7 +51,7 @@ public class AnswerFragment extends Fragment
     {
 	if (savedInstanceState == null)
 	{
-	    parentLayout = (LinearLayout) inflater.inflate(R.layout.answers, null);
+	    parentLayout = (LinearLayout) inflater.inflate(R.layout.answer, null);
 	    answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
 
 	    if (answer != null)

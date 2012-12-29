@@ -71,7 +71,7 @@ public class QuestionFragment extends Fragment
 
     private void createView(LayoutInflater inflater)
     {
-	parentLayout = (LinearLayout) inflater.inflate(R.layout.question_detail, null);
+	parentLayout = (LinearLayout) inflater.inflate(R.layout.question, null);
 	titleLayout = (RelativeLayout) parentLayout.findViewById(R.id.questionTitleLayout);
 	titleLayout.setOnClickListener(new View.OnClickListener()
 	{

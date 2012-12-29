@@ -55,7 +55,6 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     private Intent intent;
     private int page = 0;
     private LinearLayout itemsLayout;
-    private LinearLayout parentLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -79,9 +78,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 
 	Log.d(TAG, "Creating answer fragment");
 
-	parentLayout = (LinearLayout) inflater.inflate(R.layout.scroll_linear_layout, null);
-
-	scroller = (ScrollViewWithNotifier) parentLayout.findViewById(R.id.scroller_with_linear_layout);
+	scroller = (ScrollViewWithNotifier) inflater.inflate(R.layout.scroll_linear_layout, null);
 	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
 	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
 	{
@@ -101,7 +98,7 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 	    displayItems();
 	}
 
-	return parentLayout;
+	return scroller;
     }
 
     private void addAnswersToView()
@@ -199,8 +196,8 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     }
 
     @Override
-    protected LinearLayout getParentLayout()
+    protected ViewGroup getParentLayout()
     {
-	return parentLayout;
+	return itemsLayout;
     }
 }
