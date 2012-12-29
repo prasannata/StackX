@@ -50,9 +50,8 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     private int answerDisplayCursor = 0;
     private ScrollViewWithNotifier scroller;
     private LinearLayout loadingProgressView;
-    private Intent intent;
-    private int page = 0;
     private LinearLayout itemsLayout;
+    private int page = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -151,23 +150,24 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     }
 
     @Override
+    protected void startIntentService()
+    {
+	Intent intent = getIntentForService(UserIntentService.class,
+	                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
+	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+	intent.putExtra(StringConstants.PAGE, page++);
+
+	startService();
+    }
+    
+    @Override
     public String getReceiverExtraName()
     {
 	return UserIntentAction.ANSWERS_BY_USER.getExtra();
     }
 
-    @Override
-    public void startIntentService()
-    {
-	intent = getIntentForService(UserIntentService.class,
-	                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
-	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
-	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-	intent.putExtra(StringConstants.PAGE, ++page);
-
-	getActivity().startService(intent);
-    }
 
     @Override
     protected void displayItems()

@@ -46,18 +46,16 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
                 ScrollableFragment, HttpErrorListener
 {
     private Intent intentForService;
-
-    protected boolean serviceRunning = false;
+    private boolean serviceRunning = false;
+    private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
 
     protected LinearLayout itemsContainer;
-
     protected ArrayList<T> items = new ArrayList<T>();
-
     protected LinearLayout loadingProgressView;
 
-    public abstract String getReceiverExtraName();
+    protected abstract String getReceiverExtraName();
 
-    public abstract void startIntentService();
+    protected abstract void startIntentService();
 
     protected abstract void registerReceiver();
 
@@ -67,8 +65,6 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
     protected abstract ViewGroup getParentLayout();
 
-    private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
-
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
 	@SuppressWarnings("unchecked")
@@ -76,6 +72,8 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	public void onReceive(Context context, Intent intent)
 	{
 	    Log.d(getLogTag(), "Receiver invoked: " + intent.getExtras());
+
+	    serviceRunning = false;
 
 	    items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName()));
 
@@ -92,6 +90,11 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
     }
 
+    protected boolean isServiceRunning()
+    {
+	return serviceRunning;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -105,7 +108,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     {
 	super.onDestroy();
 
-	stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceivers();
     }
 
     @Override
@@ -113,15 +116,12 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
     {
 	super.onStop();
 
-	stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceivers();
     }
 
-    protected void stopServiceAndUnregisterReceiver()
+    protected void stopServiceAndUnregisterReceivers()
     {
-	if (intentForService != null)
-	{
-	    getActivity().stopService(intentForService);
-	}
+	stopService();
 
 	try
 	{
@@ -175,9 +175,31 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	return intentForService;
     }
 
+    protected void startService()
+    {
+	if (serviceRunning)
+	{
+	    Log.d(getLogTag(), "Service is already running");
+	}
+	else if (intentForService != null)
+	{
+	    getActivity().startService(intentForService);
+	    serviceRunning = true;
+	}
+    }
+
+    protected void stopService()
+    {
+	if (intentForService != null)
+	{
+	    getActivity().stopService(intentForService);
+	    serviceRunning = false;
+	}
+    }
+
     public void refresh()
     {
-	stopServiceAndUnregisterReceiver();
+	stopServiceAndUnregisterReceivers();
 
 	getParentLayout().removeAllViews();
 
@@ -194,14 +216,12 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	Log.d(getLogTag(), "Http error " + code + " " + text);
 
 	dismissLoadingSpinningWheel();
-
 	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
 	                null);
 	TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
-
 	textView.setText(code + " " + text);
 
-	itemsContainer.removeAllViews();
-	itemsContainer.addView(errorDisplayLayout);
+	getParentLayout().removeAllViews();
+	getParentLayout().addView(errorDisplayLayout);
     }
 }

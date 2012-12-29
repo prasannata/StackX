@@ -122,7 +122,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 
 	Notification notification = new Notification.Builder(context)
 	                .setContentTitle(String.format(NEW_MSG_NOTIF_TITLE, totalNewMsgs)).setStyle(inboxStyle)
-	                .setContentText("Question").setSmallIcon(R.drawable.new_msg_notify)
+	                .setContentText(context.getString(R.string.questions)).setSmallIcon(R.drawable.new_msg_notify)
 	                .setLargeIcon(bitmapSoftReference.get()).setContentIntent(resultPendingIntent).build();
 
 	NotificationManager notificationManager = (NotificationManager) context

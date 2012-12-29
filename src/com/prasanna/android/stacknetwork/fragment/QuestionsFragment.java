@@ -110,11 +110,10 @@ public class QuestionsFragment extends ItemDisplayFragment<Question>
     }
 
     @Override
-    public void startIntentService()
+    protected void startIntentService()
     {
 	intent.putExtra(StringConstants.PAGE, ++currentPage);
-	getActivity().startService(intent);
-	serviceRunning = true;
+	startService();
     }
 
     @Override
@@ -130,19 +129,18 @@ public class QuestionsFragment extends ItemDisplayFragment<Question>
 	return TAG;
     }
 
-    private void cancelRunningServiceAndReceiver()
+    private void stopRunningServiceAndReceiver()
     {
-	if (serviceRunning)
+	if (isServiceRunning())
 	{
 	    getActivity().stopService(intent);
 	    getActivity().unregisterReceiver(receiver);
-	    serviceRunning = false;
 	}
     }
 
     private void clean()
     {
-	cancelRunningServiceAndReceiver();
+	stopRunningServiceAndReceiver();
 
 	itemsContainer.removeAllViews();
 
@@ -216,8 +214,6 @@ public class QuestionsFragment extends ItemDisplayFragment<Question>
 	    getParentLayout().addView(questionLayout,
 		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 	}
-
-	serviceRunning = false;
     }
 
     @Override

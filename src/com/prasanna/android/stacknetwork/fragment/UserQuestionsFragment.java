@@ -99,7 +99,7 @@ public class UserQuestionsFragment extends ItemDisplayFragment<Question>
     }
 
     @Override
-    public void startIntentService()
+    protected void startIntentService()
     {
 	intent = getIntentForService(UserIntentService.class,
 	                IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
@@ -107,7 +107,7 @@ public class UserQuestionsFragment extends ItemDisplayFragment<Question>
 	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
 	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
 	intent.putExtra(StringConstants.PAGE, ++page);
-	getActivity().startService(intent);
+	startService();
     }
 
     @Override
@@ -142,7 +142,5 @@ public class UserQuestionsFragment extends ItemDisplayFragment<Question>
 	    getParentLayout().addView(questionLayout,
 		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 	}
-
-	serviceRunning = false;
     }
 }
