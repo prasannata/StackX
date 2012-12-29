@@ -21,14 +21,17 @@ package com.prasanna.android.stacknetwork.intent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import android.content.Intent;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
+import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -40,6 +43,8 @@ public class UserIntentService extends AbstractIntentService
     public static final int GET_USER_ANSWERS = 3;
     public static final int GET_USER_INBOX = 4;
     public static final int GET_USER_UNREAD_INBOX = 5;
+    public static final int GET_USER_SITES = 6;
+    public static final int DEAUTH_APP = 7;
 
     private UserService userService = UserService.getInstance();
 
@@ -83,6 +88,12 @@ public class UserIntentService extends AbstractIntentService
 		    break;
 		case GET_USER_UNREAD_INBOX:
 		    getUnreadInboxItems(intent);
+		    break;
+		case GET_USER_SITES:
+		    getUserSites();
+		    break;
+		case DEAUTH_APP:
+		    deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
 		    break;
 		default:
 		    Log.e(TAG, "Unknown action: " + action);
@@ -197,6 +208,46 @@ public class UserIntentService extends AbstractIntentService
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
 	broadcastIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), totalNewMsgs);
+	sendBroadcast(broadcastIntent);
+    }
+
+    private void getUserSites()
+    {
+	HashMap<String, Account> linkAccountsMap = null;
+	LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
+
+	if (AppUtils.inAuthenticatedRealm())
+	{
+	    linkAccountsMap = userService.getAccounts(1);
+	}
+
+	if (linkAccountsMap != null && linkSitesMap != null)
+	{
+	    for (String siteUrl : linkAccountsMap.keySet())
+	    {
+		if (linkSitesMap.containsKey(siteUrl) == true)
+		{
+		    Site site = linkSitesMap.get(siteUrl);
+		    Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
+		    site.userType = linkAccountsMap.get(siteUrl).userType;
+		    linkSitesMap.put(siteUrl, site);
+		}
+	    }
+	}
+
+	if (linkSitesMap != null)
+	{
+	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES,
+		            new ArrayList<Site>(linkSitesMap.values()));
+	}
+    }
+
+    private void deauthenticateApp(String accessToken)
+    {
+	Intent broadcastIntent = new Intent();
+	broadcastIntent.setAction(UserIntentAction.LOGOUT.name());
+	broadcastIntent.putExtra(UserIntentAction.LOGOUT.getExtra(), userService.logout(accessToken));
+	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 	sendBroadcast(broadcastIntent);
     }
 }

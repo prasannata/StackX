@@ -27,9 +27,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -39,7 +37,7 @@ import android.widget.TextView;
 import com.prasanna.android.http.HttpErrorBroadcastReceiver;
 import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
-import com.prasanna.android.stacknetwork.intent.UserSitesIntentService;
+import com.prasanna.android.stacknetwork.intent.UserIntentService;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -219,13 +217,8 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 
     private void startIntentService()
     {
-	sitesIntent = new Intent(this, UserSitesIntentService.class);
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-	{
-	    sitesIntent.putExtra(StringConstants.ACCESS_TOKEN,
-		            sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null));
-	}
+	sitesIntent = new Intent(this, UserIntentService.class);
+	sitesIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
 	startService(sitesIntent);
     }
 

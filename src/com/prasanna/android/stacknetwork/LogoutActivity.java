@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork;
 
@@ -32,7 +32,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.LinearLayout;
 
-import com.prasanna.android.stacknetwork.intent.UserDeauthenticateAppIntentService;
+import com.prasanna.android.stacknetwork.intent.UserIntentService;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.utils.CacheUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
@@ -42,7 +42,7 @@ public class LogoutActivity extends Activity
 {
     private static final String TAG = LogoutActivity.class.getSimpleName();
 
-    private Intent accessTokenDeauthenticateIntent;
+    private Intent deauthAppIntent;
 
     private ProgressDialog progressDialog;
 
@@ -84,9 +84,9 @@ public class LogoutActivity extends Activity
 
     private void stopServiceAndUnregisterReceiver()
     {
-	if (accessTokenDeauthenticateIntent != null)
+	if (deauthAppIntent != null)
 	{
-	    stopService(accessTokenDeauthenticateIntent);
+	    stopService(deauthAppIntent);
 	}
 
 	try
@@ -111,9 +111,10 @@ public class LogoutActivity extends Activity
     {
 	progressDialog = ProgressDialog.show(LogoutActivity.this, "", "Logging out");
 
-	accessTokenDeauthenticateIntent = new Intent(this, UserDeauthenticateAppIntentService.class);
-	accessTokenDeauthenticateIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
-	startService(accessTokenDeauthenticateIntent);
+	deauthAppIntent = new Intent(this, UserIntentService.class);
+	deauthAppIntent.putExtra(StringConstants.ACTION, UserIntentService.DEAUTH_APP);
+	deauthAppIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
+	startService(deauthAppIntent);
     }
 
     private void registerReceiver()

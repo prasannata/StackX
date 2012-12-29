@@ -18,8 +18,6 @@
         <service android:name=".intent.QuestionsIntentService" />
         <service android:name=".intent.QuestionDetailsIntentService" />
         <service android:name=".intent.UserIntentService" />
-        <service android:name=".intent.UserDeauthenticateAppIntentService" />
-        <service android:name=".intent.UserSitesIntentService" />
 
         <receiver
             android:name=".receiver.NewMsgNotificationReceiver"
