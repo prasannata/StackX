@@ -19,7 +19,6 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -99,7 +98,6 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
 	startActivity(Intent.createChooser(emailIntent, ""));
     }
 
-    @SuppressLint("NewApi")
     @Override
     public View getView(Question item, View convertView, ViewGroup parent)
     {
@@ -107,7 +105,7 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
 	                getActivity(), false, item);
 	TextView textView = (TextView) layout.findViewById(R.id.questionSnippetTitle);
 	RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) textView.getLayoutParams();
-	layoutParams.removeRule(RelativeLayout.RIGHT_OF);
+	layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
 	layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 	ImageView imageView = (ImageView) layout.findViewById(R.id.questionOptionsContextMenu);
 	imageView.setOnClickListener(new View.OnClickListener()
