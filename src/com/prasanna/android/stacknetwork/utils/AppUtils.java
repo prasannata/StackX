@@ -65,13 +65,13 @@ public class AppUtils
 
     public static boolean inAuthenticatedRealm()
     {
-	return CacheUtils.getAccessToken(null) == null ? false : true;
+	return SharedPreferencesUtil.getAccessToken(null) == null ? false : true;
     }
 
     public static boolean inRegisteredSite(File cacheDir)
     {
 	return inAuthenticatedRealm()
-	                && CacheUtils.getRegisteredSitesForUser(cacheDir).containsKey(OperatingSite.getSite().name);
+	                && SharedPreferencesUtil.getRegisteredSitesForUser(cacheDir).containsKey(OperatingSite.getSite().name);
     }
 
     public static Map<String, String> getDefaultQueryParams()
@@ -79,7 +79,7 @@ public class AppUtils
 	Map<String, String> queryParams = new HashMap<String, String>();
 	queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
 
-	String accessToken = CacheUtils.getAccessToken(null);
+	String accessToken = SharedPreferencesUtil.getAccessToken(null);
 	if (accessToken != null)
 	{
 	    queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);

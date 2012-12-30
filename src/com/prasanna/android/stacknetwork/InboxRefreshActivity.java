@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -31,7 +31,7 @@ public class InboxRefreshActivity extends Activity
 	    fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_UNREAD_INBOX);
 	    fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), Boolean.TRUE);
 	    fetchInboxIntent.putExtra(UserIntentAction.SITES.getExtra(),
-		            CacheUtils.getRegisteredSitesForUser(getCacheDir()));
+		            SharedPreferencesUtil.getRegisteredSitesForUser(getCacheDir()));
 
 	    startService(fetchInboxIntent);
 	}

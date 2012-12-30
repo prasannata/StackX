@@ -23,7 +23,7 @@ import java.io.File;
 
 import android.os.AsyncTask;
 
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class WriteObjectAsyncTask extends AsyncTask<Object, Void, Void>
 {
@@ -41,7 +41,7 @@ public class WriteObjectAsyncTask extends AsyncTask<Object, Void, Void>
     {
 	if (params != null && params.length == 1)
 	{
-	    CacheUtils.cacheObject(params[0], directory, fileName);
+	    SharedPreferencesUtil.cacheObject(params[0], directory, fileName);
 	}
 
 	return null;

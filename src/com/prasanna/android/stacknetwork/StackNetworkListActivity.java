@@ -39,7 +39,7 @@ import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -90,7 +90,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 	    lastSavedInstance = savedInstanceState.getSerializable(StringConstants.SITES);
 	}
 
-	if (lastSavedInstance == null && CacheUtils.hasSiteListCache(getCacheDir()) == false)
+	if (lastSavedInstance == null && SharedPreferencesUtil.hasSiteListCache(getCacheDir()) == false)
 	{
 	    registerReceiverAndStartService();
 	}
@@ -103,7 +103,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 	    }
 	    else
 	    {
-		sites = CacheUtils.fetchSiteListFromCache(getCacheDir());
+		sites = SharedPreferencesUtil.fetchSiteListFromCache(getCacheDir());
 		updateView(sites);
 	    }
 	}
@@ -241,7 +241,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 
 	if (sites != null)
 	{
-	    CacheUtils.cacheSiteList(getCacheDir(), sites);
+	    SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
 	    updateView(sites);
 	}
     }

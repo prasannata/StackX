@@ -220,9 +220,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    public boolean onCreateOptionsMenu(Menu menu)
     {
+	boolean ret = super.onCreateOptionsMenu(menu);
+
 	menu.removeItem(R.id.menu_my_inbox);
+
+	return ret & true;
     }
 
     @Override

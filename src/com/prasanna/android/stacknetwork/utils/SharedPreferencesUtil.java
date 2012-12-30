@@ -43,9 +43,9 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 
-public class CacheUtils
+public class SharedPreferencesUtil
 {
-    private static final String TAG = CacheUtils.class.getSimpleName();
+    private static final String TAG = SharedPreferencesUtil.class.getSimpleName();
     private static final int BYTE_UNIT = 1024;
     private static String userAccessToken;
     private static final String[] sizeUnit = { "K", "M" };

@@ -35,7 +35,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -74,7 +74,7 @@ public class OAuthActivity extends Activity
 		    if (nameValuePair != null && nameValuePair.length == 2
 			            && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
 		    {
-			CacheUtils.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
+			SharedPreferencesUtil.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
 		    }
 		}
 

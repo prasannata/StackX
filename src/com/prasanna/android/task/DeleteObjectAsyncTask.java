@@ -23,7 +23,7 @@ import java.io.File;
 
 import android.os.AsyncTask;
 
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class DeleteObjectAsyncTask extends AsyncTask<Object, Void, Boolean>
 {
@@ -41,7 +41,7 @@ public class DeleteObjectAsyncTask extends AsyncTask<Object, Void, Boolean>
     @Override
     protected Boolean doInBackground(Object... paramArrayOfParams)
     {
-        return CacheUtils.deleteDir(new File(directory, fileName));
+        return SharedPreferencesUtil.deleteDir(new File(directory, fileName));
     }
 
     @Override

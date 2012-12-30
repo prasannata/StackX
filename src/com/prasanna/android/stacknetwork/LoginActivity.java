@@ -28,7 +28,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 
 public class LoginActivity extends Activity
@@ -49,7 +49,7 @@ public class LoginActivity extends Activity
         
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         
-        if (CacheUtils.getAccessToken(getApplicationContext()) == null)
+        if (SharedPreferencesUtil.getAccessToken(getApplicationContext()) == null)
         {
             setContentView(R.layout.main);
             handleLogin();
@@ -69,7 +69,7 @@ public class LoginActivity extends Activity
             public void onClick(View view)
             {
                 Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
-                CacheUtils.clear(getApplicationContext());
+                SharedPreferencesUtil.clear(getApplicationContext());
                 startActivity(oAuthIntent);
             }
         });

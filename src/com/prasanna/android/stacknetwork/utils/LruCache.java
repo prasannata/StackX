@@ -19,41 +19,48 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-import java.util.ArrayList;
+import java.lang.ref.SoftReference;
 
-import com.prasanna.android.stacknetwork.model.Answer;
-import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.cache.LRU;
 
-public class QuestionsCache extends LruCache<Long, Question>
+public class LruCache<K, T>
 {
-    private static int CACHE_SIZE = 15;
-    private static final QuestionsCache INSTANCE = new QuestionsCache();
+    private final int size;
+    private final LRU<K, SoftReference<T>> lru;
 
-    private QuestionsCache()
+    public LruCache(int size)
     {
-	super(CACHE_SIZE);
+	this.size = size;
+	lru = new LRU<K, SoftReference<T>>(size);
     }
 
-    public static QuestionsCache getInstance()
+    public void add(K key, T value)
     {
-	return INSTANCE;
+	if (key != null && value != null)
+	    lru.put(key, new SoftReference<T>(value));
     }
 
-    public void updateAnswersForQuestion(Long questionId, ArrayList<Answer> answers)
+    public T get(K key)
     {
-	if (answers != null && containsKey(questionId))
+	T value = null;
+
+	if (key != null && lru.containsKey(key))
 	{
-	    Question question = get(questionId);
-	    if (question != null)
-	    {
-		if (question.answers == null)
-		{
-		    question.answers = new ArrayList<Answer>();
-		}
-
-		question.answers.addAll(answers);
-		add(questionId, question);
-	    }
+	    value = lru.get(key).get();
+	    if (value == null)
+		lru.remove(key);
 	}
+
+	return value;
+    }
+
+    public boolean containsKey(K key)
+    {
+	return lru.containsKey(key);
+    }
+    
+    public int getSize()
+    {
+	return size;
     }
 }

@@ -33,10 +33,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
-import com.prasanna.android.cache.LRU;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.User.UserType;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
+import com.prasanna.android.stacknetwork.utils.IconCache;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -47,7 +47,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 {
     private String accessToken;
     protected SearchView searchView;
-    private static LRU<String, Bitmap> iconCache = new LRU<String, Bitmap>(5);
+    private IconCache iconCache = IconCache.getInstance();
     private OnDiscardOptionListener discardOptionListener;
 
     protected abstract void refresh();
@@ -60,43 +60,49 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	getActionBar().setTitle(OperatingSite.getSite().name);
 
 	if (iconCache.containsKey(OperatingSite.getSite().name))
-	{
 	    setActionBarIcon(iconCache.get(OperatingSite.getSite().name));
-	}
 	else
-	{
 	    loadIcon();
-	}
 
 	getMenuInflater().inflate(R.menu.action_menu, menu);
 
-	searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-	searchView.setOnQueryTextListener(this);
-	searchView.setQueryHint(getString(R.string.searchInTitle));
+	setupSearchView(menu);
 
 	if (isAuthenticatedRealm())
-	{
-	    Log.d("AbstractUserActionBarActivity", "In authenticated realm");
-	    menu.removeItem(R.id.menu_option_login);
-
-	    if (OperatingSite.getSite().userType == null
-		            || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
-	    {
-		menu.removeItem(R.id.menu_my_profile);
-		menu.removeItem(R.id.menu_my_inbox);
-	    }
-
-	}
+	    setupActionBarForAuthenticatedUser(menu);
 	else
+	    setupActionBarForAnyUser(menu);
+
+	return super.onCreateOptionsMenu(menu);
+    }
+
+    private void setupActionBarForAnyUser(Menu menu)
+    {
+	menu.removeItem(R.id.menu_my_profile);
+	menu.removeItem(R.id.menu_my_inbox);
+	menu.removeItem(R.id.menu_option_logout);
+    }
+
+    private void setupActionBarForAuthenticatedUser(Menu menu)
+    {
+	Log.d("AbstractUserActionBarActivity", "In authenticated realm");
+	menu.removeItem(R.id.menu_option_login);
+
+	if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
 	{
 	    menu.removeItem(R.id.menu_my_profile);
 	    menu.removeItem(R.id.menu_my_inbox);
-	    menu.removeItem(R.id.menu_option_logout);
 	}
+    }
 
-	onCreateOptionsMenuPostProcess(menu);
-
-	return super.onCreateOptionsMenu(menu);
+    private void setupSearchView(Menu menu)
+    {
+	// SearchManager searchManager = (SearchManager)
+	// getSystemService(Context.SEARCH_SERVICE);
+	searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+	searchView.setOnQueryTextListener(this);
+	searchView.setQueryHint(getString(R.string.searchInTitle));
+	// searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
     }
 
     private void loadIcon()
@@ -107,9 +113,8 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	    public void notifyOnCompletion(Bitmap result)
 	    {
 		setActionBarIcon(result);
-		iconCache.put(OperatingSite.getSite().name, result);
+		iconCache.add(OperatingSite.getSite().name, result);
 	    }
-
 	});
 
 	fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
@@ -163,7 +168,7 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		break;
 	    case R.id.menu_option_login:
 		Intent oAuthIntent = new Intent(this, OAuthActivity.class);
-		CacheUtils.clear(getApplicationContext());
+		SharedPreferencesUtil.clear(getApplicationContext());
 		startActivity(oAuthIntent);
 		break;
 	    case R.id.menu_option_logout:
@@ -196,12 +201,6 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 	accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
 
 	return (accessToken != null);
-    }
-
-    protected void onCreateOptionsMenuPostProcess(Menu menu)
-    {
-	Log.d(getClass().getSimpleName(),
-	                "No post processing of menu options. Override this method if any post processing is necessary.");
     }
 
     protected void setOnDiscardOptionClick(OnDiscardOptionListener discardOptionListener)

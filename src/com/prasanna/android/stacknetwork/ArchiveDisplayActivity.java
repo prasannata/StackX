@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -152,8 +152,10 @@ public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    protected void onCreateOptionsMenuPostProcess(final Menu menu)
+    public boolean onCreateOptionsMenu(final Menu menu)
     {
+	boolean ret = super.onCreateOptionsMenu(menu);
+	
 	this.menu = menu;
 	menu.removeItem(R.id.menu_refresh);
 	setOnDiscardOptionClick(new OnDiscardOptionListener()
@@ -165,10 +167,12 @@ public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
 
 		for (Long questionId : toDelQuestions)
 		{
-		    CacheUtils.deleteQuestion(getCacheDir(), questionId);
+		    SharedPreferencesUtil.deleteQuestion(getCacheDir(), questionId);
 		    container.removeView(findViewById(questionId.intValue()));
 		}
 	    }
 	});
+	
+	return ret & true;
     }
 }

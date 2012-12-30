@@ -46,7 +46,7 @@ import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
@@ -131,7 +131,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	    {
 		if (DialogInterface.BUTTON_POSITIVE == which)
 		{
-		    CacheUtils.deleteAllQuestions(getActivity().getCacheDir());
+		    SharedPreferencesUtil.deleteAllQuestions(getActivity().getCacheDir());
 		    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
 		}
 	    }
@@ -205,7 +205,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 		accountActionPref.getDialog().dismiss();
 
 		Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
-		CacheUtils.clear(getActivity());
+		SharedPreferencesUtil.clear(getActivity());
 		startActivity(oAuthIntent);
 		return true;
 	    }
@@ -224,7 +224,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     private void setupCacheMaxSizePreference()
     {
-	String currentCacheSize = CacheUtils.getQuestionDirSize(getActivity().getCacheDir());
+	String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity().getCacheDir());
 
 	cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
 	cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));

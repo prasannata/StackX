@@ -34,7 +34,7 @@ import android.widget.LinearLayout;
 
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -140,7 +140,7 @@ public class LogoutActivity extends Activity
 	    editor.remove(StringConstants.ACCESS_TOKEN);
 	    editor.commit();
 
-	    CacheUtils.clear(getApplicationContext());
+	    SharedPreferencesUtil.clear(getApplicationContext());
 
 	    startLoginActivity();
 	}

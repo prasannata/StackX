@@ -43,7 +43,7 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -79,7 +79,7 @@ public class UserProfileFragment extends Fragment
 
 		user.accounts.addAll(accounts.values());
 
-		CacheUtils.cacheMeAccounts(getActivity().getCacheDir(), user.accounts);
+		SharedPreferencesUtil.cacheMeAccounts(getActivity().getCacheDir(), user.accounts);
 
 		displayUserAccounts();
 	    }
@@ -111,11 +111,11 @@ public class UserProfileFragment extends Fragment
 
 	me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
 	if (me)
-	    user = CacheUtils.getMe(getActivity().getCacheDir());
+	    user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
 
 	if (user != null)
 	{
-	    user.accounts = CacheUtils.getMeAccounts(getActivity().getCacheDir());
+	    user.accounts = SharedPreferencesUtil.getMeAccounts(getActivity().getCacheDir());
 	}
 	else
 	{

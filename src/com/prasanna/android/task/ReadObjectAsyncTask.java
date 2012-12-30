@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import android.os.AsyncTask;
 
-import com.prasanna.android.stacknetwork.utils.CacheUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class ReadObjectAsyncTask extends AsyncTask<Void, Void, ArrayList<Object>>
 {
@@ -46,12 +46,12 @@ public class ReadObjectAsyncTask extends AsyncTask<Void, Void, ArrayList<Object>
     {
         if (fileName == null)
         {
-            return CacheUtils.readObjects(directory);
+            return SharedPreferencesUtil.readObjects(directory);
         }
         else
         {
             ArrayList<Object> objects = new ArrayList<Object>();
-            objects.add(CacheUtils.readObject(new File(directory, fileName)));
+            objects.add(SharedPreferencesUtil.readObject(new File(directory, fileName)));
             return objects;
         }
     }

@@ -79,7 +79,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
 		    if (answers != null)
 		    {
-			QuestionsCache.updateAnswersForQuestion(questionId, answers);
+			QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
 			broadcastAnswers(answers);
 		    }
 		}
@@ -98,7 +98,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void getQuestionDetail(Question question, String action)
     {
-	Question cachedQuestion = QuestionsCache.get(question.id);
+	Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
 
 	if (cachedQuestion == null)
 	{
@@ -138,7 +138,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	    broadcastAnswers(question.answers);
 	}
 
-	QuestionsCache.add(question);
+	QuestionsCache.getInstance().add(question.id, question);
     }
 
     private void broadcastAnswers(ArrayList<Answer> answers)
