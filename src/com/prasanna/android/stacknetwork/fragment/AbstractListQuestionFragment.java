@@ -29,7 +29,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -48,8 +47,7 @@ import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public abstract class AbstractListQuestionFragment extends ItemListFragment<Question> implements OnScrollListener,
-                ListItemView<Question>
+public abstract class AbstractListQuestionFragment extends ItemListFragment<Question> implements ListItemView<Question>
 {
     @Override
     public void onActivityCreated(Bundle savedInstanceState)

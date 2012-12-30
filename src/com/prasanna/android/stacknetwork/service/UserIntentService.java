@@ -156,8 +156,7 @@ public class UserIntentService extends AbstractIntentService
 	    if (userId > 0)
 	    {
 		broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.name(),
-		                UserIntentAction.QUESTIONS_BY_USER.getExtra(),
-		                userService.getQuestionsByUser(userId, page));
+		                QuestionIntentAction.QUESTIONS.getExtra(), userService.getQuestionsByUser(userId, page));
 	    }
 	}
     }
