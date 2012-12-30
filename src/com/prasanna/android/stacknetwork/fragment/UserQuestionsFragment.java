@@ -19,33 +19,32 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 
+import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
-import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserQuestionsFragment extends ItemDisplayFragment<Question>
+public class UserQuestionsFragment extends AbstractListQuestionFragment
 {
     private static final String TAG = UserQuestionsFragment.class.getSimpleName();
-    private ScrollViewWithNotifier scroller;
     private Intent intent;
     private int page = 0;
-    private LinearLayout itemsLayout;
-    private int itemDisplayCursor = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -53,12 +52,9 @@ public class UserQuestionsFragment extends ItemDisplayFragment<Question>
 	super.onCreate(savedInstanceState);
 	page = 0;
 
-	if (items == null || items.isEmpty() == true)
-	{
-	    registerReceiver();
+	registerReceiver();
 
-	    startIntentService();
-	}
+	startIntentService();
     }
 
     @Override
@@ -66,28 +62,17 @@ public class UserQuestionsFragment extends ItemDisplayFragment<Question>
     {
 	Log.d(TAG, "Creating question fragment");
 
-	itemDisplayCursor = 0;
-	scroller = (ScrollViewWithNotifier) inflater.inflate(R.layout.scroll_linear_layout, null);
-	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
-	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	if (itemsContainer == null)
 	{
-	    @Override
-	    public void onScrollToBottom(View view)
-	    {
-		UserQuestionsFragment.this.onScrollToBottom();
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
+	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+		            new ArrayList<Question>(), this);
+	    setListAdapter(itemListAdapter);
 
-		startIntentService();
-	    }
-	});
-
-	showLoadingSpinningWheel();
-
-	if (items != null && items.isEmpty() == false)
-	{
-	    displayItems();
+	    showLoadingSpinningWheel();
 	}
 
-	return scroller;
+	return itemsContainer;
     }
 
     @Override
@@ -111,36 +96,43 @@ public class UserQuestionsFragment extends ItemDisplayFragment<Question>
     }
 
     @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+	Log.d(getLogTag(), "onContextItemSelected");
+
+	if (!super.onContextItemSelected(item))
+	{
+	    if (item.getGroupId() == R.id.qContextMenuGroup)
+	    {
+		Log.d(getLogTag(), "Context item selected: " + item.getItemId());
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		switch (item.getItemId())
+		{
+		    case R.id.q_ctx_related:
+			getRelatedQuestions(itemListAdapter.getItem(info.position).id);
+			return true;
+		    default:
+			Log.d(TAG, "Unknown item " + item.getItemId());
+			return false;
+		}
+	    }
+	}
+
+	return false;
+    }
+
+    private void getRelatedQuestions(long questionId)
+    {
+	Intent intent = new Intent(getActivity(), QuestionsActivity.class);
+	intent.putExtra(StringConstants.RELATED, true);
+	intent.putExtra(StringConstants.QUESTION_ID, questionId);
+	startActivity(intent);
+    }
+
+    @Override
     public String getLogTag()
     {
 	return TAG;
-    }
-
-    @Override
-    protected ViewGroup getParentLayout()
-    {
-	return itemsLayout;
-    }
-
-    @Override
-    public String getReceiverExtraName()
-    {
-	return UserIntentAction.QUESTIONS_BY_USER.getExtra();
-    }
-
-    @Override
-    protected void displayItems()
-    {
-	dismissLoadingSpinningWheel();
-
-	Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
-
-	for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
-	{
-	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
-	    getParentLayout().addView(questionLayout,
-		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-	}
     }
 }

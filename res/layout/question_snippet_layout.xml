@@ -1,36 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/question_unanswered_shape"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp" >
 
         <CheckBox
             android:id="@+id/deleteQuestionCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:layout_marginTop="2dp"
             android:button="@drawable/checkbox"
             android:gravity="center"
             android:visibility="gone" />
 
+        <ImageView
+            android:id="@+id/questionOptionsContextMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/next_item" />
+
         <TextView
             android:id="@+id/questionSnippetTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
             android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
+            android:layout_marginRight="2dp"
+            android:layout_toLeftOf="@id/questionOptionsContextMenu"
+            android:layout_toRightOf="@id/deleteQuestionCheckbox"
             android:textColor="@color/black"
-            android:textSize="18sp" />
-    </LinearLayout>
+            android:textSize="15sp" />
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/questionSnippetTags"

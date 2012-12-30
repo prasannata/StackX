@@ -9,9 +9,9 @@
             android:title="@string/comments"
             android:visible="false"/>
         <item
-            android:id="@+id/q_ctx_similar"
+            android:id="@+id/q_ctx_related"
             android:orderInCategory="1"
-            android:title="@string/similar"/>
+            android:title="@string/related"/>
         <item
             android:id="@+id/q_ctx_menu_user_profile"
             android:orderInCategory="2"

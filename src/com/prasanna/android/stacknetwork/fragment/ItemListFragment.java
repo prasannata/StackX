@@ -21,7 +21,7 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 
-import android.app.Fragment;
+import android.app.ListFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +31,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
@@ -39,31 +41,26 @@ import android.widget.TextView;
 import com.prasanna.android.http.HttpErrorBroadcastReceiver;
 import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.ErrorIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 
-public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> extends Fragment implements
-                ScrollableFragment, HttpErrorListener
+public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends ListFragment implements
+                OnScrollListener, HttpErrorListener
 {
     private Intent intentForService;
     private boolean serviceRunning = false;
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
+    private LinearLayout loadingProgressView;
 
     protected LinearLayout itemsContainer;
-    protected ArrayList<T> items = new ArrayList<T>();
-    protected LinearLayout loadingProgressView;
-
+    protected ItemListAdapter<T> itemListAdapter;
+    
     protected abstract String getReceiverExtraName();
-
     protected abstract void startIntentService();
-
     protected abstract void registerReceiver();
-
-    protected abstract void displayItems();
-
     protected abstract String getLogTag();
-
-    protected abstract ViewGroup getParentLayout();
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -75,9 +72,7 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
 	    serviceRunning = false;
 
-	    items.addAll((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName()));
-
-	    displayItems();
+	    displayItems((ArrayList<T>) intent.getSerializableExtra(getReceiverExtraName()));
 	}
     };
 
@@ -134,16 +129,6 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	}
     }
 
-    @Override
-    public void onScrollToBottom()
-    {
-	if (serviceRunning == false)
-	{
-	    showLoadingSpinningWheel();
-	    startIntentService();
-	}
-    }
-
     protected void showLoadingSpinningWheel()
     {
 	if (loadingProgressView == null)
@@ -197,17 +182,32 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 	}
     }
 
+    protected ViewGroup getParentLayout()
+    {
+	return itemsContainer;
+    }
+
     public void refresh()
     {
 	stopServiceAndUnregisterReceivers();
-
-	getParentLayout().removeAllViews();
 
 	registerReceiver();
 
 	showLoadingSpinningWheel();
 
 	startIntentService();
+    }
+
+    protected void displayItems(ArrayList<T> newItems)
+    {
+	dismissLoadingSpinningWheel();
+
+	if (itemListAdapter != null)
+	{
+	    Log.d(getLogTag(), "Updating list adpater with questions");
+
+	    itemListAdapter.addAll(newItems);
+	}
     }
 
     @Override
@@ -223,5 +223,27 @@ public abstract class ItemDisplayFragment<T extends BaseStackExchangeItem> exten
 
 	getParentLayout().removeAllViews();
 	getParentLayout().addView(errorDisplayLayout);
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+    {
+	if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
+	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 3))
+	{
+	    Log.d(getLogTag(), "onScroll reached bottom threshold. Fetching more questions");
+
+	    if (serviceRunning == false)
+	    {
+		showLoadingSpinningWheel();
+		startIntentService();
+	    }
+	}
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState)
+    {
+	Log.v(getLogTag(), "onScrollStateChanged");
     }
 }

@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.prasanna.android.views.ScrollViewWithNotifier xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/itemScroller"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/questionsFragment"
+    android:name="com.prasanna.android.stacknetwork.fragment.QuestionsFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white" >
-
-    <fragment
-        android:id="@+id/questionsFragment"
-        android:name="com.prasanna.android.stacknetwork.fragment.QuestionsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-</com.prasanna.android.views.ScrollViewWithNotifier>
+    android:layout_height="match_parent" />

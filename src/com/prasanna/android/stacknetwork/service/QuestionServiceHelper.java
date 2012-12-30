@@ -206,6 +206,47 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 	return question;
     }
 
+    public ArrayList<Question> getAllQuestions(int page)
+    {
+	ArrayList<Question> questions = null;
+
+	String restEndPoint = "questions";
+	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+
+	JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+	if (questionsJsonResponse != null)
+	{
+	    questions = getQuestionModel(questionsJsonResponse);
+	}
+
+	return questions;
+    }
+    public ArrayList<Question> getRelatedQuestions(long questionId, int page)
+    {
+	ArrayList<Question> questions = null;
+
+	String restEndPoint = "questions/" + questionId + "/related";
+	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
+	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+
+	JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+	if (questionsJsonResponse != null)
+	{
+	    questions = getQuestionModel(questionsJsonResponse);
+	}
+
+	return questions;
+    }
+
     public ArrayList<Question> getFaqForTag(String tag, int page)
     {
 	ArrayList<Question> questions = null;

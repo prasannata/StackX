@@ -31,6 +31,7 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -148,7 +149,7 @@ public class UserIntentService extends AbstractIntentService
 	if (me)
 	{
 	    broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.name(),
-		            UserIntentAction.QUESTIONS_BY_USER.getExtra(), userService.getMyQuestions(page));
+		            QuestionIntentAction.QUESTIONS.getExtra(), userService.getMyQuestions(page));
 	}
 	else
 	{

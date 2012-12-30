@@ -131,8 +131,8 @@ public class QuestionFragment extends Fragment
 		case R.id.q_ctx_comments:
 		    Toast.makeText(getActivity(), "Fetch comments", Toast.LENGTH_LONG).show();
 		    return true;
-		case R.id.q_ctx_similar:
-		    Toast.makeText(getActivity(), "Fetch similar questions", Toast.LENGTH_LONG).show();
+		case R.id.q_ctx_related:
+		    Toast.makeText(getActivity(), "Fetch related questions", Toast.LENGTH_LONG).show();
 		    return true;
 		case R.id.q_ctx_menu_user_profile:
 		    Intent userProfileIntent = new Intent(getActivity(), UserProfileActivity.class);

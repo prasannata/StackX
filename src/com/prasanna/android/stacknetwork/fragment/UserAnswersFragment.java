@@ -19,6 +19,8 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Point;
@@ -29,12 +31,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
@@ -42,103 +46,39 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserAnswersFragment extends ItemDisplayFragment<Answer>
+public class UserAnswersFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
 {
     private static final String TAG = UserAnswersFragment.class.getSimpleName();
-    private int answerDisplayCursor = 0;
-    private ScrollViewWithNotifier scroller;
-    private LinearLayout loadingProgressView;
-    private LinearLayout itemsLayout;
     private int page = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+	Log.d(TAG, "onCreate");
+
 	super.onCreate(savedInstanceState);
 
-	if (items == null || items.isEmpty() == true)
-	{
-	    registerReceiver();
+	registerReceiver();
 
-	    startIntentService();
-	}
+	startIntentService();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	answerDisplayCursor = 0;
-
 	Log.d(TAG, "Creating answer fragment");
 
-	scroller = (ScrollViewWithNotifier) inflater.inflate(R.layout.scroll_linear_layout, null);
-	itemsLayout = (LinearLayout) scroller.findViewById(R.id.ll_in_scroller);
-	scroller.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+	if (itemsContainer == null)
 	{
-	    @Override
-	    public void onScrollToBottom(View view)
-	    {
-		UserAnswersFragment.this.onScrollToBottom();
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
+	    itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.user_item_row,
+		            new ArrayList<Answer>(), this);
+	    setListAdapter(itemListAdapter);
 
-		startIntentService();
-	    }
-	});
-
-	showLoadingSpinningWheel();
-
-	if (items != null && items.isEmpty() == false)
-	{
-	    displayItems();
+	    showLoadingSpinningWheel();
 	}
-
-	return scroller;
-    }
-
-    private void addAnswersToView()
-    {
-	for (; answerDisplayCursor < items.size(); answerDisplayCursor++)
-	{
-	    final RelativeLayout answerRow = (RelativeLayout) getActivity().getLayoutInflater().inflate(
-		            R.layout.user_item_row, null);
-	    final Answer answer = items.get(answerDisplayCursor);
-	    TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
-	    textView.setText(Html.fromHtml(answer.title));
-
-	    textView = (TextView) answerRow.findViewById(R.id.viewItem);
-	    textView.setClickable(true);
-	    textView.setOnClickListener(new View.OnClickListener()
-	    {
-		@Override
-		public void onClick(View v)
-		{
-		    Point size = new Point();
-		    getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-
-		    PopupBuilder.build(getActivity().getLayoutInflater(), answerRow, answer, size);
-		}
-	    });
-
-	    textView = (TextView) answerRow.findViewById(R.id.viewQuestion);
-	    textView.setClickable(true);
-	    textView.setOnClickListener(new View.OnClickListener()
-	    {
-		@Override
-		public void onClick(View v)
-		{
-		    Intent intent = new Intent(getActivity(), QuestionActivity.class);
-		    Question question = new Question();
-		    question.id = answer.questionId;
-		    question.title = answer.title;
-		    intent.putExtra(StringConstants.QUESTION, question);
-		    intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
-		    startActivity(intent);
-		}
-	    });
-	    itemsLayout.addView(answerRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-		            LayoutParams.WRAP_CONTENT));
-	}
+	return itemsContainer;
     }
 
     @Override
@@ -161,29 +101,31 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
 
 	startService();
     }
-    
+
     @Override
     public String getReceiverExtraName()
     {
 	return UserIntentAction.ANSWERS_BY_USER.getExtra();
     }
 
-
     @Override
-    protected void displayItems()
+    protected void displayItems(ArrayList<Answer> items)
     {
 	dismissLoadingSpinningWheel();
 
-	if (loadingProgressView != null)
-	{
-	    loadingProgressView.setVisibility(View.GONE);
-	    loadingProgressView = null;
-	}
+	Log.d(TAG, "Add items to adapter");
 
-	if (items != null && scroller != null)
-	{
-	    addAnswersToView();
-	}
+	itemListAdapter.addAll(items);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+	super.onActivityCreated(savedInstanceState);
+
+	registerForContextMenu(getListView());
+
+	getListView().setOnScrollListener(this);
     }
 
     @Override
@@ -195,6 +137,46 @@ public class UserAnswersFragment extends ItemDisplayFragment<Answer>
     @Override
     protected ViewGroup getParentLayout()
     {
-	return itemsLayout;
+	return itemsContainer;
+    }
+
+    @Override
+    public View getView(final Answer item, View convertView, ViewGroup parent)
+    {
+	final RelativeLayout answerRow = (RelativeLayout) getActivity().getLayoutInflater().inflate(
+	                R.layout.user_item_row, null);
+	TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
+	textView.setText(Html.fromHtml(item.title));
+
+	textView = (TextView) answerRow.findViewById(R.id.viewItem);
+	textView.setClickable(true);
+	textView.setOnClickListener(new View.OnClickListener()
+	{
+	    @Override
+	    public void onClick(View v)
+	    {
+		Point size = new Point();
+		getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+
+		PopupBuilder.build(getActivity().getLayoutInflater(), answerRow, item, size);
+	    }
+	});
+
+	textView = (TextView) answerRow.findViewById(R.id.viewQuestion);
+	textView.setClickable(true);
+
+	return answerRow;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id)
+    {
+	Intent intent = new Intent(getActivity(), QuestionActivity.class);
+	Question question = new Question();
+	question.id = itemListAdapter.getItem(position).questionId;
+	question.title = itemListAdapter.getItem(position).title;
+	intent.putExtra(StringConstants.QUESTION, question);
+	intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
+	startActivity(intent);
     }
 }

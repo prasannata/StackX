@@ -28,33 +28,34 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class QuestionsFragment extends ItemDisplayFragment<Question>
+public class QuestionsFragment extends AbstractListQuestionFragment
 {
     private static final String TAG = QuestionsFragment.class.getSimpleName();
 
     private Intent intent;
     private IntentFilter filter;
-    private int itemDisplayCursor = 0;
     private int currentPage = 0;
+    private boolean relatedQuestions = false;
 
     public enum QuestionAction
     {
 	FRONT_PAGE,
 	FAQS_TAG,
-	SEARCH;
+	SEARCH
     }
 
     public interface OnGetQuestionsListener
@@ -74,38 +75,30 @@ public class QuestionsFragment extends ItemDisplayFragment<Question>
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	itemDisplayCursor = 0;
-	itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
+	if (itemsContainer == null)
+	{
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
+	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+		            new ArrayList<Question>(), this);
+	    setListAdapter(itemListAdapter);
+	}
 
 	return itemsContainer;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    public void onActivityCreated(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+	super.onActivityCreated(savedInstanceState);
 
-	if (savedInstanceState != null)
-	{
-	    Log.d(TAG, "onCreate savedInstanceState");
-
-	    items = (ArrayList<Question>) savedInstanceState.getSerializable(StringConstants.QUESTIONS);
-
-	    if (items != null)
-		displayItems();
-	}
+	if (relatedQuestions)
+	    getRelatedQuestions(getActivity().getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
 	Log.d(TAG, "Saving instance state");
-	if (items != null && items.isEmpty() == false)
-	{
-	    outState.putSerializable(StringConstants.QUESTIONS, items);
-	}
-
 	super.onSaveInstanceState(outState);
     }
 
@@ -138,25 +131,37 @@ public class QuestionsFragment extends ItemDisplayFragment<Question>
 	}
     }
 
-    private void clean()
+    protected void clean()
     {
 	stopRunningServiceAndReceiver();
 
-	itemsContainer.removeAllViews();
+	itemListAdapter.clear();
 
 	currentPage = 0;
-
-	itemDisplayCursor = 0;
-
-	items.clear();
     }
 
-    public void loadFrontPage()
+    public void getFrontPage()
     {
 	clean();
 
 	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
+	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+
+	showLoadingSpinningWheel();
+
+	registerReceiver();
+
+	startIntentService();
+    }
+
+    public void getRelatedQuestions(long questionId)
+    {
+	clean();
+
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
+	intent.putExtra(StringConstants.QUESTION_ID, questionId);
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
 	showLoadingSpinningWheel();
@@ -197,35 +202,45 @@ public class QuestionsFragment extends ItemDisplayFragment<Question>
 	registerReceiver();
 
 	startIntentService();
-
     }
 
     @Override
-    protected void displayItems()
+    public boolean onContextItemSelected(MenuItem item)
     {
-	dismissLoadingSpinningWheel();
+	Log.d(getLogTag(), "onContextItemSelected");
 
-	Log.d(getLogTag(), "questions size: " + items.size() + ", lastDisplayQuestionIndex: " + itemDisplayCursor);
-
-	for (; itemDisplayCursor < items.size(); itemDisplayCursor++)
+	if (!super.onContextItemSelected(item))
 	{
-	    LinearLayout questionLayout = QuestionRowLayoutBuilder.getInstance().build(
-		            getActivity().getLayoutInflater(), getActivity(), false, items.get(itemDisplayCursor));
-	    getParentLayout().addView(questionLayout,
-		            new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+	    if (item.getGroupId() == R.id.qContextMenuGroup)
+	    {
+		Log.d(getLogTag(), "Context item selected: " + item.getItemId());
+
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		switch (item.getItemId())
+		{
+		    case R.id.q_ctx_related:
+			getRelatedQuestions(itemListAdapter.getItem(info.position).id);
+			return true;
+		    default:
+			Log.d(TAG, "Unknown item " + item.getItemId());
+			return false;
+		}
+	    }
 	}
+
+	return false;
     }
 
     @Override
-    public String getReceiverExtraName()
+    public void refresh()
     {
-	return QuestionIntentAction.QUESTIONS.getExtra();
+	clean();
+
+	super.refresh();
     }
 
-    @Override
-    protected ViewGroup getParentLayout()
+    public void setFetchRelatedQuestions(boolean relatedQuestions)
     {
-	return itemsContainer;
+	this.relatedQuestions = relatedQuestions;
     }
-
 }

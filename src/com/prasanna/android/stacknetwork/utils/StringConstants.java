@@ -40,6 +40,7 @@ public class StringConstants
     public static final String ME = "me";
     public static final String ACCOUNTS = "accounts";
     public static final String ACTION = "action";
+    public static final String RELATED = "related";
 
     public static final class HttpError
     {

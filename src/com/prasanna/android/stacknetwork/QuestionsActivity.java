@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment;
@@ -37,22 +35,12 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.FetchTagsAsyncTask;
-import com.prasanna.android.views.ScrollViewWithNotifier;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements OnGetQuestionsListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
 
-    protected boolean serviceRunning = false;
-
-    protected Intent questionsIntent;
-
-    private ScrollViewWithNotifier scrollView;
-
     private ArrayList<String> tags = new ArrayList<String>();
-
-    private int itemPosition;
-
     private ArrayAdapter<String> spinnerAdapter;
 
     public class FetchUserTagsCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<String>>
@@ -105,36 +93,36 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
 	setContentView(R.layout.scroll_fragment);
 
-	scrollView = (ScrollViewWithNotifier) findViewById(R.id.itemScroller);
-	scrollView.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-	{
-	    @Override
-	    public void onScrollToBottom(View view)
-	    {
-		QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
-		                R.id.questionsFragment);
-		questionsFragment.onScrollToBottom();
-	    }
-	});
-
 	int lastSavedPosition = -1;
 
-	if (savedInstanceState != null)
-	{
-	    tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
-	    lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
-	    initActionBarSpinner();
+	boolean relatedQuestions = getIntent().getBooleanExtra(StringConstants.RELATED, false);
 
-	    if (lastSavedPosition > 0)
+	if (!relatedQuestions)
+	{
+	    if (savedInstanceState != null)
 	    {
-		getActionBar().setSelectedNavigationItem(lastSavedPosition);
+		tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
+		lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
+		initActionBarSpinner();
+
+		if (lastSavedPosition > 0)
+		{
+		    getActionBar().setSelectedNavigationItem(lastSavedPosition);
+		}
+	    }
+	    else
+	    {
+		FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(new FetchUserTagsCompletionNotifier(),
+		                AppUtils.inRegisteredSite(getCacheDir()));
+		fetchUserAsyncTask.execute(1);
 	    }
 	}
 	else
 	{
-	    FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(new FetchUserTagsCompletionNotifier(),
-		            AppUtils.inRegisteredSite(getCacheDir()));
-	    fetchUserAsyncTask.execute(1);
+	    QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+		            R.id.questionsFragment);
+	    questionsFragment.setFetchRelatedQuestions(true);
+
 	}
     }
 
@@ -157,7 +145,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     {
 	Log.d(TAG, "Saving activity instance");
 	outState.putSerializable(StringConstants.TAGS, tags);
-	outState.putInt(StringConstants.ITEM_POSITION, itemPosition);
 
 	super.onSaveInstanceState(outState);
     }
@@ -178,7 +165,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 	switch (questionAction)
 	{
 	    case FRONT_PAGE:
-		questionsFragment.loadFrontPage();
+		questionsFragment.getFrontPage();
 		break;
 	    case FAQS_TAG:
 		questionsFragment.getFaqsForTag(term);
@@ -187,8 +174,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 		questionsFragment.search(term);
 		break;
 	    default:
+		Log.d(TAG, "Invalid question action");
 		break;
 	}
-
     }
 }

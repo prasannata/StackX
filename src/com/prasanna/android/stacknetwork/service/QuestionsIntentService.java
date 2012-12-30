@@ -32,8 +32,8 @@ public class QuestionsIntentService extends AbstractIntentService
     public static final int GET_FRONT_PAGE = 1;
     public static final int GET_FAQ_FOR_TAG = 2;
     public static final int SEARCH = 3;
+    public static final int GET_RELATED = 4;
 
-    private UserServiceHelper userService = UserServiceHelper.getInstance();
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
     public QuestionsIntentService()
@@ -59,7 +59,7 @@ public class QuestionsIntentService extends AbstractIntentService
 		case GET_FRONT_PAGE:
 		    Log.d(TAG, "Get front page");
 		    broadcastSerializableExtra(QuestionIntentAction.QUESTIONS.name(),
-			            QuestionIntentAction.QUESTIONS.getExtra(), userService.getAllQuestions(page));
+			            QuestionIntentAction.QUESTIONS.getExtra(), questionService.getAllQuestions(page));
 		    break;
 		case GET_FAQ_FOR_TAG:
 		    String tag = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ.getExtra());
@@ -73,6 +73,17 @@ public class QuestionsIntentService extends AbstractIntentService
 		    broadcastSerializableExtra(QuestionIntentAction.QUESTION_SEARCH.name(),
 			            QuestionIntentAction.QUESTIONS.getExtra(), questionService.search(query, page));
 		    break;
+		case GET_RELATED:
+		    Log.d(TAG, "Get related questions");
+		    long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
+		    if (questionId > 0)
+		    {
+			broadcastSerializableExtra(QuestionIntentAction.QUESTIONS.name(),
+			                QuestionIntentAction.QUESTIONS.getExtra(),
+			                questionService.getRelatedQuestions(questionId, page));
+		    }
+		    break;
+
 		default:
 		    Log.e(TAG, "Unknown action: " + action);
 		    break;

@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -51,6 +51,8 @@ public class QuestionsCache
 	if (id != null && id > 0 && lru.containsKey(id))
 	{
 	    question = lru.get(id).get();
+	    if (question == null)
+		lru.remove(id);
 	}
 
 	return question;
