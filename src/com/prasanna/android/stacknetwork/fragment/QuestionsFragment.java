@@ -51,6 +51,8 @@ public class QuestionsFragment extends AbstractListQuestionFragment
     private int currentPage = 0;
     private boolean relatedQuestions = false;
 
+    private boolean isSearch;
+
     public enum QuestionAction
     {
 	FRONT_PAGE,
@@ -93,6 +95,8 @@ public class QuestionsFragment extends AbstractListQuestionFragment
 
 	if (relatedQuestions)
 	    getRelatedQuestions(getActivity().getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
+	else if (isSearch)
+	    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
     }
 
     @Override
@@ -242,5 +246,10 @@ public class QuestionsFragment extends AbstractListQuestionFragment
     public void setFetchRelatedQuestions(boolean relatedQuestions)
     {
 	this.relatedQuestions = relatedQuestions;
+    }
+
+    public void setSearch(boolean isSearch)
+    {
+	this.isSearch = isSearch;
     }
 }

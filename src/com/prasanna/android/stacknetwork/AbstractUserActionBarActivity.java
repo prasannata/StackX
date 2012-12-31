@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,15 +36,15 @@ import android.widget.SearchView;
 
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.User.UserType;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.IconCache;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.FetchImageAsyncTask;
 
-public abstract class AbstractUserActionBarActivity extends Activity implements SearchView.OnQueryTextListener
+public abstract class AbstractUserActionBarActivity extends Activity
 {
     private String accessToken;
     protected SearchView searchView;
@@ -97,12 +98,9 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 
     private void setupSearchView(Menu menu)
     {
-	// SearchManager searchManager = (SearchManager)
-	// getSystemService(Context.SEARCH_SERVICE);
+	SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 	searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-	searchView.setOnQueryTextListener(this);
-	searchView.setQueryHint(getString(R.string.searchInTitle));
-	// searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+	searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
     }
 
     private void loadIcon()
@@ -138,49 +136,49 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		    startActivity(intent);
 		}
-		break;
+		return true;
 	    case R.id.menu_refresh:
 		refresh();
-		break;
+		return true;
 	    case R.id.menu_search:
-		break;
+		return false;
 	    case R.id.menu_my_profile:
 		Intent userProfileIntent = new Intent(getCurrentContext(), UserProfileActivity.class);
 		userProfileIntent.putExtra(StringConstants.ME, true);
 		startActivity(userProfileIntent);
-		break;
+		return true;
 	    case R.id.menu_option_archive:
 		Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
 		startActivity(archiveIntent);
-		break;
+		return true;
 	    case R.id.menu_my_inbox:
 		Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
 		userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
 		startActivity(userInboxIntent);
-		break;
+		return true;
 	    case R.id.menu_option_change_site:
 		Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
 		startActivity(siteListIntent);
-		break;
+		return true;
 	    case R.id.menu_option_settings:
 		Intent settingsIntent = new Intent(this, SettingsActivity.class);
 		startActivity(settingsIntent);
-		break;
+		return true;
 	    case R.id.menu_option_login:
 		Intent oAuthIntent = new Intent(this, OAuthActivity.class);
 		SharedPreferencesUtil.clear(getApplicationContext());
 		startActivity(oAuthIntent);
-		break;
+		return true;
 	    case R.id.menu_option_logout:
 		Intent logoutIntent = new Intent(this, LogoutActivity.class);
 		startActivity(logoutIntent);
-		break;
+		return true;
 	    case R.id.menu_discard:
 		if (discardOptionListener != null)
 		{
 		    discardOptionListener.onDiscardOptionClick();
 		}
-		break;
+		return true;
 	    case R.id.menu_option_test_gen_notify:
 		Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.name());
 		HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
@@ -189,10 +187,10 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
 		notifyIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
 		notifyIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), 4);
 		sendBroadcast(notifyIntent);
-		break;
+		return true;
 	}
 
-	return super.onOptionsItemSelected(item);
+	return false;
     }
 
     public boolean isAuthenticatedRealm()
@@ -211,17 +209,5 @@ public abstract class AbstractUserActionBarActivity extends Activity implements 
     public String getAccessToken()
     {
 	return accessToken;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query)
-    {
-	return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String paramString)
-    {
-	return false;
     }
 }

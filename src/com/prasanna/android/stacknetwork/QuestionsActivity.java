@@ -23,11 +23,15 @@ import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.prasanna.android.provider.RecentQueriesProvider;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnGetQuestionsListener;
 import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.QuestionAction;
@@ -85,7 +89,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 	getActionBar().setListNavigationCallbacks(spinnerAdapter, callback);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -93,36 +96,45 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
 	setContentView(R.layout.scroll_fragment);
 
-	int lastSavedPosition = -1;
+	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+	                R.id.questionsFragment);
 
-	boolean relatedQuestions = getIntent().getBooleanExtra(StringConstants.RELATED, false);
-
-	if (!relatedQuestions)
+	if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
 	{
-	    if (savedInstanceState != null)
-	    {
-		tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
-		lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
-		initActionBarSpinner();
+	    SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
+		            RecentQueriesProvider.MODE);
+	    suggestions.saveRecentQuery(getIntent().getStringExtra(SearchManager.QUERY), null);
+	    questionsFragment.setSearch(true);
+	}
+	else if (getIntent().getBooleanExtra(StringConstants.RELATED, false))
+	{
+	    questionsFragment.setFetchRelatedQuestions(true);
+	}
+	else
+	{
+	    loadFrontPage(savedInstanceState);
+	}
+    }
 
-		if (lastSavedPosition > 0)
-		{
-		    getActionBar().setSelectedNavigationItem(lastSavedPosition);
-		}
-	    }
-	    else
+    @SuppressWarnings("unchecked")
+    private void loadFrontPage(Bundle savedInstanceState)
+    {
+	if (savedInstanceState != null)
+	{
+	    tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
+	    int lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
+	    initActionBarSpinner();
+
+	    if (lastSavedPosition > 0)
 	    {
-		FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(new FetchUserTagsCompletionNotifier(),
-		                AppUtils.inRegisteredSite(getCacheDir()));
-		fetchUserAsyncTask.execute(1);
+		getActionBar().setSelectedNavigationItem(lastSavedPosition);
 	    }
 	}
 	else
 	{
-	    QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
-		            R.id.questionsFragment);
-	    questionsFragment.setFetchRelatedQuestions(true);
-
+	    FetchTagsAsyncTask fetchUserAsyncTask = new FetchTagsAsyncTask(new FetchUserTagsCompletionNotifier(),
+		            AppUtils.inRegisteredSite(getCacheDir()));
+	    fetchUserAsyncTask.execute(1);
 	}
     }
 
@@ -150,13 +162,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query)
-    {
-	onGetQuestions(QuestionAction.SEARCH, query);
-	return true;
-    }
-
-    @Override
     public void onGetQuestions(QuestionAction questionAction, String term)
     {
 	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
@@ -171,7 +176,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 		questionsFragment.getFaqsForTag(term);
 		break;
 	    case SEARCH:
-		questionsFragment.search(term);
+		// questionsFragment.search(term);
 		break;
 	    default:
 		Log.d(TAG, "Invalid question action");
