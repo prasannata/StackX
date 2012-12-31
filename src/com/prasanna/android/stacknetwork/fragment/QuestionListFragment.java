@@ -42,9 +42,9 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class QuestionsFragment extends AbstractListQuestionFragment
+public class QuestionListFragment extends AbstractListQuestionFragment
 {
-    private static final String TAG = QuestionsFragment.class.getSimpleName();
+    private static final String TAG = QuestionListFragment.class.getSimpleName();
 
     private Intent intent;
     private IntentFilter filter;

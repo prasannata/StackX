@@ -47,9 +47,9 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserAnswersFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
+public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
 {
-    private static final String TAG = UserAnswersFragment.class.getSimpleName();
+    private static final String TAG = UserAnswerListFragment.class.getSimpleName();
     private int page = 1;
 
     @Override

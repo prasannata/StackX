@@ -26,9 +26,9 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
-import com.prasanna.android.stacknetwork.fragment.UserAnswersFragment;
+import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
-import com.prasanna.android.stacknetwork.fragment.UserQuestionsFragment;
+import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity
@@ -65,9 +65,9 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
 		case 0:
 		    return new UserProfileFragment();
 		case 1:
-		    return new UserQuestionsFragment();
+		    return new UserQuestionListFragment();
 		case 2:
-		    return new UserAnswersFragment();
+		    return new UserAnswerListFragment();
 
 		default:
 		    return null;

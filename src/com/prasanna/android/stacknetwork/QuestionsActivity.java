@@ -32,9 +32,9 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import com.prasanna.android.provider.RecentQueriesProvider;
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment;
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.OnGetQuestionsListener;
-import com.prasanna.android.stacknetwork.fragment.QuestionsFragment.QuestionAction;
+import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
+import com.prasanna.android.stacknetwork.fragment.QuestionListFragment.OnGetQuestionsListener;
+import com.prasanna.android.stacknetwork.fragment.QuestionListFragment.QuestionAction;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -96,7 +96,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
 	setContentView(R.layout.scroll_fragment);
 
-	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+	QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
 	                R.id.questionsFragment);
 
 	if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
@@ -141,7 +141,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void refresh()
     {
-	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+	QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
 	                R.id.questionsFragment);
 	questionsFragment.refresh();
     }
@@ -164,7 +164,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onGetQuestions(QuestionAction questionAction, String term)
     {
-	QuestionsFragment questionsFragment = (QuestionsFragment) getFragmentManager().findFragmentById(
+	QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
 	                R.id.questionsFragment);
 
 	switch (questionAction)

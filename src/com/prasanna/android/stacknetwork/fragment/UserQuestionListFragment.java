@@ -40,9 +40,9 @@ import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserQuestionsFragment extends AbstractListQuestionFragment
+public class UserQuestionListFragment extends AbstractListQuestionFragment
 {
-    private static final String TAG = UserQuestionsFragment.class.getSimpleName();
+    private static final String TAG = UserQuestionListFragment.class.getSimpleName();
     private Intent intent;
     private int page = 0;
 
