@@ -37,7 +37,7 @@ import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserQuestionListFragment extends AbstractListQuestionFragment
+public class UserQuestionListFragment extends AbstractQuestionListFragment
 {
     private static final String TAG = UserQuestionListFragment.class.getSimpleName();
     private Intent intent;

@@ -45,7 +45,7 @@ import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAc
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public abstract class AbstractListQuestionFragment extends ItemListFragment<Question> implements ListItemView<Question>
+public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
 {
     private OnContextItemSelectedListener<Question> onContextItemSelectedListener;
     private final Bundle bundle = new Bundle();
