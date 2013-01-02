@@ -44,6 +44,7 @@ import com.prasanna.android.preference.DialogPreferenceImpl;
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -110,7 +111,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	addPreferencesFromResource(R.xml.preferences);
 
 	setupDefaultSitePreference();
-	
+
 	setupAccountPreference();
 
 	setupInboxPreference();
@@ -200,12 +201,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     private void setupDefaultSitePreference()
     {
-	defaultSitePref =  (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
+	defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
 	String entry = (String) defaultSitePref.getValue();
 	defaultSitePref.setEntryValues(new String[0]);
 	defaultSitePref.setEntries(new String[0]);
 	defaultSitePref.setSummary(entry != null ? entry : "None");
-
 
 	defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
 	{
@@ -214,6 +214,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	    {
 		defaultSitePref.getDialog().dismiss();
 
+		startActivity(new Intent(getActivity(), StackNetworkListActivity.class));
 		return true;
 	    }
 	});
