@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,18 +15,18 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.utils;
 
 public class DateTimeUtils
 {
-    public static final String SECOND = "second";
-    public static final String MINUTE = "minute";
-    public static final String HOUR = "hour";
-    public static final String DAY = "day";
-    public static final String MONTH = "month";
-    public static final String YEAR = "year";
+    public static final String SECOND = "s";
+    public static final String MINUTE = "m";
+    public static final String HOUR = "h";
+    public static final String DAY = "d";
+    public static final String MONTH = "m";
+    public static final String YEAR = "y";
     public static final int SECONDS_IN_MIN = 60;
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = 3600 * 24;
@@ -35,72 +35,62 @@ public class DateTimeUtils
 
     public static String getElapsedDurationSince(long seconds)
     {
-        String duration = null;
-        String unit = SECOND;
-        String residueUnit = null;
+	String unit = SECOND;
+	String residueUnit = null;
 
-        long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-        long elapsedTimeInSeconds = currentTimeInSeconds - seconds;
+	long currentTimeInSeconds = System.currentTimeMillis() / 1000;
+	long elapsedTimeInSeconds = currentTimeInSeconds - seconds;
 
-        int count = 0;
-        int residue = 0;
+	int count = 0;
+	int residue = 0;
 
-        if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR)
-        {
-            count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
-            unit = MINUTE;
-        }
-        else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY)
-        {
-            count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
-            unit = HOUR;
-        }
-        else if (elapsedTimeInSeconds > SECONDS_IN_DAY)
-        {
-            count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
-            if (count > DAYS_IN_MONTH)
-            {
+	if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR)
+	{
+	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
+	    unit = MINUTE;
+	}
+	else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY)
+	{
+	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
+	    unit = HOUR;
+	}
+	else if (elapsedTimeInSeconds > SECONDS_IN_DAY)
+	{
+	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
+	    if (count > DAYS_IN_MONTH)
+	    {
 
-                residue = count % DAYS_IN_MONTH;
-                count /= DAYS_IN_MONTH;
+		residue = count % DAYS_IN_MONTH;
+		count /= DAYS_IN_MONTH;
 
-                if (count > MONTHS_IN_YEAR)
-                {
-                    residue = count % MONTHS_IN_YEAR;
-                    count /= MONTHS_IN_YEAR;
-                    unit = YEAR;
-                    residueUnit = MONTH;
-                }
-                else
-                {
-                    unit = MONTH;
-                    residueUnit = DAY;
-                }
-            }
-            else
-            {
-                unit = DAY;
-            }
-        }
+		if (count > MONTHS_IN_YEAR)
+		{
+		    residue = count % MONTHS_IN_YEAR;
+		    count /= MONTHS_IN_YEAR;
+		    unit = YEAR;
+		    residueUnit = MONTH;
+		}
+		else
+		{
+		    unit = MONTH;
+		    residueUnit = DAY;
+		}
+	    }
+	    else
+	    {
+		unit = DAY;
+	    }
+	}
 
-        duration = new String();
-        duration = count + " " + getUnit(count, unit);
-        if (residue > 0)
-        {
-            duration += " and " + residue + " " + getUnit(residue, residueUnit);
-        }
+	if (count == 0)
+	    return "now";
+	
+	String duration = new String(count + unit);
 
-        duration += " ago";
-        return duration;
-    }
+	if (residue > 0)
+	    duration += " and " + residue + residueUnit;
 
-    private static String getUnit(int count, String unit)
-    {
-        if (count > 1)
-        {
-            unit += "s";
-        }
-
-        return unit;
+	duration += " ago";
+	return duration;
     }
 }

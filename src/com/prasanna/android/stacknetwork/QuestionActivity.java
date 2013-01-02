@@ -35,9 +35,6 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
@@ -63,7 +60,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private QuestionViewPageAdapter questionViewPageAdapter;
     private ViewPager viewPager;
     private TitlePageIndicator indicator;
-    private MenuItem refreshMenuItem;
     boolean serviceRunningForAnswers = false;
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
@@ -316,8 +312,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	if (ret)
 	{
-	    refreshMenuItem = menu.findItem(R.id.menu_refresh);
-
 	    if (viewPager.getCurrentItem() == 0 && question != null && question.answerCount > 0
 		            && question.answers == null)
 	    {
@@ -328,26 +322,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	}
 
 	return false;
-    }
-
-    private void startRefreshAnimation()
-    {
-	ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(R.layout.refresh_action_view, null);
-	Animation rotation = AnimationUtils.loadAnimation(this, R.animator.rotate_360);
-	rotation.setRepeatCount(Animation.INFINITE);
-	refreshActionView.startAnimation(rotation);
-	refreshMenuItem.setEnabled(false);
-	refreshMenuItem.setActionView(refreshActionView);
-    }
-
-    private void hideRefreshActionAnimation()
-    {
-	if (refreshMenuItem != null && refreshMenuItem.getActionView() != null)
-	{
-	    refreshMenuItem.getActionView().clearAnimation();
-	    refreshMenuItem.setActionView(null);
-	    refreshMenuItem.setEnabled(true);
-	}
     }
 
     @Override

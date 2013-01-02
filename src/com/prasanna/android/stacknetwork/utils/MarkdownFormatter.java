@@ -120,7 +120,7 @@ public class MarkdownFormatter
 			    else
 			    {
 				addSimpleTextToView(context, views, buffer, params);
-				views.add(getTextViewForCode(context, params, code.toString()));
+				views.add(getTextViewForCode(context, code.toString()));
 				buffer.delete(0, code.length());
 			    }
 			}
@@ -195,15 +195,17 @@ public class MarkdownFormatter
 	return textView;
     }
 
-    private static TextView getTextViewForCode(Context context, LinearLayout.LayoutParams params, String text)
+    private static TextView getTextViewForCode(Context context, String text)
     {
+	LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+	                LinearLayout.LayoutParams.WRAP_CONTENT);
 	TextView textView = new TextView(context);
-	textView.setTextColor(Color.BLACK);
+	textView.setTextColor(context.getResources().getColor(R.color.delft));
 	textView.setLayoutParams(params);
 	textView.setTextSize(10f);
-	textView.setBackgroundColor(context.getResources().getColor(R.color.lightGrey));
+	textView.setBackgroundColor(context.getResources().getColor(R.color.codeBg));
 	textView.setTextIsSelectable(true);
-	textView.setPadding(0, 0, 0, 0);
+	textView.setPadding(5, 5, 5, 5);
 	textView.setText(text);
 	return textView;
     }

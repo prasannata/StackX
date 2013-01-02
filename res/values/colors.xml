@@ -17,5 +17,6 @@
     <color name="lichen">#C0D9AF</color>
     <color name="azure">#C0D9D9</color>
     <color name="signRed">#AF1E2D</color>
-
+    <color name="tagBlue">#E0EAF1</color>
+    <color name="codeBg">#EAEAEA</color>
 </resources>

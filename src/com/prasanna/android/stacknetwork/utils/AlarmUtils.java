@@ -28,7 +28,6 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.LoginActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.receiver.InboxRefreshAlarmBroadcastReceiver;
-import com.prasanna.android.stacknetwork.receiver.NewMsgNotificationReceiver;
 
 public class AlarmUtils
 {
@@ -47,7 +46,7 @@ public class AlarmUtils
 	else
 	{
 	    Log.d(TAG, "Inbox refreshing set to " + interval + " minutes");
-	    
+
 	    interval = interval * 60 * 1000;
 	    createRepeatingAlarm(LoginActivity.getAppContext(), InboxRefreshAlarmBroadcastReceiver.class, interval, 0);
 	}
@@ -56,7 +55,7 @@ public class AlarmUtils
     public static void cancelInboxRefreshAlarm()
     {
 	Log.d(TAG, "Cancel inbox refresh alarm");
-	cancelAlarm(LoginActivity.getAppContext(), 0);
+	cancelAlarm(LoginActivity.getAppContext(), InboxRefreshAlarmBroadcastReceiver.class, 0);
     }
 
     public static void rescheduleInboxRefreshAlarm(Context context)
@@ -73,10 +72,10 @@ public class AlarmUtils
 	alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), intervalInMs, pendingIntent);
     }
 
-    public static void cancelAlarm(Context context, int flags)
+    public static void cancelAlarm(Context context, Class<?> clazz, int flags)
     {
 	AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-	Intent intent = new Intent(context, NewMsgNotificationReceiver.class);
+	Intent intent = new Intent(context, clazz);
 	PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, flags);
 	pendingIntent.cancel();
 	alarmManager.cancel(pendingIntent);
@@ -84,7 +83,7 @@ public class AlarmUtils
 
     public static void rescheduleRepeatingAlarm(Context context, Class<?> clazz, int newIntervalInMs, int flags)
     {
-	cancelAlarm(context, flags);
+	cancelAlarm(context, clazz, flags);
 	createRepeatingAlarm(context, clazz, newIntervalInMs, flags);
     }
 }

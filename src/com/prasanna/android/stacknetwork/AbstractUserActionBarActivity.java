@@ -32,6 +32,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.SearchView;
 
 import com.prasanna.android.listener.OnDiscardOptionListener;
@@ -52,6 +55,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     protected SearchView searchView;
     private IconCache iconCache = IconCache.getInstance();
     private OnDiscardOptionListener discardOptionListener;
+    private MenuItem refreshMenuItem;
 
     protected abstract void refresh();
 
@@ -76,6 +80,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
 	else
 	    setupActionBarForAnyUser(menu);
 
+	refreshMenuItem = menu.findItem(R.id.menu_refresh);
+	
 	return true;
     }
 
@@ -210,6 +216,25 @@ public abstract class AbstractUserActionBarActivity extends Activity
 	this.discardOptionListener = discardOptionListener;
     }
 
+    protected void startRefreshAnimation()
+    {
+	ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(R.layout.refresh_action_view, null);
+	Animation rotation = AnimationUtils.loadAnimation(this, R.animator.rotate_360);
+	rotation.setRepeatCount(Animation.INFINITE);
+	refreshActionView.startAnimation(rotation);
+	refreshMenuItem.setEnabled(false);
+	refreshMenuItem.setActionView(refreshActionView);
+    }
+
+    protected void hideRefreshActionAnimation()
+    {
+	if (refreshMenuItem != null && refreshMenuItem.getActionView() != null)
+	{
+	    refreshMenuItem.getActionView().clearAnimation();
+	    refreshMenuItem.setActionView(null);
+	    refreshMenuItem.setEnabled(true);
+	}
+    }
     public String getAccessToken()
     {
 	return accessToken;

@@ -109,6 +109,8 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     @Override
     public void onDestroy()
     {
+	Log.d(getLogTag(), "onDestroy");
+	
 	super.onDestroy();
 
 	stopServiceAndUnregisterReceivers();
@@ -117,9 +119,11 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     @Override
     public void onStop()
     {
+	Log.d(getLogTag(), "onStop");
+	
 	super.onStop();
 
-	stopServiceAndUnregisterReceivers();
+	stopService();
     }
 
     protected void stopServiceAndUnregisterReceivers()
