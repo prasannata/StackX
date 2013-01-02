@@ -2,6 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory
+        android:key="pref_general"
+        android:persistent="false"
+        android:title="@string/general" >
+        <ListPreference
+            android:key="pref_defaultSite"
+            android:title="@string/defaultSite"
+            android:persistent="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:key="pref_storage"
         android:persistent="false"
         android:title="@string/storage" >

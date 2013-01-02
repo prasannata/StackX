@@ -46,24 +46,11 @@ public class QuestionRowLayoutBuilder
 	            final Question question)
     {
 	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
+
 	questionRowLayout.setId((int) question.id);
-
-	if (question.hasAcceptedAnswer == true)
-	{
-	    questionRowLayout.setBackgroundResource(R.drawable.question_answered_shape);
-	}
-
-	createCountsView(questionRowLayout, question);
-	createQuestionSnippetView(questionRowLayout, context, cached, question);
+	setupViewForQuestionMetadata(questionRowLayout, question);
 	setupViewForTags(questionRowLayout, context, question);
 	return questionRowLayout;
-    }
-
-    private void createQuestionSnippetView(final LinearLayout parentLayout, final Context context,
-	            final boolean cached, final Question question)
-    {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.questionSnippetTitle);
-	textView.setText(Html.fromHtml(question.title));
     }
 
     private void setupViewForTags(final LinearLayout parentLayout, final Context context, final Question question)
@@ -84,16 +71,26 @@ public class QuestionRowLayoutBuilder
 	}
     }
 
-    private void createCountsView(final LinearLayout parentLayout, Question question)
+    private void setupViewForQuestionMetadata(LinearLayout parentLayout, Question question)
     {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
-	textView.append(":" + AppUtils.formatNumber(question.viewCount));
+	TextView textView = (TextView) parentLayout.findViewById(R.id.questionScore);
+	textView.setText(AppUtils.formatNumber(question.score));
 
-	textView = (TextView) parentLayout.findViewById(R.id.questionScoreValue);
-	textView.append(":" + AppUtils.formatNumber(question.score));
+	if (question.hasAcceptedAnswer)
+	    textView.setBackgroundResource(R.drawable.rounded_border_delft_bg_lichen);
+
+	textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
+	textView.setText(Html.fromHtml(question.title));
+
+	textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
+	textView.append(":" + AppUtils.formatNumber(question.viewCount));
 
 	textView = (TextView) parentLayout.findViewById(R.id.questionAnswersValue);
 	textView.append(":" + AppUtils.formatNumber(question.answerCount));
+
+	textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
+	textView.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
+	                + Html.fromHtml(question.owner.displayName));
     }
 
     private LayoutInflater getInflater(Context context)

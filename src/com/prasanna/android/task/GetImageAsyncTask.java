@@ -24,11 +24,11 @@ import android.os.AsyncTask;
 
 import com.prasanna.android.http.SecureHttpHelper;
 
-public class FetchImageAsyncTask extends AsyncTask<String, Void, Bitmap>
+public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 {
     private final AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl;
 
-    public FetchImageAsyncTask(
+    public GetImageAsyncTask(
 		    AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl)
     {
 	this.imageFetchAsyncTaskCompleteNotiferImpl = imageFetchAsyncTaskCompleteNotiferImpl;

@@ -22,17 +22,27 @@ package com.prasanna.android.stacknetwork;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
+import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.utils.IntentUtils;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class UserProfileActivity extends AbstractUserActionBarActivity
+public class UserProfileActivity extends AbstractUserActionBarActivity implements
+                OnContextItemSelectedListener<BaseStackExchangeItem>
 {
+    private static final String TAG = UserProfileActivity.class.getSimpleName();
     private static final String[] PAGES = { "Profile", "Questions", "Answers" };
 
     private ProfileViewPageAdapter profileViewPageAdapter;
@@ -108,9 +118,53 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
 	boolean ret = super.onCreateOptionsMenu(menu);
-	
 	menu.removeItem(R.id.menu_my_profile);
-	
 	return ret & true;
     }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item, BaseStackExchangeItem stackXItem)
+    {
+	if (item.getGroupId() == R.id.qContextMenuGroup)
+	{
+	    
+	    Log.d(TAG, "Context item selected: " + item.getTitle());
+
+	    switch (item.getItemId())
+	    {
+		case R.id.q_ctx_comments:
+		    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+		    return true;
+		case R.id.q_ctx_menu_user_profile:
+		    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
+		    userProfileIntent.putExtra(StringConstants.USER_ID, stackXItem.owner.id);
+		    startActivity(userProfileIntent);
+		case R.id.q_ctx_related:
+		    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+		    questionsIntent.setAction(StringConstants.RELATED);
+		    questionsIntent.putExtra(StringConstants.QUESTION_ID, stackXItem.id);
+		    startActivity(questionsIntent);
+		    return true;
+		case R.id.q_ctx_menu_email:
+		    IntentUtils.createEmailIntent(stackXItem.title, stackXItem.link);
+		    return true;
+		default:
+		    return false;
+	    }
+	}
+	else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
+	{
+	    Log.d(TAG, "Tag selected: " + item.getTitle());
+	    
+	    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+	    questionsIntent.setAction(StringConstants.TAG);
+	    questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
+	    startActivity(questionsIntent);
+
+	    return true;
+	}
+
+	return false;
+    }
+
 }

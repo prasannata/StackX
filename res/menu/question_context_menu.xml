@@ -3,26 +3,35 @@
 
     <group android:id="@+id/qContextMenuGroup" >
         <item
+            android:id="@+id/q_ctx_menu_tags"
+            android:orderInCategory="0"
+            android:title="@string/tags">
+            <menu>
+                <group android:id="@+id/qContextTagsMenuGroup" >
+                </group>
+            </menu>
+        </item>
+        <item
             android:id="@+id/q_ctx_comments"
             android:enabled="false"
-            android:orderInCategory="0"
+            android:orderInCategory="1"
             android:title="@string/comments"
             android:visible="false"/>
         <item
             android:id="@+id/q_ctx_related"
-            android:orderInCategory="1"
+            android:orderInCategory="2"
             android:title="@string/related"/>
         <item
             android:id="@+id/q_ctx_menu_user_profile"
-            android:orderInCategory="2"
+            android:orderInCategory="3"
             android:title=""/>
         <item
             android:id="@+id/q_ctx_menu_archive"
-            android:orderInCategory="3"
+            android:orderInCategory="4"
             android:title="@string/archive"/>
         <item
             android:id="@+id/q_ctx_menu_email"
-            android:orderInCategory="4"
+            android:orderInCategory="5"
             android:title="@string/email"/>
     </group>
 

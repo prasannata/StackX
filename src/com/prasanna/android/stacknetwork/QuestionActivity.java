@@ -19,6 +19,7 @@
 
 package com.prasanna.android.stacknetwork;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Fragment;
@@ -37,6 +38,7 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
@@ -46,7 +48,9 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener
@@ -72,7 +76,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	@Override
 	public int getCount()
 	{
-	    return question.answers == null ? 1 : 1 + question.answers.size();
+	    if (question == null)
+		return 1;
+	    else
+		return question.answers == null ? 1 : 1 + question.answers.size();
 	}
 
 	@Override
@@ -121,7 +128,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS
 		                            .getExtra());
 
-	    questionFragment.displayBody(question.body);
+	    if (StringConstants.QUESTION_ID.equals(QuestionActivity.this.getIntent().getAction()))
+		questionFragment.setAndDisplay(question);
+	    else
+		questionFragment.displayBody(question.body);
 
 	    // Happens if question was retrieved from LRU cache.
 	    if (question.answers != null && !question.answers.isEmpty())
@@ -140,7 +150,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	{
 	    question.comments = (ArrayList<Comment>) intent
 		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.getExtra());
-	    
+
 	    questionFragment.setComments(question.comments);
 	}
     };
@@ -151,22 +161,18 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
+	    Log.d(TAG, "Answers received for question");
+
 	    ArrayList<Answer> answers = (ArrayList<Answer>) intent
 		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra());
 
-	    Log.d(TAG, "Answers received for question");
-
 	    serviceRunningForAnswers = false;
-
-	    hideRefreshActionAnimation();
 
 	    if (answers != null && !answers.isEmpty())
 	    {
 		if (question.answers == null)
-		{
 		    question.answers = new ArrayList<Answer>();
 
-		}
 		question.answers.addAll(answers);
 		indicator.notifyDataSetChanged();
 		questionViewPageAdapter.notifyDataSetChanged();
@@ -175,6 +181,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    {
 		Log.d(TAG, "No answers for question");
 	    }
+
+	    hideRefreshActionAnimation();
 	}
     };
 
@@ -194,19 +202,31 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	indicator.setViewPager(viewPager);
 	indicator.setOnPageChangeListener(this);
 
-	question = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
-
 	questionFragment = new QuestionFragment();
-	questionFragment.setQuestion(question);
 	questionFragment.setRetainInstance(true);
 
-	boolean cached = getIntent().getBooleanExtra(StringConstants.CACHED, false);
+	registerReceivers();
+	prepareIntentAndStartService();
+    }
 
-	if (cached == false)
+    private void prepareIntentAndStartService()
+    {
+	activeIntentForService = new Intent(this, QuestionDetailsIntentService.class);
+	if (StringConstants.QUESTION_ID.equals(getIntent().getAction()))
 	{
-	    registerReceivers();
-	    startQuestionService(IntentActionEnum.QuestionIntentAction.QUESTION_BODY.name());
+	    activeIntentForService.setAction(StringConstants.QUESTION_ID);
+	    activeIntentForService.putExtra(StringConstants.QUESTION_ID,
+		            getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
 	}
+	else
+	{
+	    activeIntentForService.setAction(StringConstants.QUESTION);
+	    question = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
+	    questionFragment.setQuestion(question);
+	    activeIntentForService.putExtra(StringConstants.QUESTION, question);
+	}
+
+	startQuestionService(activeIntentForService);
     }
 
     @Override
@@ -235,27 +255,18 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private void stopServiceAndUnregsiterReceiver()
     {
 	if (activeIntentForService != null)
-	{
 	    stopService(activeIntentForService);
-	}
 
 	try
 	{
 	    if (questionBodyReceiver != null)
-	    {
 		unregisterReceiver(questionBodyReceiver);
-	    }
 
 	    if (questionAnswersReceiver != null)
-	    {
 		unregisterReceiver(questionAnswersReceiver);
-	    }
 
 	    if (questionCommentsReceiver != null)
-	    {
 		unregisterReceiver(questionCommentsReceiver);
-	    }
-
 	}
 	catch (IllegalArgumentException e)
 	{
@@ -263,20 +274,17 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	}
     }
 
-    private void startQuestionService(String intentAction)
+    private void startQuestionService(Intent intent)
     {
-	activeIntentForService = new Intent(this, QuestionDetailsIntentService.class);
-	activeIntentForService.setAction(intentAction);
-	activeIntentForService.putExtra(StringConstants.QUESTION, question);
+	activeIntentForService.putExtra(StringConstants.CACHED,
+	                getIntent().getBooleanExtra(StringConstants.CACHED, false));
 	startService(activeIntentForService);
     }
 
     private void registerReceivers()
     {
 	registerForQuestionBodyReceiver();
-
 	registerForQuestionCommentsReceiver();
-
 	registerForQuestionAnswersReceiver();
     }
 
@@ -301,16 +309,25 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	registerReceiver(questionAnswersReceiver, filter);
     }
 
-    protected void onCreateOptionsMenuPostProcess(Menu menu)
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
     {
-	refreshMenuItem = menu.findItem(R.id.menu_refresh);
+	boolean ret = super.onCreateOptionsMenu(menu);
 
-	if (viewPager.getCurrentItem() == 0 && question.answerCount > 0 && question.answers == null)
+	if (ret)
 	{
-	    Log.d(TAG, "Starting refresh action animation");
+	    refreshMenuItem = menu.findItem(R.id.menu_refresh);
 
-	    startRefreshAnimation();
+	    if (viewPager.getCurrentItem() == 0 && question != null && question.answerCount > 0
+		            && question.answers == null)
+	    {
+		Log.d(TAG, "Starting refresh action animation");
+		startRefreshAnimation();
+	    }
+	    return true;
 	}
+
+	return false;
     }
 
     private void startRefreshAnimation()
@@ -336,7 +353,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     protected void refresh()
     {
-	// TODO Auto-generated method stub
+	Intent intent = getIntent();
+	finish();
+	intent.putExtra(StringConstants.CACHED, false);
+	startActivity(intent);
     }
 
     @Override
@@ -348,11 +368,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onPageScrollStateChanged(int arg0)
     {
+	Log.v(TAG, "onPageScrollStateChanged N/A");
     }
 
     @Override
     public void onPageScrolled(int arg0, float arg1, int arg2)
     {
+	Log.v(TAG, "onPageScrolled N/A");
     }
 
     @Override
@@ -380,10 +402,111 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	}
     }
 
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+	if (viewPager.getCurrentItem() == 0)
+	    return onContextItemSelectedForQuestion(item);
+	else
+	    return onContextItemSelectedForAnswer(item, viewPager.getCurrentItem() - 1);
+    }
+
+    private boolean onContextItemSelectedForQuestion(MenuItem item)
+    {
+	Log.d(TAG, "onContextItemSelectedForQuestion");
+
+	if (item.getGroupId() == R.id.qContextMenuGroup)
+	{
+	    Log.d(TAG, "Context item selected: " + item.getTitle());
+
+	    switch (item.getItemId())
+	    {
+		case R.id.q_ctx_comments:
+		    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+		    return true;
+		case R.id.q_ctx_related:
+		    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+		    questionsIntent.setAction(StringConstants.RELATED);
+		    questionsIntent.putExtra(StringConstants.QUESTION_ID, question.id);
+		    startActivity(questionsIntent);
+		    return true;
+		case R.id.q_ctx_menu_user_profile:
+		    viewUserProfile(question.owner.id);
+		    return true;
+		case R.id.q_ctx_menu_archive:
+		    archiveQuestion();
+		    return true;
+		case R.id.q_ctx_menu_email:
+		    emailQuestion();
+		    return true;
+		default:
+		    return false;
+	    }
+	}
+	else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
+	{
+	    Log.d(TAG, "Tag selected: " + item.getTitle());
+
+	    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+	    questionsIntent.setAction(StringConstants.TAG);
+	    questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
+	    startActivity(questionsIntent);
+
+	    return true;
+	}
+
+	return false;
+    }
+
+    private boolean onContextItemSelectedForAnswer(MenuItem item, int answerPosition)
+    {
+	Log.d(TAG, "onContextItemSelectedForAnswer");
+
+	if (item.getGroupId() == R.id.qContextMenuGroup)
+	{
+	    Log.d(TAG, "Context item selected: " + item.getTitle());
+
+	    switch (item.getItemId())
+	    {
+		case R.id.q_ctx_comments:
+		    Toast.makeText(this, "Fetch comments for answer", Toast.LENGTH_LONG).show();
+		    return true;
+		case R.id.q_ctx_menu_user_profile:
+		    viewUserProfile(question.answers.get(answerPosition).owner.id);
+		    return true;
+		default:
+		    return false;
+	    }
+	}
+
+	return false;
+    }
+
+    private void viewUserProfile(long userId)
+    {
+	Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
+	userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+	startActivity(userProfileIntent);
+    }
+
+    private void emailQuestion()
+    {
+	Intent emailIntent = IntentUtils.createEmailIntent(question.title, question.link);
+	startActivity(Intent.createChooser(emailIntent, ""));
+    }
+
+    private void archiveQuestion()
+    {
+	File directory = new File(this.getCacheDir(), StringConstants.QUESTIONS);
+	WriteObjectAsyncTask cacheTask = new WriteObjectAsyncTask(directory, String.valueOf(question.id));
+	cacheTask.execute(question);
+
+	Toast.makeText(this, "Question saved", Toast.LENGTH_SHORT).show();
+    }
+
     private int getNextPageNumber()
     {
 	int numAnswersDisplayed = questionViewPageAdapter.getCount() - 1;
-
 	return (numAnswersDisplayed / 10) + 1;
     }
 }

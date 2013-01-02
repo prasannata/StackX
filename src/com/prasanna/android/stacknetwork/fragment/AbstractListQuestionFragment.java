@@ -19,39 +19,58 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.UserProfileActivity;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractListQuestionFragment extends ItemListFragment<Question> implements ListItemView<Question>
 {
+    private OnContextItemSelectedListener<Question> onContextItemSelectedListener;
+    private final Bundle bundle = new Bundle();
+    private int position;
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onAttach(Activity activity)
+    {
+	Log.d(getLogTag(), "onAttach");
+
+	super.onAttach(activity);
+
+	if (!(activity instanceof OnContextItemSelectedListener))
+	    throw new IllegalArgumentException(activity.getLocalClassName()
+		            + " must implement OnContextItemSelectedListener");
+
+	onContextItemSelectedListener = (OnContextItemSelectedListener<Question>) activity;
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
+	Log.d(getLogTag(), "onActivityCreated");
+
 	super.onActivityCreated(savedInstanceState);
 
 	registerForContextMenu(getListView());
@@ -62,38 +81,9 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
-	if (item.getGroupId() == R.id.qContextMenuGroup)
-	{
-	    Log.d(getLogTag(), "Context item selected: " + item.getItemId());
+	Log.d(getLogTag(), "onContextItemSelected");
 
-	    AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-	    switch (item.getItemId())
-	    {
-		case R.id.q_ctx_comments:
-		    Toast.makeText(getActivity(), "Fetch comments", Toast.LENGTH_LONG).show();
-		    return true;
-		case R.id.q_ctx_menu_user_profile:
-		    Intent userProfileIntent = new Intent(getActivity(), UserProfileActivity.class);
-		    userProfileIntent
-			            .putExtra(StringConstants.USER_ID, itemListAdapter.getItem(info.position).owner.id);
-		    startActivity(userProfileIntent);
-		    return true;
-		case R.id.q_ctx_menu_email:
-		    emailQuestion(itemListAdapter.getItem(info.position).title,
-			            itemListAdapter.getItem(info.position).link);
-		    return true;
-		default:
-		    return false;
-	    }
-	}
-
-	return false;
-    }
-
-    private void emailQuestion(String subject, String body)
-    {
-	Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
-	startActivity(Intent.createChooser(emailIntent, ""));
+	return onContextItemSelectedListener.onContextItemSelected(item, itemListAdapter.getItem(position));
     }
 
     @Override
@@ -101,10 +91,6 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
     {
 	LinearLayout layout = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(),
 	                getActivity(), false, item);
-	TextView textView = (TextView) layout.findViewById(R.id.questionSnippetTitle);
-	RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) textView.getLayoutParams();
-	layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
-	layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 	ImageView imageView = (ImageView) layout.findViewById(R.id.questionOptionsContextMenu);
 	imageView.setOnClickListener(new View.OnClickListener()
 	{
@@ -121,12 +107,9 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
     public void onListItemClick(ListView l, View v, int position, long id)
     {
 	Intent displayQuestionIntent = new Intent(getActivity(), QuestionActivity.class);
+	displayQuestionIntent.setAction(StringConstants.QUESTION);
 	displayQuestionIntent.putExtra(StringConstants.QUESTION, itemListAdapter.getItem(position));
 	displayQuestionIntent.putExtra(StringConstants.CACHED, false);
-	// if (cached == true)
-	// {
-	// displayQuestionIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-	// }
 	startActivity(displayQuestionIntent);
     }
 
@@ -138,15 +121,24 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
 	super.onCreateContextMenu(menu, v, menuInfo);
 
 	AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+	position = info.position;
+
 	MenuInflater inflater = getActivity().getMenuInflater();
 	inflater.inflate(R.menu.question_context_menu, menu);
 	menu.removeItem(R.id.q_ctx_menu_archive);
-	MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
 
-	if (userProfileMenuItem != null)
+	MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
+	menuItem.setTitle(Html.fromHtml(itemListAdapter.getItem(position).owner.displayName) + "'s profile");
+
+	menuItem = menu.findItem(R.id.q_ctx_menu_tags);
+	SubMenu subMenu = menuItem.getSubMenu();
+
+	if (itemListAdapter.getItem(position).tags != null)
 	{
-	    userProfileMenuItem.setTitle(Html.fromHtml(itemListAdapter.getItem(info.position).owner.displayName)
-		            + "'s profile");
+	    for (int idx = 0; idx < itemListAdapter.getItem(position).tags.length; idx++)
+	    {
+		subMenu.add(R.id.qContextTagsMenuGroup, Menu.NONE, idx, itemListAdapter.getItem(position).tags[idx]);
+	    }
 	}
     }
 
@@ -154,5 +146,10 @@ public abstract class AbstractListQuestionFragment extends ItemListFragment<Ques
     public String getReceiverExtraName()
     {
 	return QuestionIntentAction.QUESTIONS.getExtra();
+    }
+
+    public Bundle getBundle()
+    {
+	return bundle;
     }
 }

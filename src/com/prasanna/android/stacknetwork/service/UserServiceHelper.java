@@ -256,11 +256,10 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
     public ArrayList<InboxItem> getInbox(int page)
     {
-	String restEndPoint = "/me/inbox";
+	String restEndPoint = "inbox";
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
-	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
@@ -269,12 +268,11 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 	return getInboxItems(restEndPoint, queryParams);
     }
 
-    public ArrayList<InboxItem> getUnreadItemsInInbox(int page, Site site)
+    public ArrayList<InboxItem> getUnreadItemsInInbox(int page)
     {
-	String restEndPoint = "/me/inbox/unread";
+	String restEndPoint = "/inbox/unread";
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-	queryParams.put(StackUri.QueryParams.SITE, site.apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 	queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 	queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_INBOX_FILTER);
@@ -400,10 +398,10 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 	return error;
     }
 
-    public ArrayList<String> getTags(int page, boolean registeredForSite)
+    public ArrayList<String> getTags(int page, boolean meTags)
     {
 	ArrayList<String> tags = null;
-	String restEndPoint = registeredForSite ? "/me/tags" : "/tags";
+	String restEndPoint = meTags ? "/me/tags" : "/tags";
 
 	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);

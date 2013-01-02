@@ -39,6 +39,7 @@ import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -103,7 +104,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 	    }
 	    else
 	    {
-		sites = SharedPreferencesUtil.fetchSiteListFromCache(getCacheDir());
+		sites = SharedPreferencesUtil.getSiteListFromCache(getCacheDir());
 		updateView(sites);
 	    }
 	}
@@ -219,6 +220,7 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
     {
 	sitesIntent = new Intent(this, UserIntentService.class);
 	sitesIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
+	sitesIntent.putExtra(StringConstants.AUTHENTICATED, AppUtils.inAuthenticatedRealm(getApplicationContext()));
 	startService(sitesIntent);
     }
 

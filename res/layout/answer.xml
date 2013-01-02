@@ -24,11 +24,20 @@
             android:textColor="@color/black"
             android:textSize="10sp" />
 
+        <ImageView
+            android:id="@+id/answerOptionsContextMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:paddingRight="-5dp"
+            android:src="@drawable/control_bottom_right" />
+
         <TextView
             android:id="@+id/answerAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@id/answerOptionsContextMenu"
             android:textColor="@color/black"
             android:textSize="10sp" />
     </RelativeLayout>

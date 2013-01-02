@@ -25,41 +25,44 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.prasanna.android.stacknetwork.InboxRefreshActivity;
 import com.prasanna.android.stacknetwork.LoginActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.receiver.InboxRefreshAlarmBroadcastReceiver;
 import com.prasanna.android.stacknetwork.receiver.NewMsgNotificationReceiver;
 
 public class AlarmUtils
 {
     private static final String TAG = AlarmUtils.class.getSimpleName();
 
-    public static void createInboxRefreshAlarm(Context context)
+    public static void setInboxRefreshAlarm(Context context)
     {
 	int interval = SettingsFragment.getInboxRefreshInterval(context);
 
-	if (interval > 0)
+	if (interval == 0)
 	{
-	    interval = interval * 60 * 1000;
-	    Log.d(TAG, "Inbox refreshing set to " + interval + " minutes");
+	    Log.d(TAG, "Inbox refreshing set to manual");
+
+	    cancelInboxRefreshAlarm();
 	}
 	else
 	{
-	    Log.d(TAG, "Inbox refreshing set to manual");
+	    Log.d(TAG, "Inbox refreshing set to " + interval + " minutes");
+	    
+	    interval = interval * 60 * 1000;
+	    createRepeatingAlarm(LoginActivity.getAppContext(), InboxRefreshAlarmBroadcastReceiver.class, interval, 0);
 	}
-
-	createRepeatingAlarm(LoginActivity.getAppContext(), InboxRefreshActivity.class, interval, 0);
     }
 
     public static void cancelInboxRefreshAlarm()
     {
+	Log.d(TAG, "Cancel inbox refresh alarm");
 	cancelAlarm(LoginActivity.getAppContext(), 0);
     }
 
     public static void rescheduleInboxRefreshAlarm(Context context)
     {
 	cancelInboxRefreshAlarm();
-	createInboxRefreshAlarm(context);
+	setInboxRefreshAlarm(context);
     }
 
     public static void createRepeatingAlarm(Context context, Class<?> clazz, int intervalInMs, int flags)

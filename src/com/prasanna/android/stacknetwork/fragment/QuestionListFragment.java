@@ -21,17 +21,14 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.LinearLayout;
 
 import com.prasanna.android.stacknetwork.R;
@@ -49,34 +46,21 @@ public class QuestionListFragment extends AbstractListQuestionFragment
     private Intent intent;
     private IntentFilter filter;
     private int currentPage = 0;
-    private boolean relatedQuestions = false;
+    private int action;
+    private boolean created = false;
+    private int selectedNavigationIndex;
 
-    private boolean isSearch;
-
-    public enum QuestionAction
+    public static QuestionListFragment newFragment(int action)
     {
-	FRONT_PAGE,
-	FAQS_TAG,
-	SEARCH
-    }
-
-    public interface OnGetQuestionsListener
-    {
-	void onGetQuestions(QuestionAction questionAction, String tag);
-    }
-
-    @Override
-    public void onAttach(Activity activity)
-    {
-	super.onAttach(activity);
-
-	if (!(activity instanceof OnGetQuestionsListener))
-	    throw new ClassCastException(activity.toString() + " must implement OnGetQuestionsListener");
+	QuestionListFragment newFragment = new QuestionListFragment();
+	return newFragment.setQuestionAction(action);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+	Log.d(TAG, "onCreateView");
+
 	if (itemsContainer == null)
 	{
 	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
@@ -91,19 +75,55 @@ public class QuestionListFragment extends AbstractListQuestionFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
+	Log.d(TAG, "onActivityCreated");
+
 	super.onActivityCreated(savedInstanceState);
 
-	if (relatedQuestions)
-	    getRelatedQuestions(getActivity().getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
-	else if (isSearch)
-	    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
+	if (!created)
+	{
+	    switch (action)
+	    {
+		case QuestionsIntentService.GET_FRONT_PAGE:
+		    getFrontPage();
+		    break;
+		case QuestionsIntentService.GET_FAQ_FOR_TAG:
+		    getFaqsForTag();
+		    break;
+		case QuestionsIntentService.GET_RELATED:
+		    getRelatedQuestions();
+		    break;
+		case QuestionsIntentService.SEARCH:
+		    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
+		    break;
+	    }
+
+	    selectedNavigationIndex = getActivity().getActionBar().getSelectedNavigationIndex();
+	    created = true;
+	}
+	else
+	{
+	    Log.d(TAG, "Fragment was already created. Restoring");
+
+	    if (getActivity().getActionBar().getNavigationItemCount() > 0)
+		getActivity().getActionBar().setSelectedNavigationItem(selectedNavigationIndex);
+	}
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
 	Log.d(TAG, "Saving instance state");
+
 	super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onPause()
+    {
+	Log.d(TAG, "onPause");
+
+	super.onPause();
     }
 
     @Override
@@ -144,10 +164,8 @@ public class QuestionListFragment extends AbstractListQuestionFragment
 	currentPage = 0;
     }
 
-    public void getFrontPage()
+    private void getFrontPage()
     {
-	clean();
-
 	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
@@ -159,13 +177,11 @@ public class QuestionListFragment extends AbstractListQuestionFragment
 	startIntentService();
     }
 
-    public void getRelatedQuestions(long questionId)
+    private void getRelatedQuestions()
     {
-	clean();
-
 	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
-	intent.putExtra(StringConstants.QUESTION_ID, questionId);
+	intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
 	showLoadingSpinningWheel();
@@ -175,13 +191,11 @@ public class QuestionListFragment extends AbstractListQuestionFragment
 	startIntentService();
     }
 
-    public void getFaqsForTag(String tag)
+    private void getFaqsForTag()
     {
-	clean();
-
 	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.name());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
-	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), tag);
+	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), getBundle().getString(StringConstants.TAG, null));
 	filter = new IntentFilter(QuestionIntentAction.TAGS_FAQ.name());
 
 	showLoadingSpinningWheel();
@@ -209,33 +223,6 @@ public class QuestionListFragment extends AbstractListQuestionFragment
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-	Log.d(getLogTag(), "onContextItemSelected");
-
-	if (!super.onContextItemSelected(item))
-	{
-	    if (item.getGroupId() == R.id.qContextMenuGroup)
-	    {
-		Log.d(getLogTag(), "Context item selected: " + item.getItemId());
-
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		switch (item.getItemId())
-		{
-		    case R.id.q_ctx_related:
-			getRelatedQuestions(itemListAdapter.getItem(info.position).id);
-			return true;
-		    default:
-			Log.d(TAG, "Unknown item " + item.getItemId());
-			return false;
-		}
-	    }
-	}
-
-	return false;
-    }
-
-    @Override
     public void refresh()
     {
 	clean();
@@ -243,13 +230,9 @@ public class QuestionListFragment extends AbstractListQuestionFragment
 	super.refresh();
     }
 
-    public void setFetchRelatedQuestions(boolean relatedQuestions)
+    public QuestionListFragment setQuestionAction(int action)
     {
-	this.relatedQuestions = relatedQuestions;
-    }
-
-    public void setSearch(boolean isSearch)
-    {
-	this.isSearch = isSearch;
+	this.action = action;
+	return this;
     }
 }

@@ -19,7 +19,7 @@
 
 package com.prasanna.android.stacknetwork;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.SearchManager;
@@ -35,6 +35,8 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.prasanna.android.listener.OnDiscardOptionListener;
+import com.prasanna.android.stacknetwork.model.InboxItem;
+import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.IconCache;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
@@ -42,7 +44,7 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
-import com.prasanna.android.task.FetchImageAsyncTask;
+import com.prasanna.android.task.GetImageAsyncTask;
 
 public abstract class AbstractUserActionBarActivity extends Activity
 {
@@ -74,7 +76,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 	else
 	    setupActionBarForAnyUser(menu);
 
-	return super.onCreateOptionsMenu(menu);
+	return true;
     }
 
     private void setupActionBarForAnyUser(Menu menu)
@@ -105,7 +107,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void loadIcon()
     {
-	FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+	GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
 	{
 	    @Override
 	    public void notifyOnCompletion(Bitmap result)
@@ -181,11 +183,13 @@ public abstract class AbstractUserActionBarActivity extends Activity
 		return true;
 	    case R.id.menu_option_test_gen_notify:
 		Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.name());
-		HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
-		newMsgCount.put("stackoverflow", 2);
-		newMsgCount.put("serverfault", 2);
-		notifyIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
-		notifyIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), 4);
+		ArrayList<InboxItem> unreadInboxItems = new ArrayList<InboxItem>();
+		InboxItem inboxItem = new InboxItem();
+		inboxItem.itemType = ItemType.NEW_ANSWER;
+		inboxItem.title = "Python unit testing functions by using mocks";
+		inboxItem.body = "You can use mock library by Michael Foord, which is part Python 3. It makes this kind of mocking ...";
+		unreadInboxItems.add(inboxItem);
+		notifyIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), unreadInboxItems);
 		sendBroadcast(notifyIntent);
 		return true;
 	}

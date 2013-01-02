@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.task;
 
@@ -41,7 +41,7 @@ public class WriteObjectAsyncTask extends AsyncTask<Object, Void, Void>
     {
 	if (params != null && params.length == 1)
 	{
-	    SharedPreferencesUtil.cacheObject(params[0], directory, fileName);
+	    SharedPreferencesUtil.writeObject(params[0], directory, fileName);
 	}
 
 	return null;

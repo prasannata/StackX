@@ -47,8 +47,8 @@ import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.task.FetchImageAsyncTask;
-import com.prasanna.android.task.ImageFetchAsyncTaskCompleteNotifierImpl;
+import com.prasanna.android.task.GetImageAsyncTask;
+import com.prasanna.android.task.GetImageAsyncTaskCompleteNotifierImpl;
 
 public class UserProfileFragment extends Fragment
 {
@@ -217,8 +217,8 @@ public class UserProfileFragment extends Fragment
 	ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
 	if (userProfileImage.getDrawable() == null)
 	{
-	    FetchImageAsyncTask fetchImageAsyncTask = new FetchImageAsyncTask(
-		            new ImageFetchAsyncTaskCompleteNotifierImpl(userProfileImage));
+	    GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(
+		            new GetImageAsyncTaskCompleteNotifierImpl(userProfileImage));
 	    fetchImageAsyncTask.execute(user.profileImageLink);
 	}
 

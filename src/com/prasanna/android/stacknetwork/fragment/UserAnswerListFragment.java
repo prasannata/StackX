@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -32,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
@@ -40,11 +38,10 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
-import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
-import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
@@ -72,7 +69,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
 	if (itemsContainer == null)
 	{
 	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
-	    itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.user_item_row,
+	    itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
 		            new ArrayList<Answer>(), this);
 	    setListAdapter(itemListAdapter);
 
@@ -141,30 +138,28 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    public View getView(final Answer item, View convertView, ViewGroup parent)
+    public View getView(final Answer answer, View convertView, ViewGroup parent)
     {
-	final RelativeLayout answerRow = (RelativeLayout) getActivity().getLayoutInflater().inflate(
-	                R.layout.user_item_row, null);
-	TextView textView = (TextView) answerRow.findViewById(R.id.userItemTitle);
-	textView.setText(Html.fromHtml(item.title));
+	final LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(
+	                R.layout.answer_snippet, null);
 
-	textView = (TextView) answerRow.findViewById(R.id.viewItem);
-	textView.setClickable(true);
-	textView.setOnClickListener(new View.OnClickListener()
-	{
-	    @Override
-	    public void onClick(View v)
-	    {
-		Point size = new Point();
-		getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+	if (answer.accepted)
+	    answerRow.setBackgroundResource(R.drawable.rounded_lichen_color_border_grey);
 
-		PopupBuilder.build(getActivity().getLayoutInflater(), answerRow, item, size);
-	    }
-	});
+	TextView textView = (TextView) answerRow.findViewById(R.id.questionTitle);
+	textView.setText(Html.fromHtml(answer.title));
 
-	textView = (TextView) answerRow.findViewById(R.id.viewQuestion);
-	textView.setClickable(true);
+	textView = (TextView) answerRow.findViewById(R.id.answerScore);
+	textView.setText("Answer Score: " + answer.score);
 
+	textView = (TextView) answerRow.findViewById(R.id.answerTime);
+	textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
+
+	textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
+	if (answer.body != null && answer.body.length() > 200)
+	    textView.setText(Html.fromHtml(answer.body.substring(0, 200) + "...."));
+	else
+	    textView.setText(Html.fromHtml(answer.body));
 	return answerRow;
     }
 
@@ -172,11 +167,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     public void onListItemClick(ListView l, View v, int position, long id)
     {
 	Intent intent = new Intent(getActivity(), QuestionActivity.class);
-	Question question = new Question();
-	question.id = itemListAdapter.getItem(position).questionId;
-	question.title = itemListAdapter.getItem(position).title;
-	intent.putExtra(StringConstants.QUESTION, question);
-	intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
+	intent.setAction(StringConstants.QUESTION_ID);
+	intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
 	startActivity(intent);
     }
 }

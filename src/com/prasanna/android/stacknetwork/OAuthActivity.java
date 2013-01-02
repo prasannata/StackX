@@ -65,6 +65,8 @@ public class OAuthActivity extends Activity
 	    if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
 	    {
 		Intent listStackNetworkIntent = new Intent(view.getContext(), StackNetworkListActivity.class);
+		listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		Uri uri = Uri.parse(url);
 		String accessToken = uri.getFragment();
@@ -78,11 +80,9 @@ public class OAuthActivity extends Activity
 		    }
 		}
 
-		AlarmUtils.createInboxRefreshAlarm(OAuthActivity.this);
-
+		AlarmUtils.setInboxRefreshAlarm(OAuthActivity.this);
 		startActivity(listStackNetworkIntent);
-
-		finish();
+		OAuthActivity.this.finish();
 	    }
 	    else
 	    {
@@ -133,6 +133,8 @@ public class OAuthActivity extends Activity
 	                StackUri.QueryParamDefaultValues.REDIRECT_URI);
 
 	oauthUrl = uriBuilder.build().toString();
+	
+	SharedPreferencesUtil.clearDefaultSite(getApplicationContext());
 	webview.loadUrl(oauthUrl);
     }
 

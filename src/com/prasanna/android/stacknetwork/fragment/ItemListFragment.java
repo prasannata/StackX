@@ -28,13 +28,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -52,15 +52,23 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     private Intent intentForService;
     private boolean serviceRunning = false;
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
-    private LinearLayout loadingProgressView;
+    private ProgressBar progressBar;
 
     protected LinearLayout itemsContainer;
     protected ItemListAdapter<T> itemListAdapter;
-    
+
     protected abstract String getReceiverExtraName();
+
     protected abstract void startIntentService();
+
     protected abstract void registerReceiver();
+
     protected abstract String getLogTag();
+
+    public interface OnContextItemSelectedListener<T>
+    {
+	boolean onContextItemSelected(MenuItem item, T stackXItem);
+    }
 
     protected BroadcastReceiver receiver = new BroadcastReceiver()
     {
@@ -131,26 +139,17 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
 
     protected void showLoadingSpinningWheel()
     {
-	if (loadingProgressView == null)
-	{
-	    loadingProgressView = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.loading_progress,
-		            null);
-	    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-		            LayoutParams.WRAP_CONTENT);
-	    layoutParams.setMargins(0, 15, 0, 15);
-	    layoutParams.gravity = Gravity.CENTER | Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
-	    getParentLayout().addView(loadingProgressView, layoutParams);
-	}
+	if (progressBar == null)
+	    progressBar = (ProgressBar) getParentLayout().findViewById(R.id.loadingProgressBar);
+
+	if (progressBar.getVisibility() != View.VISIBLE)
+	    progressBar.setVisibility(View.VISIBLE);
     }
 
     protected void dismissLoadingSpinningWheel()
     {
-	if (loadingProgressView != null)
-	{
-	    loadingProgressView.setVisibility(View.GONE);
-	    getParentLayout().removeView(loadingProgressView);
-	    loadingProgressView = null;
-	}
+	if (progressBar != null)
+	    progressBar.setVisibility(View.GONE);
     }
 
     protected Intent getIntentForService(Class<?> clazz, String action)
@@ -202,7 +201,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     {
 	dismissLoadingSpinningWheel();
 
-	if (itemListAdapter != null)
+	if (itemListAdapter != null && newItems != null)
 	{
 	    Log.d(getLogTag(), "Updating list adpater with questions");
 
@@ -229,7 +228,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
     {
 	if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
-	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 3))
+	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
 	{
 	    Log.d(getLogTag(), "onScroll reached bottom threshold. Fetching more questions");
 

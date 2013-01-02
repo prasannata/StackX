@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
@@ -25,32 +25,52 @@ public class InboxItem extends BaseStackExchangeItem implements Serializable
 {
     public static enum ItemType
     {
-        COMMENT,
-        CHAT_MESSAGE,
-        NEW_ANSWER,
-        CAREERS_MESSAGE,
-        CAREERS_INVITATIONS,
-        META_QUESTION,
-        POST_NOTICE;
+	COMMENT("comment"),
+	CHAT_MESSAGE("chat message"),
+	NEW_ANSWER("answer"),
+	CAREERS_MESSAGE("career message"),
+	CAREERS_INVITATIONS("career invite"),
+	META_QUESTION("meta question"),
+	POST_NOTICE("post notice"),
+	MODERATOR_MESSAGE("message from moderator");
 
-        public static ItemType getValue(String string)
-        {
-            ItemType itemType = null;
+	private final String repr;
 
-            if (string != null)
-            {
-                try
-                {
-                    itemType = valueOf(string);
-                }
-                catch (IllegalArgumentException e)
-                {
-                    itemType = null;
-                }
+	ItemType(String repr)
+	{
+	    this.repr = repr;
+	}
 
-            }
-            return itemType;
-        }
+	public static ItemType getValue(String string)
+	{
+	    ItemType itemType = null;
+
+	    if (string != null)
+	    {
+		try
+		{
+		    itemType = valueOf(string.toUpperCase());
+		}
+		catch (IllegalArgumentException e)
+		{
+		    itemType = null;
+		}
+
+	    }
+	    return itemType;
+	}
+
+	public String getNotificationTitle(int count)
+	{
+	    String plural = (count > 1) ? "s" : "";
+
+	    return count + " new " + getRepr() + plural;
+	}
+
+	public String getRepr()
+	{
+	    return repr;
+	}
     }
 
     private static final long serialVersionUID = 7015749387787062217L;

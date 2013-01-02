@@ -26,13 +26,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.LinearLayout;
 
-import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -93,41 +90,6 @@ public class UserQuestionListFragment extends AbstractListQuestionFragment
 	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
 	intent.putExtra(StringConstants.PAGE, ++page);
 	startService();
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-	Log.d(getLogTag(), "onContextItemSelected");
-
-	if (!super.onContextItemSelected(item))
-	{
-	    if (item.getGroupId() == R.id.qContextMenuGroup)
-	    {
-		Log.d(getLogTag(), "Context item selected: " + item.getItemId());
-
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		switch (item.getItemId())
-		{
-		    case R.id.q_ctx_related:
-			getRelatedQuestions(itemListAdapter.getItem(info.position).id);
-			return true;
-		    default:
-			Log.d(TAG, "Unknown item " + item.getItemId());
-			return false;
-		}
-	    }
-	}
-
-	return false;
-    }
-
-    private void getRelatedQuestions(long questionId)
-    {
-	Intent intent = new Intent(getActivity(), QuestionsActivity.class);
-	intent.putExtra(StringConstants.RELATED, true);
-	intent.putExtra(StringConstants.QUESTION_ID, questionId);
-	startActivity(intent);
     }
 
     @Override

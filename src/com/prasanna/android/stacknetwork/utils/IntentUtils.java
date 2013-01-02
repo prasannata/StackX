@@ -19,19 +19,10 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-import android.content.Context;
 import android.content.Intent;
-
-import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 
 public class IntentUtils
 {
-    public static Intent createSiteListIntent(Context context)
-    {
-	Intent listStackNetworkIntent = new Intent(context, StackNetworkListActivity.class);
-	return listStackNetworkIntent.putExtra("allSites", true);
-    }
-
     public static Intent createEmailIntent(String subject, String body)
     {
 	String type = "plain/text";

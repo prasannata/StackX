@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/question_unanswered_shape"
+    android:background="@drawable/rounded_border_grey_min_padding"
     android:orientation="vertical" >
 
     <RelativeLayout
@@ -23,24 +23,78 @@
             android:gravity="center"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/questionScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/rounded_border_delft"
+            android:textColor="@color/delft"
+            android:textSize="12sp" />
+
         <ImageView
             android:id="@+id/questionOptionsContextMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/next_item" />
+            android:paddingRight="-5dp"
+            android:src="@drawable/control_bottom_right" />
 
         <TextView
-            android:id="@+id/questionSnippetTitle"
+            android:id="@+id/questionTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="2dp"
             android:layout_toLeftOf="@id/questionOptionsContextMenu"
-            android:layout_toRightOf="@id/deleteQuestionCheckbox"
+            android:layout_toRightOf="@id/questionScore"
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/questionCountLinearLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp" >
+
+        <TextView
+            android:id="@+id/questionViewsValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="1dp"
+            android:gravity="center"
+            android:text="@string/views"
+            android:textColor="@color/delft"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/questionAnswersValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/questionViewsValue"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="3dp"
+            android:layout_toRightOf="@id/questionViewsValue"
+            android:gravity="center"
+            android:text="@string/answers"
+            android:textColor="@color/delft"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/questionOwner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/questionViewsValue"
+            android:gravity="center"
+            android:textColor="@color/delft"
+            android:textSize="10sp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -51,51 +105,5 @@
         android:layout_marginLeft="2dp"
         android:layout_marginTop="3dp"
         android:orientation="horizontal" />
-
-    <LinearLayout
-        android:id="@+id/questionCountLinearLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/silver"
-        android:orientation="horizontal"
-        android:weightSum="3" >
-
-        <TextView
-            android:id="@+id/questionScoreValue"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:layout_marginTop="1dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/score"
-            android:textColor="@color/delft"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/questionViewsValue"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:layout_marginTop="1dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/views"
-            android:textAlignment="center"
-            android:textColor="@color/delft"
-            android:textSize="10sp" />
-
-        <TextView
-            android:id="@+id/questionAnswersValue"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="3dp"
-            android:layout_marginTop="1dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/answers"
-            android:textColor="@color/delft"
-            android:textSize="10sp" />
-    </LinearLayout>
 
 </LinearLayout>

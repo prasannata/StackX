@@ -49,9 +49,12 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.prasanna.android.stacknetwork.R;
 
 public class MarkdownFormatter
 {
@@ -60,107 +63,148 @@ public class MarkdownFormatter
 
     public static class Tags
     {
-        public static final String CODE = "code";
-        public static final String IMG = "img";
+	public static final String CODE = "code";
+	public static final String IMG = "img";
     }
 
-    public static ArrayList<TextView> format(Context context, String markdownText)
+    /**
+     * Format HTML text to fit into one or more vertically aligned text views.
+     * Parses the given text and removes {@code <code> </code>} tags. If the
+     * code text is of multiple lines a new {@link android.widget.TextView
+     * TextView} is created and added to the view container else the code text
+     * is added to already created {@link android.widget.TextView TextView}.
+     * 
+     * @param context
+     * @param markdownText
+     * @return
+     */
+    public static ArrayList<TextView> parse(Context context, String markdownText)
     {
-        ArrayList<TextView> views = new ArrayList<TextView>();
-        try
-        {
-            if (markdownText != null)
-            {
-                XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
-                XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
-                xmlPullParser.setInput(new StringReader(markdownText));
-                int eventType = xmlPullParser.getEventType();
-                StringBuffer buffer = new StringBuffer();
+	ArrayList<TextView> views = new ArrayList<TextView>();
+	try
+	{
+	    if (markdownText != null)
+	    {
+		XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
+		XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
+		xmlPullParser.setInput(new StringReader(markdownText));
+		int eventType = xmlPullParser.getEventType();
+		StringBuffer buffer = new StringBuffer();
+		StringBuffer code = new StringBuffer();
 
-                boolean codeFound = false;
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(2, 5, 2, 5);
-                while (eventType != XmlPullParser.END_DOCUMENT)
-                {
+		boolean codeFound = false;
+		boolean oneLineCode = false;
 
-                    if (eventType == XmlPullParser.START_DOCUMENT)
-                    {
-                    }
-                    else if (eventType == XmlPullParser.START_TAG)
-                    {
-                        if (xmlPullParser.getName().equals(Tags.CODE))
-                        {
-                            codeFound = true;
-                        }
-                    }
-                    else if (eventType == XmlPullParser.END_TAG)
-                    {
-                        if (xmlPullParser.getName().equals(Tags.CODE))
-                        {
-                            codeFound = false;
-                        }
-                    }
-                    else if (eventType == XmlPullParser.TEXT)
-                    {
-                        String text = xmlPullParser.getText();
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+		                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		while (eventType != XmlPullParser.END_DOCUMENT)
+		{
+		    if (eventType == XmlPullParser.START_DOCUMENT)
+		    {
+		    }
+		    else if (eventType == XmlPullParser.START_TAG)
+		    {
+			if (xmlPullParser.getName().equals(Tags.CODE))
+			    codeFound = true;
+			else
+			    buffer.append("<" + xmlPullParser.getName() + ">");
+		    }
+		    else if (eventType == XmlPullParser.END_TAG)
+		    {
+			if (xmlPullParser.getName().equals(Tags.CODE))
+			{
+			    codeFound = false;
 
-                        if (codeFound)
-                        {
-                            if (!text.contains(NEW_LINE_STR))
-                            {
-                                if (buffer.length() > 0 && buffer.lastIndexOf(NEW_LINE_STR) == buffer.length() - 1)
-                                    buffer.setCharAt(buffer.length() - 1, ' ');
-                                buffer.append(text);
-                            }
-                            else
-                            {
-                                views.add(getTextViewForCode(context, params, text));
-                            }
-                        }
-                        else
-                        {
-                            buffer.append(text);
+			    if (oneLineCode)
+				oneLineCode = false;
+			    else
+			    {
+				addSimpleTextToView(context, views, buffer, params);
+				views.add(getTextViewForCode(context, params, code.toString()));
+				buffer.delete(0, code.length());
+			    }
+			}
+			else
+			{
+			    buffer.append("<" + xmlPullParser.getName() + "/>");
+			}
+		    }
+		    else if (eventType == XmlPullParser.TEXT)
+		    {
+			String text = xmlPullParser.getText();
 
-                            views.add(getTextView(context, params, buffer));
-                            buffer.delete(0, buffer.length());
-                        }
-                    }
+			if (codeFound)
+			{
+			    if (!text.contains(NEW_LINE_STR))
+			    {
+				if (buffer.length() > 0 && buffer.lastIndexOf(NEW_LINE_STR) == buffer.length() - 1)
+				    buffer.setCharAt(buffer.length() - 1, ' ');
 
-                    eventType = xmlPullParser.next();
-                }
-            }
-        }
-        catch (XmlPullParserException e)
-        {
-            Log.e(TAG, "Error parsing: " + e);
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "Error parsing: " + e);
-        }
-        return views;
+				buffer.append(text);
+				oneLineCode = true;
+			    }
+			    else
+			    {
+				code.append(text);
+			    }
+			}
+			else
+			{
+			    text = text.replace("\n", " ").replace("\r", " ");
+			    buffer.append(text);
+			}
+		    }
 
+		    eventType = xmlPullParser.next();
+		}
+
+		addSimpleTextToView(context, views, buffer, params);
+	    }
+	}
+	catch (XmlPullParserException e)
+	{
+	    Log.e(TAG, "Error parsing: " + e);
+	}
+	catch (IOException e)
+	{
+	    Log.e(TAG, "Error parsing: " + e);
+	}
+	return views;
+
+    }
+
+    private static void addSimpleTextToView(Context context, ArrayList<TextView> views, StringBuffer buffer,
+	            LinearLayout.LayoutParams params)
+    {
+	if (buffer.length() > 0)
+	{
+	    views.add(getTextView(context, params, buffer));
+	    buffer.delete(0, buffer.length());
+	}
     }
 
     private static TextView getTextView(Context context, LinearLayout.LayoutParams params, StringBuffer buffer)
     {
-        TextView textView = new TextView(context);
-        textView.setTextColor(Color.BLACK);
-        textView.setLayoutParams(params);
-        textView.setText(Html.fromHtml(buffer.toString()));
-        return textView;
+	TextView textView = new TextView(context);
+	textView.setTextColor(Color.BLACK);
+	textView.setLayoutParams(params);
+	textView.setAutoLinkMask(Linkify.WEB_URLS);
+	textView.setTextSize(10f);
+	textView.setTextIsSelectable(true);
+	textView.setText(Html.fromHtml(buffer.toString()));
+	return textView;
     }
 
     private static TextView getTextViewForCode(Context context, LinearLayout.LayoutParams params, String text)
     {
-        TextView textView = new TextView(context);
-        textView.setTextColor(Color.BLACK);
-        textView.setLayoutParams(params);
-        textView.setTextSize(10f);
-        textView.setBackgroundResource(com.prasanna.android.stacknetwork.R.color.lightGrey);
-        textView.setText(text);
-        textView.setPadding(0, 0, 0, 0);
-        return textView;
+	TextView textView = new TextView(context);
+	textView.setTextColor(Color.BLACK);
+	textView.setLayoutParams(params);
+	textView.setTextSize(10f);
+	textView.setBackgroundColor(context.getResources().getColor(R.color.lightGrey));
+	textView.setTextIsSelectable(true);
+	textView.setPadding(0, 0, 0, 0);
+	textView.setText(text);
+	return textView;
     }
 }

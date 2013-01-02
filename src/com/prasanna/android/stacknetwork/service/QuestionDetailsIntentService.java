@@ -86,51 +86,49 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	    }
 	    else
 	    {
-		Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
 
-		if (question != null && question.id > 0)
-		{
-		    getQuestionDetail(question, action);
-		}
+		getQuestionDetail(intent);
 	    }
 	}
     }
 
-    private void getQuestionDetail(Question question, String action)
+    private void getQuestionDetail(Intent intent)
     {
-	Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
+	Question cachedQuestion = null;
+	Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
+	long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
+	boolean fromCache = intent.getBooleanExtra(StringConstants.CACHED, false);
 
-	if (cachedQuestion == null)
+	if (fromCache)
 	{
-	    getFromServer(question, action);
+	    if (StringConstants.QUESTION.equals(intent.getAction()))
+		cachedQuestion = QuestionsCache.getInstance().get(question.id);
+	    else
+		cachedQuestion = QuestionsCache.getInstance().get(questionId);
+	}
+	if (cachedQuestion != null)
+	{
+	    Log.d(TAG, "Question " + question.id + " recovered from cache.");
+	    broadcastQuestion(cachedQuestion);
 	}
 	else
 	{
-	    Log.d(TAG, "Question " + question.id + " recovered from cache.");
+	    if (StringConstants.QUESTION.equals(intent.getAction()))
+		question.body = questionService.getQuestionBodyForId(question.id);
+	    else
+		question = questionService.getQuestionFullDetails(intent.getLongExtra(StringConstants.QUESTION_ID, 0));
 
-	    broadcastQuestionBody(cachedQuestion);
+	    getItemsForQuestionAndBroadcast(question);
 	}
     }
 
-    private void getFromServer(Question question, String action)
+    private void getItemsForQuestionAndBroadcast(Question question)
     {
-	if (action.equals(IntentActionEnum.QuestionIntentAction.QUESTION_BODY.name()))
-	{
-	    question.body = questionService.getQuestionBodyForId(question.id);
-	}
-	else
-	{
-	    question = questionService.getQuestionFullDetails(question.id);
-	}
-
-	broadcastQuestionBody(question);
-
+	broadcastQuestion(question);
 	broadcoastComments(questionService.getComments(StringConstants.QUESTIONS, question.id));
 
 	if (question.answers == null)
-	{
 	    question.answers = new ArrayList<Answer>();
-	}
 
 	if (question.answerCount > 0)
 	{
@@ -159,7 +157,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	sendBroadcast(broadcastIntent);
     }
 
-    private void broadcastQuestionBody(Question question)
+    private void broadcastQuestion(Question question)
     {
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name());

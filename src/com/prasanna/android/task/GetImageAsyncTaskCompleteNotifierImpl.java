@@ -22,11 +22,11 @@ package com.prasanna.android.task;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-public class ImageFetchAsyncTaskCompleteNotifierImpl implements AsyncTaskCompletionNotifier<Bitmap>
+public class GetImageAsyncTaskCompleteNotifierImpl implements AsyncTaskCompletionNotifier<Bitmap>
 {
     private final ImageView imageView;
 
-    public ImageFetchAsyncTaskCompleteNotifierImpl(ImageView imageView)
+    public GetImageAsyncTaskCompleteNotifierImpl(ImageView imageView)
     {
 	this.imageView = imageView;
     }

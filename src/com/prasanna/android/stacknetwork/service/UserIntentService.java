@@ -30,7 +30,6 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -90,7 +89,7 @@ public class UserIntentService extends AbstractIntentService
 		    getUnreadInboxItems(intent);
 		    break;
 		case GET_USER_SITES:
-		    getUserSites();
+		    getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false));
 		    break;
 		case DEAUTH_APP:
 		    deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
@@ -178,63 +177,61 @@ public class UserIntentService extends AbstractIntentService
 	}
     }
 
-    @SuppressWarnings("unchecked")
     private void getUnreadInboxItems(Intent intent)
     {
 	int totalNewMsgs = 0;
 	int page = intent.getIntExtra(StringConstants.PAGE, 1);
-	HashMap<String, Integer> newMsgCount = new HashMap<String, Integer>();
-	HashMap<String, Site> sites = (HashMap<String, Site>) intent.getSerializableExtra(UserIntentAction.SITES
-	                .getExtra());
+	ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page);
 
-	for (Site site : sites.values())
+	if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
 	{
-	    ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page, site);
-	    if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
-	    {
-		newMsgCount.put(site.name, unreadInboxItems.size());
-		totalNewMsgs += unreadInboxItems.size();
-	    }
+	    totalNewMsgs += unreadInboxItems.size();
+	    broadcastUnreadItemsCount(totalNewMsgs, unreadInboxItems);
 	}
-
-	broadcastUnreadItemsCount(totalNewMsgs, newMsgCount);
     }
 
-    private void broadcastUnreadItemsCount(int totalNewMsgs, HashMap<String, Integer> newMsgCount)
+    private void broadcastUnreadItemsCount(int totalNewMsgs, ArrayList<InboxItem> unreadInboxItems)
     {
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.setAction(UserIntentAction.NEW_MSG.name());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), newMsgCount);
-	broadcastIntent.putExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), totalNewMsgs);
+	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), unreadInboxItems);
 	sendBroadcast(broadcastIntent);
     }
 
-    private void getUserSites()
+    private void getUserSites(boolean forAuthenicatedUser)
     {
-	HashMap<String, Account> linkAccountsMap = null;
 	LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
-	if (AppUtils.inAuthenticatedRealm())
+	if (forAuthenicatedUser)
 	{
-	    linkAccountsMap = userService.getAccounts(1);
-	}
+	    LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
+	    HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
 
-	if (linkAccountsMap != null && linkSitesMap != null)
-	{
-	    for (String siteUrl : linkAccountsMap.keySet())
+	    if (linkAccountsMap != null && linkSitesMap != null)
 	    {
-		if (linkSitesMap.containsKey(siteUrl) == true)
+		for (String siteUrl : linkAccountsMap.keySet())
 		{
-		    Site site = linkSitesMap.get(siteUrl);
-		    Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
-		    site.userType = linkAccountsMap.get(siteUrl).userType;
-		    linkSitesMap.put(siteUrl, site);
-		}
-	    }
-	}
+		    if (linkSitesMap.containsKey(siteUrl))
+		    {
+			Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
 
-	if (linkSitesMap != null)
+			Site site = linkSitesMap.get(siteUrl);
+			site.userType = linkAccountsMap.get(siteUrl).userType;
+			regSitesFirstMap.put(siteUrl, site);
+
+			linkSitesMap.remove(siteUrl);
+		    }
+		}
+
+		regSitesFirstMap.putAll(linkSitesMap);
+	    }
+
+	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES, new ArrayList<Site>(
+		            regSitesFirstMap.values()));
+
+	}
+	else
 	{
 	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES,
 		            new ArrayList<Site>(linkSitesMap.values()));

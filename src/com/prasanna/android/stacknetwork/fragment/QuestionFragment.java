@@ -19,53 +19,46 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.UserProfileActivity;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.task.WriteObjectAsyncTask;
 
 public class QuestionFragment extends Fragment
 {
     private static final String TAG = QuestionFragment.class.getSimpleName();
 
     private LinearLayout parentLayout;
-    private RelativeLayout titleLayout;
     private Question question;
     private ContextMenu menu;
+    private boolean ctxMenuSetup = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
 	if (parentLayout == null)
-	{
 	    createView(inflater);
-	}
 
 	return parentLayout;
     }
@@ -73,8 +66,8 @@ public class QuestionFragment extends Fragment
     private void createView(LayoutInflater inflater)
     {
 	parentLayout = (LinearLayout) inflater.inflate(R.layout.question, null);
-	titleLayout = (RelativeLayout) parentLayout.findViewById(R.id.questionTitleLayout);
-	titleLayout.setOnClickListener(new View.OnClickListener()
+	ImageView imageView = (ImageView) parentLayout.findViewById(R.id.questionOptionsContextMenu);
+	imageView.setOnClickListener(new View.OnClickListener()
 	{
 	    @Override
 	    public void onClick(View v)
@@ -84,7 +77,7 @@ public class QuestionFragment extends Fragment
 	});
 
 	displayQuestionMetaData();
-	registerForContextMenu(titleLayout);
+	registerForContextMenu(imageView);
     }
 
     @Override
@@ -105,73 +98,49 @@ public class QuestionFragment extends Fragment
 
 	MenuInflater inflater = getActivity().getMenuInflater();
 	inflater.inflate(R.menu.question_context_menu, menu);
-	MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
-
-	if (userProfileMenuItem != null)
-	{
-	    userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName) + "'s profile");
-	}
-
 	this.menu = menu;
 
+	setupUserProfileInContextMenu();
+	setupTagsInContextMenu();
 	enableCommentsInContextMenu();
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
+    private void setupUserProfileInContextMenu()
     {
-	Log.d(TAG, "onContextItemSelected");
-
-	if (item.getGroupId() == R.id.qContextMenuGroup)
+	if (question != null && question.owner != null)
 	{
-	    Log.d(TAG, "Context item selected: " + item.getItemId());
+	    MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
 
-	    switch (item.getItemId())
-	    {
-		case R.id.q_ctx_comments:
-		    Toast.makeText(getActivity(), "Fetch comments", Toast.LENGTH_LONG).show();
-		    return true;
-		case R.id.q_ctx_related:
-		    Toast.makeText(getActivity(), "Fetch related questions", Toast.LENGTH_LONG).show();
-		    return true;
-		case R.id.q_ctx_menu_user_profile:
-		    Intent userProfileIntent = new Intent(getActivity(), UserProfileActivity.class);
-		    userProfileIntent.putExtra(StringConstants.USER_ID, question.owner.id);
-		    startActivity(userProfileIntent);
-		    return true;
-		case R.id.q_ctx_menu_archive:
-		    archiveQuestion();
-		    return true;
-		case R.id.q_ctx_menu_email:
-		    emailQuestion();
-		    return true;
-		default:
-		    return false;
-	    }
+	    if (userProfileMenuItem != null)
+		userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName) + "'s profile");
+
+	    ctxMenuSetup = true;
 	}
-
-	return false;
     }
 
-    private void emailQuestion()
+    private void setupTagsInContextMenu()
     {
-	Intent emailIntent = IntentUtils.createEmailIntent(question.title, question.link);
-	startActivity(Intent.createChooser(emailIntent, ""));
-    }
+	if (question != null && question.tags != null)
+	{
+	    MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_tags);
+	    SubMenu subMenu = menuItem.getSubMenu();
+	    for (int idx = 0; idx < question.tags.length; idx++)
+		subMenu.add(R.id.qContextTagsMenuGroup, Menu.NONE, idx, question.tags[idx]);
 
-    private void archiveQuestion()
-    {
-	File directory = new File(getActivity().getCacheDir(), StringConstants.QUESTIONS);
-	WriteObjectAsyncTask cacheTask = new WriteObjectAsyncTask(directory, String.valueOf(question.id));
-	cacheTask.execute(question);
-
-	Toast.makeText(getActivity(), "Question saved", Toast.LENGTH_SHORT).show();
+	    ctxMenuSetup = ctxMenuSetup & true;
+	}
     }
 
     private void displayQuestionMetaData()
     {
 	if (question != null)
 	{
+	    if (!ctxMenuSetup && menu != null)
+	    {
+		setupTagsInContextMenu();
+		setupUserProfileInContextMenu();
+	    }
+
 	    TextView textView = (TextView) parentLayout.findViewById(R.id.questionScore);
 	    textView.setText(AppUtils.formatNumber(question.score));
 
@@ -219,11 +188,9 @@ public class QuestionFragment extends Fragment
     public void displayBody(String text)
     {
 	LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-	ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.format(getActivity(), text);
+	ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
 	for (TextView questionBodyTextView : questionBodyTextViews)
-	{
 	    questionBodyLayout.addView(questionBodyTextView);
-	}
     }
 
     public void setQuestion(Question question)
@@ -234,7 +201,13 @@ public class QuestionFragment extends Fragment
     public void setComments(ArrayList<Comment> comments)
     {
 	question.comments = comments;
-
 	showNumComments();
+    }
+
+    public void setAndDisplay(Question question)
+    {
+	setQuestion(question);
+	displayQuestionMetaData();
+	displayBody(question.body);
     }
 }

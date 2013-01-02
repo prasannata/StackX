@@ -61,11 +61,13 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_CACHE_MAX_SIZE = "pref_cacheMaxSize";
     public static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
     public static final String KEY_PREF_CLEAR_CACHE = "pref_clearCache";
+    public static final String KEY_PREF_DEFAULT_SITE = "pref_defaultSite";
 
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
     private ListPreference refreshIntervalPref;
     private ListPreference accountActionPref;
+    private ListPreference defaultSitePref;
     private RingtonePreference notifRingTonePref;
     private EditTextPreference cacheMaxSizePreference;
     private PreferenceCategory inboxPrefCategory;
@@ -107,6 +109,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
 	addPreferencesFromResource(R.xml.preferences);
 
+	setupDefaultSitePreference();
+	
 	setupAccountPreference();
 
 	setupInboxPreference();
@@ -144,7 +148,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	accountActionPref.setEntryValues(new String[0]);
 	accountActionPref.setEntries(new String[0]);
 
-	if (AppUtils.inAuthenticatedRealm())
+	if (AppUtils.inAuthenticatedRealm(getActivity()))
 	{
 	    setupLogoutPreference();
 	}
@@ -194,6 +198,27 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	});
     }
 
+    private void setupDefaultSitePreference()
+    {
+	defaultSitePref =  (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
+	String entry = (String) defaultSitePref.getValue();
+	defaultSitePref.setEntryValues(new String[0]);
+	defaultSitePref.setEntries(new String[0]);
+	defaultSitePref.setSummary(entry != null ? entry : "None");
+
+
+	defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+	{
+	    @Override
+	    public boolean onPreferenceClick(Preference preference)
+	    {
+		defaultSitePref.getDialog().dismiss();
+
+		return true;
+	    }
+	});
+    }
+
     private void setupLoginPreference()
     {
 	accountActionPref.setTitle(getString(R.string.login));
@@ -215,7 +240,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private void setupInboxPreference()
     {
 	inboxPrefCategory = (PreferenceCategory) findPreference(KEY_PREF_INBOX);
-	inboxPrefCategory.setEnabled(AppUtils.inAuthenticatedRealm());
+	inboxPrefCategory.setEnabled(AppUtils.inAuthenticatedRealm(getActivity()));
 	refreshIntervalPref = (ListPreference) findPreference(KEY_PREF_INBOX_REFRESH_INTERVAL);
 	refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
 

@@ -37,6 +37,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
@@ -54,6 +55,84 @@ public class SharedPreferencesUtil
     {
 	public static final String SITE_CACHE_FILE_NAME = "sites";
 	public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
+    }
+
+    public static boolean isFirstRun(Context context)
+    {
+	return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(StringConstants.IS_FIRST_RUN, true);
+    }
+
+    public static void setFirstRunComplete(Context context)
+    {
+	if (context != null)
+	{
+	    Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+	    prefEditor.putBoolean(StringConstants.IS_FIRST_RUN, false);
+	    prefEditor.commit();
+	}
+    }
+
+    public static void clearDefaultSite(Context context)
+    {
+	SharedPreferencesUtil.setDefaultSiteName(context, null);
+	SharedPreferencesUtil.removeDefaultSite(context);
+    }
+    
+    public static void setDefaultSiteName(Context context, String name)
+    {
+	Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+	prefEditor.putString(SettingsFragment.KEY_PREF_DEFAULT_SITE, name);
+	prefEditor.commit();
+    }
+
+    public static String getDefaultSiteName(Context context)
+    {
+	return PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.KEY_PREF_DEFAULT_SITE,
+	                null);
+    }
+
+    public static void setDefaultSite(Context context, Site site)
+    {
+	if (site != null && context != null)
+	{
+	    File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+	    writeObject(site, dir, StringConstants.SITE);
+	}
+    }
+
+    public static Site getDefaultSite(Context context)
+    {
+	if (context != null)
+	{
+	    File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+	    if (dir.exists() && dir.isDirectory())
+	    {
+		File file = new File(dir, StringConstants.SITE);
+		if (file.exists() && file.isFile())
+		{
+		    return (Site) readObject(file);
+		}
+
+	    }
+	}
+
+	return null;
+    }
+
+    public static void removeDefaultSite(Context context)
+    {
+	if (context != null)
+	{
+	    File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+	    if (dir.exists() && dir.isDirectory())
+	    {
+		File file = new File(dir, StringConstants.SITE);
+		if (file.exists() && file.isFile())
+		{
+		    deleteFile(file);
+		}
+	    }
+	}
     }
 
     public static boolean hasSiteListCache(File cacheDir)
@@ -76,7 +155,7 @@ public class SharedPreferencesUtil
 	{
 	    Log.d(TAG, "Caching sites");
 
-	    cacheObject(sites, cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
+	    writeObject(sites, cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
 
 	    ArrayList<Site> registeredSites = new ArrayList<Site>();
 
@@ -105,11 +184,49 @@ public class SharedPreferencesUtil
 	{
 	    File directory = new File(cacheDir, StringConstants.QUESTIONS);
 
-	    cacheObject(question, directory, String.valueOf(question.id));
+	    writeObject(question, directory, String.valueOf(question.id));
 	}
     }
 
-    public static void cacheObject(Object object, File directory, String fileName)
+    public static void cacheRegisteredSites(File cacheDir, ArrayList<Site> sites)
+    {
+	Log.d(TAG, "Caching registered sites");
+
+	HashMap<String, Site> sitesMap = new HashMap<String, Site>();
+
+	for (Site site : sites)
+	{
+	    sitesMap.put(site.name, site);
+	}
+
+	writeObject(sitesMap, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static ArrayList<Site> getSiteListFromCache(File cacheDir)
+    {
+	Log.d(TAG, cacheDir.toString());
+	return (ArrayList<Site>) readObject(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static HashMap<String, Site> getRegisteredSitesForUser(File cacheDir)
+    {
+	Log.d(TAG, cacheDir.toString());
+	return (HashMap<String, Site>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
+    }
+
+    /**
+     * Writes the given object to specified filename under specified directory.
+     * 
+     * @param object
+     *            Object to write.
+     * @param directory
+     *            Directory under which to create the file.
+     * @param fileName
+     *            File into which object is written.
+     */
+    public static void writeObject(Object object, File directory, String fileName)
     {
 	if (object != null && directory != null && fileName != null)
 	{
@@ -138,34 +255,6 @@ public class SharedPreferencesUtil
 		}
 	    }
 	}
-    }
-
-    public static void cacheRegisteredSites(File cacheDir, ArrayList<Site> sites)
-    {
-	Log.d(TAG, "Caching registered sites");
-
-	HashMap<String, Site> sitesMap = new HashMap<String, Site>();
-
-	for (Site site : sites)
-	{
-	    sitesMap.put(site.name, site);
-	}
-
-	cacheObject(sitesMap, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static ArrayList<Site> fetchSiteListFromCache(File cacheDir)
-    {
-	Log.d(TAG, cacheDir.toString());
-	return (ArrayList<Site>) readObject(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static HashMap<String, Site> getRegisteredSitesForUser(File cacheDir)
-    {
-	Log.d(TAG, cacheDir.toString());
-	return (HashMap<String, Site>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
     }
 
     /**
@@ -426,7 +515,7 @@ public class SharedPreferencesUtil
 	if (cacheDir != null && user != null)
 	{
 	    File dir = new File(cacheDir, StringConstants.ME);
-	    cacheObject(user, dir, OperatingSite.getSite().name + "." + StringConstants.ME);
+	    writeObject(user, dir, OperatingSite.getSite().name + "." + StringConstants.ME);
 	}
     }
 
@@ -448,7 +537,7 @@ public class SharedPreferencesUtil
 	if (cacheDir != null && accounts != null)
 	{
 	    File dir = new File(cacheDir, StringConstants.ME);
-	    cacheObject(accounts, dir, StringConstants.ACCOUNTS);
+	    writeObject(accounts, dir, StringConstants.ACCOUNTS);
 	}
     }
 
@@ -465,5 +554,4 @@ public class SharedPreferencesUtil
 
 	return null;
     }
-
 }

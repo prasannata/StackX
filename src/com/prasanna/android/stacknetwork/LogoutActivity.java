@@ -126,7 +126,7 @@ public class LogoutActivity extends Activity
 
     private void startLoginActivity()
     {
-	Intent loginIntent = new Intent(this, LoginActivity.class);
+	Intent loginIntent = new Intent(this, OAuthActivity.class);
 	loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 	loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 	startActivity(loginIntent);
@@ -141,7 +141,8 @@ public class LogoutActivity extends Activity
 	    editor.commit();
 
 	    SharedPreferencesUtil.clear(getApplicationContext());
-
+	    SharedPreferencesUtil.setFirstRunComplete(this);
+	    
 	    startLoginActivity();
 	}
 	else if (error != null && error.id > 0)

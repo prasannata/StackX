@@ -23,68 +23,98 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 
 public class LoginActivity extends Activity
 {
+    private static final String TAG = LoginActivity.class.getSimpleName();
     private static Context context;
 
     public static Context getAppContext()
     {
 	return LoginActivity.context;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	Log.d(TAG, "onCreate");
 
-        context = getApplicationContext();
-        
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        
-        if (SharedPreferencesUtil.getAccessToken(getApplicationContext()) == null)
-        {
-            setContentView(R.layout.main);
-            handleLogin();
-            handleNoLogin();
-        }
-        else
-        {
-            startActivity(IntentUtils.createSiteListIntent(getApplicationContext()));
-        }
+	super.onCreate(savedInstanceState);
+
+	context = getApplicationContext();
+
+	if (SharedPreferencesUtil.isFirstRun(getApplicationContext()))
+	{
+	    Log.d(TAG, "Preparing for first run");
+
+	    setContentView(R.layout.main);
+	    setOnLogin();
+	    setOnSkipLogin();
+	    SharedPreferencesUtil.setFirstRunComplete(this);
+	}
+	else
+	{
+	    if (SharedPreferencesUtil.getDefaultSiteName(context) != null)
+	    {
+		Log.d(TAG, "Launching default site");
+
+		OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(context));
+		Intent intent = new Intent(context, QuestionsActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	    }
+	    else
+	    {
+		Log.d(TAG, "Launching site list");
+
+		Intent intent = new Intent(context, StackNetworkListActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	    }
+	}
     }
 
-    private void handleLogin()
+    @Override
+    public void onResume()
     {
-        Button loginButton = (Button) findViewById(R.id.login_button);
-        loginButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View view)
-            {
-                Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
-                SharedPreferencesUtil.clear(getApplicationContext());
-                startActivity(oAuthIntent);
-            }
-        });
+	Log.d(TAG, "onResume");
+
+	super.onResume();
     }
 
-    private void handleNoLogin()
+    private void setOnLogin()
     {
-        TextView skipLoginTextView = (TextView) findViewById(R.id.noLogin);
-        skipLoginTextView.setOnClickListener(new View.OnClickListener()
-        {
+	Button loginButton = (Button) findViewById(R.id.login_button);
+	loginButton.setOnClickListener(new View.OnClickListener()
+	{
+	    public void onClick(View view)
+	    {
+		Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
+		startActivity(oAuthIntent);
+	    }
+	});
+    }
 
-            public void onClick(View view)
-            {
-                startActivity(IntentUtils.createSiteListIntent(view.getContext()));
-            }
-        });
+    private void setOnSkipLogin()
+    {
+	TextView skipLoginTextView = (TextView) findViewById(R.id.noLogin);
+	skipLoginTextView.setOnClickListener(new View.OnClickListener()
+	{
+	    public void onClick(View view)
+	    {
+		Toast.makeText(LoginActivity.this, "You can choose to login from settings", Toast.LENGTH_LONG).show();
+		startActivity(new Intent(context, StackNetworkListActivity.class));
+	    }
+	});
     }
 }

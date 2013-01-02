@@ -27,14 +27,14 @@ import android.util.Log;
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 
-public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<String>>
+public class GetTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<String>>
 {
-    private final String TAG = FetchTagsAsyncTask.class.getSimpleName();
+    private final String TAG = GetTagsAsyncTask.class.getSimpleName();
 
     private final AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier;
     private final boolean registeredForSite;
 
-    public FetchTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier,
+    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier,
 	            boolean registeredForSite)
     {
 	super();
@@ -50,6 +50,8 @@ public class FetchTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<Strin
 	try
 	{
 	    tags = UserServiceHelper.getInstance().getTags(1, registeredForSite);
+	    if (tags == null || tags.isEmpty())
+		tags = UserServiceHelper.getInstance().getTags(1, !registeredForSite);
 	}
 	catch (HttpErrorException e)
 	{

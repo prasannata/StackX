@@ -19,11 +19,11 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -63,15 +63,16 @@ public class AppUtils
 	return reputationString;
     }
 
-    public static boolean inAuthenticatedRealm()
+    public static boolean inAuthenticatedRealm(Context context)
     {
-	return SharedPreferencesUtil.getAccessToken(null) == null ? false : true;
+	return SharedPreferencesUtil.getAccessToken(context) == null ? false : true;
     }
 
-    public static boolean inRegisteredSite(File cacheDir)
+    public static boolean inRegisteredSite(Context context)
     {
-	return inAuthenticatedRealm()
-	                && SharedPreferencesUtil.getRegisteredSitesForUser(cacheDir).containsKey(OperatingSite.getSite().name);
+	return inAuthenticatedRealm(context)
+	                && SharedPreferencesUtil.getRegisteredSitesForUser(context.getCacheDir()).containsKey(
+	                                OperatingSite.getSite().name);
     }
 
     public static Map<String, String> getDefaultQueryParams()

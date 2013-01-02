@@ -20,11 +20,11 @@
 package com.prasanna.android.stacknetwork.receiver;
 
 import java.lang.ref.SoftReference;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -42,6 +42,7 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.UserInboxActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
 
@@ -58,13 +59,12 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     {
 	if (SettingsFragment.isNotificationEnabled(context))
 	{
-	    HashMap<String, Integer> unreadItemsInInbox = (HashMap<String, Integer>) intent
+	    ArrayList<InboxItem> unreadInboxItems = (ArrayList<InboxItem>) intent
 		            .getSerializableExtra(UserIntentAction.NEW_MSG.getExtra());
-	    int totalNewMsgs = intent.getIntExtra(UserIntentAction.TOTAL_NEW_MSGS.getExtra(), 0);
 
-	    if (unreadItemsInInbox != null && !unreadItemsInInbox.isEmpty())
+	    if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
 	    {
-		sendNotification(context, totalNewMsgs, unreadItemsInInbox);
+		sendNotification(context, unreadInboxItems);
 
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
@@ -102,9 +102,12 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     }
 
     @SuppressLint("NewApi")
-    private void sendNotification(Context context, int totalNewMsgs, HashMap<String, Integer> newMsgCount)
+    private void sendNotification(Context context, ArrayList<InboxItem> unreadItemsInInbox)
     {
+	int totalNewMsgs = unreadItemsInInbox.size();
 	Intent resultIntent = new Intent(context, UserInboxActivity.class);
+	resultIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), unreadItemsInInbox);
+
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 	stackBuilder.addParentStack(UserInboxActivity.class);
 	stackBuilder.addNextIntent(resultIntent);
@@ -115,21 +118,27 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 
 	Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
 
-	for (Map.Entry<String, Integer> entry : newMsgCount.entrySet())
+	Builder notificationBuilder = new Notification.Builder(context)
+	                .setContentText(context.getString(R.string.questions)).setSmallIcon(R.drawable.new_msg_notify)
+	                .setLargeIcon(bitmapSoftReference.get()).setContentIntent(resultPendingIntent);
+
+	if (unreadItemsInInbox.size() == 1)
 	{
-	    inboxStyle.addLine(entry.getKey() + " (" + entry.getValue() + ")");
+	    notificationBuilder.setContentTitle(unreadItemsInInbox.get(0).title);
+	    inboxStyle.addLine(unreadItemsInInbox.get(0).body);
+	}
+	else
+	{
+	    notificationBuilder.setContentTitle(String.format(NEW_MSG_NOTIF_TITLE, totalNewMsgs));
+	    for (InboxItem inboxItem : unreadItemsInInbox)
+		inboxStyle.addLine(inboxItem.itemType.getNotificationTitle(totalNewMsgs));
 	}
 
-	Notification notification = new Notification.Builder(context)
-	                .setContentTitle(String.format(NEW_MSG_NOTIF_TITLE, totalNewMsgs)).setStyle(inboxStyle)
-	                .setContentText(context.getString(R.string.questions)).setSmallIcon(R.drawable.new_msg_notify)
-	                .setLargeIcon(bitmapSoftReference.get()).setContentIntent(resultPendingIntent).build();
-
+	notificationBuilder = notificationBuilder.setStyle(inboxStyle).setContentIntent(resultPendingIntent);
+	Notification notification = notificationBuilder.build();
 	NotificationManager notificationManager = (NotificationManager) context
 	                .getSystemService(Context.NOTIFICATION_SERVICE);
-
 	notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
 	notificationManager.notify(0, notification);
     }
 }
