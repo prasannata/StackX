@@ -12,16 +12,17 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="5dp"
+        android:paddingRight="5sp"
         android:src="@drawable/circle_white" />
 
     <TextView
         android:id="@+id/siteName"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/isDefaultSite"
         android:gravity="left|center_vertical"
-        android:layout_centerVertical="true"
         android:textColor="@color/black" />
 
     <TextView
