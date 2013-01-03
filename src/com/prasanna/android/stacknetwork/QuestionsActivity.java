@@ -241,6 +241,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 		    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
 		    userProfileIntent.putExtra(StringConstants.USER_ID, question.owner.id);
 		    startActivity(userProfileIntent);
+		    break;
 		case R.id.q_ctx_related:
 		    beginRelatedQuestionsFragment(question.id);
 		    return true;
