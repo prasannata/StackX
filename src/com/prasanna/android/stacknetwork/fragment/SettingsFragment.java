@@ -159,6 +159,24 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 	}
     }
 
+    private void setupLoginPreference()
+    {
+	accountActionPref.setTitle(getString(R.string.login));
+	accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+	{
+	    @Override
+	    public boolean onPreferenceClick(Preference preference)
+	    {
+		accountActionPref.getDialog().dismiss();
+
+		Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
+		SharedPreferencesUtil.clearDefaultSite(getActivity());
+		startActivity(oAuthIntent);
+		return true;
+	    }
+	});
+    }
+
     private void setupLogoutPreference()
     {
 	accountActionPref.setTitle(getString(R.string.logout));
@@ -173,6 +191,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 		    {
 			case DialogInterface.BUTTON_POSITIVE:
 			    Intent logoutIntent = new Intent(getActivity(), LogoutActivity.class);
+			    SharedPreferencesUtil.clearDefaultSite(getActivity());
 			    logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			    logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			    startActivity(logoutIntent);
@@ -215,24 +234,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 		defaultSitePref.getDialog().dismiss();
 
 		startActivity(new Intent(getActivity(), StackNetworkListActivity.class));
-		return true;
-	    }
-	});
-    }
-
-    private void setupLoginPreference()
-    {
-	accountActionPref.setTitle(getString(R.string.login));
-	accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-	{
-	    @Override
-	    public boolean onPreferenceClick(Preference preference)
-	    {
-		accountActionPref.getDialog().dismiss();
-
-		Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
-		SharedPreferencesUtil.clear(getActivity());
-		startActivity(oAuthIntent);
 		return true;
 	    }
 	});
