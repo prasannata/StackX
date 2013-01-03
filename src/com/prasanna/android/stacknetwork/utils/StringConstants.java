@@ -26,16 +26,18 @@ public class StringConstants
 
     public static final String SITES = "sites";
     public static final String SITE = "site";
-    
+
     public static final String QUESTION = "question";
     public static final String QUESTION_ID = "question_id";
     public static final String QUESTIONS = "questions";
-    
+
     public static final String ANSWERS = "answers";
-    
+
+    public static final String COMMENTS = "comments";
+
     public static final String USER = "user";
     public static final String USER_ID = "user_id";
-    
+
     public static final String PAGE = "page";
     public static final String OAUTH_REDIRECT_URL = "http://oauth.prasanna.stackx.com";
     public static final String FRONT_PAGE = "Front page";
@@ -51,13 +53,12 @@ public class StringConstants
     public static final String RELATED = "related";
     public static final String IS_FIRST_RUN = "is_first_run";
     public static final String DEFAULTS = "defaults";
-    
 
     public static final class HttpError
     {
-	public static final String CODE = "code";
-	public static final String ERROR_ID = "error_id";
-	public static final String ERROR_NAME = "error_name";
-	public static final String ERROR_MESSAGE = "error_message";
+        public static final String CODE = "code";
+        public static final String ERROR_ID = "error_id";
+        public static final String ERROR_NAME = "error_name";
+        public static final String ERROR_MESSAGE = "error_message";
     }
 }

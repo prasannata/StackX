@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.utils;
 
@@ -27,11 +27,11 @@ public class OperatingSite
 
     public static Site getSite()
     {
-	return site;
+        return site;
     }
 
     public static void setSite(Site site)
     {
-	OperatingSite.site = site;
+        OperatingSite.site = site;
     }
 }
