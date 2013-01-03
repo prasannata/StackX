@@ -22,6 +22,9 @@ package com.prasanna.android.stacknetwork.utils;
 public class JsonFields
 {
     public static final String ITEMS = "items";
+    public static final String QUOTA_REMAINING = "quota_remaining";
+    public static final String QUOTA_MAX = "quota_max";
+    public static final String HAS_MORE = "has_more";
 
     public static class BaseUserContribFields
     {

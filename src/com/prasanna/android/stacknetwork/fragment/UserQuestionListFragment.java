@@ -25,6 +25,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,59 +48,73 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
-	page = 0;
+        super.onCreate(savedInstanceState);
+        page = 0;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	Log.d(TAG, "Creating question fragment");
+        Log.d(TAG, "Creating question fragment");
 
-	if (itemsContainer == null)
-	{
-	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
-	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-		            new ArrayList<Question>(), this);
-	    showProgressBar();
-	}
+        if (itemsContainer == null)
+        {
+            itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container,
+                    null);
+            itemListAdapter = new ItemListAdapter<Question>(getActivity(),
+                    R.layout.question_snippet_layout, new ArrayList<Question>(), this);
+            showProgressBar();
+        }
 
-	return itemsContainer;
+        return itemsContainer;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-	Log.d(getLogTag(), "onActivityCreated");
+        Log.d(getLogTag(), "onActivityCreated");
 
-	super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
-	registerReceiver();
-	startIntentService();
+        registerReceiver();
+        startIntentService();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
+        Log.d(getLogTag(), "onCreateContextMenu");
+
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        menu.removeItem(R.id.q_ctx_menu_user_profile);
     }
 
     @Override
     protected void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(UserIntentAction.QUESTIONS_BY_USER.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	getActivity().registerReceiver(receiver, filter);
+        IntentFilter filter = new IntentFilter(UserIntentAction.QUESTIONS_BY_USER.getAction());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(receiver, filter);
     }
 
     @Override
     protected void startIntentService()
     {
-	intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
-	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
-	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-	intent.putExtra(StringConstants.PAGE, ++page);
-	startService();
+        intent = getIntentForService(UserIntentService.class,
+                UserIntentAction.QUESTIONS_BY_USER.getAction());
+        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
+        intent.putExtra(StringConstants.ME,
+                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+        intent.putExtra(StringConstants.USER_ID,
+                getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+        intent.putExtra(StringConstants.PAGE, ++page);
+        startService();
     }
 
     @Override
     public String getLogTag()
     {
-	return TAG;
+        return TAG;
     }
 }
