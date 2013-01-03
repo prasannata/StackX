@@ -230,6 +230,9 @@ public class UserProfileFragment extends Fragment
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(user.displayName);
 
+        textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
+        textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.creationDate));
+
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
         textView.setText(AppUtils.formatReputation(user.reputation));
 

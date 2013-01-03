@@ -89,6 +89,7 @@ public abstract class AbstractBaseServiceHelper
                         .getJSONObject(JsonFields.User.BADGE_COUNTS));
                 user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
                 user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
+                user.creationDate = userJsonObject.getLong(JsonFields.User.CREATION_DATE);
                 page.items.add(user);
             }
         }
