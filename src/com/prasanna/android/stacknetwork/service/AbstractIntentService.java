@@ -22,6 +22,7 @@ import java.io.Serializable;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
@@ -29,6 +30,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractIntentService extends IntentService
 {
+    private static final String TAG = AbstractIntentService.class.getSimpleName();
 
     public AbstractIntentService(String name)
     {
@@ -37,6 +39,8 @@ public abstract class AbstractIntentService extends IntentService
 
     protected void broadcastHttpErrorIntent(StackXError error)
     {
+	Log.d(TAG, "broadcastHttpErrorIntent: " + error.msg);
+
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -46,6 +50,8 @@ public abstract class AbstractIntentService extends IntentService
 
     protected void broadcastSerializableExtra(String action, String extraName, Serializable extra)
     {
+	Log.d(TAG, "broadcastSerializableExtra: " + action);
+
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.setAction(action);
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

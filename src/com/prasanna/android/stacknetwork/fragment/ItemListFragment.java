@@ -76,7 +76,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-	    Log.d(getLogTag(), "Receiver invoked: " + intent.getExtras());
+	    Log.d(getLogTag(), "Receiver invoked: " + intent.getAction());
 
 	    serviceRunning = false;
 

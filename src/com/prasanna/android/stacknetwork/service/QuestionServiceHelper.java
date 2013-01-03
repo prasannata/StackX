@@ -20,7 +20,6 @@
 package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -161,7 +160,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
     public ArrayList<Question> search(String query, int page)
     {
 	String restEndPoint = "search";
-	Map<String, String> queryParams = new HashMap<String, String>();
+	Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 	queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
 	queryParams.put(StackUri.QueryParams.IN_TITLE, query);
 	queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
@@ -226,6 +225,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
 	return questions;
     }
+
     public ArrayList<Question> getRelatedQuestions(long questionId, int page)
     {
 	ArrayList<Question> questions = null;
