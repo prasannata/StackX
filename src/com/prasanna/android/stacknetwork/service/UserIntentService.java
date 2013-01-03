@@ -30,7 +30,6 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -147,15 +146,14 @@ public class UserIntentService extends AbstractIntentService
     {
 	if (me)
 	{
-	    broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(),
-		            QuestionIntentAction.QUESTIONS.getAction(), userService.getMyQuestions(page));
+	    broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(), StringConstants.QUESTIONS,
+		            userService.getMyQuestions(page));
 	}
 	else
 	{
 	    if (userId > 0)
 	    {
-		broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(),
-		                QuestionIntentAction.QUESTIONS.getAction(),
+		broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(), StringConstants.QUESTIONS,
 		                userService.getQuestionsByUser(userId, page));
 	    }
 	}
