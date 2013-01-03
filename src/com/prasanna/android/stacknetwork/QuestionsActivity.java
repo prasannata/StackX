@@ -158,8 +158,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
 	    initActionBarSpinner();
 
-	    if (lastSavedPosition > 0)
-		getActionBar().setSelectedNavigationItem(lastSavedPosition);
+	    if (lastSavedPosition > 0) getActionBar().setSelectedNavigationItem(lastSavedPosition);
 	}
 	else
 	{
@@ -236,7 +235,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 	    switch (item.getItemId())
 	    {
 		case R.id.q_ctx_comments:
-		    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+		    showComments(question);
 		    return true;
 		case R.id.q_ctx_menu_user_profile:
 		    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
@@ -262,6 +261,14 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 	return false;
     }
 
+    private void showComments(Question question)
+    {
+	if (question != null && question.comments != null && question.comments.size() > 0)
+	    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+	else
+	    Toast.makeText(this, "No comments", Toast.LENGTH_LONG).show();
+    }
+
     /*
      * While pressing back, when all fragments have been popped out of the
      * stack, an empty container is shown and I have no FUCKING idea as how to
@@ -275,7 +282,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     {
 	super.onBackPressed();
 
-	if (getFragmentManager().getBackStackEntryCount() == 0)
-	    finish();
+	if (getFragmentManager().getBackStackEntryCount() == 0) finish();
     }
 }
