@@ -30,6 +30,7 @@ import java.io.StreamCorruptedException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -49,171 +50,183 @@ public class SharedPreferencesUtil
     private static final String TAG = SharedPreferencesUtil.class.getSimpleName();
     private static final int BYTE_UNIT = 1024;
     private static String userAccessToken;
-    private static final String[] sizeUnit = { "K", "M" };
+    private static final String[] sizeUnit =
+    { "K", "M" };
 
     public static class CacheFileName
     {
-	public static final String SITE_CACHE_FILE_NAME = "sites";
-	public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
+        public static final String SITE_CACHE_FILE_NAME = "sites";
+        public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
     }
 
     public static boolean isFirstRun(Context context)
     {
-	return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(StringConstants.IS_FIRST_RUN, true);
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+                StringConstants.IS_FIRST_RUN, true);
     }
 
     public static void setFirstRunComplete(Context context)
     {
-	if (context != null)
-	{
-	    Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	    prefEditor.putBoolean(StringConstants.IS_FIRST_RUN, false);
-	    prefEditor.commit();
-	}
+        if (context != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.putBoolean(StringConstants.IS_FIRST_RUN, false);
+            prefEditor.commit();
+        }
     }
 
     public static void clearDefaultSite(Context context)
     {
-	SharedPreferencesUtil.setDefaultSiteName(context, null);
-	SharedPreferencesUtil.removeDefaultSite(context);
+        SharedPreferencesUtil.setDefaultSiteName(context, null);
+        SharedPreferencesUtil.removeDefaultSite(context);
     }
-    
+
     public static void setDefaultSiteName(Context context, String name)
     {
-	Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	prefEditor.putString(SettingsFragment.KEY_PREF_DEFAULT_SITE, name);
-	prefEditor.commit();
+        Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefEditor.putString(SettingsFragment.KEY_PREF_DEFAULT_SITE, name);
+        prefEditor.commit();
     }
 
     public static String getDefaultSiteName(Context context)
     {
-	return PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.KEY_PREF_DEFAULT_SITE,
-	                null);
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(
+                SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
     }
 
     public static void setDefaultSite(Context context, Site site)
     {
-	if (site != null && context != null)
-	{
-	    File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-	    writeObject(site, dir, StringConstants.SITE);
-	}
+        if (site != null && context != null)
+        {
+            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+            writeObject(site, dir, StringConstants.SITE);
+        }
     }
 
     public static Site getDefaultSite(Context context)
     {
-	if (context != null)
-	{
-	    File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-	    if (dir.exists() && dir.isDirectory())
-	    {
-		File file = new File(dir, StringConstants.SITE);
-		if (file.exists() && file.isFile())
-		{
-		    return (Site) readObject(file);
-		}
+        if (context != null)
+        {
+            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+            if (dir.exists() && dir.isDirectory())
+            {
+                File file = new File(dir, StringConstants.SITE);
+                if (file.exists() && file.isFile())
+                {
+                    return (Site) readObject(file);
+                }
 
-	    }
-	}
+            }
+        }
 
-	return null;
+        return null;
     }
 
     public static void removeDefaultSite(Context context)
     {
-	if (context != null)
-	{
-	    File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-	    if (dir.exists() && dir.isDirectory())
-	    {
-		File file = new File(dir, StringConstants.SITE);
-		if (file.exists() && file.isFile())
-		{
-		    deleteFile(file);
-		}
-	    }
-	}
+        if (context != null)
+        {
+            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+            if (dir.exists() && dir.isDirectory())
+            {
+                File file = new File(dir, StringConstants.SITE);
+                if (file.exists() && file.isFile())
+                {
+                    deleteFile(file);
+                }
+            }
+        }
     }
 
     public static boolean hasSiteListCache(File cacheDir)
     {
-	boolean present = false;
-	File file = new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
+        boolean present = false;
+        File file = new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
 
-	if (file != null)
-	{
-	    present = file.exists();
-	}
+        if (file != null)
+        {
+            present = file.exists();
+        }
 
-	Log.d(TAG, "Sites cached: " + present);
-	return present;
+        Log.d(TAG, "Sites cached: " + present);
+        return present;
     }
 
     public static void cacheSiteList(File cacheDir, ArrayList<Site> sites)
     {
-	if (cacheDir != null && sites != null && sites.isEmpty() == false)
-	{
-	    Log.d(TAG, "Caching sites");
+        if (cacheDir != null && sites != null && sites.isEmpty() == false)
+        {
+            Log.d(TAG, "Caching sites");
 
-	    writeObject(sites, cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
+            writeObject(sites, cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
 
-	    ArrayList<Site> registeredSites = new ArrayList<Site>();
+            ArrayList<Site> registeredSites = new ArrayList<Site>();
 
-	    for (Site site : sites)
-	    {
-		if (site.userType.equals(UserType.REGISTERED))
-		{
-		    registeredSites.add(site);
-		}
-	    }
+            for (Site site : sites)
+            {
+                if (site.userType.equals(UserType.REGISTERED))
+                {
+                    registeredSites.add(site);
+                }
+            }
 
-	    SoftReference<ArrayList<Site>> registeredSitesSoftReference = new SoftReference<ArrayList<Site>>(
-		            registeredSites);
+            SoftReference<ArrayList<Site>> registeredSitesSoftReference = new SoftReference<ArrayList<Site>>(
+                    registeredSites);
 
-	    if (!registeredSites.isEmpty())
-		cacheRegisteredSites(cacheDir, registeredSitesSoftReference.get());
+            if (!registeredSites.isEmpty())
+                cacheRegisteredSites(cacheDir, registeredSitesSoftReference.get());
 
-	}
+        }
+    }
+
+    public static void clearSiteListCache(File cacheDir)
+    {
+        if (cacheDir != null)
+        {
+            deleteDir(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
+            deleteDir(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
+        }
     }
 
     public static void cacheQuestion(File cacheDir, Question question)
     {
-	Log.d(TAG, "Caching question");
+        Log.d(TAG, "Caching question");
 
-	if (question != null && question.id > 0)
-	{
-	    File directory = new File(cacheDir, StringConstants.QUESTIONS);
+        if (question != null && question.id > 0)
+        {
+            File directory = new File(cacheDir, StringConstants.QUESTIONS);
 
-	    writeObject(question, directory, String.valueOf(question.id));
-	}
+            writeObject(question, directory, String.valueOf(question.id));
+        }
     }
 
     public static void cacheRegisteredSites(File cacheDir, ArrayList<Site> sites)
     {
-	Log.d(TAG, "Caching registered sites");
+        Log.d(TAG, "Caching registered sites");
 
-	HashMap<String, Site> sitesMap = new HashMap<String, Site>();
+        HashMap<String, Site> sitesMap = new HashMap<String, Site>();
 
-	for (Site site : sites)
-	{
-	    sitesMap.put(site.name, site);
-	}
+        for (Site site : sites)
+        {
+            sitesMap.put(site.name, site);
+        }
 
-	writeObject(sitesMap, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
+        writeObject(sitesMap, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
     }
 
     @SuppressWarnings("unchecked")
     public static ArrayList<Site> getSiteListFromCache(File cacheDir)
     {
-	Log.d(TAG, cacheDir.toString());
-	return (ArrayList<Site>) readObject(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
+        Log.d(TAG, cacheDir.toString());
+        return (ArrayList<Site>) readObject(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
     }
 
     @SuppressWarnings("unchecked")
     public static HashMap<String, Site> getRegisteredSitesForUser(File cacheDir)
     {
-	Log.d(TAG, cacheDir.toString());
-	return (HashMap<String, Site>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
+        Log.d(TAG, cacheDir.toString());
+        return (HashMap<String, Site>) readObject(new File(cacheDir,
+                CacheFileName.REGD_SITE_CACHE_FILE_NAME));
     }
 
     /**
@@ -228,33 +241,33 @@ public class SharedPreferencesUtil
      */
     public static void writeObject(Object object, File directory, String fileName)
     {
-	if (object != null && directory != null && fileName != null)
-	{
-	    if (directory.exists() == false)
-	    {
-		directory.mkdir();
-	    }
+        if (object != null && directory != null && fileName != null)
+        {
+            if (directory.exists() == false)
+            {
+                directory.mkdir();
+            }
 
-	    File cacheFile = new File(directory, fileName);
+            File cacheFile = new File(directory, fileName);
 
-	    if (cacheFile != null)
-	    {
-		try
-		{
-		    ObjectOutputStream oo = new ObjectOutputStream(new FileOutputStream(cacheFile));
-		    oo.writeObject(object);
-		    oo.close();
-		}
-		catch (FileNotFoundException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-		catch (IOException e)
-		{
-		    Log.e(TAG, e.getMessage());
-		}
-	    }
-	}
+            if (cacheFile != null)
+            {
+                try
+                {
+                    ObjectOutputStream oo = new ObjectOutputStream(new FileOutputStream(cacheFile));
+                    oo.writeObject(object);
+                    oo.close();
+                }
+                catch (FileNotFoundException e)
+                {
+                    Log.e(TAG, e.getMessage());
+                }
+                catch (IOException e)
+                {
+                    Log.e(TAG, e.getMessage());
+                }
+            }
+        }
     }
 
     /**
@@ -267,7 +280,7 @@ public class SharedPreferencesUtil
      */
     public static ArrayList<Object> readObjects(File directory)
     {
-	return readObjects(directory, null);
+        return readObjects(directory, null);
     }
 
     /**
@@ -282,79 +295,80 @@ public class SharedPreferencesUtil
      */
     public static ArrayList<Object> readObjects(File directory, Integer maxDepth)
     {
-	ArrayList<Object> objects = null;
+        ArrayList<Object> objects = null;
 
-	if (directory != null && directory.isDirectory() && directory.exists() == true)
-	{
-	    objects = readObjectsInDir(directory, maxDepth);
-	}
+        if (directory != null && directory.isDirectory() && directory.exists() == true)
+        {
+            objects = readObjectsInDir(directory, maxDepth);
+        }
 
-	return objects;
+        return objects;
     }
 
     private static ArrayList<Object> readObjectsInDir(File directory, Integer depth)
     {
-	ArrayList<Object> objects = null;
+        ArrayList<Object> objects = null;
 
-	if (depth == null || depth > 0)
-	{
-	    objects = new ArrayList<Object>();
+        if (depth == null || depth > 0)
+        {
+            objects = new ArrayList<Object>();
 
-	    String[] fileNames = directory.list();
+            String[] fileNames = directory.list();
 
-	    for (String fileName : fileNames)
-	    {
-		File file = new File(directory, fileName);
-		if (file.isDirectory())
-		{
-		    ArrayList<Object> childObjects = readObjects(directory, depth != null ? --depth : depth);
-		    if (childObjects != null)
-		    {
-			objects.addAll(childObjects);
-		    }
-		}
-		else
-		{
-		    objects.add(readObject(file));
-		}
-	    }
-	}
-	return objects;
+            for (String fileName : fileNames)
+            {
+                File file = new File(directory, fileName);
+                if (file.isDirectory())
+                {
+                    ArrayList<Object> childObjects = readObjects(directory, depth != null ? --depth
+                            : depth);
+                    if (childObjects != null)
+                    {
+                        objects.addAll(childObjects);
+                    }
+                }
+                else
+                {
+                    objects.add(readObject(file));
+                }
+            }
+        }
+        return objects;
     }
 
     public static Object readObject(File file)
     {
-	Object object = null;
+        Object object = null;
 
-	if (file != null && file.exists() == true && file.isFile() == true)
-	{
-	    Log.d(TAG, "Fetch cached objects");
+        if (file != null && file.exists() == true && file.isFile() == true)
+        {
+            Log.d(TAG, "Fetch cached objects");
 
-	    try
-	    {
-		ObjectInputStream oi = new ObjectInputStream(new FileInputStream(file));
-		object = oi.readObject();
-		oi.close();
-	    }
-	    catch (StreamCorruptedException e)
-	    {
-		Log.e(TAG, e.getMessage());
-	    }
-	    catch (FileNotFoundException e)
-	    {
-		Log.e(TAG, e.getMessage());
-	    }
-	    catch (IOException e)
-	    {
-		Log.e(TAG, e.getMessage());
-	    }
-	    catch (ClassNotFoundException e)
-	    {
-		Log.e(TAG, e.getMessage());
-	    }
-	}
+            try
+            {
+                ObjectInputStream oi = new ObjectInputStream(new FileInputStream(file));
+                object = oi.readObject();
+                oi.close();
+            }
+            catch (StreamCorruptedException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            catch (FileNotFoundException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            catch (ClassNotFoundException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+        }
 
-	return object;
+        return object;
     }
 
     /**
@@ -364,63 +378,63 @@ public class SharedPreferencesUtil
      */
     public static void clear(Context context)
     {
-	if (context != null)
-	{
-	    Log.d(TAG, "Clearing cache");
+        if (context != null)
+        {
+            Log.d(TAG, "Clearing cache");
 
-	    File cacheDir = context.getCacheDir();
+            File cacheDir = context.getCacheDir();
 
-	    if (cacheDir != null && cacheDir.isDirectory())
-	    {
-		deleteDir(cacheDir);
-	    }
+            if (cacheDir != null && cacheDir.isDirectory())
+            {
+                deleteDir(cacheDir);
+            }
 
-	    clearSharedPreferences(context);
-	}
+            clearSharedPreferences(context);
+        }
     }
 
     public static void clearSharedPreferences(Context context)
     {
-	Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	prefEditor.clear();
-	prefEditor.commit();
-	userAccessToken = null;
+        Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefEditor.clear();
+        prefEditor.commit();
+        userAccessToken = null;
     }
 
     public static boolean deleteFile(File file)
     {
-	boolean deleted = false;
+        boolean deleted = false;
 
-	if (file != null && file.exists() == true && file.isFile())
-	{
-	    deleted = file.delete();
-	}
+        if (file != null && file.exists() == true && file.isFile())
+        {
+            deleted = file.delete();
+        }
 
-	return deleted;
+        return deleted;
     }
 
     public static boolean deleteDir(File dir)
     {
-	if (dir != null && dir.isDirectory())
-	{
-	    String[] children = dir.list();
-	    for (int i = 0; i < children.length; i++)
-	    {
-		deleteDir(new File(dir, children[i]));
-	    }
-	}
-	return dir.delete();
+        if (dir != null && dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++)
+            {
+                deleteDir(new File(dir, children[i]));
+            }
+        }
+        return dir.delete();
     }
 
     public static void cacheAccessToken(Context context, String accessToken)
     {
-	if (accessToken != null)
-	{
-	    Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-	    prefEditor.putString(StringConstants.ACCESS_TOKEN, accessToken);
-	    prefEditor.commit();
-	    userAccessToken = accessToken;
-	}
+        if (accessToken != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.putString(StringConstants.ACCESS_TOKEN, accessToken);
+            prefEditor.commit();
+            userAccessToken = accessToken;
+        }
     }
 
     /**
@@ -431,13 +445,14 @@ public class SharedPreferencesUtil
      */
     public static String getAccessToken(Context context)
     {
-	if (userAccessToken == null && context != null)
-	{
-	    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	    userAccessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-	}
+        if (userAccessToken == null && context != null)
+        {
+            SharedPreferences sharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(context);
+            userAccessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
+        }
 
-	return userAccessToken;
+        return userAccessToken;
     }
 
     /**
@@ -448,29 +463,29 @@ public class SharedPreferencesUtil
      */
     public static long size(File cacheDir)
     {
-	long size = 0;
+        long size = 0;
 
-	if (cacheDir != null && cacheDir.isDirectory())
-	{
-	    File[] files = cacheDir.listFiles();
+        if (cacheDir != null && cacheDir.isDirectory())
+        {
+            File[] files = cacheDir.listFiles();
 
-	    for (File file : files)
-	    {
-		if (file.isFile())
-		{
-		    size += file.length();
-		}
-		else
-		{
-		    if (file.isDirectory())
-		    {
-			size += size(file);
-		    }
-		}
-	    }
-	}
+            for (File file : files)
+            {
+                if (file.isFile())
+                {
+                    size += file.length();
+                }
+                else
+                {
+                    if (file.isDirectory())
+                    {
+                        size += size(file);
+                    }
+                }
+            }
+        }
 
-	return size;
+        return size;
     }
 
     /**
@@ -481,77 +496,76 @@ public class SharedPreferencesUtil
      */
     public static String getHumanReadableCacheSize(File cacheDir)
     {
-	long size = size(cacheDir);
+        long size = size(cacheDir);
 
-	if (size < BYTE_UNIT)
-	{
-	    return size + " B";
-	}
+        if (size < BYTE_UNIT)
+        {
+            return size + " B";
+        }
 
-	int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
+        int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
 
-	return String.format("%.1f %sB", size / Math.pow(BYTE_UNIT, exp), sizeUnit[exp - 1]);
+        return String.format(Locale.US, "%.1f %sB", size / Math.pow(BYTE_UNIT, exp),
+                sizeUnit[exp - 1]);
     }
 
     public static String getQuestionDirSize(File cacheDir)
     {
-	return getHumanReadableCacheSize(new File(cacheDir, StringConstants.QUESTIONS));
+        return getHumanReadableCacheSize(new File(cacheDir, StringConstants.QUESTIONS));
     }
 
     public static void deleteQuestion(File cacheDir, long questionId)
     {
-	File directory = new File(cacheDir, StringConstants.QUESTIONS);
-	deleteFile(new File(directory, String.valueOf(questionId)));
+        File directory = new File(cacheDir, StringConstants.QUESTIONS);
+        deleteFile(new File(directory, String.valueOf(questionId)));
     }
 
     public static void deleteAllQuestions(File cacheDir)
     {
-	File directory = new File(cacheDir, StringConstants.QUESTIONS);
-	deleteDir(directory);
+        File directory = new File(cacheDir, StringConstants.QUESTIONS);
+        deleteDir(directory);
     }
 
     public static void cacheMe(File cacheDir, User user)
     {
-	if (cacheDir != null && user != null)
-	{
-	    File dir = new File(cacheDir, StringConstants.ME);
-	    writeObject(user, dir, OperatingSite.getSite().name + "." + StringConstants.ME);
-	}
+        if (cacheDir != null && user != null)
+        {
+            File dir = new File(cacheDir, StringConstants.ME);
+            writeObject(user, dir, OperatingSite.getSite().name + "." + StringConstants.ME);
+        }
     }
 
     public static User getMe(File cacheDir)
     {
-	if (cacheDir != null)
-	{
-	    File dir = new File(cacheDir, StringConstants.ME);
-	    File file = new File(dir, OperatingSite.getSite().name + "." + StringConstants.ME);
-	    if (file.exists())
-		return (User) readObject(file);
-	}
+        if (cacheDir != null)
+        {
+            File dir = new File(cacheDir, StringConstants.ME);
+            File file = new File(dir, OperatingSite.getSite().name + "." + StringConstants.ME);
+            if (file.exists()) return (User) readObject(file);
+        }
 
-	return null;
+        return null;
     }
 
     public static void cacheMeAccounts(File cacheDir, ArrayList<Account> accounts)
     {
-	if (cacheDir != null && accounts != null)
-	{
-	    File dir = new File(cacheDir, StringConstants.ME);
-	    writeObject(accounts, dir, StringConstants.ACCOUNTS);
-	}
+        if (cacheDir != null && accounts != null)
+        {
+            File dir = new File(cacheDir, StringConstants.ME);
+            writeObject(accounts, dir, StringConstants.ACCOUNTS);
+        }
     }
 
     @SuppressWarnings("unchecked")
     public static ArrayList<Account> getMeAccounts(File cacheDir)
     {
-	if (cacheDir != null)
-	{
-	    File dir = new File(cacheDir, StringConstants.ME);
-	    File file = new File(dir, StringConstants.ACCOUNTS);
-	    if (file.exists())
-		return (ArrayList<Account>) readObject(file);
-	}
+        if (cacheDir != null)
+        {
+            File dir = new File(cacheDir, StringConstants.ME);
+            File file = new File(dir, StringConstants.ACCOUNTS);
+            if (file.exists()) return (ArrayList<Account>) readObject(file);
+        }
 
-	return null;
+        return null;
     }
 }
