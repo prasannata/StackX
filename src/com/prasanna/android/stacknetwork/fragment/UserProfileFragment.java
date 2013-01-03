@@ -290,12 +290,15 @@ public class UserProfileFragment extends Fragment
 
     private void displayUserAccounts()
     {
-        for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
+        if (user != null && user.accounts != null)
         {
-            TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                    R.layout.textview_black_textcolor, null);
-            textView.setText(user.accounts.get(usersAccountCursor).siteName);
-            userAccountList.addView(textView);
+            for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
+            {
+                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
+                        R.layout.textview_black_textcolor, null);
+                textView.setText(user.accounts.get(usersAccountCursor).siteName);
+                userAccountList.addView(textView);
+            }
         }
     }
 }

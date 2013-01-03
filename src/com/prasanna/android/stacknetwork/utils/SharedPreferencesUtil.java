@@ -455,6 +455,11 @@ public class SharedPreferencesUtil
         return userAccessToken;
     }
 
+    public static void loadAccessToken(Context context)
+    {
+        getAccessToken(context);
+    }
+
     /**
      * Returns current cache size in bytes.
      * 

@@ -43,9 +43,9 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.IconCache;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetImageAsyncTask;
@@ -69,6 +69,20 @@ public abstract class AbstractUserActionBarActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
+        refreshOperationSite();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        SharedPreferencesUtil.loadAccessToken(getApplicationContext());
+        refreshOperationSite();
+    }
+
+    public void refreshOperationSite()
+    {
         if (OperatingSite.getSite() == null)
             OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(getApplicationContext()));
     }
