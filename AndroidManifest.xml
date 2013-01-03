@@ -29,10 +29,11 @@
             android:process=":remote" />
         <receiver
             android:name=".receiver.NewMsgNotificationReceiver"
-            android:exported="false" >
+            android:exported="true" >
             <intent-filter>
-                <action android:name="com.prasanna.stacknetwork.newMsg" >
-                </action>
+                <action android:name="com.prasanna.stacknetwork.newMsg" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 

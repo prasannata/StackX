@@ -185,6 +185,7 @@ public class UserIntentService extends AbstractIntentService
 
 	if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
 	{
+	    Log.d(TAG, "New unread inbox items found. Notifying reeiver");
 	    totalNewMsgs += unreadInboxItems.size();
 	    broadcastUnreadItemsCount(totalNewMsgs, unreadInboxItems);
 	}

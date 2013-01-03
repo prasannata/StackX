@@ -57,8 +57,12 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
+	Log.d(TAG, "Received new msg notificaiton");
+	
 	if (SettingsFragment.isNotificationEnabled(context))
 	{
+	    Log.d(TAG, "Notification enabled in settings");
+	    
 	    ArrayList<InboxItem> unreadInboxItems = (ArrayList<InboxItem>) intent
 		            .getSerializableExtra(UserIntentAction.NEW_MSG.getAction());
 
