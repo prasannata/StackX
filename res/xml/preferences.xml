@@ -34,7 +34,7 @@
         android:persistent="false"
         android:title="@string/inbox" >
         <ListPreference
-            android:defaultValue="-1"
+            android:defaultValue="0"
             android:entries="@array/pref_refreshInterval_default_entries"
             android:entryValues="@array/pref_refreshInterval_default_values"
             android:key="pref_inboxRefreshInterval"
