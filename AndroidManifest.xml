@@ -31,7 +31,7 @@
             android:name=".receiver.NewMsgNotificationReceiver"
             android:exported="false" >
             <intent-filter>
-                <action android:name="NEW_MSG" >
+                <action android:name="com.prasanna.stacknetwork.newMsg" >
                 </action>
             </intent-filter>
         </receiver>
