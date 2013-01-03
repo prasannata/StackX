@@ -66,7 +66,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
 	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
 		            new ArrayList<Question>(), this);
-	    setListAdapter(itemListAdapter);
 	}
 
 	return itemsContainer;
@@ -170,7 +169,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
-	showLoadingSpinningWheel();
+	showProgressBar();
 
 	registerReceiver();
 
@@ -184,7 +183,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
 
-	showLoadingSpinningWheel();
+	showProgressBar();
 
 	registerReceiver();
 
@@ -198,7 +197,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), getBundle().getString(StringConstants.TAG, null));
 	filter = new IntentFilter(QuestionIntentAction.TAGS_FAQ.name());
 
-	showLoadingSpinningWheel();
+	showProgressBar();
 
 	registerReceiver();
 
@@ -215,7 +214,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
 	filter = new IntentFilter(QuestionIntentAction.QUESTION_SEARCH.name());
 
-	showLoadingSpinningWheel();
+	showProgressBar();
 
 	registerReceiver();
 

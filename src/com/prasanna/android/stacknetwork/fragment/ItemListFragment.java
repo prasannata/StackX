@@ -110,7 +110,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     public void onDestroy()
     {
 	Log.d(getLogTag(), "onDestroy");
-	
+
 	super.onDestroy();
 
 	stopServiceAndUnregisterReceivers();
@@ -120,7 +120,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     public void onStop()
     {
 	Log.d(getLogTag(), "onStop");
-	
+
 	super.onStop();
 
 	stopService();
@@ -141,19 +141,14 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
 	}
     }
 
-    protected void showLoadingSpinningWheel()
+    protected void showProgressBar()
     {
-	if (progressBar == null)
-	    progressBar = (ProgressBar) getParentLayout().findViewById(R.id.loadingProgressBar);
-
-	if (progressBar.getVisibility() != View.VISIBLE)
-	    progressBar.setVisibility(View.VISIBLE);
+	getProgressBar().setVisibility(View.VISIBLE);
     }
 
-    protected void dismissLoadingSpinningWheel()
+    protected void dismissProgressBar()
     {
-	if (progressBar != null)
-	    progressBar.setVisibility(View.GONE);
+	getProgressBar().setVisibility(View.GONE);
     }
 
     protected Intent getIntentForService(Class<?> clazz, String action)
@@ -196,14 +191,14 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
 
 	registerReceiver();
 
-	showLoadingSpinningWheel();
+	showProgressBar();
 
 	startIntentService();
     }
 
     protected void displayItems(ArrayList<T> newItems)
     {
-	dismissLoadingSpinningWheel();
+	dismissProgressBar();
 
 	if (itemListAdapter != null && newItems != null)
 	{
@@ -218,7 +213,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     {
 	Log.d(getLogTag(), "Http error " + code + " " + text);
 
-	dismissLoadingSpinningWheel();
+	dismissProgressBar();
 	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
 	                null);
 	TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
@@ -238,7 +233,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
 
 	    if (serviceRunning == false)
 	    {
-		showLoadingSpinningWheel();
+		showProgressBar();
 		startIntentService();
 	    }
 	}
@@ -248,5 +243,12 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     public void onScrollStateChanged(AbsListView view, int scrollState)
     {
 	Log.v(getLogTag(), "onScrollStateChanged");
+    }
+
+    protected ProgressBar getProgressBar()
+    {
+	if (progressBar == null)
+	    progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
+	return progressBar;
     }
 }

@@ -48,10 +48,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     {
 	super.onCreate(savedInstanceState);
 	page = 0;
-
-	registerReceiver();
-
-	startIntentService();
     }
 
     @Override
@@ -64,12 +60,21 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
 	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
 	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
 		            new ArrayList<Question>(), this);
-	    setListAdapter(itemListAdapter);
-
-	    showLoadingSpinningWheel();
+	    showProgressBar();
 	}
 
 	return itemsContainer;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+	Log.d(getLogTag(), "onActivityCreated");
+
+	super.onActivityCreated(savedInstanceState);
+
+	registerReceiver();
+	startIntentService();
     }
 
     @Override

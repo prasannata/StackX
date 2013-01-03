@@ -75,6 +75,8 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
 	registerForContextMenu(getListView());
 
+	getListView().addFooterView(getProgressBar());
+	setListAdapter(itemListAdapter);
 	getListView().setOnScrollListener(this);
     }
 
