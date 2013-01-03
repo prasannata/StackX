@@ -33,13 +33,13 @@ import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItem
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
-import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity implements
-        OnContextItemSelectedListener<BaseStackExchangeItem>
+        OnContextItemSelectedListener<StackXItem>
 {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
     private static final String[] PAGES =
@@ -115,7 +115,7 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item, BaseStackExchangeItem stackXItem)
+    public boolean onContextItemSelected(MenuItem item, StackXItem stackXItem)
     {
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {

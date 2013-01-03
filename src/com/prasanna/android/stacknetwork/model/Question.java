@@ -22,7 +22,7 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Question extends BaseStackExchangeItem implements Serializable
+public class Question extends StackXItem implements Serializable
 {
     private static final long serialVersionUID = -4722553914475051236L;
 

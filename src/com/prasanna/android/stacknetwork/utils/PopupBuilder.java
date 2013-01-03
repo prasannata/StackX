@@ -34,11 +34,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.model.StackXItem;
 
 public class PopupBuilder
 {
-    public static void build(LayoutInflater layoutInflater, View anchor, BaseStackExchangeItem item, Point size)
+    public static void build(LayoutInflater layoutInflater, View anchor, StackXItem item, Point size)
     {
         LinearLayout rowsParentLayout = inflateLayoutAndGetRowParent(layoutInflater, anchor, size);
 
@@ -48,14 +48,14 @@ public class PopupBuilder
 
     public static void build(LayoutInflater layoutInflater,
             View anchor,
-            ArrayList<? extends BaseStackExchangeItem> items,
+            ArrayList<? extends StackXItem> items,
             Point size)
     {
         if (items != null)
         {
             LinearLayout rowsParentLayout = inflateLayoutAndGetRowParent(layoutInflater, anchor, size);
 
-            for (BaseStackExchangeItem item : items)
+            for (StackXItem item : items)
             {
                 rowsParentLayout.addView(buildRow(layoutInflater, item), LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -86,7 +86,7 @@ public class PopupBuilder
         return popupLinearLayout;
     }
 
-    private static RelativeLayout buildRow(LayoutInflater layoutInflater, BaseStackExchangeItem item)
+    private static RelativeLayout buildRow(LayoutInflater layoutInflater, StackXItem item)
     {
         RelativeLayout itemRowLayout = (RelativeLayout) layoutInflater.inflate(R.layout.popup_item_row, null);
 

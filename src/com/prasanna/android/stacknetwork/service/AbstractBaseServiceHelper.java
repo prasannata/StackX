@@ -31,7 +31,7 @@ import android.util.Log;
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Answer;
-import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.StackXPage;
@@ -46,7 +46,7 @@ public abstract class AbstractBaseServiceHelper
     protected abstract String getLogTag();
 
     protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper,
-            StackXPage<? extends BaseStackExchangeItem> page)
+            StackXPage<? extends StackXItem> page)
     {
         if (jsonObjectWrapper != null && page != null)
         {

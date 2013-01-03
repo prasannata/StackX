@@ -42,12 +42,12 @@ import com.prasanna.android.http.HttpErrorBroadcastReceiver;
 import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
-import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 
-public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends ListFragment
+public abstract class ItemListFragment<T extends StackXItem> extends ListFragment
         implements OnScrollListener, HttpErrorListener
 {
     private Intent intentForService;
