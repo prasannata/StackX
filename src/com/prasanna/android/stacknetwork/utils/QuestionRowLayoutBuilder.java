@@ -73,13 +73,13 @@ public class QuestionRowLayoutBuilder
 
     private void setupViewForQuestionMetadata(LinearLayout parentLayout, Question question)
     {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.questionScore);
+	TextView textView = (TextView) parentLayout.findViewById(R.id.itemScore);
 	textView.setText(AppUtils.formatNumber(question.score));
 
 	if (question.hasAcceptedAnswer)
 	    textView.setBackgroundResource(R.drawable.rounded_border_delft_bg_lichen);
 
-	textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
+	textView = (TextView) parentLayout.findViewById(R.id.itemTitle);
 	textView.setText(Html.fromHtml(question.title));
 
 	textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);

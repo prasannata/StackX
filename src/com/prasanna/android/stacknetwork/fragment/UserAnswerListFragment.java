@@ -31,6 +31,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
@@ -135,14 +137,21 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public View getView(final Answer answer, View convertView, ViewGroup parent)
     {
-	final LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(
-	                R.layout.answer_snippet, null);
+	LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater()
+	                .inflate(R.layout.answer_snippet, null);
+
+	TextView textView = (TextView) answerRow.findViewById(R.id.itemScore);
+	textView.setVisibility(View.GONE);
 
 	if (answer.accepted)
 	    answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
 
-	TextView textView = (TextView) answerRow.findViewById(R.id.questionTitle);
+	textView = (TextView) answerRow.findViewById(R.id.itemTitle);
 	textView.setText(Html.fromHtml(answer.title));
+	RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
+	layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
+	layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+	textView.setLayoutParams(layoutParams);
 
 	textView = (TextView) answerRow.findViewById(R.id.answerScore);
 	textView.setText("Answer Score: " + answer.score);

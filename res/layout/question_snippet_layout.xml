@@ -5,57 +5,7 @@
     android:background="@drawable/rounded_border_grey_min_padding"
     android:orientation="vertical" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp" >
-
-        <CheckBox
-            android:id="@+id/deleteQuestionCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="2dp"
-            android:button="@drawable/checkbox"
-            android:gravity="center"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/questionScore"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/rounded_border_delft"
-            android:textColor="@color/delft"
-            android:textSize="12sp" />
-
-        <ImageView
-            android:id="@+id/questionOptionsContextMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:paddingBottom="3dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="-5dp"
-            android:paddingTop="3dp"
-            android:src="@drawable/control_bottom_right" />
-
-        <TextView
-            android:id="@+id/questionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="2dp"
-            android:layout_toLeftOf="@id/questionOptionsContextMenu"
-            android:layout_toRightOf="@id/questionScore"
-            android:textColor="@color/black"
-            android:textSize="12sp" />
-    </RelativeLayout>
+    <include layout="@layout/item_title" />
 
     <RelativeLayout
         android:id="@+id/questionCountLinearLayout"

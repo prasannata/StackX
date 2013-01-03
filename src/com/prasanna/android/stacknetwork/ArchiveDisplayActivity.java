@@ -98,7 +98,7 @@ public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
 
     private void setupQuestionDelCheckbox(final Question question, LinearLayout row)
     {
-	CheckBox deleteQuestionCheckBox = (CheckBox) row.findViewById(R.id.deleteQuestionCheckbox);
+	CheckBox deleteQuestionCheckBox = (CheckBox) row.findViewById(R.id.deleteItemCheckbox);
 
 	deleteQuestionCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
 	{

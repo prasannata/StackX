@@ -93,7 +93,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     {
 	LinearLayout layout = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(),
 	                getActivity(), false, item);
-	ImageView imageView = (ImageView) layout.findViewById(R.id.questionOptionsContextMenu);
+	ImageView imageView = (ImageView) layout.findViewById(R.id.itemContextMenu);
 	imageView.setOnClickListener(new View.OnClickListener()
 	{
 	    @Override
