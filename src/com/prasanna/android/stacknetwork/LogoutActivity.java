@@ -35,7 +35,7 @@ import android.widget.LinearLayout;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class LogoutActivity extends Activity
@@ -54,7 +54,7 @@ public class LogoutActivity extends Activity
 	    progressDialog.dismiss();
 
 	    StackExchangeHttpError error = (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT
-		            .getExtra());
+		            .getAction());
 
 	    processLogoutResponse(error);
 	}
@@ -119,7 +119,7 @@ public class LogoutActivity extends Activity
 
     private void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.name());
+	IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	registerReceiver(receiver, filter);
     }

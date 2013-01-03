@@ -28,7 +28,7 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -69,7 +69,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
 	if (action != null)
 	{
-	    if (action.equals(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name()))
+	    if (action.equals(QuestionIntentAction.QUESTION_ANSWERS.getAction()))
 	    {
 		long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0L);
 		int page = intent.getIntExtra(StringConstants.PAGE, 0);
@@ -142,27 +142,27 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     private void broadcastAnswers(ArrayList<Answer> answers)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name());
+	broadcastIntent.setAction(QuestionIntentAction.QUESTION_ANSWERS.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra(), answers);
+	broadcastIntent.putExtra(QuestionIntentAction.QUESTION_ANSWERS.getAction(), answers);
 	sendBroadcast(broadcastIntent);
     }
 
     private void broadcoastComments(ArrayList<Comment> comments)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.name());
+	broadcastIntent.setAction(QuestionIntentAction.QUESTION_COMMENTS.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.getExtra(), comments);
+	broadcastIntent.putExtra(QuestionIntentAction.QUESTION_COMMENTS.getAction(), comments);
 	sendBroadcast(broadcastIntent);
     }
 
     private void broadcastQuestion(Question question)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name());
+	broadcastIntent.setAction(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.getExtra(), question);
+	broadcastIntent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), question);
 	sendBroadcast(broadcastIntent);
     }
 }

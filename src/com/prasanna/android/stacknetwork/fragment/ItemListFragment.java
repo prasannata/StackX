@@ -43,7 +43,7 @@ import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.ErrorIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 
 public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends ListFragment implements
@@ -88,7 +88,7 @@ public abstract class ItemListFragment<T extends BaseStackExchangeItem> extends 
     {
 	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
 
-	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.name());
+	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
     }

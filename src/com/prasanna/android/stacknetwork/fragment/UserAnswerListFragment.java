@@ -42,8 +42,7 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
@@ -73,7 +72,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     protected void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.name());
+	IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	getActivity().registerReceiver(receiver, filter);
     }
@@ -81,8 +80,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     protected void startIntentService()
     {
-	Intent intent = getIntentForService(UserIntentService.class,
-	                IntentActionEnum.UserIntentAction.ANSWERS_BY_USER.name());
+	Intent intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
 	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
 	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
 	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
@@ -94,7 +92,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public String getReceiverExtraName()
     {
-	return UserIntentAction.ANSWERS_BY_USER.getExtra();
+	return UserIntentAction.ANSWERS_BY_USER.getAction();
     }
 
     @Override

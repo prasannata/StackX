@@ -43,9 +43,9 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.GetImageAsyncTask;
 import com.prasanna.android.task.GetImageAsyncTaskCompleteNotifierImpl;
@@ -68,7 +68,7 @@ public class UserProfileFragment extends Fragment
 	public void onReceive(Context context, Intent intent)
 	{
 	    HashMap<String, Account> accounts = (HashMap<String, Account>) intent
-		            .getSerializableExtra(IntentActionEnum.UserIntentAction.USER_ACCOUNTS.getExtra());
+		            .getSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction());
 
 	    if (user != null && userAccountList != null && accounts != null)
 	    {
@@ -91,12 +91,12 @@ public class UserProfileFragment extends Fragment
 	@Override
 	public void onReceive(Context context, Intent intent)
 	{
-	    user = (User) intent.getSerializableExtra(IntentActionEnum.UserIntentAction.USER_DETAIL.getExtra());
+	    user = (User) intent.getSerializableExtra(UserIntentAction.USER_DETAIL.getAction());
 
 	    if (profileHomeLayout != null)
 	    {
-//		if (me)
-//		    CacheUtils.cacheMe(getActivity().getCacheDir(), user);
+		// if (me)
+		// CacheUtils.cacheMe(getActivity().getCacheDir(), user);
 
 		fetchProfileProgress.dismiss();
 		displayUserDetail();
@@ -217,8 +217,8 @@ public class UserProfileFragment extends Fragment
 	ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
 	if (userProfileImage.getDrawable() == null)
 	{
-	    GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(
-		            new GetImageAsyncTaskCompleteNotifierImpl(userProfileImage));
+	    GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new GetImageAsyncTaskCompleteNotifierImpl(
+		            userProfileImage));
 	    fetchImageAsyncTask.execute(user.profileImageLink);
 	}
 
@@ -258,7 +258,7 @@ public class UserProfileFragment extends Fragment
     {
 	userProfileIntent = new Intent(getActivity(), UserIntentService.class);
 	userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
-	userProfileIntent.setAction(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
+	userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
 	userProfileIntent.putExtra(StringConstants.ME,
 	                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
 	userProfileIntent.putExtra(StringConstants.USER_ID,
@@ -268,14 +268,14 @@ public class UserProfileFragment extends Fragment
 
     private void registerUserAccountsReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.USER_ACCOUNTS.name());
+	IntentFilter filter = new IntentFilter(UserIntentAction.USER_ACCOUNTS.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	getActivity().registerReceiver(userAccountsReceiver, filter);
     }
 
     private void registerUserProfileReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.USER_DETAIL.name());
+	IntentFilter filter = new IntentFilter(UserIntentAction.USER_DETAIL.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	getActivity().registerReceiver(userProfileReceiver, filter);
     }

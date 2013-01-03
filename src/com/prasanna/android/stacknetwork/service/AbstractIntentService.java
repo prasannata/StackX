@@ -20,12 +20,12 @@ package com.prasanna.android.stacknetwork.service;
 
 import java.io.Serializable;
 
-import com.prasanna.android.stacknetwork.model.StackXError;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
-
 import android.app.IntentService;
 import android.content.Intent;
+
+import com.prasanna.android.stacknetwork.model.StackXError;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractIntentService extends IntentService
 {
@@ -38,7 +38,7 @@ public abstract class AbstractIntentService extends IntentService
     protected void broadcastHttpErrorIntent(StackXError error)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(IntentActionEnum.ErrorIntentAction.HTTP_ERROR.name());
+	broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 	broadcastIntent.putExtra(StringConstants.ERROR, error);
 	sendBroadcast(broadcastIntent);

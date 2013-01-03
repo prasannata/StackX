@@ -30,8 +30,8 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserIntentService extends AbstractIntentService
@@ -82,7 +82,7 @@ public class UserIntentService extends AbstractIntentService
 		    getAnswers(me, userId, page);
 		    break;
 		case GET_USER_INBOX:
-		    broadcastSerializableExtra(UserIntentAction.INBOX.name(), UserIntentAction.INBOX.getExtra(),
+		    broadcastSerializableExtra(UserIntentAction.INBOX.getAction(), UserIntentAction.INBOX.getAction(),
 			            userService.getInbox(page));
 		    break;
 		case GET_USER_UNREAD_INBOX:
@@ -112,13 +112,13 @@ public class UserIntentService extends AbstractIntentService
 
 	    if (me)
 	    {
-		broadcastSerializableExtra(UserIntentAction.USER_DETAIL.name(),
-		                UserIntentAction.USER_DETAIL.getExtra(), userService.getMe());
+		broadcastSerializableExtra(UserIntentAction.USER_DETAIL.getAction(),
+		                UserIntentAction.USER_DETAIL.getAction(), userService.getMe());
 	    }
 	    else
 	    {
-		broadcastSerializableExtra(UserIntentAction.USER_DETAIL.name(),
-		                UserIntentAction.USER_DETAIL.getExtra(), userService.getUserById(userId));
+		broadcastSerializableExtra(UserIntentAction.USER_DETAIL.getAction(),
+		                UserIntentAction.USER_DETAIL.getAction(), userService.getUserById(userId));
 	    }
 	}
 	catch (HttpErrorException e)
@@ -133,13 +133,13 @@ public class UserIntentService extends AbstractIntentService
     {
 	if (me)
 	{
-	    broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.name(),
-		            UserIntentAction.USER_ACCOUNTS.getExtra(), userService.getAccounts(1));
+	    broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction(),
+		            UserIntentAction.USER_ACCOUNTS.getAction(), userService.getAccounts(1));
 	}
 	else
 	{
-	    broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.name(),
-		            UserIntentAction.USER_ACCOUNTS.getExtra(), userService.getAccounts(userId, 1));
+	    broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction(),
+		            UserIntentAction.USER_ACCOUNTS.getAction(), userService.getAccounts(userId, 1));
 	}
     }
 
@@ -147,15 +147,16 @@ public class UserIntentService extends AbstractIntentService
     {
 	if (me)
 	{
-	    broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.name(),
-		            QuestionIntentAction.QUESTIONS.getExtra(), userService.getMyQuestions(page));
+	    broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(),
+		            QuestionIntentAction.QUESTIONS.getAction(), userService.getMyQuestions(page));
 	}
 	else
 	{
 	    if (userId > 0)
 	    {
-		broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.name(),
-		                QuestionIntentAction.QUESTIONS.getExtra(), userService.getQuestionsByUser(userId, page));
+		broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(),
+		                QuestionIntentAction.QUESTIONS.getAction(),
+		                userService.getQuestionsByUser(userId, page));
 	    }
 	}
     }
@@ -164,15 +165,16 @@ public class UserIntentService extends AbstractIntentService
     {
 	if (me)
 	{
-	    broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.name(),
-		            UserIntentAction.ANSWERS_BY_USER.getExtra(), userService.getMyAnswers(page));
+	    broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.getAction(),
+		            UserIntentAction.ANSWERS_BY_USER.getAction(), userService.getMyAnswers(page));
 	}
 	else
 	{
 	    if (userId > 0)
 	    {
-		broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.name(),
-		                UserIntentAction.ANSWERS_BY_USER.getExtra(), userService.getAnswersByUser(userId, page));
+		broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.getAction(),
+		                UserIntentAction.ANSWERS_BY_USER.getAction(),
+		                userService.getAnswersByUser(userId, page));
 	    }
 	}
     }
@@ -193,9 +195,9 @@ public class UserIntentService extends AbstractIntentService
     private void broadcastUnreadItemsCount(int totalNewMsgs, ArrayList<InboxItem> unreadInboxItems)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(UserIntentAction.NEW_MSG.name());
+	broadcastIntent.setAction(UserIntentAction.NEW_MSG.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), unreadInboxItems);
+	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadInboxItems);
 	sendBroadcast(broadcastIntent);
     }
 
@@ -241,8 +243,8 @@ public class UserIntentService extends AbstractIntentService
     private void deauthenticateApp(String accessToken)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(UserIntentAction.LOGOUT.name());
-	broadcastIntent.putExtra(UserIntentAction.LOGOUT.getExtra(), userService.logout(accessToken));
+	broadcastIntent.setAction(UserIntentAction.LOGOUT.getAction());
+	broadcastIntent.putExtra(UserIntentAction.LOGOUT.getAction(), userService.logout(accessToken));
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 	sendBroadcast(broadcastIntent);
     }

@@ -34,7 +34,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserQuestionListFragment extends AbstractQuestionListFragment
@@ -80,7 +80,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	IntentFilter filter = new IntentFilter(UserIntentAction.QUESTIONS_BY_USER.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	getActivity().registerReceiver(receiver, filter);
     }
@@ -88,8 +88,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void startIntentService()
     {
-	intent = getIntentForService(UserIntentService.class,
-	                IntentActionEnum.UserIntentAction.QUESTIONS_BY_USER.name());
+	intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
 	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
 	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
 	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));

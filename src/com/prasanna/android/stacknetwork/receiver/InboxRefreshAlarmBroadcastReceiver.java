@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class InboxRefreshAlarmBroadcastReceiver extends BroadcastReceiver
@@ -32,7 +32,7 @@ public class InboxRefreshAlarmBroadcastReceiver extends BroadcastReceiver
 
 	    Intent fetchInboxIntent = new Intent(context, UserIntentService.class);
 	    fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_UNREAD_INBOX);
-	    fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), Boolean.TRUE);
+	    fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), Boolean.TRUE);
 
 	    context.startService(fetchInboxIntent);
 	}

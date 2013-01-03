@@ -35,8 +35,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionListFragment extends AbstractQuestionListFragment
@@ -165,9 +164,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getFrontPage()
     {
-	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
-	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+	filter = new IntentFilter(QuestionIntentAction.QUESTIONS.getAction());
 
 	showProgressBar();
 
@@ -178,10 +177,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getRelatedQuestions()
     {
-	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
 	intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
-	filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTIONS.name());
+	filter = new IntentFilter(QuestionIntentAction.QUESTIONS.getAction());
 
 	showProgressBar();
 
@@ -192,10 +191,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getFaqsForTag()
     {
-	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
-	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getExtra(), getBundle().getString(StringConstants.TAG, null));
-	filter = new IntentFilter(QuestionIntentAction.TAGS_FAQ.name());
+	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(), getBundle().getString(StringConstants.TAG, null));
+	filter = new IntentFilter(QuestionIntentAction.TAGS_FAQ.getAction());
 
 	showProgressBar();
 
@@ -208,11 +207,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     {
 	clean();
 
-	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.name());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
 	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH);
 	intent.putExtra(SearchManager.QUERY, query);
 
-	filter = new IntentFilter(QuestionIntentAction.QUESTION_SEARCH.name());
+	filter = new IntentFilter(QuestionIntentAction.QUESTION_SEARCH.getAction());
 
 	showProgressBar();
 

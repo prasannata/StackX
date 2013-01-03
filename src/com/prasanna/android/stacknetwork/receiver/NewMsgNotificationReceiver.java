@@ -44,7 +44,7 @@ import com.prasanna.android.stacknetwork.UserInboxActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 
 public class NewMsgNotificationReceiver extends BroadcastReceiver
 {
@@ -60,7 +60,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 	if (SettingsFragment.isNotificationEnabled(context))
 	{
 	    ArrayList<InboxItem> unreadInboxItems = (ArrayList<InboxItem>) intent
-		            .getSerializableExtra(UserIntentAction.NEW_MSG.getExtra());
+		            .getSerializableExtra(UserIntentAction.NEW_MSG.getAction());
 
 	    if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
 	    {
@@ -106,7 +106,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     {
 	int totalNewMsgs = unreadItemsInInbox.size();
 	Intent resultIntent = new Intent(context, UserInboxActivity.class);
-	resultIntent.putExtra(UserIntentAction.NEW_MSG.getExtra(), unreadItemsInInbox);
+	resultIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadItemsInInbox);
 
 	TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
 	stackBuilder.addParentStack(UserInboxActivity.class);

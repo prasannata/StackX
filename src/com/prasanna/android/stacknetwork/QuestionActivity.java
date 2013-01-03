@@ -43,8 +43,7 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
@@ -121,8 +120,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	public void onReceive(Context context, Intent intent)
 	{
 	    question = (Question) intent
-		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS
-		                            .getExtra());
+		            .getSerializableExtra(QuestionIntentAction.QUESTION_FULL_DETAILS
+		                            .getAction());
 
 	    if (StringConstants.QUESTION_ID.equals(QuestionActivity.this.getIntent().getAction()))
 		questionFragment.setAndDisplay(question);
@@ -145,7 +144,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	public void onReceive(Context context, Intent intent)
 	{
 	    question.comments = (ArrayList<Comment>) intent
-		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.getExtra());
+		            .getSerializableExtra(QuestionIntentAction.QUESTION_COMMENTS.getAction());
 
 	    questionFragment.setComments(question.comments);
 	}
@@ -160,7 +159,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    Log.d(TAG, "Answers received for question");
 
 	    ArrayList<Answer> answers = (ArrayList<Answer>) intent
-		            .getSerializableExtra(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.getExtra());
+		            .getSerializableExtra(QuestionIntentAction.QUESTION_ANSWERS.getAction());
 
 	    serviceRunningForAnswers = false;
 
@@ -286,21 +285,21 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private void registerForQuestionBodyReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name());
+	IntentFilter filter = new IntentFilter(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	registerReceiver(questionBodyReceiver, filter);
     }
 
     private void registerForQuestionCommentsReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_COMMENTS.name());
+	IntentFilter filter = new IntentFilter(QuestionIntentAction.QUESTION_COMMENTS.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	registerReceiver(questionCommentsReceiver, filter);
     }
 
     private void registerForQuestionAnswersReceiver()
     {
-	IntentFilter filter = new IntentFilter(IntentActionEnum.QuestionIntentAction.QUESTION_ANSWERS.name());
+	IntentFilter filter = new IntentFilter(QuestionIntentAction.QUESTION_ANSWERS.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	registerReceiver(questionAnswersReceiver, filter);
     }
@@ -367,7 +366,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 		startRefreshAnimation();
 
 		activeIntentForService = new Intent(this, QuestionDetailsIntentService.class);
-		activeIntentForService.setAction(QuestionIntentAction.QUESTION_ANSWERS.name());
+		activeIntentForService.setAction(QuestionIntentAction.QUESTION_ANSWERS.getAction());
 		activeIntentForService.putExtra(StringConstants.QUESTION_ID, question.id);
 		activeIntentForService.putExtra(StringConstants.PAGE, getNextPageNumber());
 		startService(activeIntentForService);

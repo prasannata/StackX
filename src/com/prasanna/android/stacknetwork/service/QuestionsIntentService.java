@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsIntentService extends AbstractIntentService
@@ -58,28 +58,28 @@ public class QuestionsIntentService extends AbstractIntentService
 	    {
 		case GET_FRONT_PAGE:
 		    Log.d(TAG, "Get front page");
-		    broadcastSerializableExtra(QuestionIntentAction.QUESTIONS.name(),
-			            QuestionIntentAction.QUESTIONS.getExtra(), questionService.getAllQuestions(page));
+		    broadcastSerializableExtra(QuestionIntentAction.QUESTIONS.getAction(),
+			            QuestionIntentAction.QUESTIONS.getAction(), questionService.getAllQuestions(page));
 		    break;
 		case GET_FAQ_FOR_TAG:
-		    String tag = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ.getExtra());
+		    String tag = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ.getAction());
 		    Log.d(TAG, "Get FAQ for " + tag);
-		    broadcastSerializableExtra(QuestionIntentAction.TAGS_FAQ.name(),
-			            QuestionIntentAction.QUESTIONS.getExtra(), questionService.getFaqForTag(tag, page));
+		    broadcastSerializableExtra(QuestionIntentAction.TAGS_FAQ.getAction(),
+			            QuestionIntentAction.QUESTIONS.getAction(), questionService.getFaqForTag(tag, page));
 		    break;
 		case SEARCH:
 		    String query = intent.getStringExtra(SearchManager.QUERY);
 		    Log.d(TAG, "Received search query: " + query);
-		    broadcastSerializableExtra(QuestionIntentAction.QUESTION_SEARCH.name(),
-			            QuestionIntentAction.QUESTIONS.getExtra(), questionService.search(query, page));
+		    broadcastSerializableExtra(QuestionIntentAction.QUESTION_SEARCH.getAction(),
+			            QuestionIntentAction.QUESTIONS.getAction(), questionService.search(query, page));
 		    break;
 		case GET_RELATED:
 		    Log.d(TAG, "Get related questions");
 		    long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
 		    if (questionId > 0)
 		    {
-			broadcastSerializableExtra(QuestionIntentAction.QUESTIONS.name(),
-			                QuestionIntentAction.QUESTIONS.getExtra(),
+			broadcastSerializableExtra(QuestionIntentAction.QUESTIONS.getAction(),
+			                QuestionIntentAction.QUESTIONS.getAction(),
 			                questionService.getRelatedQuestions(questionId, page));
 		    }
 		    break;

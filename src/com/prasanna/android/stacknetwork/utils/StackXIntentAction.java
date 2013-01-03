@@ -19,11 +19,11 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-public class IntentActionEnum
+public class StackXIntentAction
 {
     public interface IntentAction
     {
-        String getExtra();
+        String getAction();
     }
 
     public enum QuestionIntentAction implements IntentAction
@@ -35,16 +35,16 @@ public class IntentActionEnum
         QUESTION_COMMENTS("com.prasanna.stacknetwork.questionComments"),
         QUESTION_SEARCH("com.prasanna.stacknetwork.questionSearch"),
         TAGS_FAQ("com.prasanna.stacknetwork.tagsFaq");
-        private final String extra;
+        private final String action;
 
-        private QuestionIntentAction(String extra)
+        private QuestionIntentAction(String action)
         {
-            this.extra = extra;
+            this.action = action;
         }
 
-        public String getExtra()
+        public String getAction()
         {
-            return extra;
+            return action;
         }
     }
 
@@ -60,16 +60,16 @@ public class IntentActionEnum
         SITES("com.prasanna.stacknetwork.userSites"),
         NEW_MSG("com.prasanna.stacknetwork.newMsg"),
         TOTAL_NEW_MSGS("com.prasanna.stacknetwork.newMsgTotal");
-        private final String extra;
+        private final String action;
 
-        private UserIntentAction(String extra)
+        private UserIntentAction(String action)
         {
-            this.extra = extra;
+            this.action = action;
         }
 
-        public String getExtra()
+        public String getAction()
         {
-            return extra;
+            return action;
         }
     }
 
@@ -77,17 +77,17 @@ public class IntentActionEnum
     {
         HTTP_ERROR("com.prasanna.stacknetwork.http.error");
 
-        private final String extra;
+        private final String action;
 
-        private ErrorIntentAction(String extra)
+        private ErrorIntentAction(String action)
         {
-            this.extra = extra;
+            this.action = action;
         }
 
         @Override
-        public String getExtra()
+        public String getAction()
         {
-            return extra;
+            return action;
         }
     }
 }

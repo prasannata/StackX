@@ -40,8 +40,8 @@ import android.widget.TextView;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.UserIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
@@ -76,9 +76,9 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 		loadingProgressView = null;
 	    }
 
-	    if (intent.getSerializableExtra(UserIntentAction.INBOX.getExtra()) != null)
+	    if (intent.getSerializableExtra(UserIntentAction.INBOX.getAction()) != null)
 	    {
-		inboxItems.addAll((ArrayList<InboxItem>) intent.getSerializableExtra(UserIntentAction.INBOX.getExtra()));
+		inboxItems.addAll((ArrayList<InboxItem>) intent.getSerializableExtra(UserIntentAction.INBOX.getAction()));
 
 		displayInbox();
 	    }
@@ -150,7 +150,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 
     private void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(UserIntentAction.INBOX.name());
+	IntentFilter filter = new IntentFilter(UserIntentAction.INBOX.getAction());
 	filter.addCategory(Intent.CATEGORY_DEFAULT);
 	registerReceiver(receiver, filter);
     }
@@ -209,7 +209,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 		    question.id = inboxItem.questionId;
 		    question.title = inboxItem.title;
 		    intent.putExtra(StringConstants.QUESTION, question);
-		    intent.putExtra(IntentActionEnum.QuestionIntentAction.QUESTION_FULL_DETAILS.name(), true);
+		    intent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), true);
 		    startActivity(intent);
 		}
 	    });

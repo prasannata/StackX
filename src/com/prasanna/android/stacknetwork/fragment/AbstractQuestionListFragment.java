@@ -41,7 +41,7 @@ import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.IntentActionEnum.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -147,7 +147,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public String getReceiverExtraName()
     {
-	return QuestionIntentAction.QUESTIONS.getExtra();
+	return QuestionIntentAction.QUESTIONS.getAction();
     }
 
     public Bundle getBundle()
