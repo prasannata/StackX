@@ -25,16 +25,14 @@ import java.util.ArrayList;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -44,14 +42,16 @@ import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener
+public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
+                StackXRestQueryResultReceiver
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
@@ -62,6 +62,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private ViewPager viewPager;
     private TitlePageIndicator titlePageIndicator;
     boolean serviceRunningForAnswers = false;
+    private RestQueryResultReceiver resultReceiver;
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
@@ -105,66 +106,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	}
     }
 
-    private BroadcastReceiver bodyReceiver = new BroadcastReceiver()
-    {
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{
-	    question = (Question) intent.getSerializableExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction());
-
-	    if (StringConstants.QUESTION_ID.equals(QuestionActivity.this.getIntent().getAction()))
-		questionFragment.setAndDisplay(question);
-	    else
-		questionFragment.displayBody(question.body);
-
-	    // Happens if question was retrieved from LRU cache.
-	    if (question.answers != null && !question.answers.isEmpty())
-	    {
-		hideRefreshActionAnimation();
-		titlePageIndicator.notifyDataSetChanged();
-	    }
-	}
-    };
-
-    private BroadcastReceiver commentsReceiver = new BroadcastReceiver()
-    {
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{
-	    question.comments = (ArrayList<Comment>) intent.getSerializableExtra(QuestionIntentAction.QUESTION_COMMENTS
-		            .getAction());
-
-	    questionFragment.setComments(question.comments);
-	}
-    };
-
-    private BroadcastReceiver answersReceiver = new BroadcastReceiver()
-    {
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{
-	    Log.d(TAG, "Answers received for question");
-
-	    ArrayList<Answer> answers = (ArrayList<Answer>) intent
-		            .getSerializableExtra(QuestionIntentAction.QUESTION_ANSWERS.getAction());
-
-	    serviceRunningForAnswers = false;
-
-	    if (answers != null && !answers.isEmpty())
-	    {
-		if (question.answers == null) question.answers = new ArrayList<Answer>();
-
-		question.answers.addAll(answers);
-		titlePageIndicator.notifyDataSetChanged();
-		questionViewPageAdapter.notifyDataSetChanged();
-	    }
-
-	    hideRefreshActionAnimation();
-	}
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -172,11 +113,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	setContentView(R.layout.viewpager_title_indicator);
 
+	resultReceiver = new RestQueryResultReceiver(new Handler());
+	resultReceiver.setReceiver(this);
 	questionFragment = QuestionFragment.newFragment();
-	
+
 	setupViewPager();
 
-	registerReceivers();
 	prepareIntentAndStartService();
     }
 
@@ -194,6 +136,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private void prepareIntentAndStartService()
     {
 	intent = new Intent(this, QuestionDetailsIntentService.class);
+	intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+
 	if (StringConstants.QUESTION_ID.equals(getIntent().getAction()))
 	{
 	    intent.setAction(StringConstants.QUESTION_ID);
@@ -204,10 +148,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    intent.setAction(StringConstants.QUESTION);
 	    question = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
 	    questionFragment.setQuestion(question);
-	    intent.putExtra(StringConstants.QUESTION, question);
+	    intent.putExtra(StringConstants.QUESTION_ID, question.id);
 	}
 
-	startQuestionService(intent);
+	startService(intent);
     }
 
     @Override
@@ -219,87 +163,14 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     }
 
     @Override
-    protected void onDestroy()
-    {
-	super.onDestroy();
-	stopServiceAndUnregsiterReceiver();
-    }
-
-    @Override
     protected void onStop()
     {
 	super.onStop();
 
-	stopServiceAndUnregsiterReceiver();
-    }
+	if (intent != null)
+	    stopService(intent);
 
-    private void stopServiceAndUnregsiterReceiver()
-    {
-	if (intent != null) stopService(intent);
-
-	try
-	{
-	    if (bodyReceiver != null) unregisterReceiver(bodyReceiver);
-	    if (answersReceiver != null) unregisterReceiver(answersReceiver);
-	    if (commentsReceiver != null) unregisterReceiver(commentsReceiver);
-	}
-	catch (IllegalArgumentException e)
-	{
-	    Log.d(TAG, e.getMessage());
-	}
-    }
-
-    private void startQuestionService(Intent intent)
-    {
-	intent.putExtra(StringConstants.CACHED, getIntent().getBooleanExtra(StringConstants.CACHED, false));
-	startService(intent);
-    }
-
-    private void registerReceivers()
-    {
-	registerBodyReceiver();
-	registerCommentsReceiver();
-	registerAnswersReceiver();
-    }
-
-    private void registerBodyReceiver()
-    {
-	IntentFilter filter = new IntentFilter(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(bodyReceiver, filter);
-    }
-
-    private void registerCommentsReceiver()
-    {
-	IntentFilter filter = new IntentFilter(QuestionIntentAction.QUESTION_COMMENTS.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(commentsReceiver, filter);
-    }
-
-    private void registerAnswersReceiver()
-    {
-	IntentFilter filter = new IntentFilter(QuestionIntentAction.QUESTION_ANSWERS.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(answersReceiver, filter);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-	boolean ret = super.onCreateOptionsMenu(menu);
-
-	if (ret)
-	{
-	    if (viewPager.getCurrentItem() == 0 && question != null && question.answerCount > 0
-		            && question.answers == null)
-	    {
-		Log.d(TAG, "Starting refresh action animation");
-		startRefreshAnimation();
-	    }
-	    return true;
-	}
-
-	return false;
+	resultReceiver.setReceiver(null);
     }
 
     @Override
@@ -345,7 +216,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 		startRefreshAnimation();
 
 		intent = new Intent(this, QuestionDetailsIntentService.class);
-		intent.setAction(QuestionIntentAction.QUESTION_ANSWERS.getAction());
+		intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+		intent.setAction(StringConstants.ANSWERS);
 		intent.putExtra(StringConstants.QUESTION_ID, question.id);
 		intent.putExtra(StringConstants.PAGE, getNextPageNumber());
 		startService(intent);
@@ -374,7 +246,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    switch (item.getItemId())
 	    {
 		case R.id.q_ctx_comments:
-		    if (question.comments != null && !question.comments.isEmpty()) displayCommentFragment();
+		    if (question.comments != null && !question.comments.isEmpty())
+			displayCommentFragment();
 		    return true;
 		case R.id.q_ctx_related:
 		    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
@@ -473,5 +346,38 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
 	int numAnswersDisplayed = questionViewPageAdapter.getCount() - 1;
 	return (numAnswersDisplayed / 10) + 1;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData)
+    {
+	switch (resultCode)
+	{
+	    case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
+		questionFragment.displayBody(resultData.getString(StringConstants.BODY));
+		break;
+	    case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
+		question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);
+		questionFragment.setComments(question.comments);
+		break;
+	    case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
+		ArrayList<Answer> answers = (ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS);
+
+		serviceRunningForAnswers = false;
+
+		if (answers != null && !answers.isEmpty())
+		{
+		    if (question.answers == null)
+			question.answers = new ArrayList<Answer>();
+
+		    question.answers.addAll(answers);
+		    titlePageIndicator.notifyDataSetChanged();
+		    questionViewPageAdapter.notifyDataSetChanged();
+		}
+
+		hideRefreshActionAnimation();
+		break;
+	}
     }
 }

@@ -60,7 +60,7 @@ public class QuestionFragment extends Fragment
 	questionFragment.setRetainInstance(true);
 	return questionFragment;
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -194,10 +194,13 @@ public class QuestionFragment extends Fragment
 
     public void displayBody(String text)
     {
-	LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-	ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
-	for (TextView questionBodyTextView : questionBodyTextViews)
-	    questionBodyLayout.addView(questionBodyTextView);
+	if (text != null)
+	{
+	    LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
+	    ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
+	    for (TextView questionBodyTextView : questionBodyTextViews)
+		questionBodyLayout.addView(questionBodyTextView);
+	}
     }
 
     public void setQuestion(Question question)

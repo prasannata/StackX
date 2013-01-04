@@ -57,6 +57,8 @@ public class StringConstants
     public static final String IS_FIRST_RUN = "is_first_run";
     public static final String DEFAULTS = "defaults";
 
+    public static final String BODY = "body";
+
     
 
     public static final class HttpError

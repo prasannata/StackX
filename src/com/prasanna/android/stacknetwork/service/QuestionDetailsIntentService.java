@@ -22,14 +22,14 @@ package com.prasanna.android.stacknetwork.service;
 import java.util.ArrayList;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
-import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionDetailsIntentService extends AbstractIntentService
@@ -37,6 +37,11 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     private static final String TAG = QuestionDetailsIntentService.class.getSimpleName();
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
+
+    public static final int RESULT_CODE_Q_BODY = 0x01;
+    public static final int RESULT_CODE_Q_COMMENTS = 0x02;
+    public static final int RESULT_CODE_Q_ANSWERS = 0x03;
+    public static final int RESULT_CODE_Q = 0x04;
 
     public QuestionDetailsIntentService()
     {
@@ -65,11 +70,12 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void handleIntent(Intent intent)
     {
-	String action = intent.getAction();
+	final String action = intent.getAction();
+	final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
 	if (action != null)
 	{
-	    if (action.equals(QuestionIntentAction.QUESTION_ANSWERS.getAction()))
+	    if (action.equals(StringConstants.ANSWERS))
 	    {
 		long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0L);
 		int page = intent.getIntExtra(StringConstants.PAGE, 0);
@@ -79,111 +85,55 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
 		    if (answers != null)
 		    {
+			Bundle bundle = new Bundle();
 			QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
-			broadcastAnswers(answers);
+			bundle.putSerializable(StringConstants.ANSWERS, answers);
+			receiver.send(RESULT_CODE_Q_ANSWERS, bundle);
 		    }
 		}
 	    }
 	    else
 	    {
 
-		getQuestionDetail(intent);
+		getQuestionDetail(receiver, intent);
 	    }
 	}
     }
 
-    private void getQuestionDetail(Intent intent)
+    private void getQuestionDetail(ResultReceiver receiver, Intent intent)
     {
+	Bundle bundle = new Bundle();
 	Question cachedQuestion = null;
-	Question question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
 	long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
-	boolean fromCache = intent.getBooleanExtra(StringConstants.CACHED, false);
 
-	if (fromCache)
-	{
-	    if (StringConstants.QUESTION.equals(intent.getAction()))
-		cachedQuestion = QuestionsCache.getInstance().get(question.id);
-	    else
-		cachedQuestion = QuestionsCache.getInstance().get(questionId);
-	}
+	if (StringConstants.QUESTION.equals(intent.getAction()))
+	    cachedQuestion = QuestionsCache.getInstance().get(questionId);
+
 	if (cachedQuestion != null)
 	{
-	    Log.d(TAG, "Question " + question.id + " recovered from cache.");
-	    broadcastQuestion(cachedQuestion);
+	    Log.d(TAG, "Question " + questionId + " recovered from cache.");
+	    bundle.putSerializable(StringConstants.QUESTION, cachedQuestion);
+	    receiver.send(RESULT_CODE_Q, bundle);
 	}
 	else
 	{
 	    if (StringConstants.QUESTION.equals(intent.getAction()))
-		question.body = questionService.getQuestionBodyForId(question.id);
-	    else
-		question = questionService.getQuestionFullDetails(intent.getLongExtra(StringConstants.QUESTION_ID, 0));
-
-	    getItemsForQuestionAndBroadcast(question);
-	}
-    }
-
-    private void getItemsForQuestionAndBroadcast(Question question)
-    {
-	broadcastQuestion(question);
-	broadcastQuestionComments(questionService.getComments(StringConstants.QUESTIONS, String.valueOf(question.id)));
-
-	if (question.answers == null) question.answers = new ArrayList<Answer>();
-
-	if (question.answerCount > 0)
-	{
-	    question.answers = questionService.getAnswersForQuestion(question.id, 1);
-	    broadcastAnswers(question.answers);
-
-	    if (question.answers != null && !question.answers.isEmpty())
 	    {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(question.answers.get(0).id);
-
-		for (int i = 1; i < question.answers.size(); i++)
-		    stringBuilder.append(";" + question.answers.get(i).id);
-
-		broadcastAnswerComments(questionService.getComments(StringConstants.ANSWERS, stringBuilder.toString()));
-
+		bundle.putString(StringConstants.BODY, questionService.getQuestionBodyForId(questionId));
+		receiver.send(RESULT_CODE_Q_BODY, bundle);
 	    }
+	    else
+	    {
+		bundle.putSerializable(StringConstants.QUESTION, questionService.getQuestionFullDetails(questionId));
+		receiver.send(RESULT_CODE_Q, bundle);
+	    }
+
+	    bundle.putSerializable(StringConstants.COMMENTS,
+		            questionService.getComments(StringConstants.QUESTIONS, String.valueOf(questionId)));
+	    receiver.send(RESULT_CODE_Q_COMMENTS, bundle);
+
+	    bundle.putSerializable(StringConstants.ANSWERS, questionService.getAnswersForQuestion(questionId, 1));
+	    receiver.send(RESULT_CODE_Q_ANSWERS, bundle);
 	}
-
-	QuestionsCache.getInstance().add(question.id, question);
-    }
-
-    private void broadcastAnswers(ArrayList<Answer> answers)
-    {
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(QuestionIntentAction.QUESTION_ANSWERS.getAction());
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(QuestionIntentAction.QUESTION_ANSWERS.getAction(), answers);
-	sendBroadcast(broadcastIntent);
-    }
-
-    private void broadcastQuestionComments(ArrayList<Comment> comments)
-    {
-	broadcoastComments(QuestionIntentAction.QUESTION_COMMENTS, comments);
-    }
-
-    private void broadcastAnswerComments(ArrayList<Comment> comments)
-    {
-	broadcoastComments(QuestionIntentAction.ANSWER_COMMENTS, comments);
-    }
-
-    private void broadcoastComments(QuestionIntentAction questionIntentAction, ArrayList<Comment> comments)
-    {
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(questionIntentAction.getAction());
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(questionIntentAction.getAction(), comments);
-	sendOrderedBroadcast(broadcastIntent, null);
-    }
-
-    private void broadcastQuestion(Question question)
-    {
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction());
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), question);
-	sendBroadcast(broadcastIntent);
     }
 }
