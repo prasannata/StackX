@@ -21,12 +21,11 @@ package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
@@ -39,18 +38,20 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.PopupBuilder;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserInboxActivity extends AbstractUserActionBarActivity
+public class UserInboxActivity extends AbstractUserActionBarActivity implements
+        StackXRestQueryResultReceiver
 {
     private static final String TAG = UserInboxActivity.class.getSimpleName();
 
-    private Intent fetchInboxIntent = null;
+    private Intent intent = null;
 
     private LinearLayout questionsDisplayList;
 
@@ -64,31 +65,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 
     private int page = 0;
 
-    private BroadcastReceiver receiver = new BroadcastReceiver()
-    {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if (loadingProgressView != null)
-            {
-                loadingProgressView.setVisibility(View.GONE);
-                loadingProgressView = null;
-            }
-
-            if (intent.getSerializableExtra(UserIntentAction.INBOX.getAction()) != null)
-            {
-                inboxItems.addAll((ArrayList<InboxItem>) intent
-                        .getSerializableExtra(UserIntentAction.INBOX.getAction()));
-
-                displayInbox();
-            }
-        }
-    };
+    private RestQueryResultReceiver receiver;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
 
         questionsScroll = (ScrollViewWithNotifier) getLayoutInflater().inflate(
@@ -115,18 +98,12 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
             }
         });
 
+        receiver = new RestQueryResultReceiver(new Handler());
+        receiver.setReceiver(this);
+
         setContentView(questionsScroll);
 
-        registerReceiver();
-
         startIntentService();
-    }
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
     }
 
     @Override
@@ -134,7 +111,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
     {
         super.onStop();
 
-        stopServiceAndUnregisterReceiver();
+        if (intent != null)
+            stopService(intent);
     }
 
     private void startIntentService()
@@ -143,36 +121,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
                 .getDefaultSharedPreferences(getApplicationContext());
         if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
         {
-            fetchInboxIntent = new Intent(this, UserIntentService.class);
-            fetchInboxIntent.setAction(UserIntentAction.INBOX.getAction());
-            fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
-            fetchInboxIntent.putExtra(StringConstants.PAGE, ++page);
+            intent = new Intent(this, UserIntentService.class);
+            intent.setAction(StringConstants.INBOX_ITEMS);
+            intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
+            intent.putExtra(StringConstants.PAGE, ++page);
+            intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
 
-            startService(fetchInboxIntent);
-        }
-    }
-
-    private void registerReceiver()
-    {
-        IntentFilter filter = new IntentFilter(UserIntentAction.INBOX.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
-    }
-
-    private void stopServiceAndUnregisterReceiver()
-    {
-        if (fetchInboxIntent != null)
-        {
-            stopService(fetchInboxIntent);
-        }
-
-        try
-        {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
+            startService(intent);
         }
     }
 
@@ -244,9 +199,22 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
         startIntentService();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Context getCurrentContext()
+    public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        return UserInboxActivity.this;
+        if (loadingProgressView != null)
+        {
+            loadingProgressView.setVisibility(View.GONE);
+            loadingProgressView = null;
+        }
+
+        if (resultData.getSerializable(StringConstants.INBOX_ITEMS) != null)
+        {
+            inboxItems.addAll((ArrayList<InboxItem>) resultData
+                    .getSerializable(StringConstants.INBOX_ITEMS));
+
+            displayInbox();
+        }
     }
 }

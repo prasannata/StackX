@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork;
 import java.io.File;
 import java.util.ArrayList;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -37,8 +36,8 @@ import android.widget.TextView;
 
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.ReadObjectAsyncTask;
@@ -146,12 +145,6 @@ public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
         ReadObjectAsyncTask asyncTask = new ReadObjectAsyncTask(directory, null,
                 new CacheReadCompletionNotifier());
         asyncTask.execute((Void) null);
-    }
-
-    @Override
-    public Context getCurrentContext()
-    {
-        return this;
     }
 
     @Override
