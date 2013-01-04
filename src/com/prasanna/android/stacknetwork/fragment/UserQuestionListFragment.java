@@ -91,6 +91,26 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
+    public void onDestroy()
+    {
+        Log.d(getLogTag(), "onDestroy");
+
+        super.onDestroy();
+
+        stopService(intent);
+    }
+
+    @Override
+    public void onStop()
+    {
+        Log.d(getLogTag(), "onStop");
+
+        super.onStop();
+
+        stopService(intent);
+    }
+
+    @Override
     protected void registerReceiver()
     {
         IntentFilter filter = new IntentFilter(UserIntentAction.QUESTIONS_BY_USER.getAction());
@@ -101,6 +121,8 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void startIntentService()
     {
+        Log.d(TAG, "startIntentService");
+
         intent = getIntentForService(UserIntentService.class,
                 UserIntentAction.QUESTIONS_BY_USER.getAction());
         intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
@@ -109,7 +131,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.USER_ID,
                 getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         intent.putExtra(StringConstants.PAGE, ++page);
-        startService();
+        startService(intent);
     }
 
     @Override

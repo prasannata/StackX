@@ -48,202 +48,212 @@ public class UserIntentService extends AbstractIntentService
 
     public UserIntentService()
     {
-	this(TAG);
+        this(TAG);
     }
 
     public UserIntentService(String name)
     {
-	super(name);
+        super(name);
     }
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	int action = intent.getIntExtra(StringConstants.ACTION, -1);
-	int page = intent.getIntExtra(StringConstants.PAGE, 1);
-	boolean me = intent.getBooleanExtra(StringConstants.ME, false);
-	long userId = intent.getLongExtra(StringConstants.USER_ID, -1);
+        int action = intent.getIntExtra(StringConstants.ACTION, -1);
+        int page = intent.getIntExtra(StringConstants.PAGE, 1);
+        boolean me = intent.getBooleanExtra(StringConstants.ME, false);
+        long userId = intent.getLongExtra(StringConstants.USER_ID, -1);
 
-	try
-	{
-	    switch (action)
-	    {
-		case GET_USER_PROFILE:
-		    Log.d(TAG, "getUserDetail");
-		    getUserDetail(me, userId, page);
-		    break;
-		case GET_USER_QUESTIONS:
-		    Log.d(TAG, "getQuestions");
-		    getQuestions(me, userId, page);
-		    break;
-		case GET_USER_ANSWERS:
-		    Log.d(TAG, "getAnswers");
-		    getAnswers(me, userId, page);
-		    break;
-		case GET_USER_INBOX:
-		    broadcastSerializableExtra(UserIntentAction.INBOX.getAction(), UserIntentAction.INBOX.getAction(),
-			            userService.getInbox(page));
-		    break;
-		case GET_USER_UNREAD_INBOX:
-		    getUnreadInboxItems(intent);
-		    break;
-		case GET_USER_SITES:
-		    getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false));
-		    break;
-		case DEAUTH_APP:
-		    deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
-		    break;
-		default:
-		    Log.e(TAG, "Unknown action: " + action);
-		    break;
-	    }
-	}
-	catch (HttpErrorException e)
-	{
-	    broadcastHttpErrorIntent(e.getError());
-	}
+        try
+        {
+            switch (action)
+            {
+                case GET_USER_PROFILE:
+                    Log.d(TAG, "getUserDetail");
+                    getUserDetail(me, userId, page);
+                    break;
+                case GET_USER_QUESTIONS:
+                    Log.d(TAG, "getQuestions");
+                    getQuestions(me, userId, page);
+                    break;
+                case GET_USER_ANSWERS:
+                    Log.d(TAG, "getAnswers");
+                    getAnswers(me, userId, page);
+                    break;
+                case GET_USER_INBOX:
+                    broadcastSerializableExtra(UserIntentAction.INBOX.getAction(),
+                            UserIntentAction.INBOX.getAction(), userService.getInbox(page));
+                    break;
+                case GET_USER_UNREAD_INBOX:
+                    getUnreadInboxItems(intent);
+                    break;
+                case GET_USER_SITES:
+                    getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false));
+                    break;
+                case DEAUTH_APP:
+                    deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
+                    break;
+                default:
+                    Log.e(TAG, "Unknown action: " + action);
+                    break;
+            }
+        }
+        catch (HttpErrorException e)
+        {
+            broadcastHttpErrorIntent(e.getError());
+        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        Log.d(TAG, intent.getAction() == null ? "no action" : intent.getAction());
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void getUserDetail(boolean me, long userId, int page)
     {
-	try
-	{
+        try
+        {
 
-	    if (me)
-	    {
-		broadcastSerializableExtra(UserIntentAction.USER_DETAIL.getAction(),
-		                UserIntentAction.USER_DETAIL.getAction(), userService.getMe());
-	    }
-	    else
-	    {
-		broadcastSerializableExtra(UserIntentAction.USER_DETAIL.getAction(),
-		                UserIntentAction.USER_DETAIL.getAction(), userService.getUserById(userId));
-	    }
-	}
-	catch (HttpErrorException e)
-	{
-	    broadcastHttpErrorIntent(e.getError());
-	}
+            if (me)
+            {
+                broadcastSerializableExtra(UserIntentAction.USER_DETAIL.getAction(),
+                        UserIntentAction.USER_DETAIL.getAction(), userService.getMe());
+            }
+            else
+            {
+                broadcastSerializableExtra(UserIntentAction.USER_DETAIL.getAction(),
+                        UserIntentAction.USER_DETAIL.getAction(), userService.getUserById(userId));
+            }
+        }
+        catch (HttpErrorException e)
+        {
+            broadcastHttpErrorIntent(e.getError());
+        }
 
-	fetchUserAccountsAndBroadcast(me, userId);
+        fetchUserAccountsAndBroadcast(me, userId);
     }
 
     private void fetchUserAccountsAndBroadcast(boolean me, long userId)
     {
-	if (me)
-	{
-	    broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction(),
-		            UserIntentAction.USER_ACCOUNTS.getAction(), userService.getAccounts(1));
-	}
-	else
-	{
-	    broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction(),
-		            UserIntentAction.USER_ACCOUNTS.getAction(), userService.getAccounts(userId, 1));
-	}
+        if (me)
+        {
+            broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction(),
+                    UserIntentAction.USER_ACCOUNTS.getAction(), userService.getAccounts(1));
+        }
+        else
+        {
+            broadcastSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction(),
+                    UserIntentAction.USER_ACCOUNTS.getAction(), userService.getAccounts(userId, 1));
+        }
     }
 
     private void getQuestions(boolean me, long userId, int page)
     {
-	if (me)
-	{
-	    broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(), StringConstants.QUESTIONS,
-		            userService.getMyQuestions(page));
-	}
-	else
-	{
-	    if (userId > 0)
-	    {
-		broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(), StringConstants.QUESTIONS,
-		                userService.getQuestionsByUser(userId, page));
-	    }
-	}
+        if (me)
+        {
+            broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(),
+                    StringConstants.QUESTIONS, userService.getMyQuestions(page));
+        }
+        else
+        {
+            if (userId > 0)
+            {
+                broadcastSerializableExtra(UserIntentAction.QUESTIONS_BY_USER.getAction(),
+                        StringConstants.QUESTIONS, userService.getQuestionsByUser(userId, page));
+            }
+        }
     }
 
     private void getAnswers(boolean me, long userId, int page)
     {
-	if (me)
-	{
-	    broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.getAction(),
-		            UserIntentAction.ANSWERS_BY_USER.getAction(), userService.getMyAnswers(page));
-	}
-	else
-	{
-	    if (userId > 0)
-	    {
-		broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.getAction(),
-		                UserIntentAction.ANSWERS_BY_USER.getAction(),
-		                userService.getAnswersByUser(userId, page));
-	    }
-	}
+        if (me)
+        {
+            broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.getAction(),
+                    UserIntentAction.ANSWERS_BY_USER.getAction(), userService.getMyAnswers(page));
+        }
+        else
+        {
+            if (userId > 0)
+            {
+                broadcastSerializableExtra(UserIntentAction.ANSWERS_BY_USER.getAction(),
+                        UserIntentAction.ANSWERS_BY_USER.getAction(),
+                        userService.getAnswersByUser(userId, page));
+            }
+        }
     }
 
     private void getUnreadInboxItems(Intent intent)
     {
-	int totalNewMsgs = 0;
-	int page = intent.getIntExtra(StringConstants.PAGE, 1);
-	ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page);
+        int totalNewMsgs = 0;
+        int page = intent.getIntExtra(StringConstants.PAGE, 1);
+        ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page);
 
-	if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
-	{
-	    totalNewMsgs += unreadInboxItems.size();
-	    broadcastUnreadItemsCount(totalNewMsgs, unreadInboxItems);
-	}
+        if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
+        {
+            totalNewMsgs += unreadInboxItems.size();
+            broadcastUnreadItemsCount(totalNewMsgs, unreadInboxItems);
+        }
     }
 
     private void broadcastUnreadItemsCount(int totalNewMsgs, ArrayList<InboxItem> unreadInboxItems)
     {
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(UserIntentAction.NEW_MSG.getAction());
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadInboxItems);
-	sendBroadcast(broadcastIntent);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(UserIntentAction.NEW_MSG.getAction());
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadInboxItems);
+        sendBroadcast(broadcastIntent);
     }
 
     private void getUserSites(boolean forAuthenicatedUser)
     {
-	LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
+        LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
-	if (forAuthenicatedUser)
-	{
-	    LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
-	    HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
+        if (forAuthenicatedUser)
+        {
+            LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
+            HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
 
-	    if (linkAccountsMap != null && linkSitesMap != null)
-	    {
-		for (String siteUrl : linkAccountsMap.keySet())
-		{
-		    if (linkSitesMap.containsKey(siteUrl))
-		    {
-			Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
+            if (linkAccountsMap != null && linkSitesMap != null)
+            {
+                for (String siteUrl : linkAccountsMap.keySet())
+                {
+                    if (linkSitesMap.containsKey(siteUrl))
+                    {
+                        Log.d("Usertype for " + siteUrl,
+                                linkAccountsMap.get(siteUrl).userType.name());
 
-			Site site = linkSitesMap.get(siteUrl);
-			site.userType = linkAccountsMap.get(siteUrl).userType;
-			regSitesFirstMap.put(siteUrl, site);
+                        Site site = linkSitesMap.get(siteUrl);
+                        site.userType = linkAccountsMap.get(siteUrl).userType;
+                        regSitesFirstMap.put(siteUrl, site);
 
-			linkSitesMap.remove(siteUrl);
-		    }
-		}
+                        linkSitesMap.remove(siteUrl);
+                    }
+                }
 
-		regSitesFirstMap.putAll(linkSitesMap);
-	    }
+                regSitesFirstMap.putAll(linkSitesMap);
+            }
 
-	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES, new ArrayList<Site>(
-		            regSitesFirstMap.values()));
+            broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES,
+                    new ArrayList<Site>(regSitesFirstMap.values()));
 
-	}
-	else
-	{
-	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES,
-		            new ArrayList<Site>(linkSitesMap.values()));
-	}
+        }
+        else
+        {
+            broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES,
+                    new ArrayList<Site>(linkSitesMap.values()));
+        }
     }
 
     private void deauthenticateApp(String accessToken)
     {
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(UserIntentAction.LOGOUT.getAction());
-	broadcastIntent.putExtra(UserIntentAction.LOGOUT.getAction(), userService.logout(accessToken));
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	sendBroadcast(broadcastIntent);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(UserIntentAction.LOGOUT.getAction());
+        broadcastIntent.putExtra(UserIntentAction.LOGOUT.getAction(),
+                userService.logout(accessToken));
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        sendBroadcast(broadcastIntent);
     }
 }

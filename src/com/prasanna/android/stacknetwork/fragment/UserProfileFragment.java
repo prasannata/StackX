@@ -111,13 +111,14 @@ public class UserProfileFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
 
-        me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
-        if (me) user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
+        super.onCreate(savedInstanceState);
 
         if (user != null)
         {
+            me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
+            if (me) user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
             user.accounts = SharedPreferencesUtil.getMeAccounts(getActivity().getCacheDir());
         }
         else
@@ -132,10 +133,10 @@ public class UserProfileFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        usersAccountCursor = 0;
-
         if (profileHomeLayout == null)
         {
+            usersAccountCursor = 0;
+
             fetchProfileProgress = ProgressDialog.show(getActivity(), "", "Fetching profile");
 
             profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout,
@@ -203,16 +204,18 @@ public class UserProfileFragment extends Fragment
             updateProfileInfo();
 
             TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
-            textView.append(" " + String.valueOf(user.questionCount));
+            textView.setText(getString(R.string.questions) + " "
+                    + String.valueOf(user.questionCount));
 
             textView = (TextView) profileHomeLayout.findViewById(R.id.answerCount);
-            textView.append(" " + String.valueOf(user.answerCount));
+            textView.setText(getString(R.string.answers) + " " + String.valueOf(user.answerCount));
 
             textView = (TextView) profileHomeLayout.findViewById(R.id.upvoteCount);
-            textView.append(" " + String.valueOf(user.upvoteCount));
+            textView.setText(getString(R.string.upvotes) + " " + String.valueOf(user.upvoteCount));
 
             textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
-            textView.append(" " + String.valueOf(user.downvoteCount));
+            textView.setText(getString(R.string.downvotes) + " "
+                    + String.valueOf(user.downvoteCount));
         }
     }
 
@@ -231,7 +234,8 @@ public class UserProfileFragment extends Fragment
         textView.setText(user.displayName);
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
-        textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.creationDate));
+        textView.setText(getString(R.string.registered) + " "
+                + DateTimeUtils.getElapsedDurationSince(user.creationDate));
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
         textView.setText(AppUtils.formatReputation(user.reputation));
@@ -249,17 +253,18 @@ public class UserProfileFragment extends Fragment
         }
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
-        textView.append(" " + user.profileViews);
+        textView.setText(getString(R.string.views) + " " + user.profileViews);
 
         if (user.acceptRate > 0)
         {
             textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
-            textView.append(" " + user.acceptRate + "%");
+            textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
             textView.setVisibility(View.VISIBLE);
         }
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
-        textView.append(" " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+        textView.setText(getString(R.string.lastSeen) + " "
+                + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
     private void startUserProfileService()

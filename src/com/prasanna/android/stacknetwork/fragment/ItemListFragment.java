@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import android.app.ListFragment;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -47,10 +48,9 @@ import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 
-public abstract class ItemListFragment<T extends StackXItem> extends ListFragment
-        implements OnScrollListener, HttpErrorListener
+public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements
+        OnScrollListener, HttpErrorListener
 {
-    private Intent intentForService;
     private boolean serviceRunning = false;
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
     private ProgressBar progressBar;
@@ -116,25 +116,14 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         super.onDestroy();
 
-        stopServiceAndUnregisterReceivers();
+        unregisterReceivers();
     }
 
-    @Override
-    public void onStop()
+    protected void unregisterReceivers()
     {
-        Log.d(getLogTag(), "onStop");
-
-        super.onStop();
-
-        stopService();
-    }
-
-    protected void stopServiceAndUnregisterReceivers()
-    {
-        stopService();
-
         try
         {
+            Log.d(getLogTag(), "unregistering receivers");
             getActivity().unregisterReceiver(receiver);
             getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
         }
@@ -156,29 +145,39 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     protected Intent getIntentForService(Class<?> clazz, String action)
     {
-        intentForService = new Intent(getActivity().getApplicationContext(), clazz);
-        intentForService.setAction(action);
-        return intentForService;
+        if (!serviceRunning)
+        {
+            Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
+            intentForService.setAction(action);
+            return intentForService;
+        }
+
+        return null;
     }
 
-    protected void startService()
+    protected void startService(Intent intent)
     {
         if (serviceRunning)
         {
             Log.d(getLogTag(), "Service is already running");
         }
-        else if (intentForService != null)
+        else if (intent != null)
         {
-            getActivity().startService(intentForService);
+            ComponentName startService = getActivity().startService(intent);
+            if (startService == null)
+                Log.d(getLogTag(), intent.getAction() + " service started");
+            else
+                Log.d(getLogTag(), startService.getClassName());
             serviceRunning = true;
+
         }
     }
 
-    protected void stopService()
+    protected void stopService(Intent intent)
     {
-        if (intentForService != null)
+        if (intent != null)
         {
-            getActivity().stopService(intentForService);
+            getActivity().stopService(intent);
             serviceRunning = false;
         }
     }
@@ -190,7 +189,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     public void refresh()
     {
-        stopServiceAndUnregisterReceivers();
+        unregisterReceivers();
 
         registerReceiver();
 
