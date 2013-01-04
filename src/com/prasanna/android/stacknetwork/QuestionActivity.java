@@ -172,9 +172,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	setContentView(R.layout.viewpager_title_indicator);
 
-	setupViewPager();
-
 	questionFragment = QuestionFragment.newFragment();
+	
+	setupViewPager();
 
 	registerReceivers();
 	prepareIntentAndStartService();
