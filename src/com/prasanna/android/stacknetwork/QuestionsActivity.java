@@ -46,8 +46,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetTagsAsyncTask;
 
-public class QuestionsActivity extends AbstractUserActionBarActivity implements
-        OnContextItemSelectedListener<Question>
+public class QuestionsActivity extends AbstractUserActionBarActivity implements OnContextItemSelectedListener<Question>
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
     private static final String FRAGMENT_TAG_FRONT_PAGE = "front_page";
@@ -56,226 +55,219 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private ArrayList<String> tags = new ArrayList<String>();
     private ArrayAdapter<String> spinnerAdapter;
 
-    public class GetUserTagsCompletionNotifier implements
-            AsyncTaskCompletionNotifier<ArrayList<String>>
+    public class GetUserTagsCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<String>>
     {
-        @Override
-        public void notifyOnCompletion(ArrayList<String> result)
-        {
-            if (result != null)
-            {
-                tags.add(StringConstants.FRONT_PAGE);
-                tags.addAll(result);
+	@Override
+	public void notifyOnCompletion(ArrayList<String> result)
+	{
+	    if (result != null)
+	    {
+		tags.add(StringConstants.FRONT_PAGE);
+		tags.addAll(result);
 
-                initActionBarSpinner();
-            }
-        }
+		initActionBarSpinner();
+	    }
+	}
     }
 
     private void initActionBarSpinner()
     {
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+	getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
-        OnNavigationListener callback = new OnNavigationListener()
-        {
-            @Override
-            public boolean onNavigationItemSelected(int itemPosition, long itemId)
-            {
-                if (itemPosition >= 0 && itemPosition < tags.size())
-                {
-                    if (itemPosition == 0)
-                    {
-                        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_FRONT_PAGE);
-                        if (fragment == null)
-                            fragment = QuestionListFragment
-                                    .newFragment(QuestionsIntentService.GET_FRONT_PAGE);
-                        beginTransaction(fragment, FRAGMENT_TAG_FRONT_PAGE);
-                    }
-                    else
-                    {
-                        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_SPINNER_ITEM_PREFIX
-                                + tags.get(itemPosition));
-                        if (fragment == null)
-                            beginFaqForTagFragment(tags.get(itemPosition));
-                        else
-                            beginTransaction(fragment,
-                                    FRAGMENT_TAG_SPINNER_ITEM_PREFIX + tags.get(itemPosition));
+	OnNavigationListener callback = new OnNavigationListener()
+	{
+	    @Override
+	    public boolean onNavigationItemSelected(int itemPosition, long itemId)
+	    {
+		if (itemPosition >= 0 && itemPosition < tags.size())
+		{
+		    if (itemPosition == 0)
+		    {
+			QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_FRONT_PAGE);
+			if (fragment == null)
+			    fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE);
+			beginTransaction(fragment, FRAGMENT_TAG_FRONT_PAGE);
+		    }
+		    else
+		    {
+			QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_SPINNER_ITEM_PREFIX
+			                + tags.get(itemPosition));
+			if (fragment == null)
+			    beginFaqForTagFragment(tags.get(itemPosition));
+			else
+			    beginTransaction(fragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + tags.get(itemPosition));
 
-                        beginFaqForTagFragment(tags.get(itemPosition));
-                    }
+		    }
 
-                    return true;
-                }
+		    return true;
+		}
 
-                return false;
-            }
-        };
+		return false;
+	    }
+	};
 
-        spinnerAdapter = new ArrayAdapter<String>(this, R.layout.action_bar_spinner,
-                R.id.spinnertAdapterItem, tags);
-        getActionBar().setListNavigationCallbacks(spinnerAdapter, callback);
+	spinnerAdapter = new ArrayAdapter<String>(this, R.layout.action_bar_spinner, R.id.spinnertAdapterItem, tags);
+	getActionBar().setListNavigationCallbacks(spinnerAdapter, callback);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+	Log.d(TAG, "onCreate");
 
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.scroll_fragment);
+	setContentView(R.layout.scroll_fragment);
 
-        if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
-        {
-            saveSearchQuery();
-            beginTransaction(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH), null);
-        }
-        else if (StringConstants.RELATED.equals(getIntent().getAction()))
-        {
-            beginRelatedQuestionsFragment(getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
-        }
-        else if (StringConstants.TAG.equals(getIntent().getAction()))
-        {
-            beginFaqForTagFragment(getIntent().getStringExtra(StringConstants.TAG));
-        }
-        else
-        {
-            getSpinnerTags(savedInstanceState);
-        }
+	if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
+	{
+	    saveSearchQuery();
+	    beginTransaction(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH), null);
+	}
+	else if (StringConstants.RELATED.equals(getIntent().getAction()))
+	{
+	    beginRelatedQuestionsFragment(getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
+	}
+	else if (StringConstants.TAG.equals(getIntent().getAction()))
+	{
+	    beginFaqForTagFragment(getIntent().getStringExtra(StringConstants.TAG));
+	}
+	else
+	{
+	    getSpinnerTags(savedInstanceState);
+	}
     }
 
     private void saveSearchQuery()
     {
-        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                RecentQueriesProvider.AUTHORITY, RecentQueriesProvider.MODE);
-        suggestions.saveRecentQuery(getIntent().getStringExtra(SearchManager.QUERY), null);
+	SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
+	                RecentQueriesProvider.MODE);
+	suggestions.saveRecentQuery(getIntent().getStringExtra(SearchManager.QUERY), null);
     }
 
     @SuppressWarnings("unchecked")
     private void getSpinnerTags(Bundle savedInstanceState)
     {
-        if (savedInstanceState != null)
-        {
-            Log.d(TAG, "Restoring tags from savedInstanceState");
+	if (savedInstanceState != null)
+	{
+	    Log.d(TAG, "Restoring tags from savedInstanceState");
 
-            tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
-            int lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
+	    tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
+	    int lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
 
-            initActionBarSpinner();
+	    initActionBarSpinner();
 
-            if (lastSavedPosition > 0) getActionBar().setSelectedNavigationItem(lastSavedPosition);
-        }
-        else
-        {
-            GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(
-                    new GetUserTagsCompletionNotifier(),
-                    AppUtils.inRegisteredSite(getApplicationContext()));
-            fetchUserAsyncTask.execute(1);
-        }
+	    if (lastSavedPosition > 0)
+		getActionBar().setSelectedNavigationItem(lastSavedPosition);
+	}
+	else
+	{
+	    GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserTagsCompletionNotifier(),
+		            AppUtils.inRegisteredSite(getApplicationContext()));
+	    fetchUserAsyncTask.execute(1);
+	}
     }
 
     @Override
     public void refresh()
     {
-        QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager()
-                .findFragmentById(R.id.fragmentContainer);
-        questionsFragment.refresh();
+	QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
+	                R.id.fragmentContainer);
+	questionsFragment.refresh();
     }
 
     @Override
     public Context getCurrentContext()
     {
-        return this;
+	return this;
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "Saving activity instance");
-        outState.putSerializable(StringConstants.TAGS, tags);
-        super.onSaveInstanceState(outState);
+	Log.d(TAG, "Saving activity instance");
+	outState.putSerializable(StringConstants.TAGS, tags);
+	super.onSaveInstanceState(outState);
     }
 
     private void beginFaqForTagFragment(String faqTag)
     {
-        QuestionListFragment newFragment = QuestionListFragment
-                .newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG);
-        newFragment.getBundle().putString(StringConstants.TAG, faqTag);
-        ;
-        beginTransaction(newFragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + faqTag);
+	QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG);
+	newFragment.getBundle().putString(StringConstants.TAG, faqTag);
+	;
+	beginTransaction(newFragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + faqTag);
     }
 
     private void beginTransaction(QuestionListFragment questionListFragment, String fragmentTag)
     {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, questionListFragment, fragmentTag);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.addToBackStack(null);
-        transaction.commit();
+	FragmentTransaction transaction = getFragmentManager().beginTransaction();
+	transaction.replace(R.id.fragmentContainer, questionListFragment, fragmentTag);
+	transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+	transaction.addToBackStack(null);
+	transaction.commit();
     }
 
     private Fragment findFragment(String fragmentTag)
     {
-        return getFragmentManager().findFragmentByTag(fragmentTag);
+	return getFragmentManager().findFragmentByTag(fragmentTag);
     }
 
     private void beginRelatedQuestionsFragment(long questionId)
     {
-        QuestionListFragment newFragment = QuestionListFragment
-                .newFragment(QuestionsIntentService.GET_RELATED);
-        newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-        beginTransaction(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId);
+	QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED);
+	newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+	beginTransaction(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId);
     }
 
     private void emailQuestion(String subject, String body)
     {
-        Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
-        startActivity(Intent.createChooser(emailIntent, ""));
+	Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
+	startActivity(Intent.createChooser(emailIntent, ""));
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item, Question question)
     {
-        if (item.getGroupId() == R.id.qContextMenuGroup)
-        {
-            Log.d(TAG, "Context item selected: " + item.getTitle());
+	if (item.getGroupId() == R.id.qContextMenuGroup)
+	{
+	    Log.d(TAG, "Context item selected: " + item.getTitle());
 
-            switch (item.getItemId())
-            {
-                case R.id.q_ctx_comments:
-                    showComments(question);
-                    return true;
-                case R.id.q_ctx_menu_user_profile:
-                    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-                    userProfileIntent.putExtra(StringConstants.USER_ID, question.owner.id);
-                    startActivity(userProfileIntent);
-                    break;
-                case R.id.q_ctx_related:
-                    beginRelatedQuestionsFragment(question.id);
-                    return true;
-                case R.id.q_ctx_menu_email:
-                    emailQuestion(question.title, question.link);
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
-        {
-            Log.d(TAG, "Tag selected: " + item.getTitle());
-            beginFaqForTagFragment((String) item.getTitle());
-            return true;
-        }
+	    switch (item.getItemId())
+	    {
+		case R.id.q_ctx_comments:
+		    showComments(question);
+		    return true;
+		case R.id.q_ctx_menu_user_profile:
+		    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
+		    userProfileIntent.putExtra(StringConstants.USER_ID, question.owner.id);
+		    startActivity(userProfileIntent);
+		    break;
+		case R.id.q_ctx_related:
+		    beginRelatedQuestionsFragment(question.id);
+		    return true;
+		case R.id.q_ctx_menu_email:
+		    emailQuestion(question.title, question.link);
+		    return true;
+		default:
+		    return false;
+	    }
+	}
+	else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
+	{
+	    Log.d(TAG, "Tag selected: " + item.getTitle());
+	    beginFaqForTagFragment((String) item.getTitle());
+	    return true;
+	}
 
-        return false;
+	return false;
     }
 
     private void showComments(Question question)
     {
-        if (question != null && question.comments != null && question.comments.size() > 0)
-            Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
-        else
-            Toast.makeText(this, "No comments", Toast.LENGTH_LONG).show();
+	if (question != null && question.comments != null && question.comments.size() > 0)
+	    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+	else
+	    Toast.makeText(this, "No comments", Toast.LENGTH_LONG).show();
     }
 
     /*
@@ -289,8 +281,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     @Override
     public void onBackPressed()
     {
-        super.onBackPressed();
+	super.onBackPressed();
 
-        if (getFragmentManager().getBackStackEntryCount() == 0) finish();
+	if (getFragmentManager().getBackStackEntryCount() == 0)
+	    finish();
     }
 }

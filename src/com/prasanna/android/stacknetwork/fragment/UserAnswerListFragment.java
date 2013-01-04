@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -72,13 +71,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
         return itemsContainer;
     }
 
-    @Override
-    protected void registerReceiver()
-    {
-        IntentFilter filter = new IntentFilter(UserIntentAction.ANSWERS_BY_USER.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(receiver, filter);
-    }
 
     @Override
     protected void startIntentService()
@@ -91,14 +83,15 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
         intent.putExtra(StringConstants.USER_ID,
                 getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         intent.putExtra(StringConstants.PAGE, page++);
-
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        
         startService(intent);
     }
 
     @Override
     public String getReceiverExtraName()
     {
-        return UserIntentAction.ANSWERS_BY_USER.getAction();
+        return StringConstants.ANSWERS;
     }
 
     @Override
@@ -122,7 +115,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
         setListAdapter(itemListAdapter);
         getListView().setOnScrollListener(this);
 
-        registerReceiver();
         startIntentService();
     }
 

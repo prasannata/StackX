@@ -60,7 +60,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
 	if (!(activity instanceof OnContextItemSelectedListener))
 	    throw new IllegalArgumentException(activity.getLocalClassName()
-		            + " must implement OnContextItemSelectedListener");
+	                    + " must implement OnContextItemSelectedListener");
 
 	onContextItemSelectedListener = (OnContextItemSelectedListener<Question>) activity;
     }

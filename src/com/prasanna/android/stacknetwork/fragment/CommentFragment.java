@@ -69,13 +69,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     }
 
     @Override
-    protected void registerReceiver()
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
     protected String getLogTag()
     {
         return TAG;

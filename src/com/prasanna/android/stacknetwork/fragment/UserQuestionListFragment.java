@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -76,7 +75,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
 
         super.onActivityCreated(savedInstanceState);
 
-        registerReceiver();
         startIntentService();
     }
 
@@ -111,14 +109,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    protected void registerReceiver()
-    {
-        IntentFilter filter = new IntentFilter(UserIntentAction.QUESTIONS_BY_USER.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(receiver, filter);
-    }
-
-    @Override
     protected void startIntentService()
     {
         Log.d(TAG, "startIntentService");
@@ -131,6 +121,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.USER_ID,
                 getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         intent.putExtra(StringConstants.PAGE, ++page);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         startService(intent);
     }
 

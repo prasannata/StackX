@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +42,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     private static final String TAG = QuestionListFragment.class.getSimpleName();
 
     private Intent intent;
-    private IntentFilter filter;
     private int currentPage = 0;
     private int action;
     private boolean created = false;
@@ -51,213 +49,183 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     public static QuestionListFragment newFragment(int action)
     {
-        QuestionListFragment newFragment = new QuestionListFragment();
-        return newFragment.setQuestionAction(action);
+	QuestionListFragment newFragment = new QuestionListFragment();
+	return newFragment.setQuestionAction(action);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
+	Log.d(TAG, "onCreateView");
 
-        if (itemsContainer == null)
-        {
-            itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container,
-                    container, false);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(),
-                    R.layout.question_snippet_layout, new ArrayList<Question>(), this);
-        }
+	if (itemsContainer == null)
+	{
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
+	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+		            new ArrayList<Question>(), this);
+	}
 
-        return itemsContainer;
+	return itemsContainer;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
+	Log.d(TAG, "onActivityCreated");
 
-        super.onActivityCreated(savedInstanceState);
+	super.onActivityCreated(savedInstanceState);
 
-        if (!created)
-        {
-            switch (action)
-            {
-                case QuestionsIntentService.GET_FRONT_PAGE:
-                    getFrontPage();
-                    break;
-                case QuestionsIntentService.GET_FAQ_FOR_TAG:
-                    getFaqsForTag();
-                    break;
-                case QuestionsIntentService.GET_RELATED:
-                    getRelatedQuestions();
-                    break;
-                case QuestionsIntentService.SEARCH:
-                    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
-                    break;
-            }
+	if (!created)
+	{
+	    switch (action)
+	    {
+		case QuestionsIntentService.GET_FRONT_PAGE:
+		    getFrontPage();
+		    break;
+		case QuestionsIntentService.GET_FAQ_FOR_TAG:
+		    getFaqsForTag();
+		    break;
+		case QuestionsIntentService.GET_RELATED:
+		    getRelatedQuestions();
+		    break;
+		case QuestionsIntentService.SEARCH:
+		    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
+		    break;
+	    }
 
-            selectedNavigationIndex = getActivity().getActionBar().getSelectedNavigationIndex();
-            created = true;
-        }
-        else
-        {
-            Log.d(TAG, "Fragment was already created. Restoring");
+	    selectedNavigationIndex = getActivity().getActionBar().getSelectedNavigationIndex();
+	    created = true;
+	}
+	else
+	{
+	    Log.d(TAG, "Fragment was already created. Restoring");
 
-            if (getActivity().getActionBar().getNavigationItemCount() > 0)
-                getActivity().getActionBar().setSelectedNavigationItem(selectedNavigationIndex);
-        }
+	    if (getActivity().getActionBar().getNavigationItemCount() > 0)
+		getActivity().getActionBar().setSelectedNavigationItem(selectedNavigationIndex);
+	}
 
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "Saving instance state");
+	Log.d(TAG, "Saving instance state");
 
-        super.onSaveInstanceState(outState);
+	super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onPause()
     {
-        Log.d(TAG, "onPause");
+	Log.d(TAG, "onPause");
 
-        super.onPause();
+	super.onPause();
     }
 
     @Override
     public void onDestroy()
     {
-        Log.d(getLogTag(), "onDestroy");
+	Log.d(getLogTag(), "onDestroy");
 
-        super.onDestroy();
+	super.onDestroy();
 
-        stopService(intent);
+	stopService(intent);
     }
 
     @Override
     public void onStop()
     {
-        Log.d(getLogTag(), "onStop");
+	Log.d(getLogTag(), "onStop");
 
-        super.onStop();
+	super.onStop();
 
-        stopService(intent);
+	stopService(intent);
     }
 
     @Override
     protected void startIntentService()
     {
-        intent.putExtra(StringConstants.PAGE, ++currentPage);
-        startService(intent);
-    }
-
-    @Override
-    protected void registerReceiver()
-    {
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(receiver, filter);
+	intent.putExtra(StringConstants.PAGE, ++currentPage);
+	intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+	startService(intent);
     }
 
     @Override
     public String getLogTag()
     {
-        return TAG;
+	return TAG;
     }
 
     private void stopRunningServiceAndReceiver()
     {
-        if (isServiceRunning())
-        {
-            getActivity().stopService(intent);
-            getActivity().unregisterReceiver(receiver);
-        }
+	if (isServiceRunning()) getActivity().stopService(intent);
     }
 
     protected void clean()
     {
-        stopRunningServiceAndReceiver();
+	stopRunningServiceAndReceiver();
 
-        itemListAdapter.clear();
+	itemListAdapter.clear();
 
-        currentPage = 0;
+	currentPage = 0;
     }
 
     private void getFrontPage()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
-        filter = new IntentFilter(QuestionIntentAction.QUESTIONS.getAction());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 
-        showProgressBar();
+	showProgressBar();
 
-        registerReceiver();
-
-        startIntentService();
+	startIntentService();
     }
 
     private void getRelatedQuestions()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
-        intent.putExtra(StringConstants.QUESTION_ID,
-                getBundle().getLong(StringConstants.QUESTION_ID, 0));
-        filter = new IntentFilter(QuestionIntentAction.QUESTIONS.getAction());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
+	intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 
-        showProgressBar();
+	showProgressBar();
 
-        registerReceiver();
-
-        startIntentService();
+	startIntentService();
     }
 
     private void getFaqsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.TAGS_FAQ.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
-        intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(),
-                getBundle().getString(StringConstants.TAG, null));
-        filter = new IntentFilter(QuestionIntentAction.TAGS_FAQ.getAction());
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
+	intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(), getBundle().getString(StringConstants.TAG, null));
 
-        showProgressBar();
+	showProgressBar();
 
-        registerReceiver();
-
-        startIntentService();
+	startIntentService();
     }
 
     public void search(String query)
     {
-        clean();
+	clean();
 
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.QUESTION_SEARCH.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH);
-        intent.putExtra(SearchManager.QUERY, query);
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH);
+	intent.putExtra(SearchManager.QUERY, query);
 
-        filter = new IntentFilter(QuestionIntentAction.QUESTION_SEARCH.getAction());
+	showProgressBar();
 
-        showProgressBar();
-
-        registerReceiver();
-
-        startIntentService();
+	startIntentService();
     }
 
     @Override
     public void refresh()
     {
-        clean();
+	clean();
 
-        super.refresh();
+	super.refresh();
     }
 
     public QuestionListFragment setQuestionAction(int action)
     {
-        this.action = action;
-        return this;
+	this.action = action;
+	return this;
     }
 }

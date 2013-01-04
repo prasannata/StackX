@@ -24,11 +24,9 @@ import java.util.HashMap;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,16 +40,18 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.GetImageAsyncTask;
 import com.prasanna.android.task.GetImageAsyncTaskCompleteNotifierImpl;
 
-public class UserProfileFragment extends Fragment
+public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver
 {
     private static final String TAG = UserProfileFragment.class.getSimpleName();
     private RelativeLayout profileHomeLayout;
@@ -61,249 +61,204 @@ public class UserProfileFragment extends Fragment
     private Intent userProfileIntent;
     private User user;
     private boolean me = false;
-
-    private BroadcastReceiver userAccountsReceiver = new BroadcastReceiver()
-    {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            HashMap<String, Account> accounts = (HashMap<String, Account>) intent
-                    .getSerializableExtra(UserIntentAction.USER_ACCOUNTS.getAction());
-
-            if (user != null && userAccountList != null && accounts != null)
-            {
-                if (user.accounts == null)
-                {
-                    user.accounts = new ArrayList<Account>();
-                }
-
-                user.accounts.addAll(accounts.values());
-
-                SharedPreferencesUtil.cacheMeAccounts(getActivity().getCacheDir(), user.accounts);
-
-                displayUserAccounts();
-            }
-        }
-    };
-
-    private BroadcastReceiver userProfileReceiver = new BroadcastReceiver()
-    {
-        private StackXPage<User> pageObject;
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            pageObject = (StackXPage<User>) intent
-                    .getSerializableExtra(UserIntentAction.USER_DETAIL.getAction());
-
-            fetchProfileProgress.dismiss();
-
-            if (pageObject != null && pageObject.items != null && !pageObject.items.isEmpty())
-            {
-                user = pageObject.items.get(0);
-                displayUserDetail();
-            }
-        }
-    };
+    private RestQueryResultReceiver resultReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+	Log.d(TAG, "onCreate");
 
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        if (user != null)
-        {
-            me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
-            if (me) user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
-            user.accounts = SharedPreferencesUtil.getMeAccounts(getActivity().getCacheDir());
-        }
-        else
-        {
-            registerUserProfileReceiver();
-            registerUserAccountsReceiver();
+	resultReceiver = new RestQueryResultReceiver(new Handler());
+	resultReceiver.setReceiver(this);
 
-            startUserProfileService();
-        }
+	if (user != null)
+	{
+	    me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
+	    if (me)
+		user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
+	    user.accounts = SharedPreferencesUtil.getMeAccounts(getActivity().getCacheDir());
+	}
+	else
+	{
+	    startUserProfileService();
+	}
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        if (profileHomeLayout == null)
-        {
-            usersAccountCursor = 0;
+	if (profileHomeLayout == null)
+	{
+	    usersAccountCursor = 0;
 
-            fetchProfileProgress = ProgressDialog.show(getActivity(), "", "Fetching profile");
+	    fetchProfileProgress = ProgressDialog.show(getActivity(), "", "Fetching profile");
 
-            profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout,
-                    container, false);
-            userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
-        }
-        else
-        {
-            Log.d(TAG, "Not fetching, display existing user");
-            displayUserDetail();
-            displayUserAccounts();
-        }
+	    profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
+	    userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
+	}
+	else
+	{
+	    Log.d(TAG, "Not fetching, display existing user");
+	    displayUserDetail();
+	    displayUserAccounts();
+	}
 
-        return profileHomeLayout;
+	return profileHomeLayout;
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        stopServiceAndUnregsiterReceivers();
+	stopServiceAndUnregsiterReceivers();
     }
 
     @Override
     public void onDestroy()
     {
-        super.onDestroy();
+	super.onDestroy();
 
-        stopServiceAndUnregsiterReceivers();
+	stopServiceAndUnregsiterReceivers();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        if (user != null)
-        {
-            outState.putSerializable(StringConstants.USER, user);
-        }
-        super.onSaveInstanceState(outState);
+	if (user != null)
+	{
+	    outState.putSerializable(StringConstants.USER, user);
+	}
+	super.onSaveInstanceState(outState);
     }
 
     private void stopServiceAndUnregsiterReceivers()
     {
-        if (userProfileIntent != null)
-        {
-            getActivity().stopService(userProfileIntent);
-        }
-
-        try
-        {
-            getActivity().unregisterReceiver(userProfileReceiver);
-            getActivity().unregisterReceiver(userAccountsReceiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
+	if (userProfileIntent != null)
+	{
+	    getActivity().stopService(userProfileIntent);
+	}
     }
 
     private void displayUserDetail()
     {
-        if (user != null)
-        {
-            updateProfileInfo();
+	if (user != null)
+	{
+	    updateProfileInfo();
 
-            TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
-            textView.setText(getString(R.string.questions) + " "
-                    + String.valueOf(user.questionCount));
+	    TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
+	    textView.setText(getString(R.string.questions) + " " + String.valueOf(user.questionCount));
 
-            textView = (TextView) profileHomeLayout.findViewById(R.id.answerCount);
-            textView.setText(getString(R.string.answers) + " " + String.valueOf(user.answerCount));
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.answerCount);
+	    textView.setText(getString(R.string.answers) + " " + String.valueOf(user.answerCount));
 
-            textView = (TextView) profileHomeLayout.findViewById(R.id.upvoteCount);
-            textView.setText(getString(R.string.upvotes) + " " + String.valueOf(user.upvoteCount));
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.upvoteCount);
+	    textView.setText(getString(R.string.upvotes) + " " + String.valueOf(user.upvoteCount));
 
-            textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
-            textView.setText(getString(R.string.downvotes) + " "
-                    + String.valueOf(user.downvoteCount));
-        }
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
+	    textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
+	}
     }
 
     private void updateProfileInfo()
     {
-        ImageView userProfileImage = (ImageView) profileHomeLayout
-                .findViewById(R.id.profileUserImage);
-        if (userProfileImage.getDrawable() == null)
-        {
-            GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(
-                    new GetImageAsyncTaskCompleteNotifierImpl(userProfileImage));
-            fetchImageAsyncTask.execute(user.profileImageLink);
-        }
+	ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
+	if (userProfileImage.getDrawable() == null)
+	{
+	    GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new GetImageAsyncTaskCompleteNotifierImpl(
+		            userProfileImage));
+	    fetchImageAsyncTask.execute(user.profileImageLink);
+	}
 
-        TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
-        textView.setText(user.displayName);
+	TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
+	textView.setText(user.displayName);
 
-        textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
-        textView.setText(getString(R.string.registered) + " "
-                + DateTimeUtils.getElapsedDurationSince(user.creationDate));
+	textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
+	textView.setText(getString(R.string.registered) + " "
+	                + DateTimeUtils.getElapsedDurationSince(user.creationDate));
 
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
-        textView.setText(AppUtils.formatReputation(user.reputation));
+	textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
+	textView.setText(AppUtils.formatReputation(user.reputation));
 
-        if (user.badgeCounts != null && user.badgeCounts.length == 3)
-        {
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserGoldNum);
-            textView.setText(String.valueOf(user.badgeCounts[0]));
+	if (user.badgeCounts != null && user.badgeCounts.length == 3)
+	{
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserGoldNum);
+	    textView.setText(String.valueOf(user.badgeCounts[0]));
 
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserSilverNum);
-            textView.setText(String.valueOf(user.badgeCounts[1]));
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserSilverNum);
+	    textView.setText(String.valueOf(user.badgeCounts[1]));
 
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserBronzeNum);
-            textView.setText(String.valueOf(user.badgeCounts[2]));
-        }
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserBronzeNum);
+	    textView.setText(String.valueOf(user.badgeCounts[2]));
+	}
 
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
-        textView.setText(getString(R.string.views) + " " + user.profileViews);
+	textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
+	textView.setText(getString(R.string.views) + " " + user.profileViews);
 
-        if (user.acceptRate > 0)
-        {
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
-            textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
-            textView.setVisibility(View.VISIBLE);
-        }
+	if (user.acceptRate > 0)
+	{
+	    textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
+	    textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
+	    textView.setVisibility(View.VISIBLE);
+	}
 
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
-        textView.setText(getString(R.string.lastSeen) + " "
-                + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+	textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
+	textView.setText(getString(R.string.lastSeen) + " "
+	                + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
     private void startUserProfileService()
     {
-        userProfileIntent = new Intent(getActivity(), UserIntentService.class);
-        userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
-        userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
-        userProfileIntent.putExtra(StringConstants.ME,
-                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-        userProfileIntent.putExtra(StringConstants.USER_ID,
-                getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-        getActivity().startService(userProfileIntent);
-    }
-
-    private void registerUserAccountsReceiver()
-    {
-        IntentFilter filter = new IntentFilter(UserIntentAction.USER_ACCOUNTS.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(userAccountsReceiver, filter);
-    }
-
-    private void registerUserProfileReceiver()
-    {
-        IntentFilter filter = new IntentFilter(UserIntentAction.USER_DETAIL.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(userProfileReceiver, filter);
+	userProfileIntent = new Intent(getActivity(), UserIntentService.class);
+	userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
+	userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
+	userProfileIntent.putExtra(StringConstants.ME,
+	                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+	userProfileIntent.putExtra(StringConstants.USER_ID,
+	                getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+	userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+	getActivity().startService(userProfileIntent);
     }
 
     private void displayUserAccounts()
     {
-        if (user != null && user.accounts != null)
-        {
-            for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
-            {
-                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                        R.layout.textview_black_textcolor, null);
-                textView.setText(user.accounts.get(usersAccountCursor).siteName);
-                userAccountList.addView(textView);
-            }
-        }
+	if (user != null && user.accounts != null)
+	{
+	    for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
+	    {
+		TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
+		                R.layout.textview_black_textcolor, null);
+		textView.setText(user.accounts.get(usersAccountCursor).siteName);
+		userAccountList.addView(textView);
+	    }
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData)
+    {
+	if (fetchProfileProgress != null)
+	    fetchProfileProgress.dismiss();
+
+	StackXPage<User> userPage = (StackXPage<User>) resultData.getSerializable(StringConstants.USER);
+	if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
+	{
+	    user = userPage.items.get(0);
+	    displayUserDetail();
+	}
+
+	HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
+	                .getSerializable(StringConstants.USER_ACCOUNTS);
+	if (accounts != null)
+	{
+	    if (user.accounts == null)
+		user.accounts = new ArrayList<Account>();
+
+	    user.accounts.addAll(accounts.values());
+	    displayUserAccounts();
+	}
     }
 }

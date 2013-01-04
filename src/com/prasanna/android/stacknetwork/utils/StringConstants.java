@@ -21,6 +21,8 @@ package com.prasanna.android.stacknetwork.utils;
 
 public class StringConstants
 {
+    public static String RESULT_RECEIVER = "result_receiver";
+    
     public static final String ACCESS_TOKEN = "access_token";
     public static final String AUTHENTICATED = "authenticated";
 
@@ -36,6 +38,7 @@ public class StringConstants
     public static final String COMMENTS = "comments";
 
     public static final String USER = "user";
+    public static final String USER_ACCOUNTS = "user_accounts";
     public static final String USER_ID = "user_id";
 
     public static final String PAGE = "page";
@@ -53,6 +56,8 @@ public class StringConstants
     public static final String RELATED = "related";
     public static final String IS_FIRST_RUN = "is_first_run";
     public static final String DEFAULTS = "defaults";
+
+    
 
     public static final class HttpError
     {
