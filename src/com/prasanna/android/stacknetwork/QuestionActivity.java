@@ -177,8 +177,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
 
         if (intent != null)
             stopService(intent);
-
-        resultReceiver.setReceiver(null);
     }
 
     @Override

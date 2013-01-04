@@ -94,7 +94,9 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         super.onCreate(savedInstanceState);
 
-        resultReceiver = new RestQueryResultReceiver(new Handler());
+        if (resultReceiver == null)
+            resultReceiver = new RestQueryResultReceiver(new Handler());
+
         resultReceiver.setReceiver(this);
 
         if (pages == null)
@@ -121,8 +123,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         Log.d(getLogTag(), "onDestroy");
 
         super.onStop();
-
-        resultReceiver.setReceiver(null);
 
         unregisterReceivers();
     }
@@ -165,7 +165,10 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     protected void startService(Intent intent)
     {
         if (!isServiceRunning() && intent != null)
+        {
             getActivity().startService(intent);
+            serviceRunning = true;
+        }
     }
 
     protected void stopService(Intent intent)
