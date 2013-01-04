@@ -22,7 +22,7 @@ package com.prasanna.android.stacknetwork.utils;
 public class StringConstants
 {
     public static String RESULT_RECEIVER = "result_receiver";
-    
+
     public static final String ACCESS_TOKEN = "access_token";
     public static final String AUTHENTICATED = "authenticated";
 
@@ -34,6 +34,7 @@ public class StringConstants
     public static final String QUESTIONS = "questions";
 
     public static final String ANSWERS = "answers";
+    public static final String ANSWER_COUNT = "answer_count";
 
     public static final String COMMENTS = "comments";
 
@@ -58,8 +59,6 @@ public class StringConstants
     public static final String DEFAULTS = "defaults";
 
     public static final String BODY = "body";
-
-    
 
     public static final class HttpError
     {
