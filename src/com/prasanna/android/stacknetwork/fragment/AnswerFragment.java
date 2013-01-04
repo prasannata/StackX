@@ -22,6 +22,10 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -39,9 +43,11 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Answer;
+import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 
 public class AnswerFragment extends Fragment
 {
@@ -51,6 +57,25 @@ public class AnswerFragment extends Fragment
     private Answer answer;
     private RelativeLayout answerMetaInfoLayout;
     private ImageView iv;
+
+    public static AnswerFragment newFragment(Answer answer)
+    {
+	AnswerFragment answerFragment = new AnswerFragment();
+	answerFragment.setRetainInstance(true);
+	answerFragment.setAnswer(answer);
+	return answerFragment;
+    }
+
+    private BroadcastReceiver answerCommentsReceiver = new BroadcastReceiver()
+    {
+	@SuppressWarnings("unchecked")
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+	    answer.comments = (ArrayList<Comment>) intent.getSerializableExtra(QuestionIntentAction.ANSWER_COMMENTS
+		            .getAction());
+	}
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -62,8 +87,7 @@ public class AnswerFragment extends Fragment
 	    answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
 	    iv = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
 
-	    if (answer != null)
-		displayAnswer();
+	    if (answer != null) displayAnswer();
 	}
 
 	return parentLayout;
@@ -77,6 +101,13 @@ public class AnswerFragment extends Fragment
 	super.onActivityCreated(savedInstanceState);
 
 	registerForContextMenu(iv);
+    }
+
+    private void registerCommentsReceiver(long answerId)
+    {
+	IntentFilter filter = new IntentFilter(QuestionIntentAction.ANSWER_COMMENTS.getAction() + "." + answerId);
+	filter.addCategory(Intent.CATEGORY_DEFAULT);
+	getActivity().registerReceiver(answerCommentsReceiver, filter);
     }
 
     private void displayAnswer()
@@ -96,11 +127,10 @@ public class AnswerFragment extends Fragment
 		AnswerFragment.this.getActivity().openContextMenu(v);
 	    }
 	});
+
 	ArrayList<TextView> answerBodyTextViews = MarkdownFormatter.parse(getActivity(), answer.body);
 	for (TextView answer : answerBodyTextViews)
-	{
 	    answerBodyLayout.addView(answer);
-	}
     }
 
     private String getAutherDisplayText(String acceptRate)
@@ -110,11 +140,13 @@ public class AnswerFragment extends Fragment
 	                + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
-    public void setAnswer(Answer answer)
+    private void setAnswer(Answer answer)
     {
 	Log.d(TAG, "answer set");
 
 	this.answer = answer;
+
+	if (this.answer != null) registerCommentsReceiver(answer.id);
     }
 
     @Override

@@ -28,8 +28,8 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionDetailsIntentService extends AbstractIntentService
@@ -125,15 +125,26 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     private void getItemsForQuestionAndBroadcast(Question question)
     {
 	broadcastQuestion(question);
-	broadcoastComments(questionService.getComments(StringConstants.QUESTIONS, question.id));
+	broadcastQuestionComments(questionService.getComments(StringConstants.QUESTIONS, String.valueOf(question.id)));
 
-	if (question.answers == null)
-	    question.answers = new ArrayList<Answer>();
+	if (question.answers == null) question.answers = new ArrayList<Answer>();
 
 	if (question.answerCount > 0)
 	{
 	    question.answers = questionService.getAnswersForQuestion(question.id, 1);
 	    broadcastAnswers(question.answers);
+
+	    if (question.answers != null && !question.answers.isEmpty())
+	    {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(question.answers.get(0).id);
+
+		for (int i = 1; i < question.answers.size(); i++)
+		    stringBuilder.append(";" + question.answers.get(i).id);
+
+		broadcastAnswerComments(questionService.getComments(StringConstants.ANSWERS, stringBuilder.toString()));
+
+	    }
 	}
 
 	QuestionsCache.getInstance().add(question.id, question);
@@ -148,13 +159,23 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	sendBroadcast(broadcastIntent);
     }
 
-    private void broadcoastComments(ArrayList<Comment> comments)
+    private void broadcastQuestionComments(ArrayList<Comment> comments)
+    {
+	broadcoastComments(QuestionIntentAction.QUESTION_COMMENTS, comments);
+    }
+
+    private void broadcastAnswerComments(ArrayList<Comment> comments)
+    {
+	broadcoastComments(QuestionIntentAction.ANSWER_COMMENTS, comments);
+    }
+
+    private void broadcoastComments(QuestionIntentAction questionIntentAction, ArrayList<Comment> comments)
     {
 	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(QuestionIntentAction.QUESTION_COMMENTS.getAction());
+	broadcastIntent.setAction(questionIntentAction.getAction());
 	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(QuestionIntentAction.QUESTION_COMMENTS.getAction(), comments);
-	sendBroadcast(broadcastIntent);
+	broadcastIntent.putExtra(questionIntentAction.getAction(), comments);
+	sendOrderedBroadcast(broadcastIntent, null);
     }
 
     private void broadcastQuestion(Question question)

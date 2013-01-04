@@ -30,6 +30,7 @@ public class JsonFields
     {
         public static final String SCORE = "score";
         public static final String OWNER = "owner";
+        public static final String POST_ID = "post_id";
         public static final String BODY = "body";
         public static final String TITLE = "title";
         public static final String CREATION_DATE = "creation_date";

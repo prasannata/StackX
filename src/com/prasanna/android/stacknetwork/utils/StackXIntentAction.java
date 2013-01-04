@@ -34,6 +34,7 @@ public class StackXIntentAction
         QUESTION_ANSWERS("com.prasanna.stacknetwork.questionAnswers"),
         QUESTION_COMMENTS("com.prasanna.stacknetwork.questionComments"),
         QUESTION_SEARCH("com.prasanna.stacknetwork.questionSearch"),
+        ANSWER_COMMENTS("com.prasanna.stacknetwork.answerComments"),
         TAGS_FAQ("com.prasanna.stacknetwork.tagsFaq");
         private final String action;
 

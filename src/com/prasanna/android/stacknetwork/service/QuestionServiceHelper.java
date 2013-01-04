@@ -112,7 +112,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return questionBody;
     }
 
-    public ArrayList<Comment> getComments(String parent, long parentId)
+    public ArrayList<Comment> getComments(String parent, String parentId)
     {
         ArrayList<Comment> comments = null;
         String restEndPoint = parent + "/" + parentId + "/comments";
@@ -130,6 +130,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                     Comment comment = new Comment();
                     JSONObject jsonObject = jsonArray.getJSONObject(count);
                     comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
+                    comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
                     comment.body = jsonObject.getString(JsonFields.Comment.BODY);
                     comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
                     comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);

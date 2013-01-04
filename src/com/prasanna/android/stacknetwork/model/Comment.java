@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 public class Comment extends StackXItem implements Serializable
 {
-
     private static final long serialVersionUID = 4507419037482371574L;
 
+    public long post_id;
 }

@@ -54,6 +54,13 @@ public class QuestionFragment extends Fragment
     private ContextMenu menu;
     private boolean ctxMenuSetup = false;
 
+    public static QuestionFragment newFragment()
+    {
+	QuestionFragment questionFragment = new QuestionFragment();
+	questionFragment.setRetainInstance(true);
+	return questionFragment;
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
