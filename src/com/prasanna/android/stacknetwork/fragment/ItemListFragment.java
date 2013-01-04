@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ListFragment;
 import android.content.Intent;
@@ -48,17 +49,18 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackX
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 
-public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements OnScrollListener,
-                HttpErrorListener, StackXRestQueryResultReceiver
+public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements
+        OnScrollListener, HttpErrorListener, StackXRestQueryResultReceiver
 {
     private boolean serviceRunning = false;
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
     private ProgressBar progressBar;
 
     protected RestQueryResultReceiver resultReceiver;
-    protected StackXPage<T> currentPageObject;
+    protected List<StackXPage<T>> pages;
     protected LinearLayout itemsContainer;
     protected ItemListAdapter<T> itemListAdapter;
+    private StackXPage<T> currentPageObject;
 
     protected abstract String getReceiverExtraName();
 
@@ -68,171 +70,192 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     public interface OnContextItemSelectedListener<T>
     {
-	boolean onContextItemSelected(MenuItem item, T stackXItem);
+        boolean onContextItemSelected(MenuItem item, T stackXItem);
     }
 
     protected void registerHttpErrorReceiver()
     {
-	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
+        httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
 
-	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
+        IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.getAction());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
     }
 
     protected boolean isServiceRunning()
     {
-	return serviceRunning;
+        return serviceRunning;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	Log.d(getLogTag(), "onCreate");
-	
-	super.onCreate(savedInstanceState);
+        Log.d(getLogTag(), "onCreate");
 
-	resultReceiver = new RestQueryResultReceiver(new Handler());
-	resultReceiver.setReceiver(this);
+        super.onCreate(savedInstanceState);
 
-	registerHttpErrorReceiver();
+        resultReceiver = new RestQueryResultReceiver(new Handler());
+        resultReceiver.setReceiver(this);
+
+        if (pages == null)
+            pages = new ArrayList<StackXPage<T>>();
+
+        registerHttpErrorReceiver();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        Log.d(getLogTag(), "onActivityCreated");
+
+        super.onActivityCreated(savedInstanceState);
+
+        getListView().addFooterView(getProgressBar());
+        setListAdapter(itemListAdapter);
+        getListView().setOnScrollListener(this);
     }
 
     @Override
     public void onStop()
     {
-	Log.d(getLogTag(), "onDestroy");
+        Log.d(getLogTag(), "onDestroy");
 
-	super.onStop();
+        super.onStop();
 
-	resultReceiver.setReceiver(null);
+        resultReceiver.setReceiver(null);
 
-	unregisterReceivers();
+        unregisterReceivers();
     }
 
     protected void unregisterReceivers()
     {
-	try
-	{
-	    Log.d(getLogTag(), "unregistering receivers");
-	    getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
-	}
-	catch (IllegalArgumentException e)
-	{
-	    Log.d(getLogTag(), e.getMessage());
-	}
+        try
+        {
+            Log.d(getLogTag(), "unregistering receivers");
+            getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.d(getLogTag(), e.getMessage());
+        }
     }
 
     protected void showProgressBar()
     {
-	getProgressBar().setVisibility(View.VISIBLE);
+        getProgressBar().setVisibility(View.VISIBLE);
     }
 
     protected void dismissProgressBar()
     {
-	getProgressBar().setVisibility(View.GONE);
+        getProgressBar().setVisibility(View.GONE);
     }
 
     protected Intent getIntentForService(Class<?> clazz, String action)
     {
-	if (!serviceRunning)
-	{
-	    Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
-	    intentForService.setAction(action);
-	    return intentForService;
-	}
+        if (!serviceRunning)
+        {
+            Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
+            intentForService.setAction(action);
+            return intentForService;
+        }
 
-	return null;
+        return null;
     }
 
     protected void startService(Intent intent)
     {
-	if (!isServiceRunning() && intent != null)
-	    getActivity().startService(intent);
+        if (!isServiceRunning() && intent != null)
+            getActivity().startService(intent);
     }
 
     protected void stopService(Intent intent)
     {
-	if (intent != null)
-	{
-	    getActivity().stopService(intent);
-	    serviceRunning = false;
-	}
+        if (intent != null)
+        {
+            getActivity().stopService(intent);
+            serviceRunning = false;
+        }
     }
 
     protected ViewGroup getParentLayout()
     {
-	return itemsContainer;
+        return itemsContainer;
     }
 
     public void refresh()
     {
-	showProgressBar();
-	startIntentService();
+        showProgressBar();
+        startIntentService();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-	serviceRunning = false;
+        serviceRunning = false;
 
-	currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
-	displayItems(currentPageObject.items);
+        currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
+        if (currentPageObject != null)
+        {
+            pages.add(currentPageObject);
+            displayItems(currentPageObject.items);
+        }
     }
 
     protected void displayItems(ArrayList<T> newItems)
     {
-	dismissProgressBar();
+        dismissProgressBar();
 
-	if (itemListAdapter != null && newItems != null)
-	{
-	    Log.d(getLogTag(), "Updating list adpater with questions");
-	    itemListAdapter.addAll(newItems);
-	}
+        if (itemListAdapter != null && newItems != null)
+        {
+            Log.d(getLogTag(), "Updating list adpater with questions");
+            itemListAdapter.addAll(newItems);
+        }
     }
 
     @Override
     public void onHttpError(int code, String text)
     {
-	Log.d(getLogTag(), "Http error " + code + " " + text);
+        Log.d(getLogTag(), "Http error " + code + " " + text);
 
-	dismissProgressBar();
-	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
-	                null);
-	TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
-	textView.setText(code + " " + text);
+        dismissProgressBar();
+        RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater()
+                .inflate(R.layout.error, null);
+        TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
+        textView.setText(code + " " + text);
 
-	getParentLayout().removeAllViews();
-	getParentLayout().addView(errorDisplayLayout);
+        getParentLayout().removeAllViews();
+        getParentLayout().addView(errorDisplayLayout);
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+            int totalItemCount)
     {
-	if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
-	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
-	{
-	    Log.d(getLogTag(), "onScroll reached bottom threshold. Fetching more questions");
+        if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
+                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
+        {
+            Log.d(getLogTag(), "onScroll reached bottom threshold. Fetching more questions");
 
-	    if (currentPageObject != null && currentPageObject.hasMore)
-	    {
-		showProgressBar();
-		startIntentService();
-	    }
-	}
+            if (currentPageObject != null && currentPageObject.hasMore)
+            {
+                showProgressBar();
+                startIntentService();
+            }
+        }
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState)
     {
-	Log.v(getLogTag(), "onScrollStateChanged");
+        Log.v(getLogTag(), "onScrollStateChanged");
     }
 
     protected ProgressBar getProgressBar()
     {
-	if (progressBar == null)
-	    progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
-	return progressBar;
+        if (progressBar == null)
+            progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(
+                    R.layout.progress_bar, null);
+        return progressBar;
     }
 }

@@ -48,11 +48,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
         super.onActivityCreated(savedInstanceState);
 
-        getListView().addFooterView(getProgressBar());
-        setListAdapter(itemListAdapter);
-        getListView().setOnScrollListener(this);
-
-        if (comments != null && !comments.isEmpty()) itemListAdapter.addAll(comments);
+        if (comments != null && !comments.isEmpty())
+            itemListAdapter.addAll(comments);
     }
 
     @Override

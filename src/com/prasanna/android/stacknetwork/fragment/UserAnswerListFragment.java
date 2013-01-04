@@ -71,7 +71,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
         return itemsContainer;
     }
 
-
     @Override
     protected void startIntentService()
     {
@@ -84,7 +83,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
                 getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         intent.putExtra(StringConstants.PAGE, page++);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        
+
         startService(intent);
     }
 
@@ -107,13 +106,9 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        super.onActivityCreated(savedInstanceState);
-
         registerForContextMenu(getListView());
 
-        getListView().addFooterView(getProgressBar());
-        setListAdapter(itemListAdapter);
-        getListView().setOnScrollListener(this);
+        super.onActivityCreated(savedInstanceState);
 
         startIntentService();
     }
