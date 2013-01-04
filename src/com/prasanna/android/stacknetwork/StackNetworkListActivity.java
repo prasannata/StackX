@@ -23,11 +23,9 @@ import java.util.ArrayList;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -38,40 +36,28 @@ import com.prasanna.android.http.HttpErrorBroadcastReceiver;
 import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class StackNetworkListActivity extends ListActivity implements HttpErrorListener
+public class StackNetworkListActivity extends ListActivity implements HttpErrorListener,
+        StackXRestQueryResultReceiver
 {
     private static final String TAG = StackNetworkListActivity.class.getSimpleName();
 
     private ProgressDialog progressDialog;
 
-    private Intent sitesIntent = null;
+    private Intent intent = null;
 
     private ArrayList<Site> sites;
 
     private SiteListAdapter siteListAdapter;
 
-    // private Button reorderDoneToggleButton;
-    //
-    // private Button cancelReorderButton;
-    //
-    // private boolean reorder = false;
-    //
-    // private TextView dragDropHint;
-
-    private BroadcastReceiver receiver = new BroadcastReceiver()
-    {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            processReceiverIntent(context, intent);
-        }
-    };
+    private RestQueryResultReceiver receiver;
 
     private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
 
@@ -82,7 +68,9 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sitelist);
 
-        // setupSiteSorting();
+        receiver = new RestQueryResultReceiver(new Handler());
+        receiver.setReceiver(this);
+
         httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
 
         Object lastSavedInstance = null;
@@ -111,47 +99,6 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
         }
     }
 
-    //
-    // private void setupSiteSorting()
-    // {
-    // reorderDoneToggleButton = (Button) findViewById(R.id.reorderDoneToggle);
-    // dragDropHint = (TextView) findViewById(R.id.dragAndDropHint);
-    // cancelReorderButton = (Button) findViewById(R.id.cancelSiteListReorder);
-    //
-    // reorderDoneToggleButton.setOnClickListener(new View.OnClickListener()
-    // {
-    // @Override
-    // public void onClick(View v)
-    // {
-    // if (siteListAdapter != null)
-    // {
-    // reorder = siteListAdapter.toggleReorderFlag();
-    // toggleReorderDoneButtonText();
-    // }
-    // }
-    // });
-    //
-    // cancelReorderButton.setOnClickListener(new View.OnClickListener()
-    // {
-    //
-    // @Override
-    // public void onClick(View v)
-    // {
-    // Log.d(TAG, "Cancelling ");
-    //
-    // if (siteListAdapter != null)
-    // {
-    // // Poor to just overwrite from cache.
-    // siteListAdapter.overwriteDataset(CacheUtils.fetchSiteListFromCache(getApplicationContext()));
-    //
-    // reorder = siteListAdapter.toggleReorderFlag();
-    // v.setVisibility(View.INVISIBLE);
-    // toggleReorderDoneButtonText();
-    // }
-    // }
-    // });
-    // }
-
     /*
      * (non-Javadoc)
      * 
@@ -176,14 +123,13 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
 
     private void stopServiceAndUnregisterReceiver()
     {
-        if (sitesIntent != null)
+        if (intent != null)
         {
-            stopService(sitesIntent);
+            stopService(intent);
         }
 
         try
         {
-            unregisterReceiver(receiver);
             unregisterReceiver(httpErrorBroadcastReceiver);
         }
         catch (IllegalArgumentException e)
@@ -212,42 +158,17 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
         progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
                 getString(R.string.loadingSites));
 
-        registerReceiver();
-
         startIntentService();
     }
 
     private void startIntentService()
     {
-        sitesIntent = new Intent(this, UserIntentService.class);
-        sitesIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
-        sitesIntent.putExtra(StringConstants.AUTHENTICATED,
+        intent = new Intent(this, UserIntentService.class);
+        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
+        intent.putExtra(StringConstants.AUTHENTICATED,
                 AppUtils.inAuthenticatedRealm(getApplicationContext()));
-        startService(sitesIntent);
-    }
-
-    private void registerReceiver()
-    {
-        IntentFilter filter = new IntentFilter(StringConstants.SITES);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void processReceiverIntent(Context context, Intent intent)
-    {
-        if (progressDialog != null)
-        {
-            progressDialog.dismiss();
-        }
-
-        sites = (ArrayList<Site>) intent.getSerializableExtra(StringConstants.SITES);
-
-        if (sites != null)
-        {
-            SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
-            updateView(sites);
-        }
+        intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+        startService(intent);
     }
 
     private void updateView(ArrayList<Site> sites)
@@ -258,22 +179,6 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
             setListAdapter(siteListAdapter);
         }
     }
-
-    // private void toggleReorderDoneButtonText()
-    // {
-    // if (siteListAdapter.wasReordered() == true)
-    // {
-    // Log.d(TAG, "Persisting change to cache");
-    // CacheUtils.cacheSiteList(getApplicationContext(), (ArrayList<Site>)
-    // siteListAdapter.getSites());
-    // }
-    //
-    // dragDropHint.setVisibility(reorder ? View.VISIBLE : View.INVISIBLE);
-    // cancelReorderButton.setVisibility(reorder ? View.VISIBLE :
-    // View.INVISIBLE);
-    // reorderDoneToggleButton.setBackgroundResource(reorder ?
-    // R.drawable.accept_white : R.drawable.sort_white);
-    // }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
@@ -290,5 +195,25 @@ public class StackNetworkListActivity extends ListActivity implements HttpErrorL
         TextView textView = (TextView) relativeLayout.findViewById(R.id.errorMsg);
 
         textView.setText(code + " " + text);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData)
+    {
+        // TODO Auto-generated method stub
+        if (progressDialog != null)
+        {
+            progressDialog.dismiss();
+        }
+
+        sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
+
+        if (sites != null)
+        {
+            SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
+            updateView(sites);
+        }
+
     }
 }
