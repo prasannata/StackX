@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright (C) 2012 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -15,15 +15,19 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
-public class Comment extends StackXItem implements Serializable
+public class StackXPage<T extends StackXItem> implements Serializable
 {
+    private static final long serialVersionUID = 7047575779061924898L;
 
-    private static final long serialVersionUID = 4507419037482371574L;
-
+    public ArrayList<T> items;
+    public boolean hasMore = false;
+    public int quota_remaining = 0;
+    public int quota_max = 0;
 }

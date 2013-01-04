@@ -22,8 +22,11 @@ package com.prasanna.android.stacknetwork.utils;
 public class JsonFields
 {
     public static final String ITEMS = "items";
+    public static final String QUOTA_REMAINING = "quota_remaining";
+    public static final String QUOTA_MAX = "quota_max";
+    public static final String HAS_MORE = "has_more";
 
-    public static class BaseUserContribFields
+    public static class CommonFields
     {
         public static final String SCORE = "score";
         public static final String OWNER = "owner";
@@ -33,7 +36,7 @@ public class JsonFields
         public static final String LINK = "link";
     }
 
-    public static class Question extends BaseUserContribFields
+    public static class Question extends CommonFields
     {
         public static final String QUESTION_ID = "question_id";
         public static final String IS_ANSWERED = "is_answered";
@@ -43,14 +46,14 @@ public class JsonFields
         public static final String ACCEPTED_ANSWER_ID = "accepted_answer_id";
     }
 
-    public static class Answer extends BaseUserContribFields
+    public static class Answer extends CommonFields
     {
         public static final String ANSWER_ID = "answer_id";
         public static final String QUESTION_ID = "question_id";
         public static final String IS_ACCEPTED = "is_accepted";
     }
 
-    public static class Comment extends BaseUserContribFields
+    public static class Comment extends CommonFields
     {
         public static final String COMMENT_ID = "comment_id";
     }
@@ -65,7 +68,7 @@ public class JsonFields
         public static final String ICON_URL = "icon_url";
     }
 
-    public static class User
+    public static class User extends CommonFields
     {
         public static final String USER_ID = "user_id";
         public static final String ACCOUNT_ID = "user_id";
@@ -98,7 +101,7 @@ public class JsonFields
         public static final String BRONZE = "bronze";
     }
 
-    public static class InboxItem extends BaseUserContribFields
+    public static class InboxItem extends CommonFields
     {
         public static final String QUESTION_ID = "question_id";
         public static final String ANSWER_ID = "answer_id";

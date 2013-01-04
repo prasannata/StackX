@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -34,137 +33,130 @@ import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItem
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
-import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity implements
-                OnContextItemSelectedListener<BaseStackExchangeItem>
+        OnContextItemSelectedListener<StackXItem>
 {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
-    private static final String[] PAGES = { "Profile", "Questions", "Answers" };
+    private static final String[] PAGES =
+    { "Profile", "Questions", "Answers" };
 
     private ProfileViewPageAdapter profileViewPageAdapter;
     private ViewPager viewPager;
 
     public static class ProfileViewPageAdapter extends FragmentPagerAdapter
     {
-	public ProfileViewPageAdapter(FragmentManager fm)
-	{
-	    super(fm);
-	}
+        public ProfileViewPageAdapter(FragmentManager fm)
+        {
+            super(fm);
+        }
 
-	@Override
-	public int getCount()
-	{
-	    return PAGES.length;
-	}
+        @Override
+        public int getCount()
+        {
+            return PAGES.length;
+        }
 
-	@Override
-	public CharSequence getPageTitle(int position)
-	{
-	    return PAGES[position];
-	}
+        @Override
+        public CharSequence getPageTitle(int position)
+        {
+            return PAGES[position];
+        }
 
-	@Override
-	public Fragment getItem(int position)
-	{
-	    switch (position)
-	    {
-		case 0:
-		    return new UserProfileFragment();
-		case 1:
-		    return new UserQuestionListFragment();
-		case 2:
-		    return new UserAnswerListFragment();
+        @Override
+        public Fragment getItem(int position)
+        {
+            switch (position)
+            {
+                case 0:
+                    return new UserProfileFragment();
+                case 1:
+                    return new UserQuestionListFragment();
+                case 2:
+                    return new UserAnswerListFragment();
 
-		default:
-		    return null;
-	    }
-	}
+                default:
+                    return null;
+            }
+        }
     }
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.viewpager_title_indicator);
+        setContentView(R.layout.viewpager_title_indicator);
 
-	profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
+        profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
 
-	viewPager = (ViewPager) findViewById(R.id.viewPager);
-	viewPager.setAdapter(profileViewPageAdapter);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setAdapter(profileViewPageAdapter);
 
-	TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
-	indicator.setViewPager(viewPager);
+        TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
+        indicator.setViewPager(viewPager);
     }
 
     @Override
     public void refresh()
     {
-	// TODO: Find a way to inform the fragment within current selected tab
-	// to refresh
+        // TODO: Find a way to inform the fragment within current selected tab
+        // to refresh
     }
 
     @Override
     public Context getCurrentContext()
     {
-	return UserProfileActivity.this;
+        return UserProfileActivity.this;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    public boolean onContextItemSelected(MenuItem item, StackXItem stackXItem)
     {
-	boolean ret = super.onCreateOptionsMenu(menu);
-	menu.removeItem(R.id.menu_my_profile);
-	return ret & true;
-    }
+        if (item.getGroupId() == R.id.qContextMenuGroup)
+        {
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item, BaseStackExchangeItem stackXItem)
-    {
-	if (item.getGroupId() == R.id.qContextMenuGroup)
-	{
-	    
-	    Log.d(TAG, "Context item selected: " + item.getTitle());
+            Log.d(TAG, "Context item selected: " + item.getTitle());
 
-	    switch (item.getItemId())
-	    {
-		case R.id.q_ctx_comments:
-		    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
-		    return true;
-		case R.id.q_ctx_menu_user_profile:
-		    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-		    userProfileIntent.putExtra(StringConstants.USER_ID, stackXItem.owner.id);
-		    startActivity(userProfileIntent);
-		case R.id.q_ctx_related:
-		    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-		    questionsIntent.setAction(StringConstants.RELATED);
-		    questionsIntent.putExtra(StringConstants.QUESTION_ID, stackXItem.id);
-		    startActivity(questionsIntent);
-		    return true;
-		case R.id.q_ctx_menu_email:
-		    IntentUtils.createEmailIntent(stackXItem.title, stackXItem.link);
-		    return true;
-		default:
-		    return false;
-	    }
-	}
-	else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
-	{
-	    Log.d(TAG, "Tag selected: " + item.getTitle());
-	    
-	    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-	    questionsIntent.setAction(StringConstants.TAG);
-	    questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
-	    startActivity(questionsIntent);
+            switch (item.getItemId())
+            {
+                case R.id.q_ctx_comments:
+                    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+                    return true;
+                case R.id.q_ctx_menu_user_profile:
+                    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
+                    userProfileIntent.putExtra(StringConstants.USER_ID, stackXItem.owner.id);
+                    startActivity(userProfileIntent);
+                case R.id.q_ctx_related:
+                    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+                    questionsIntent.setAction(StringConstants.RELATED);
+                    questionsIntent.putExtra(StringConstants.QUESTION_ID, stackXItem.id);
+                    startActivity(questionsIntent);
+                    return true;
+                case R.id.q_ctx_menu_email:
+                    IntentUtils.createEmailIntent(stackXItem.title, stackXItem.link);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
+        {
+            Log.d(TAG, "Tag selected: " + item.getTitle());
 
-	    return true;
-	}
+            Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+            questionsIntent.setAction(StringConstants.TAG);
+            questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
+            startActivity(questionsIntent);
 
-	return false;
+            return true;
+        }
+
+        return false;
     }
 
 }

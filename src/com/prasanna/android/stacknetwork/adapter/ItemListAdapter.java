@@ -26,9 +26,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
-import com.prasanna.android.stacknetwork.model.BaseStackExchangeItem;
+import com.prasanna.android.stacknetwork.model.StackXItem;
 
-public class ItemListAdapter<T extends BaseStackExchangeItem> extends ArrayAdapter<T>
+public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
 {
     private final ArrayList<T> items;
     private final ListItemView<T> listItemView;

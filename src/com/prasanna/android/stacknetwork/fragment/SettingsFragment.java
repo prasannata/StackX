@@ -50,7 +50,8 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 
-public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
+public class SettingsFragment extends PreferenceFragment implements
+        OnSharedPreferenceChangeListener
 {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
@@ -76,244 +77,250 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     public static int getInboxRefreshInterval(Context context)
     {
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	return Integer.parseInt(sharedPreferences.getString(KEY_PREF_INBOX_REFRESH_INTERVAL, "-1"));
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return Integer.parseInt(sharedPreferences.getString(KEY_PREF_INBOX_REFRESH_INTERVAL, "-1"));
     }
 
     public static boolean isNotificationEnabled(Context context)
     {
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	return sharedPreferences.getBoolean(KEY_PREF_INBOX_NOTIFICATION, false);
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(KEY_PREF_INBOX_NOTIFICATION, false);
     }
 
     public static boolean isVibrateEnabled(Context context)
     {
-	if (!isNotificationEnabled(context))
-	    return false;
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
+        if (!isNotificationEnabled(context)) return false;
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
     }
 
     public static Uri getRingtone(Context context)
     {
-	if (!isNotificationEnabled(context))
-	    return null;
+        if (!isNotificationEnabled(context)) return null;
 
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	return Uri.parse(sharedPreferences.getString(KEY_PREF_NOTIF_RINGTONE, ""));
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return Uri.parse(sharedPreferences.getString(KEY_PREF_NOTIF_RINGTONE, ""));
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	addPreferencesFromResource(R.xml.preferences);
+        addPreferencesFromResource(R.xml.preferences);
 
-	setupDefaultSitePreference();
+        setupDefaultSitePreference();
 
-	setupAccountPreference();
+        setupAccountPreference();
 
-	setupInboxPreference();
+        setupInboxPreference();
 
-	setupStoragePreferences();
+        setupStoragePreferences();
     }
 
     private void setupStoragePreferences()
     {
-	setupCacheClearPreference();
+        setupCacheClearPreference();
 
-	setupCacheMaxSizePreference();
+        setupCacheMaxSizePreference();
     }
 
     private void setupCacheClearPreference()
     {
-	clearCacheDialogPreference = (DialogPreferenceImpl) findPreference(KEY_PREF_CLEAR_CACHE);
-	clearCacheDialogPreference.setOnClickListener(new DialogInterface.OnClickListener()
-	{
-	    @Override
-	    public void onClick(DialogInterface dialog, int which)
-	    {
-		if (DialogInterface.BUTTON_POSITIVE == which)
-		{
-		    SharedPreferencesUtil.deleteAllQuestions(getActivity().getCacheDir());
-		    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
-		}
-	    }
-	});
+        clearCacheDialogPreference = (DialogPreferenceImpl) findPreference(KEY_PREF_CLEAR_CACHE);
+        clearCacheDialogPreference.setOnClickListener(new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                if (DialogInterface.BUTTON_POSITIVE == which)
+                {
+                    SharedPreferencesUtil.deleteAllQuestions(getActivity().getCacheDir());
+                    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void setupAccountPreference()
     {
-	accountActionPref = (ListPreference) findPreference(KEY_PREF_ACCOUNT_ACTION);
-	accountActionPref.setEntryValues(new String[0]);
-	accountActionPref.setEntries(new String[0]);
+        accountActionPref = (ListPreference) findPreference(KEY_PREF_ACCOUNT_ACTION);
+        accountActionPref.setEntryValues(new String[0]);
+        accountActionPref.setEntries(new String[0]);
 
-	if (AppUtils.inAuthenticatedRealm(getActivity()))
-	{
-	    setupLogoutPreference();
-	}
-	else
-	{
-	    setupLoginPreference();
-	}
+        if (AppUtils.inAuthenticatedRealm(getActivity()))
+        {
+            setupLogoutPreference();
+        }
+        else
+        {
+            setupLoginPreference();
+        }
     }
 
     private void setupLoginPreference()
     {
-	accountActionPref.setTitle(getString(R.string.login));
-	accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-	{
-	    @Override
-	    public boolean onPreferenceClick(Preference preference)
-	    {
-		accountActionPref.getDialog().dismiss();
+        accountActionPref.setTitle(getString(R.string.login));
+        accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                accountActionPref.getDialog().dismiss();
 
-		Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
-		SharedPreferencesUtil.clearDefaultSite(getActivity());
-		startActivity(oAuthIntent);
-		return true;
-	    }
-	});
+                Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
+                SharedPreferencesUtil.clearDefaultSite(getActivity());
+                SharedPreferencesUtil.clearSiteListCache(getActivity().getCacheDir());
+                startActivity(oAuthIntent);
+                return true;
+            }
+        });
     }
 
     private void setupLogoutPreference()
     {
-	accountActionPref.setTitle(getString(R.string.logout));
-	accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-	{
-	    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
-	    {
-		@Override
-		public void onClick(DialogInterface dialog, int which)
-		{
-		    switch (which)
-		    {
-			case DialogInterface.BUTTON_POSITIVE:
-			    Intent logoutIntent = new Intent(getActivity(), LogoutActivity.class);
-			    SharedPreferencesUtil.clearDefaultSite(getActivity());
-			    logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			    logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			    startActivity(logoutIntent);
-			    break;
+        accountActionPref.setTitle(getString(R.string.logout));
+        accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    switch (which)
+                    {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Intent logoutIntent = new Intent(getActivity(), LogoutActivity.class);
+                            SharedPreferencesUtil.clearDefaultSite(getActivity());
+                            logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(logoutIntent);
+                            break;
 
-			case DialogInterface.BUTTON_NEGATIVE:
-			    dialog.dismiss();
-			    break;
-		    }
-		}
-	    };
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            dialog.dismiss();
+                            break;
+                    }
+                }
+            };
 
-	    @Override
-	    public boolean onPreferenceClick(Preference preference)
-	    {
-		accountActionPref.getDialog().dismiss();
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                accountActionPref.getDialog().dismiss();
 
-		AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg,
-		                dialogClickListener);
-		yesNoDialog.show();
+                AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(),
+                        R.string.logoutMsg, dialogClickListener);
+                yesNoDialog.show();
 
-		return true;
-	    }
-	});
+                return true;
+            }
+        });
     }
 
     private void setupDefaultSitePreference()
     {
-	defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
-	String entry = (String) defaultSitePref.getValue();
-	defaultSitePref.setEntryValues(new String[0]);
-	defaultSitePref.setEntries(new String[0]);
-	defaultSitePref.setSummary(entry != null ? entry : "None");
+        defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
+        String entry = (String) defaultSitePref.getValue();
+        defaultSitePref.setEntryValues(new String[0]);
+        defaultSitePref.setEntries(new String[0]);
+        defaultSitePref.setSummary(entry != null ? entry : "None");
 
-	defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-	{
-	    @Override
-	    public boolean onPreferenceClick(Preference preference)
-	    {
-		defaultSitePref.getDialog().dismiss();
+        defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                defaultSitePref.getDialog().dismiss();
 
-		startActivity(new Intent(getActivity(), StackNetworkListActivity.class));
-		return true;
-	    }
-	});
+                startActivity(new Intent(getActivity(), StackNetworkListActivity.class));
+                return true;
+            }
+        });
     }
 
     private void setupInboxPreference()
     {
-	inboxPrefCategory = (PreferenceCategory) findPreference(KEY_PREF_INBOX);
-	inboxPrefCategory.setEnabled(AppUtils.inAuthenticatedRealm(getActivity()));
-	refreshIntervalPref = (ListPreference) findPreference(KEY_PREF_INBOX_REFRESH_INTERVAL);
-	refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
+        inboxPrefCategory = (PreferenceCategory) findPreference(KEY_PREF_INBOX);
+        inboxPrefCategory.setEnabled(AppUtils.inAuthenticatedRealm(getActivity()));
+        refreshIntervalPref = (ListPreference) findPreference(KEY_PREF_INBOX_REFRESH_INTERVAL);
+        refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
 
-	setupRingtonePreference();
+        setupRingtonePreference();
     }
 
     private void setupCacheMaxSizePreference()
     {
-	String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity().getCacheDir());
+        String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity()
+                .getCacheDir());
 
-	cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
-	cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
+        cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
+        cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
     }
 
     private String getCacheSizeSummary(String currentCacheSize)
     {
-	return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: " + currentCacheSize;
+        return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: "
+                + currentCacheSize;
     }
 
     private void setupRingtonePreference()
     {
-	notifRingTonePref = (RingtonePreference) findPreference(KEY_PREF_NOTIF_RINGTONE);
-	notifRingTonePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
-	{
-	    @Override
-	    public boolean onPreferenceChange(Preference preference, Object newValue)
-	    {
-		setRingtoneSummary(Uri.parse((String) newValue));
-		return true;
-	    }
-	});
+        notifRingTonePref = (RingtonePreference) findPreference(KEY_PREF_NOTIF_RINGTONE);
+        notifRingTonePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue)
+            {
+                setRingtoneSummary(Uri.parse((String) newValue));
+                return true;
+            }
+        });
 
-	Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
-	                DEFAULT_RINGTONE));
-	setRingtoneSummary(ringtoneUri);
+        Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(
+                KEY_PREF_NOTIF_RINGTONE, DEFAULT_RINGTONE));
+        setRingtoneSummary(ringtoneUri);
     }
 
     @Override
     public void onResume()
     {
-	super.onResume();
-	getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
     public void onPause()
     {
-	super.onPause();
-	getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(
+                this);
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
-	Log.d(TAG, "Preference changed for " + key);
+        Log.d(TAG, "Preference changed for " + key);
 
-	if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
-	{
-	    refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
-	    AlarmUtils.rescheduleInboxRefreshAlarm(getActivity());
-	}
-	else if (key.equals(KEY_PREF_CACHE_MAX_SIZE))
-	{
-	    String cacheSize = sharedPreferences.getString(key, "");
-	    findPreference(KEY_PREF_CACHE_MAX_SIZE).setSummary(getCacheSizeSummary(cacheSize));
-	}
+        if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
+        {
+            refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
+            AlarmUtils.rescheduleInboxRefreshAlarm(getActivity());
+        }
+        else if (key.equals(KEY_PREF_CACHE_MAX_SIZE))
+        {
+            String cacheSize = sharedPreferences.getString(key, "");
+            findPreference(KEY_PREF_CACHE_MAX_SIZE).setSummary(getCacheSizeSummary(cacheSize));
+        }
     }
 
     private void setRingtoneSummary(Uri uri)
     {
-	Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), uri);
-	notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
+        Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), uri);
+        notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
     }
 }

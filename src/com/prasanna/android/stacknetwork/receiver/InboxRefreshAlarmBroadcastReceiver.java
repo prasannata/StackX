@@ -18,23 +18,25 @@ public class InboxRefreshAlarmBroadcastReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-	Log.d(TAG, "Alarm receiver invoked");
+        Log.d(TAG, "Alarm receiver invoked");
 
-	checkForNewMessages(context);
+        checkForNewMessages(context);
     }
 
     private void checkForNewMessages(Context context)
     {
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-	if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-	{
-	    Log.d(TAG, "Checking inbox for updates");
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+        {
+            Log.d(TAG, "Checking inbox for updates");
 
-	    Intent fetchInboxIntent = new Intent(context, UserIntentService.class);
-	    fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_UNREAD_INBOX);
-	    fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), Boolean.TRUE);
+            Intent fetchInboxIntent = new Intent(context, UserIntentService.class);
+            fetchInboxIntent.putExtra(StringConstants.ACTION,
+                    UserIntentService.GET_USER_UNREAD_INBOX);
+            fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), Boolean.TRUE);
 
-	    context.startService(fetchInboxIntent);
-	}
+            context.startService(fetchInboxIntent);
+        }
     }
 }

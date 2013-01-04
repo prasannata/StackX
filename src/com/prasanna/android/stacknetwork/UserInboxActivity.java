@@ -66,182 +66,187 @@ public class UserInboxActivity extends AbstractUserActionBarActivity
 
     private BroadcastReceiver receiver = new BroadcastReceiver()
     {
-	@SuppressWarnings("unchecked")
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{
-	    if (loadingProgressView != null)
-	    {
-		loadingProgressView.setVisibility(View.GONE);
-		loadingProgressView = null;
-	    }
+        @SuppressWarnings("unchecked")
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if (loadingProgressView != null)
+            {
+                loadingProgressView.setVisibility(View.GONE);
+                loadingProgressView = null;
+            }
 
-	    if (intent.getSerializableExtra(UserIntentAction.INBOX.getAction()) != null)
-	    {
-		inboxItems.addAll((ArrayList<InboxItem>) intent.getSerializableExtra(UserIntentAction.INBOX.getAction()));
+            if (intent.getSerializableExtra(UserIntentAction.INBOX.getAction()) != null)
+            {
+                inboxItems.addAll((ArrayList<InboxItem>) intent
+                        .getSerializableExtra(UserIntentAction.INBOX.getAction()));
 
-		displayInbox();
-	    }
-	}
+                displayInbox();
+            }
+        }
     };
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	questionsScroll = (ScrollViewWithNotifier) getLayoutInflater().inflate(R.layout.scroll_linear_layout, null);
-	questionsDisplayList = (LinearLayout) questionsScroll.findViewById(R.id.ll_in_scroller);
+        questionsScroll = (ScrollViewWithNotifier) getLayoutInflater().inflate(
+                R.layout.scroll_linear_layout, null);
+        questionsDisplayList = (LinearLayout) questionsScroll.findViewById(R.id.ll_in_scroller);
 
-	questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-	{
-	    @Override
-	    public void onScrollToBottom(View view)
-	    {
-		if (loadingProgressView == null)
-		{
-		    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(R.layout.loading_progress, null);
-		    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-			            LayoutParams.WRAP_CONTENT);
-		    layoutParams.setMargins(0, 15, 0, 15);
+        questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
+        {
+            @Override
+            public void onScrollToBottom(View view)
+            {
+                if (loadingProgressView == null)
+                {
+                    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(
+                            R.layout.loading_progress, null);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                            LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                    layoutParams.setMargins(0, 15, 0, 15);
 
-		    questionsDisplayList.addView(loadingProgressView, layoutParams);
-		}
+                    questionsDisplayList.addView(loadingProgressView, layoutParams);
+                }
 
-		startIntentService();
-	    }
-	});
+                startIntentService();
+            }
+        });
 
-	setContentView(questionsScroll);
+        setContentView(questionsScroll);
 
-	registerReceiver();
+        registerReceiver();
 
-	startIntentService();
+        startIntentService();
     }
 
     @Override
     protected void onDestroy()
     {
-	super.onDestroy();
-	stopServiceAndUnregisterReceiver();
+        super.onDestroy();
+        stopServiceAndUnregisterReceiver();
     }
 
     @Override
     public void onStop()
     {
-	super.onStop();
+        super.onStop();
 
-	stopServiceAndUnregisterReceiver();
+        stopServiceAndUnregisterReceiver();
     }
 
     private void startIntentService()
     {
-	fetchInboxIntent = new Intent(this, UserIntentService.class);
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+        {
+            fetchInboxIntent = new Intent(this, UserIntentService.class);
+            fetchInboxIntent.setAction(UserIntentAction.INBOX.getAction());
+            fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
+            fetchInboxIntent.putExtra(StringConstants.PAGE, ++page);
 
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-	{
-	    fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
-	    fetchInboxIntent.putExtra(StringConstants.PAGE, ++page);
-
-	    startService(fetchInboxIntent);
-	}
+            startService(fetchInboxIntent);
+        }
     }
 
     private void registerReceiver()
     {
-	IntentFilter filter = new IntentFilter(UserIntentAction.INBOX.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	registerReceiver(receiver, filter);
+        IntentFilter filter = new IntentFilter(UserIntentAction.INBOX.getAction());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver, filter);
     }
 
     private void stopServiceAndUnregisterReceiver()
     {
-	if (fetchInboxIntent != null)
-	{
-	    stopService(fetchInboxIntent);
-	}
+        if (fetchInboxIntent != null)
+        {
+            stopService(fetchInboxIntent);
+        }
 
-	try
-	{
-	    unregisterReceiver(receiver);
-	}
-	catch (IllegalArgumentException e)
-	{
-	    Log.d(TAG, e.getMessage());
-	}
+        try
+        {
+            unregisterReceiver(receiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
     }
 
     private void displayInbox()
     {
-	for (; itemCursor < inboxItems.size(); itemCursor++)
-	{
-	    final RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.user_item_row, null);
-	    final InboxItem inboxItem = inboxItems.get(itemCursor);
+        for (; itemCursor < inboxItems.size(); itemCursor++)
+        {
+            final RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(
+                    R.layout.user_item_row, null);
+            final InboxItem inboxItem = inboxItems.get(itemCursor);
 
-	    TextView textView = (TextView) itemRow.findViewById(R.id.userItemTitle);
-	    textView.setText(Html.fromHtml(inboxItem.title));
+            TextView textView = (TextView) itemRow.findViewById(R.id.userItemTitle);
+            textView.setText(Html.fromHtml(inboxItem.title));
 
-	    textView = (TextView) itemRow.findViewById(R.id.viewItem);
-	    textView.setClickable(true);
-	    textView.setText(R.string.viewMessage);
-	    textView.setOnClickListener(new View.OnClickListener()
-	    {
-		@Override
-		public void onClick(View v)
-		{
-		    Point size = new Point();
-		    getWindowManager().getDefaultDisplay().getSize(size);
+            textView = (TextView) itemRow.findViewById(R.id.viewItem);
+            textView.setClickable(true);
+            textView.setText(R.string.viewMessage);
+            textView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Point size = new Point();
+                    getWindowManager().getDefaultDisplay().getSize(size);
 
-		    PopupBuilder.build(getLayoutInflater(), itemRow, inboxItem, size);
-		}
-	    });
+                    PopupBuilder.build(getLayoutInflater(), itemRow, inboxItem, size);
+                }
+            });
 
-	    textView = (TextView) itemRow.findViewById(R.id.viewQuestion);
-	    textView.setClickable(true);
-	    textView.setOnClickListener(new View.OnClickListener()
-	    {
-		@Override
-		public void onClick(View v)
-		{
-		    Intent intent = new Intent(getApplicationContext(), QuestionActivity.class);
-		    Question question = new Question();
-		    question.id = inboxItem.questionId;
-		    question.title = inboxItem.title;
-		    intent.putExtra(StringConstants.QUESTION, question);
-		    intent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), true);
-		    startActivity(intent);
-		}
-	    });
-	    questionsDisplayList.addView(itemRow, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-		            LayoutParams.WRAP_CONTENT));
-	}
+            textView = (TextView) itemRow.findViewById(R.id.viewQuestion);
+            textView.setClickable(true);
+            textView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent intent = new Intent(getApplicationContext(), QuestionActivity.class);
+                    Question question = new Question();
+                    question.id = inboxItem.questionId;
+                    question.title = inboxItem.title;
+                    intent.putExtra(StringConstants.QUESTION, question);
+                    intent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), true);
+                    startActivity(intent);
+                }
+            });
+            questionsDisplayList.addView(itemRow, new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        }
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-	boolean ret = super.onCreateOptionsMenu(menu);
+        boolean ret = super.onCreateOptionsMenu(menu);
 
-	menu.removeItem(R.id.menu_my_inbox);
+        menu.removeItem(R.id.menu_my_inbox);
 
-	return ret & true;
+        return ret & true;
     }
 
     @Override
     public void refresh()
     {
-	questionsDisplayList.removeAllViews();
-	inboxItems.clear();
-	page = 0;
-	itemCursor = 0;
-	startIntentService();
+        questionsDisplayList.removeAllViews();
+        inboxItems.clear();
+        page = 0;
+        itemCursor = 0;
+        startIntentService();
     }
 
     @Override
     public Context getCurrentContext()
     {
-	return UserInboxActivity.this;
+        return UserInboxActivity.this;
     }
 }
