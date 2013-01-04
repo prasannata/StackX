@@ -62,6 +62,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
     private ViewPager viewPager;
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
+    private boolean serviceRunningForGetAnswers = false;
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
@@ -216,7 +217,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
 
         if (numAnswersDisplayed < question.answerCount && numAnswersDisplayed - position < 2)
         {
-            if (question.answers != null && question.answers.size() == numAnswersDisplayed)
+            if (question.answers != null && question.answers.size() == numAnswersDisplayed
+                    && !serviceRunningForGetAnswers)
             {
                 Log.d(TAG, "Fetch next page of answers");
 
@@ -328,6 +330,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
                 questionFragment.setComments(question.comments);
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
+                serviceRunningForGetAnswers = false;
                 displayAnswers((ArrayList<Answer>) resultData
                         .getSerializable(StringConstants.ANSWERS));
                 hideRefreshActionAnimation();
@@ -348,6 +351,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         intent.putExtra(StringConstants.QUESTION_ID, question.id);
         intent.putExtra(StringConstants.PAGE, getNextPageNumber());
         startService(intent);
+        serviceRunningForGetAnswers = true;
     }
 
     private void displayQuestion(Bundle resultData)
