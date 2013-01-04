@@ -13,4 +13,4 @@ Third Party
 ===========
 
 * ViewPageIndicator, Apache 2.0 license. Refer [here] (https://github.com/JakeWharton/Android-ViewPagerIndicator).
-* HtmlCleaner, BSD License, Refer [here] (http://htmlcleaner.sourceforge.net/license.php) 
+* HtmlCleaner, BSD License. Refer [here] (http://htmlcleaner.sourceforge.net/license.php) 
