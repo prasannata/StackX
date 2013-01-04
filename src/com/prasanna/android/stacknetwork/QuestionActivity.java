@@ -175,7 +175,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	setupViewPager();
 
 	questionFragment = QuestionFragment.newFragment();
-	questionFragment.setRetainInstance(true);
 
 	registerReceivers();
 	prepareIntentAndStartService();
