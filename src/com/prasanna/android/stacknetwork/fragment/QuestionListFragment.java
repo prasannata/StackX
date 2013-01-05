@@ -102,6 +102,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
 	    if (getActivity().getActionBar().getNavigationItemCount() > 0)
 		getActivity().getActionBar().setSelectedNavigationItem(selectedNavigationIndex);
+	    
+	    if(itemListAdapter != null)
+		itemListAdapter.notifyDataSetChanged();
 	}
 
     }

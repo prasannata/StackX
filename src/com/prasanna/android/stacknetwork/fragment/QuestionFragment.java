@@ -83,7 +83,7 @@ public class QuestionFragment extends Fragment
 	    }
 	});
 
-	displayQuestionMetaData();
+	displayQuestion();
 	registerForContextMenu(imageView);
     }
 
@@ -138,7 +138,7 @@ public class QuestionFragment extends Fragment
 	}
     }
 
-    private void displayQuestionMetaData()
+    private void displayQuestion()
     {
 	if (question != null)
 	{
@@ -160,6 +160,11 @@ public class QuestionFragment extends Fragment
 
 	    textView = (TextView) parentLayout.findViewById(R.id.questionViews);
 	    textView.append(AppUtils.formatNumber(question.viewCount));
+	    
+	    if (question.body != null)
+	    {
+		displayBody(question.body);
+	    }
 	}
     }
 
@@ -217,7 +222,11 @@ public class QuestionFragment extends Fragment
     public void setAndDisplay(Question question)
     {
 	setQuestion(question);
-	displayQuestionMetaData();
-	displayBody(question.body);
+	
+	if (parentLayout != null)
+	{
+	    displayQuestion();
+	    displayBody(question.body);
+	}
     }
 }

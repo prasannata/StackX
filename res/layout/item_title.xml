@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginTop="2dp"
         android:button="@drawable/checkbox"
         android:gravity="center"
         android:visibility="gone" />
@@ -44,8 +43,8 @@
         android:id="@+id/itemTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
         android:layout_marginRight="2dp"
+        android:layout_marginTop="2dp"
         android:layout_toLeftOf="@id/itemContextMenu"
         android:layout_toRightOf="@id/itemScore"
         android:textColor="@color/black"
