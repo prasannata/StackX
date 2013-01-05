@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerInParent="true"
         android:layout_marginLeft="2dp"
-        android:layout_marginRight="5dp"
+        android:layout_marginRight="7dp"
         android:gravity="center"
         android:textColor="@color/delft"
         android:textSize="13sp" />
@@ -32,9 +32,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@id/commentTitle"
+        android:layout_marginRight="2dp"
         android:layout_marginTop="4dp"
         android:gravity="bottom"
         android:textColor="@color/delft"
-        android:textSize="9sp" />
+        android:textSize="10sp" />
 
 </RelativeLayout>

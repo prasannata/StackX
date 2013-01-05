@@ -1,59 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/userNamePasswordLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:background="@color/white" >
-
-    <ImageView
-        android:id="@+id/stackxLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
-        android:src="@drawable/stackx" />
-
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/stackxLogo"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/rounded_border_grey_min_padding"
-        android:text="@string/login"
-        android:textColor="@color/delft"
-        android:textSize="30sp" />
+    android:layout_height="match_parent" >
 
     <RelativeLayout
-        android:id="@+id/skipLoginLayout"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/login_button"
-        android:layout_below="@id/login_button" >
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@color/white" >
 
         <ImageView
-            android:id="@+id/skipLogin"
+            android:id="@+id/stackxLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/av_next" />
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/stackx" />
 
-        <TextView
-            android:id="@+id/skipText"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/login_button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/skipLogin"
-            android:layout_alignTop="@id/skipLogin"
-            android:layout_toLeftOf="@id/skipLogin"
-            android:gravity="center"
-            android:text="@string/skip"
+            android:layout_below="@id/stackxLogo"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/rounded_border_grey_min_padding"
+            android:text="@string/login"
             android:textColor="@color/delft"
-            android:textSize="20sp" />
+            android:textSize="30sp" />
+
+        <RelativeLayout
+            android:id="@+id/skipLoginLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@id/login_button"
+            android:layout_below="@id/login_button" >
+
+            <ImageView
+                android:id="@+id/skipLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/av_next" />
+
+            <TextView
+                android:id="@+id/skipText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/skipLogin"
+                android:layout_alignTop="@id/skipLogin"
+                android:layout_toLeftOf="@id/skipLogin"
+                android:gravity="center"
+                android:text="@string/skip"
+                android:textColor="@color/delft"
+                android:textSize="20sp" />
+        </RelativeLayout>
     </RelativeLayout>
 
-</RelativeLayout>
+</FrameLayout>
