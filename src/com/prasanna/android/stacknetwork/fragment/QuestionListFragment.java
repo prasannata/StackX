@@ -60,7 +60,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
 	if (itemsContainer == null)
 	{
-	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, container, false);
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
 	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
 		            new ArrayList<Question>(), this);
 	}
@@ -158,10 +158,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void stopRunningServiceAndReceiver()
     {
-	if (isServiceRunning()) getActivity().stopService(intent);
+	if (isServiceRunning())
+	    getActivity().stopService(intent);
     }
 
-    protected void clean()
+    private void clean()
     {
 	stopRunningServiceAndReceiver();
 
