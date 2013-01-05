@@ -30,7 +30,6 @@ import com.prasanna.android.stacknetwork.model.StackXItem;
 
 public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
 {
-    private final ArrayList<T> items;
     private final ListItemView<T> listItemView;
 
     public interface ListItemView<T>
@@ -41,22 +40,12 @@ public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
     public ItemListAdapter(Context context, int textViewResourceId, ArrayList<T> items, ListItemView<T> listItemView)
     {
 	super(context, textViewResourceId, items);
-	this.items = items;
 	this.listItemView = listItemView;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-	return listItemView.getView(items.get(position), convertView, parent);
-    }
-
-    @Override
-    public void clear()
-    {
-	if (items != null)
-	    items.clear();
-
-	super.clear();
+	return listItemView.getView(getItem(position), convertView, parent);
     }
 }

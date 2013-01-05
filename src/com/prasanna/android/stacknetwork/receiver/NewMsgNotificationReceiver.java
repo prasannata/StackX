@@ -43,6 +43,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.UserInboxActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
+import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 
@@ -58,17 +59,17 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     public void onReceive(Context context, Intent intent)
     {
 	Log.d(TAG, "Received new msg notificaiton");
-	
+
 	if (SettingsFragment.isNotificationEnabled(context))
 	{
 	    Log.d(TAG, "Notification enabled in settings");
-	    
-	    ArrayList<InboxItem> unreadInboxItems = (ArrayList<InboxItem>) intent
-		            .getSerializableExtra(UserIntentAction.NEW_MSG.getAction());
 
-	    if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
+	    StackXPage<InboxItem> page = (StackXPage<InboxItem>) intent.getSerializableExtra(UserIntentAction.NEW_MSG
+		            .getAction());
+
+	    if (page != null && page.items != null && !page.items.isEmpty())
 	    {
-		sendNotification(context, unreadInboxItems);
+		sendNotification(context, page.items);
 
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 

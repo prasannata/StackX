@@ -20,10 +20,10 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -31,190 +31,187 @@ import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.InboxItem;
-import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.PopupBuilder;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserInboxActivity extends AbstractUserActionBarActivity implements
-        StackXRestQueryResultReceiver
+public class UserInboxActivity extends AbstractUserActionBarActivity implements OnScrollListener,
+                StackXRestQueryResultReceiver, ListItemView<InboxItem>
 {
     private static final String TAG = UserInboxActivity.class.getSimpleName();
 
+    private ProgressBar progressBar;
+    private ListView listView;
     private Intent intent = null;
-
-    private LinearLayout questionsDisplayList;
-
-    private ScrollViewWithNotifier questionsScroll;
-
-    private ArrayList<InboxItem> inboxItems = new ArrayList<InboxItem>();
-
-    private int itemCursor = 0;
-
-    private LinearLayout loadingProgressView;
-
     private int page = 0;
-
     private RestQueryResultReceiver receiver;
+    private ItemListAdapter<InboxItem> itemListAdapter;
+    private boolean serviceRunning = false;
+    protected List<StackXPage<InboxItem>> pages;
+    private StackXPage<InboxItem> currentPageObject;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+	Log.d(TAG, "onCreate");
 
-        super.onCreate(savedInstanceState);
+	super.onCreate(savedInstanceState);
 
-        questionsScroll = (ScrollViewWithNotifier) getLayoutInflater().inflate(
-                R.layout.scroll_linear_layout, null);
-        questionsDisplayList = (LinearLayout) questionsScroll.findViewById(R.id.ll_in_scroller);
+	receiver = new RestQueryResultReceiver(new Handler());
+	receiver.setReceiver(this);
 
-        questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-        {
-            @Override
-            public void onScrollToBottom(View view)
-            {
-                if (loadingProgressView == null)
-                {
-                    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(
-                            R.layout.loading_progress, null);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                            LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-                    layoutParams.setMargins(0, 15, 0, 15);
+	if (progressBar == null)
+	    progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
 
-                    questionsDisplayList.addView(loadingProgressView, layoutParams);
-                }
+	if (pages == null)
+	    pages = new ArrayList<StackXPage<InboxItem>>();
 
-                startIntentService();
-            }
-        });
+	setContentView(R.layout.inbox_list);
 
-        receiver = new RestQueryResultReceiver(new Handler());
-        receiver.setReceiver(this);
+	listView = (ListView) findViewById(R.id.itemList);
+	listView.addFooterView(progressBar);
+	itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
+	                new ArrayList<InboxItem>(), this);
+	listView.setAdapter(itemListAdapter);
+	listView.setOnScrollListener(this);
 
-        setContentView(questionsScroll);
+	startIntentService();
+    }
 
-        startIntentService();
+    @Override
+    public void onResume()
+    {
+	super.onResume();
+
+	if (itemListAdapter != null)
+	    itemListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        if (intent != null)
-            stopService(intent);
+	if (intent != null)
+	    stopService(intent);
     }
 
     private void startIntentService()
     {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-        {
-            intent = new Intent(this, UserIntentService.class);
-            intent.setAction(StringConstants.INBOX_ITEMS);
-            intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
-            intent.putExtra(StringConstants.PAGE, ++page);
-            intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+	if (!serviceRunning)
+	{
+	    SharedPreferences sharedPreferences = PreferenceManager
+		            .getDefaultSharedPreferences(getApplicationContext());
+	    if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+	    {
+		intent = new Intent(this, UserIntentService.class);
+		intent.setAction(StringConstants.INBOX_ITEMS);
+		intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
+		intent.putExtra(StringConstants.PAGE, ++page);
+		intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
 
-            startService(intent);
-        }
-    }
+		progressBar.setVisibility(View.VISIBLE);
 
-    private void displayInbox()
-    {
-        for (; itemCursor < inboxItems.size(); itemCursor++)
-        {
-            final RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(
-                    R.layout.user_item_row, null);
-            final InboxItem inboxItem = inboxItems.get(itemCursor);
+		startService(intent);
 
-            TextView textView = (TextView) itemRow.findViewById(R.id.userItemTitle);
-            textView.setText(Html.fromHtml(inboxItem.title));
-
-            textView = (TextView) itemRow.findViewById(R.id.viewItem);
-            textView.setClickable(true);
-            textView.setText(R.string.viewMessage);
-            textView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Point size = new Point();
-                    getWindowManager().getDefaultDisplay().getSize(size);
-
-                    PopupBuilder.build(getLayoutInflater(), itemRow, inboxItem, size);
-                }
-            });
-
-            textView = (TextView) itemRow.findViewById(R.id.viewQuestion);
-            textView.setClickable(true);
-            textView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Intent intent = new Intent(getApplicationContext(), QuestionActivity.class);
-                    Question question = new Question();
-                    question.id = inboxItem.questionId;
-                    question.title = inboxItem.title;
-                    intent.putExtra(StringConstants.QUESTION, question);
-                    intent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), true);
-                    startActivity(intent);
-                }
-            });
-            questionsDisplayList.addView(itemRow, new LinearLayout.LayoutParams(
-                    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        }
-
+		serviceRunning = true;
+	    }
+	}
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        boolean ret = super.onCreateOptionsMenu(menu);
+	boolean ret = super.onCreateOptionsMenu(menu);
 
-        menu.removeItem(R.id.menu_my_inbox);
+	menu.removeItem(R.id.menu_my_inbox);
 
-        return ret & true;
+	return ret & true;
     }
 
     @Override
     public void refresh()
     {
-        questionsDisplayList.removeAllViews();
-        inboxItems.clear();
-        page = 0;
-        itemCursor = 0;
-        startIntentService();
+	itemListAdapter.clear();
+	page = 0;
+	startIntentService();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        if (loadingProgressView != null)
-        {
-            loadingProgressView.setVisibility(View.GONE);
-            loadingProgressView = null;
-        }
+	serviceRunning = false;
+	progressBar.setVisibility(View.GONE);
 
-        if (resultData.getSerializable(StringConstants.INBOX_ITEMS) != null)
-        {
-            inboxItems.addAll((ArrayList<InboxItem>) resultData
-                    .getSerializable(StringConstants.INBOX_ITEMS));
+	currentPageObject = (StackXPage<InboxItem>) resultData.getSerializable(StringConstants.INBOX_ITEMS);
 
-            displayInbox();
-        }
+	if (currentPageObject != null)
+	{
+	    pages.add(currentPageObject);
+	    itemListAdapter.addAll(currentPageObject.items);
+	}
+    }
+
+    @Override
+    public View getView(InboxItem item, View convertView, ViewGroup parent)
+    {
+	RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.inbox_item, null);
+
+	TextView textView = (TextView) itemRow.findViewById(R.id.itemTitle);
+	textView.setText(Html.fromHtml(item.title));
+
+	if (item.body != null)
+	{
+	    textView = (TextView) itemRow.findViewById(R.id.itemBodyPreview);
+	    textView.setText(Html.fromHtml(item.body));
+	}
+
+	textView = (TextView) itemRow.findViewById(R.id.itemCreationTime);
+	textView.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
+
+	if (item.site != null)
+	{
+	    textView = (TextView) itemRow.findViewById(R.id.itemSite);
+	    textView.setText(item.site.name);
+	}
+
+	return itemRow;
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+    {
+	if (!serviceRunning && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
+	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
+	{
+	    if (currentPageObject != null && currentPageObject.hasMore)
+	    {
+		Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
+		progressBar.setVisibility(View.VISIBLE);
+		startIntentService();
+	    }
+	}
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState)
+    {
+	Log.v(TAG, "onScrollStateChanged");
     }
 }
