@@ -152,7 +152,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	if (StringConstants.QUESTION_ID.equals(getIntent().getAction()))
 	{
-	    intent.setAction(StringConstants.QUESTION_ID);
 	    long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
 	    if (QuestionsCache.getInstance().containsKey(questionId))
 	    {
@@ -160,6 +159,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    }
 	    else
 	    {
+		intent.setAction(StringConstants.QUESTION_ID);
 		intent.putExtra(StringConstants.QUESTION_ID, questionId);
 		startService(intent);
 	    }
@@ -170,6 +170,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	    if (question != null)
 	    {
+		questionFragment.setQuestion(question);
+
 		if (QuestionsCache.getInstance().containsKey(question.id))
 		{
 		    displayQuestionFromCache();
@@ -177,7 +179,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 		else
 		{
 		    intent.setAction(StringConstants.QUESTION);
-		    questionFragment.setQuestion(question);
 		    intent.putExtra(StringConstants.QUESTION_ID, question.id);
 		    intent.putExtra(StringConstants.QUESTION, question);
 		    startService(intent);
