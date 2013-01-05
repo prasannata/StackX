@@ -89,7 +89,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     public View getView(Question item, View convertView, ViewGroup parent)
     {
 	LinearLayout layout = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(),
-	                getActivity(), false, item);
+	                getActivity(), item);
 	ImageView imageView = (ImageView) layout.findViewById(R.id.itemContextMenu);
 	imageView.setOnClickListener(new View.OnClickListener()
 	{

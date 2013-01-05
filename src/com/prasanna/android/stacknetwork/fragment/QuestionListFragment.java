@@ -60,7 +60,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
 	if (itemsContainer == null)
 	{
-	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container, null);
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
 	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
 		            new ArrayList<Question>(), this);
 	}

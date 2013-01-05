@@ -42,8 +42,7 @@ public class QuestionRowLayoutBuilder
 	return builder;
     }
 
-    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, final boolean cached,
-	            final Question question)
+    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, final Question question)
     {
 	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
 

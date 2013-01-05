@@ -81,7 +81,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 	if (pages == null)
 	    pages = new ArrayList<StackXPage<InboxItem>>();
 
-	setContentView(R.layout.inbox_list);
+	setContentView(R.layout.list_view);
 
 	setupListView();
 
@@ -90,7 +90,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
     private void setupListView()
     {
-	listView = (ListView) findViewById(R.id.itemList);
+	listView = (ListView) findViewById(android.R.id.list);
 	listView.addFooterView(progressBar);
 	itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
 	                new ArrayList<InboxItem>(), this);

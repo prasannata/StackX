@@ -121,7 +121,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.scroll_fragment);
+        setContentView(R.layout.fragment_container);
 
         if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
         {

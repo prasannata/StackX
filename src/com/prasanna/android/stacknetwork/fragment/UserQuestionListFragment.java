@@ -47,87 +47,83 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        page = 0;
+	super.onCreate(savedInstanceState);
+	page = 0;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "Creating question fragment");
+	Log.d(TAG, "Creating question fragment");
 
-        if (itemsContainer == null)
-        {
-            itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container,
-                    null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(),
-                    R.layout.question_snippet_layout, new ArrayList<Question>(), this);
-            showProgressBar();
-        }
+	if (itemsContainer == null)
+	{
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
+	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+		            new ArrayList<Question>(), this);
+	    showProgressBar();
+	}
 
-        return itemsContainer;
+	return itemsContainer;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(getLogTag(), "onActivityCreated");
+	Log.d(getLogTag(), "onActivityCreated");
 
-        super.onActivityCreated(savedInstanceState);
+	super.onActivityCreated(savedInstanceState);
 
-        startIntentService();
+	startIntentService();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(getLogTag(), "onCreateContextMenu");
+	Log.d(getLogTag(), "onCreateContextMenu");
 
-        super.onCreateContextMenu(menu, v, menuInfo);
+	super.onCreateContextMenu(menu, v, menuInfo);
 
-        menu.removeItem(R.id.q_ctx_menu_user_profile);
+	menu.removeItem(R.id.q_ctx_menu_user_profile);
     }
 
     @Override
     public void onDestroy()
     {
-        Log.d(getLogTag(), "onDestroy");
+	Log.d(getLogTag(), "onDestroy");
 
-        super.onDestroy();
+	super.onDestroy();
 
-        stopService(intent);
+	stopService(intent);
     }
 
     @Override
     public void onStop()
     {
-        Log.d(getLogTag(), "onStop");
+	Log.d(getLogTag(), "onStop");
 
-        super.onStop();
+	super.onStop();
 
-        stopService(intent);
+	stopService(intent);
     }
 
     @Override
     protected void startIntentService()
     {
-        Log.d(TAG, "startIntentService");
+	Log.d(TAG, "startIntentService");
 
-        intent = getIntentForService(UserIntentService.class,
-                UserIntentAction.QUESTIONS_BY_USER.getAction());
-        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
-        intent.putExtra(StringConstants.ME,
-                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-        intent.putExtra(StringConstants.USER_ID,
-                getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-        intent.putExtra(StringConstants.PAGE, ++page);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        startService(intent);
+	intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
+	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
+	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+	intent.putExtra(StringConstants.PAGE, ++page);
+	intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+	startService(intent);
     }
 
     @Override
     public String getLogTag()
     {
-        return TAG;
+	return TAG;
     }
 }
