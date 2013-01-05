@@ -21,14 +21,16 @@ package com.prasanna.android.stacknetwork;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
@@ -58,7 +60,6 @@ public class LoginActivity extends Activity
 	    setContentView(R.layout.main);
 	    setOnLogin();
 	    setOnSkipLogin();
-	    SharedPreferencesUtil.setFirstRunComplete(this);
 	}
 	else
 	{
@@ -99,6 +100,7 @@ public class LoginActivity extends Activity
 	{
 	    public void onClick(View view)
 	    {
+		SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
 		Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
 		startActivity(oAuthIntent);
 	    }
@@ -107,13 +109,27 @@ public class LoginActivity extends Activity
 
     private void setOnSkipLogin()
     {
-	TextView skipLoginTextView = (TextView) findViewById(R.id.noLogin);
+	RelativeLayout skipLoginTextView = (RelativeLayout) findViewById(R.id.skipLoginLayout);
 	skipLoginTextView.setOnClickListener(new View.OnClickListener()
 	{
+	    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+	    {
+		@Override
+		public void onClick(DialogInterface dialog, int which)
+		{
+		    if (DialogInterface.BUTTON_POSITIVE == which)
+		    {
+			Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
+			                .show();
+			SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
+			startActivity(new Intent(context, StackNetworkListActivity.class));
+		    }
+		}
+	    };
+
 	    public void onClick(View view)
 	    {
-		Toast.makeText(LoginActivity.this, "You can choose to login from settings", Toast.LENGTH_LONG).show();
-		startActivity(new Intent(context, StackNetworkListActivity.class));
+		DialogBuilder.yesNoDialog(LoginActivity.this, R.string.noLoginWarn, dialogClickListener).show();
 	    }
 	});
     }

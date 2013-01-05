@@ -83,14 +83,19 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
 	setContentView(R.layout.inbox_list);
 
+	setupListView();
+
+	startIntentService();
+    }
+
+    private void setupListView()
+    {
 	listView = (ListView) findViewById(R.id.itemList);
 	listView.addFooterView(progressBar);
 	itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
 	                new ArrayList<InboxItem>(), this);
 	listView.setAdapter(itemListAdapter);
 	listView.setOnScrollListener(this);
-
-	startIntentService();
     }
 
     @Override
