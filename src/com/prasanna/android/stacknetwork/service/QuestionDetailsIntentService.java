@@ -85,11 +85,11 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
 		    if (answers != null)
 		    {
+			QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
+
 			Bundle bundle = new Bundle();
 			bundle.putSerializable(StringConstants.ANSWERS, answers);
 			receiver.send(RESULT_CODE_Q_ANSWERS, bundle);
-
-			QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
 		    }
 		}
 	    }
