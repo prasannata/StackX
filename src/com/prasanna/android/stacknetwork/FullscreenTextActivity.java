@@ -34,7 +34,6 @@ public class FullscreenTextActivity extends Activity
 	webView.setWebChromeClient(new WebChromeClient());
 	webView.setWebViewClient(new WebViewClient());
 	webView.getSettings().setJavaScriptEnabled(true);
-	webView.getSettings().setUseWideViewPort(true);
 	webView.loadDataWithBaseURL("file:///android_asset/google_code_prettify/prettify.js", htmlString
 	                + MarkdownFormatter.escapeHtml(charSequenceExtra) + tail, "text/html", "utf-8", null);
     }
