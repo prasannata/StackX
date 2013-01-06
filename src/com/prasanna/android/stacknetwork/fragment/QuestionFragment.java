@@ -151,6 +151,17 @@ public class QuestionFragment extends Fragment
 	    TextView textView = (TextView) parentLayout.findViewById(R.id.questionScore);
 	    textView.setText(AppUtils.formatNumber(question.score));
 
+	    textView = (TextView) parentLayout.findViewById(R.id.answerCount);
+
+	    if (question.answerCount == 0)
+		textView.setVisibility(View.GONE);
+	    else
+	    {
+		if (question.answered)
+		    textView.setBackgroundColor(getResources().getColor(R.color.lichen));
+		textView.setText(AppUtils.formatNumber(question.answerCount));
+	    }
+
 	    textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
 	    textView.setText(Html.fromHtml(question.title));
 
@@ -159,12 +170,10 @@ public class QuestionFragment extends Fragment
 	    textView.setText(getTimeAndOwnerDisplay(acceptRate));
 
 	    textView = (TextView) parentLayout.findViewById(R.id.questionViews);
-	    textView.append(AppUtils.formatNumber(question.viewCount));
+	    textView.setText(getString(R.string.views) + ":" + AppUtils.formatNumber(question.viewCount));
 
 	    if (question.body != null)
-	    {
 		displayBody(question.body);
-	    }
 	}
     }
 
@@ -202,8 +211,7 @@ public class QuestionFragment extends Fragment
 	if (text != null)
 	{
 	    final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-	    ArrayList<View> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
-	    for (final View questionBodyTextView : questionBodyTextViews)
+	    for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
 		questionBodyLayout.addView(questionBodyTextView);
 	}
     }
@@ -224,9 +232,6 @@ public class QuestionFragment extends Fragment
 	setQuestion(question);
 
 	if (parentLayout != null)
-	{
 	    displayQuestion();
-	    displayBody(question.body);
-	}
     }
 }

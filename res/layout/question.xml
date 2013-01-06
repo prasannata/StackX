@@ -21,14 +21,46 @@
             android:background="@color/white"
             android:orientation="horizontal" >
 
-            <TextView
-                android:id="@+id/questionScore"
+            <LinearLayout
+                android:id="@+id/scoreAndAns"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:background="@drawable/rounded_border_delft"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
+                android:background="@drawable/question_score"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/questionScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0.5dp"
+                    android:layout_marginRight="0.5dp"
+                    android:gravity="center"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="12sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="1dp"
+                    android:layout_marginTop="1dp"
+                    android:background="@color/delft" />
+
+                <TextView
+                    android:id="@+id/answerCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="0.5dp"
+                    android:layout_marginRight="0.5dp"
+                    android:gravity="center"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:textColor="@color/black"
+                    android:textSize="12sp" />
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/questionOptionsContextMenu"
@@ -49,9 +81,9 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="5dp"
                 android:layout_toLeftOf="@id/questionOptionsContextMenu"
-                android:layout_toRightOf="@id/questionScore"
+                android:layout_toRightOf="@id/scoreAndAns"
                 android:textColor="@color/black"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
         </RelativeLayout>
 
         <TextView
@@ -59,6 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_alignTop="@id/questionViews"
             android:layout_below="@id/titleAndScore"
             android:gravity="center"
             android:text="@string/labelViews"

@@ -43,6 +43,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 
+import org.apache.http.protocol.HTTP;
 import org.htmlcleaner.CleanerTransformations;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.SimpleHtmlSerializer;
@@ -71,7 +72,6 @@ public class MarkdownFormatter
 {
     private static final String TAG = MarkdownFormatter.class.getSimpleName();
     private static final String NEW_LINE_STR = System.getProperty("line.separator");
-    private static final String UTF8 = "utf-8";
 
     public static class Tags
     {
@@ -114,7 +114,7 @@ public class MarkdownFormatter
 	TagNode node = cleaner.clean(markdownText);
 
 	SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(cleaner.getProperties());
-	serializer.write(node, new StringWriter(), UTF8);
+	serializer.write(node, new StringWriter(), HTTP.UTF_8);
 
 	return serializer.getAsString(node);
     }
@@ -264,7 +264,7 @@ public class MarkdownFormatter
 	    public void onClick(View v)
 	    {
 		Intent intent = new Intent(context, FullscreenTextActivity.class);
-		intent.putExtra("text", textView.getText());
+		intent.putExtra(StringConstants.TEXT, textView.getText());
 		context.startActivity(intent);
 	    }
 	});
