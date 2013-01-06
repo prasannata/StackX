@@ -110,6 +110,9 @@
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".FullscreenTextActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>

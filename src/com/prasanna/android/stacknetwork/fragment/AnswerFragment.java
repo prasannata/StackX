@@ -105,8 +105,8 @@ public class AnswerFragment extends Fragment
 	    }
 	});
 
-	ArrayList<TextView> answerBodyTextViews = MarkdownFormatter.parse(getActivity(), answer.body);
-	for (TextView answer : answerBodyTextViews)
+	ArrayList<View> answerBodyTextViews = MarkdownFormatter.parse(getActivity(), answer.body);
+	for (View answer : answerBodyTextViews)
 	    answerBodyLayout.addView(answer);
     }
 

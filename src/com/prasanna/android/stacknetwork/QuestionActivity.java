@@ -45,7 +45,6 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
-import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
@@ -62,7 +61,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private ViewPager viewPager;
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
-    private boolean serviceRunningForGetAnswers = false;
+    private boolean serviceRunningForAnswers = false;
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
@@ -130,7 +129,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	super.onResume();
 
 	prepareIntentAndStartService();
-
 	hideRefreshActionAnimation();
     }
 
@@ -153,16 +151,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	if (StringConstants.QUESTION_ID.equals(getIntent().getAction()))
 	{
 	    long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
-	    if (QuestionsCache.getInstance().containsKey(questionId))
-	    {
-		displayQuestionFromCache();
-	    }
-	    else
-	    {
-		intent.setAction(StringConstants.QUESTION_ID);
-		intent.putExtra(StringConstants.QUESTION_ID, questionId);
-		startService(intent);
-	    }
+	    intent.setAction(StringConstants.QUESTION_ID);
+	    intent.putExtra(StringConstants.QUESTION_ID, questionId);
+	    startService(intent);
 	}
 	else
 	{
@@ -172,26 +163,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    {
 		questionFragment.setQuestion(question);
 
-		if (QuestionsCache.getInstance().containsKey(question.id))
-		{
-		    displayQuestionFromCache();
-		}
-		else
-		{
-		    intent.setAction(StringConstants.QUESTION);
-		    intent.putExtra(StringConstants.QUESTION_ID, question.id);
-		    intent.putExtra(StringConstants.QUESTION, question);
-		    startService(intent);
-		}
+		intent.setAction(StringConstants.QUESTION);
+		intent.putExtra(StringConstants.QUESTION_ID, question.id);
+		intent.putExtra(StringConstants.QUESTION, question);
+		startService(intent);
 	    }
 	}
-    }
-
-    private void displayQuestionFromCache()
-    {
-	question = QuestionsCache.getInstance().get(question.id);
-	questionFragment.setQuestion(question);
-	questionViewPageAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -233,13 +210,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	if (numAnswersDisplayed < question.answerCount && numAnswersDisplayed - position < 2)
 	{
-	    if (question.answers != null && question.answers.size() == numAnswersDisplayed
-		            && !serviceRunningForGetAnswers)
+	    if (question.answers != null && question.answers.size() == numAnswersDisplayed && !serviceRunningForAnswers)
 	    {
 		Log.d(TAG, "Fetch next page of answers");
 
 		startRefreshAnimation();
-
 		startServiceForAnswers();
 	    }
 	}
@@ -346,7 +321,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 		questionFragment.setComments(question.comments);
 		break;
 	    case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
-		serviceRunningForGetAnswers = false;
+		serviceRunningForAnswers = false;
 		displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS));
 		hideRefreshActionAnimation();
 		break;
@@ -366,7 +341,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	intent.putExtra(StringConstants.QUESTION_ID, question.id);
 	intent.putExtra(StringConstants.PAGE, getNextPageNumber());
 	startService(intent);
-	serviceRunningForGetAnswers = true;
+	serviceRunningForAnswers = true;
     }
 
     private void displayQuestion()
@@ -378,8 +353,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
 	if (question.answerCount > 0 && (question.answers == null || question.answers.isEmpty()))
 	    startServiceForAnswers();
-	else
-	    displayAnswers(question.answers);
+
+	titlePageIndicator.notifyDataSetChanged();
+	questionViewPageAdapter.notifyDataSetChanged();
     }
 
     private void displayCommentFragment()
@@ -400,7 +376,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    if (question.answers == null)
 		question.answers = new ArrayList<Answer>();
 
-	    question.answers.addAll(answers);
+	    if (!StringConstants.QUESTION_ID.equals(getIntent().getAction()))
+		question.answers.addAll(answers);
+
 	    titlePageIndicator.notifyDataSetChanged();
 	    questionViewPageAdapter.notifyDataSetChanged();
 	}

@@ -160,7 +160,7 @@ public class QuestionFragment extends Fragment
 
 	    textView = (TextView) parentLayout.findViewById(R.id.questionViews);
 	    textView.append(AppUtils.formatNumber(question.viewCount));
-	    
+
 	    if (question.body != null)
 	    {
 		displayBody(question.body);
@@ -201,9 +201,9 @@ public class QuestionFragment extends Fragment
     {
 	if (text != null)
 	{
-	    LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-	    ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
-	    for (TextView questionBodyTextView : questionBodyTextViews)
+	    final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
+	    ArrayList<View> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
+	    for (final View questionBodyTextView : questionBodyTextViews)
 		questionBodyLayout.addView(questionBodyTextView);
 	}
     }
@@ -222,7 +222,7 @@ public class QuestionFragment extends Fragment
     public void setAndDisplay(Question question)
     {
 	setQuestion(question);
-	
+
 	if (parentLayout != null)
 	{
 	    displayQuestion();

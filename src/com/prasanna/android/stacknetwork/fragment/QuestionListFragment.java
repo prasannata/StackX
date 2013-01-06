@@ -53,6 +53,12 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	return newFragment.setQuestionAction(action);
     }
 
+    private QuestionListFragment setQuestionAction(int action)
+    {
+	this.action = action;
+	return this;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -75,6 +81,12 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
 	super.onActivityCreated(savedInstanceState);
 
+	findActionAndStartService();
+
+    }
+
+    private void findActionAndStartService()
+    {
 	if (!created)
 	{
 	    switch (action)
@@ -91,6 +103,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 		case QuestionsIntentService.SEARCH:
 		    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
 		    break;
+		default:
+		    Log.d(TAG, "Unknown action: " + action);
+		    break;
 	    }
 
 	    selectedNavigationIndex = getActivity().getActionBar().getSelectedNavigationIndex();
@@ -102,11 +117,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
 	    if (getActivity().getActionBar().getNavigationItemCount() > 0)
 		getActivity().getActionBar().setSelectedNavigationItem(selectedNavigationIndex);
-	    
-	    if(itemListAdapter != null)
+
+	    if (itemListAdapter != null)
 		itemListAdapter.notifyDataSetChanged();
 	}
-
     }
 
     @Override
@@ -115,24 +129,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	Log.d(TAG, "Saving instance state");
 
 	super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onPause()
-    {
-	Log.d(TAG, "onPause");
-
-	super.onPause();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-	Log.d(getLogTag(), "onDestroy");
-
-	super.onDestroy();
-
-	stopService(intent);
     }
 
     @Override
@@ -157,6 +153,15 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     public String getLogTag()
     {
 	return TAG;
+    }
+
+    @Override
+    public void refresh()
+    {
+	clean();
+	created = false;
+	showProgressBar();
+	findActionAndStartService();
     }
 
     private void stopRunningServiceAndReceiver()
@@ -217,19 +222,5 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 	showProgressBar();
 
 	startIntentService();
-    }
-
-    @Override
-    public void refresh()
-    {
-	clean();
-
-	super.refresh();
-    }
-
-    public QuestionListFragment setQuestionAction(int action)
-    {
-	this.action = action;
-	return this;
     }
 }
