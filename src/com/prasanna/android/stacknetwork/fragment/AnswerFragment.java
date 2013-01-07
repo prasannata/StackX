@@ -44,6 +44,7 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.views.HtmlTextView;
 
 public class AnswerFragment extends Fragment
 {
@@ -147,8 +148,8 @@ public class AnswerFragment extends Fragment
         layout.startAnimation(AnimationUtils.loadAnimation(getActivity(),
                 android.R.anim.slide_in_left));
 
-        TextView tv = (TextView) parentLayout.findViewById(R.id.qTitle);
-        tv.setText(Html.fromHtml(answer.title));
+        HtmlTextView tv = (HtmlTextView) parentLayout.findViewById(R.id.qTitle);
+        tv.setText(answer.title);
         tv.setOnClickListener(new View.OnClickListener()
         {
             @Override
