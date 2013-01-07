@@ -82,14 +82,42 @@
         </ScrollView>
     </LinearLayout>
 
-    <TextView
+    <ImageView
         android:id="@+id/goBackToQ"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|left"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="5dp"
-        android:text="@string/question"
-        android:textColor="@color/black" />
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="7dp"
+        android:src="@drawable/question_mark_small" />
+
+    <LinearLayout
+        android:id="@+id/qTitleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="7dp"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:weightSum="1" >
+
+        <TextView
+            android:id="@+id/qTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_weight=".90"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/questionCloseAction"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.1"
+            android:src="@drawable/navigation_cancel" />
+    </LinearLayout>
 
 </FrameLayout>

@@ -200,9 +200,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 return true;
             case R.id.menu_discard:
                 if (discardOptionListener != null)
-                {
                     discardOptionListener.onDiscardOptionClick();
-                }
                 return true;
             case R.id.menu_option_test_gen_notify:
                 Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.getAction());

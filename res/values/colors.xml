@@ -19,4 +19,6 @@
     <color name="signRed">#AF1E2D</color>
     <color name="tagBlue">#E0EAF1</color>
     <color name="codeBg">#EAEAEA</color>
+    <color name="transparent">#80000000</color>
+
 </resources>

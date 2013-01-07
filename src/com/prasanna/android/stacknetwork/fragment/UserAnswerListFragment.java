@@ -44,7 +44,8 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
+public class UserAnswerListFragment extends ItemListFragment<Answer> implements
+        ListItemView<Answer>
 {
     private static final String TAG = UserAnswerListFragment.class.getSimpleName();
     private int page = 1;
@@ -56,138 +57,141 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	Log.d(TAG, "Creating answer fragment");
+        Log.d(TAG, "Creating answer fragment");
 
-	if (itemsContainer == null)
-	{
-	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-	    itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
-		            new ArrayList<Answer>(), this);
+        if (itemsContainer == null)
+        {
+            itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
+            itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
+                    new ArrayList<Answer>(), this);
 
-	    showProgressBar();
-	}
-	return itemsContainer;
+            showProgressBar();
+        }
+        return itemsContainer;
     }
 
     @Override
     protected void startIntentService()
     {
-	intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
-	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
-	intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-	intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-	intent.putExtra(StringConstants.PAGE, page++);
-	intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        intent = getIntentForService(UserIntentService.class,
+                UserIntentAction.ANSWERS_BY_USER.getAction());
+        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
+        intent.putExtra(StringConstants.ME,
+                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+        intent.putExtra(StringConstants.USER_ID,
+                getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+        intent.putExtra(StringConstants.PAGE, page++);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
-	startService(intent);
+        startService(intent);
     }
 
     @Override
     public String getReceiverExtraName()
     {
-	return StringConstants.ANSWERS;
+        return StringConstants.ANSWERS;
     }
 
     @Override
     protected void displayItems(ArrayList<Answer> items)
     {
-	dismissProgressBar();
+        dismissProgressBar();
 
-	Log.d(TAG, "Add items to adapter");
+        Log.d(TAG, "Add items to adapter");
 
-	itemListAdapter.addAll(items);
+        itemListAdapter.addAll(items);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-	registerForContextMenu(getListView());
+        registerForContextMenu(getListView());
 
-	super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
-	startIntentService();
+        startIntentService();
     }
 
     @Override
     public void onDestroy()
     {
-	Log.d(getLogTag(), "onDestroy");
+        Log.d(getLogTag(), "onDestroy");
 
-	super.onDestroy();
+        super.onDestroy();
 
-	stopService(intent);
+        stopService(intent);
     }
 
     @Override
     public void onStop()
     {
-	Log.d(getLogTag(), "onStop");
+        Log.d(getLogTag(), "onStop");
 
-	super.onStop();
+        super.onStop();
 
-	stopService(intent);
+        stopService(intent);
     }
 
     @Override
     protected String getLogTag()
     {
-	return TAG;
+        return TAG;
     }
 
     @Override
     protected ViewGroup getParentLayout()
     {
-	return itemsContainer;
+        return itemsContainer;
     }
 
     @Override
     public View getView(final Answer answer, View convertView, ViewGroup parent)
     {
-	LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater()
-	                .inflate(R.layout.answer_snippet, null);
+        LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(
+                R.layout.answer_snippet, null);
 
-	TextView textView = (TextView) answerRow.findViewById(R.id.itemScore);
-	textView.setVisibility(View.GONE);
+        TextView textView = (TextView) answerRow.findViewById(R.id.score);
+        textView.setVisibility(View.GONE);
 
-	if (answer.accepted)
-	    answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
+        if (answer.accepted)
+            answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
 
-	textView = (TextView) answerRow.findViewById(R.id.itemTitle);
-	textView.setText(Html.fromHtml(answer.title));
-	RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
-	layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
-	layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-	textView.setLayoutParams(layoutParams);
+        textView = (TextView) answerRow.findViewById(R.id.itemTitle);
+        textView.setText(Html.fromHtml(answer.title));
+        RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
+        layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        textView.setLayoutParams(layoutParams);
 
-	textView = (TextView) answerRow.findViewById(R.id.answerScore);
-	textView.setText("Answer Score: " + answer.score);
+        textView = (TextView) answerRow.findViewById(R.id.answerScore);
+        textView.setText("Answer Score: " + answer.score);
 
-	textView = (TextView) answerRow.findViewById(R.id.answerTime);
-	textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
+        textView = (TextView) answerRow.findViewById(R.id.answerTime);
+        textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
 
-	textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
+        textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
 
-	if (answer.body != null)
-	{
-	    String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
+        if (answer.body != null)
+        {
+            String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
 
-	    if (answerBody.length() > ANSWER_PREVIEW_LEN)
-	    {
-		answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
-		textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
-	    }
-	    else
-		textView.setText(Html.fromHtml(answerBody));
-	}
-	return answerRow;
+            if (answerBody.length() > ANSWER_PREVIEW_LEN)
+            {
+                answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
+                textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
+            }
+            else
+                textView.setText(Html.fromHtml(answerBody));
+        }
+        return answerRow;
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-	Intent intent = new Intent(getActivity(), QuestionActivity.class);
-	intent.setAction(StringConstants.QUESTION_ID);
-	intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
-	startActivity(intent);
+        Intent intent = new Intent(getActivity(), QuestionActivity.class);
+        intent.setAction(StringConstants.QUESTION_ID);
+        intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
+        startActivity(intent);
     }
 }

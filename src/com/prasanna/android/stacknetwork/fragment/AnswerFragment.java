@@ -26,10 +26,12 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -55,115 +57,163 @@ public class AnswerFragment extends Fragment
 
     public static AnswerFragment newFragment(Answer answer, PageSelectAdapter pageSelectAdapter)
     {
-	AnswerFragment answerFragment = new AnswerFragment();
-	answerFragment.setRetainInstance(true);
-	answerFragment.setAnswer(answer);
-	answerFragment.setPageSelectAdapter(pageSelectAdapter);
-	return answerFragment;
+        AnswerFragment answerFragment = new AnswerFragment();
+        answerFragment.setRetainInstance(true);
+        answerFragment.setAnswer(answer);
+        answerFragment.setPageSelectAdapter(pageSelectAdapter);
+        answerFragment.setHasOptionsMenu(true);
+        return answerFragment;
     }
 
     private void setPageSelectAdapter(PageSelectAdapter pageSelectAdapter)
     {
-	this.pageSelectAdapter = pageSelectAdapter;
+        this.pageSelectAdapter = pageSelectAdapter;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	if (savedInstanceState == null)
-	{
-	    parentLayout = (FrameLayout) inflater.inflate(R.layout.answer, null);
-	    answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
-	    answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
-	    iv = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
+        if (parentLayout == null)
+        {
+            parentLayout = (FrameLayout) inflater.inflate(R.layout.answer, null);
+            answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
+            answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
+            iv = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
 
-	    if (answer != null)
-		displayAnswer();
-	}
+            if (answer != null)
+                displayAnswer();
+        }
 
-	return parentLayout;
+        return parentLayout;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        if (answer != null)
+        {
+            Log.d(TAG, "Setting action bar title: " + answer.title);
+            getActivity().getActionBar().setTitle(Html.fromHtml(answer.title));
+        }
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-	Log.d(TAG, "onActivityCreated");
+        Log.d(TAG, "onActivityCreated");
 
-	super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
-	registerForContextMenu(iv);
+        registerForContextMenu(iv);
     }
 
     private void displayAnswer()
     {
-	TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
-	textView.setText(AppUtils.formatNumber(answer.score));
+        TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
+        textView.setText(AppUtils.formatNumber(answer.score));
 
-	String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
-	textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
-	textView.setText(getAutherDisplayText(acceptRate));
+        String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
+        textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
+        textView.setText(getAutherDisplayText(acceptRate));
 
-	textView = (TextView) parentLayout.findViewById(R.id.goBackToQ);
-	textView.setOnClickListener(new View.OnClickListener()
-	{
-	    @Override
-	    public void onClick(View v)
-	    {
-		pageSelectAdapter.selectQuestionPage();
-	    }
-	});
+        final ImageView imageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
+        imageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                setupQuestionTitleAction(imageView);
+            }
+        });
 
-	iv.setOnClickListener(new View.OnClickListener()
-	{
-	    @Override
-	    public void onClick(View v)
-	    {
-		AnswerFragment.this.getActivity().openContextMenu(v);
-	    }
-	});
+        iv.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                AnswerFragment.this.getActivity().openContextMenu(v);
+            }
+        });
 
-	for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
-	    answerBodyLayout.addView(answerView);
+        for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
+            answerBodyLayout.addView(answerView);
+    }
+
+    private void setupQuestionTitleAction(final ImageView questionViewAction)
+    {
+        final LinearLayout layout = (LinearLayout) parentLayout.findViewById(R.id.qTitleLayout);
+        layout.startAnimation(AnimationUtils.loadAnimation(getActivity(),
+                android.R.anim.slide_in_left));
+
+        TextView tv = (TextView) parentLayout.findViewById(R.id.qTitle);
+        tv.setText(Html.fromHtml(answer.title));
+        tv.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                pageSelectAdapter.selectQuestionPage();
+                layout.setVisibility(View.GONE);
+                questionViewAction.setVisibility(View.VISIBLE);
+            }
+        });
+
+        ImageView ivCloseAction = (ImageView) parentLayout.findViewById(R.id.questionCloseAction);
+        ivCloseAction.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                layout.setVisibility(View.GONE);
+                questionViewAction.setVisibility(View.VISIBLE);
+            }
+        });
+
+        layout.setVisibility(View.VISIBLE);
+        questionViewAction.setVisibility(View.GONE);
+
     }
 
     private String getAutherDisplayText(String acceptRate)
     {
-	return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by "
-	                + Html.fromHtml(answer.owner.displayName) + " [" + acceptRate
-	                + AppUtils.formatReputation(answer.owner.reputation) + "]";
+        return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by "
+                + Html.fromHtml(answer.owner.displayName) + " [" + acceptRate
+                + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
     private void setAnswer(Answer answer)
     {
-	Log.d(TAG, "answer set");
+        Log.d(TAG, "answer set");
 
-	this.answer = answer;
+        this.answer = answer;
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-	Log.d(TAG, "onCreateContextMenu");
+        Log.d(TAG, "onCreateContextMenu");
 
-	super.onCreateContextMenu(menu, v, menuInfo);
+        super.onCreateContextMenu(menu, v, menuInfo);
 
-	MenuInflater inflater = getActivity().getMenuInflater();
-	inflater.inflate(R.menu.question_context_menu, menu);
-	menu.removeItem(R.id.q_ctx_menu_archive);
-	menu.removeItem(R.id.q_ctx_related);
-	menu.removeItem(R.id.q_ctx_menu_email);
-	menu.removeItem(R.id.q_ctx_menu_tags);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.question_context_menu, menu);
+        menu.removeItem(R.id.q_ctx_menu_archive);
+        menu.removeItem(R.id.q_ctx_related);
+        menu.removeItem(R.id.q_ctx_menu_email);
+        menu.removeItem(R.id.q_ctx_menu_tags);
 
-	enableCommentsInContextMenu(menu);
+        enableCommentsInContextMenu(menu);
 
-	MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
-	menuItem.setTitle(Html.fromHtml(answer.owner.displayName) + "'s profile");
+        MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
+        menuItem.setTitle(Html.fromHtml(answer.owner.displayName) + "'s profile");
     }
 
     private void enableCommentsInContextMenu(ContextMenu menu)
     {
-	MenuItem item = menu.findItem(R.id.q_ctx_comments);
-	item.setEnabled(true);
-	item.setVisible(true);
+        MenuItem item = menu.findItem(R.id.q_ctx_comments);
+        item.setEnabled(true);
+        item.setVisible(true);
     }
 }
