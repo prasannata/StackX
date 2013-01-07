@@ -59,7 +59,11 @@ public class StringConstants
     public static final String DEFAULTS = "defaults";
 
     public static final String BODY = "body";
+    
+    public static final String INBOX_ITEMS = "inbox_items";
 
+    public static final String TEXT = "text";
+    
     public static final class HttpError
     {
         public static final String CODE = "code";

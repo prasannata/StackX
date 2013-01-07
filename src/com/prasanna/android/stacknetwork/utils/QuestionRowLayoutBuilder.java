@@ -42,13 +42,12 @@ public class QuestionRowLayoutBuilder
 	return builder;
     }
 
-    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, final boolean cached,
-	            final Question question)
+    public LinearLayout build(final LayoutInflater layoutInflater, final Context context, final Question question)
     {
 	LinearLayout questionRowLayout = (LinearLayout) layoutInflater.inflate(R.layout.question_snippet_layout, null);
 
 	questionRowLayout.setId((int) question.id);
-	setupViewForQuestionMetadata(questionRowLayout, question);
+	setupViewForQuestionMetadata(context, questionRowLayout, question);
 	setupViewForTags(questionRowLayout, context, question);
 	return questionRowLayout;
     }
@@ -71,22 +70,22 @@ public class QuestionRowLayoutBuilder
 	}
     }
 
-    private void setupViewForQuestionMetadata(LinearLayout parentLayout, Question question)
+    private void setupViewForQuestionMetadata(Context context, LinearLayout parentLayout, Question question)
     {
-	TextView textView = (TextView) parentLayout.findViewById(R.id.itemScore);
+	TextView textView = (TextView) parentLayout.findViewById(R.id.score);
 	textView.setText(AppUtils.formatNumber(question.score));
 
+	textView = (TextView) parentLayout.findViewById(R.id.answerCount);
+	textView.setText(AppUtils.formatNumber(question.answerCount));
+
 	if (question.hasAcceptedAnswer)
-	    textView.setBackgroundResource(R.drawable.rounded_border_delft_bg_lichen);
+	    textView.setBackgroundColor(context.getResources().getColor(R.color.lichen));
 
 	textView = (TextView) parentLayout.findViewById(R.id.itemTitle);
 	textView.setText(Html.fromHtml(question.title));
 
 	textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
 	textView.append(":" + AppUtils.formatNumber(question.viewCount));
-
-	textView = (TextView) parentLayout.findViewById(R.id.questionAnswersValue);
-	textView.append(":" + AppUtils.formatNumber(question.answerCount));
 
 	textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
 	textView.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "

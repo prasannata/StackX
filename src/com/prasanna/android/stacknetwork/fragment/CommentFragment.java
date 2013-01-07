@@ -32,7 +32,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
         if (itemsContainer == null)
         {
-            itemsContainer = (LinearLayout) inflater.inflate(R.layout.items_fragment_container,
+            itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view,
                     container, false);
             itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment,
                     new ArrayList<Comment>(), this);

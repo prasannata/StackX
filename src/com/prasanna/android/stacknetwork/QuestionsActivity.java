@@ -26,7 +26,6 @@ import android.app.ActionBar.OnNavigationListener;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
@@ -82,22 +81,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 		if (itemPosition >= 0 && itemPosition < tags.size())
 		{
 		    if (itemPosition == 0)
-		    {
-			QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_FRONT_PAGE);
-			if (fragment == null)
-			    fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE);
-			beginTransaction(fragment, FRAGMENT_TAG_FRONT_PAGE);
-		    }
+			loadFrontPage();
 		    else
-		    {
-			QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_SPINNER_ITEM_PREFIX
-			                + tags.get(itemPosition));
-			if (fragment == null)
-			    beginFaqForTagFragment(tags.get(itemPosition));
-			else
-			    beginTransaction(fragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + tags.get(itemPosition));
-
-		    }
+			loadFaqForTag(itemPosition);
 
 		    return true;
 		}
@@ -117,7 +103,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
 	super.onCreate(savedInstanceState);
 
-	setContentView(R.layout.scroll_fragment);
+	setContentView(R.layout.fragment_container);
 
 	if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
 	{
@@ -177,12 +163,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    public Context getCurrentContext()
-    {
-	return this;
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState)
     {
 	Log.d(TAG, "Saving activity instance");
@@ -194,7 +174,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     {
 	QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG);
 	newFragment.getBundle().putString(StringConstants.TAG, faqTag);
-	;
 	beginTransaction(newFragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + faqTag);
     }
 
@@ -286,4 +265,32 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 	if (getFragmentManager().getBackStackEntryCount() == 0)
 	    finish();
     }
+
+    private void loadFrontPage()
+    {
+	Log.d(TAG, "Front page selected");
+
+	QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_FRONT_PAGE);
+
+	if (fragment == null)
+	{
+	    Log.d(TAG, "Creating new fragment for front page");
+	    fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE);
+	}
+
+	beginTransaction(fragment, FRAGMENT_TAG_FRONT_PAGE);
+    }
+    
+    private void loadFaqForTag(int itemPosition)
+    {
+	Log.d(TAG, tags.get(itemPosition) + " selected");
+
+	QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_SPINNER_ITEM_PREFIX
+	                + tags.get(itemPosition));
+	if (fragment == null)
+	    beginFaqForTagFragment(tags.get(itemPosition));
+	else
+	    beginTransaction(fragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + tags.get(itemPosition));
+    }
+
 }

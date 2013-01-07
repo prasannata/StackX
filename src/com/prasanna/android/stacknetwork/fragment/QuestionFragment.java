@@ -83,7 +83,7 @@ public class QuestionFragment extends Fragment
 	    }
 	});
 
-	displayQuestionMetaData();
+	displayQuestion();
 	registerForContextMenu(imageView);
     }
 
@@ -138,7 +138,7 @@ public class QuestionFragment extends Fragment
 	}
     }
 
-    private void displayQuestionMetaData()
+    private void displayQuestion()
     {
 	if (question != null)
 	{
@@ -148,8 +148,14 @@ public class QuestionFragment extends Fragment
 		setupUserProfileInContextMenu();
 	    }
 
-	    TextView textView = (TextView) parentLayout.findViewById(R.id.questionScore);
+	    TextView textView = (TextView) parentLayout.findViewById(R.id.score);
 	    textView.setText(AppUtils.formatNumber(question.score));
+
+	    textView = (TextView) parentLayout.findViewById(R.id.answerCount);
+	    textView.setText(AppUtils.formatNumber(question.answerCount));
+
+	    if (question.hasAcceptedAnswer)
+		textView.setBackgroundColor(getResources().getColor(R.color.lichen));
 
 	    textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
 	    textView.setText(Html.fromHtml(question.title));
@@ -159,7 +165,10 @@ public class QuestionFragment extends Fragment
 	    textView.setText(getTimeAndOwnerDisplay(acceptRate));
 
 	    textView = (TextView) parentLayout.findViewById(R.id.questionViews);
-	    textView.append(AppUtils.formatNumber(question.viewCount));
+	    textView.setText(getString(R.string.views) + ":" + AppUtils.formatNumber(question.viewCount));
+
+	    if (question.body != null)
+		displayBody(question.body);
 	}
     }
 
@@ -196,9 +205,8 @@ public class QuestionFragment extends Fragment
     {
 	if (text != null)
 	{
-	    LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-	    ArrayList<TextView> questionBodyTextViews = MarkdownFormatter.parse(getActivity(), text);
-	    for (TextView questionBodyTextView : questionBodyTextViews)
+	    final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
+	    for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
 		questionBodyLayout.addView(questionBodyTextView);
 	}
     }
@@ -217,7 +225,8 @@ public class QuestionFragment extends Fragment
     public void setAndDisplay(Question question)
     {
 	setQuestion(question);
-	displayQuestionMetaData();
-	displayBody(question.body);
+
+	if (parentLayout != null)
+	    displayQuestion();
     }
 }

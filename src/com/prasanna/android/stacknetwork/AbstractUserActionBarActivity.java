@@ -62,8 +62,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     protected abstract void refresh();
 
-    protected abstract Context getCurrentContext();
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -177,7 +175,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
             case R.id.menu_search:
                 return false;
             case R.id.menu_my_profile:
-                Intent userProfileIntent = new Intent(getCurrentContext(),
+                Intent userProfileIntent = new Intent(getApplicationContext(),
                         UserProfileActivity.class);
                 userProfileIntent.putExtra(StringConstants.ME, true);
                 startActivity(userProfileIntent);
@@ -187,7 +185,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 startActivity(archiveIntent);
                 return true;
             case R.id.menu_my_inbox:
-                Intent userInboxIntent = new Intent(getCurrentContext(), UserInboxActivity.class);
+                Intent userInboxIntent = new Intent(getApplicationContext(),
+                        UserInboxActivity.class);
                 userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
                 startActivity(userInboxIntent);
                 return true;

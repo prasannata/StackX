@@ -20,233 +20,203 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Point;
+import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.InboxItem;
-import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.StackXPage;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
-import com.prasanna.android.stacknetwork.utils.PopupBuilder;
+import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.views.ScrollViewWithNotifier;
 
-public class UserInboxActivity extends AbstractUserActionBarActivity
+public class UserInboxActivity extends AbstractUserActionBarActivity implements OnScrollListener,
+                StackXRestQueryResultReceiver, ListItemView<InboxItem>
 {
     private static final String TAG = UserInboxActivity.class.getSimpleName();
 
-    private Intent fetchInboxIntent = null;
-
-    private LinearLayout questionsDisplayList;
-
-    private ScrollViewWithNotifier questionsScroll;
-
-    private ArrayList<InboxItem> inboxItems = new ArrayList<InboxItem>();
-
-    private int itemCursor = 0;
-
-    private LinearLayout loadingProgressView;
-
+    private ProgressBar progressBar;
+    private ListView listView;
+    private Intent intent = null;
     private int page = 0;
-
-    private BroadcastReceiver receiver = new BroadcastReceiver()
-    {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if (loadingProgressView != null)
-            {
-                loadingProgressView.setVisibility(View.GONE);
-                loadingProgressView = null;
-            }
-
-            if (intent.getSerializableExtra(UserIntentAction.INBOX.getAction()) != null)
-            {
-                inboxItems.addAll((ArrayList<InboxItem>) intent
-                        .getSerializableExtra(UserIntentAction.INBOX.getAction()));
-
-                displayInbox();
-            }
-        }
-    };
+    private RestQueryResultReceiver receiver;
+    private ItemListAdapter<InboxItem> itemListAdapter;
+    private boolean serviceRunning = false;
+    protected List<StackXPage<InboxItem>> pages;
+    private StackXPage<InboxItem> currentPageObject;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
+	Log.d(TAG, "onCreate");
 
-        questionsScroll = (ScrollViewWithNotifier) getLayoutInflater().inflate(
-                R.layout.scroll_linear_layout, null);
-        questionsDisplayList = (LinearLayout) questionsScroll.findViewById(R.id.ll_in_scroller);
+	super.onCreate(savedInstanceState);
 
-        questionsScroll.setOnScrollListener(new ScrollViewWithNotifier.OnScrollListener()
-        {
-            @Override
-            public void onScrollToBottom(View view)
-            {
-                if (loadingProgressView == null)
-                {
-                    loadingProgressView = (LinearLayout) getLayoutInflater().inflate(
-                            R.layout.loading_progress, null);
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                            LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-                    layoutParams.setMargins(0, 15, 0, 15);
+	receiver = new RestQueryResultReceiver(new Handler());
+	receiver.setReceiver(this);
 
-                    questionsDisplayList.addView(loadingProgressView, layoutParams);
-                }
+	if (progressBar == null)
+	    progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
 
-                startIntentService();
-            }
-        });
+	if (pages == null)
+	    pages = new ArrayList<StackXPage<InboxItem>>();
 
-        setContentView(questionsScroll);
+	setContentView(R.layout.list_view);
 
-        registerReceiver();
+	setupListView();
 
-        startIntentService();
+	startIntentService();
+    }
+
+    private void setupListView()
+    {
+	listView = (ListView) findViewById(android.R.id.list);
+	listView.addFooterView(progressBar);
+	itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
+	                new ArrayList<InboxItem>(), this);
+	listView.setAdapter(itemListAdapter);
+	listView.setOnScrollListener(this);
     }
 
     @Override
-    protected void onDestroy()
+    public void onResume()
     {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
+	super.onResume();
+
+	if (itemListAdapter != null)
+	    itemListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onStop()
     {
-        super.onStop();
+	super.onStop();
 
-        stopServiceAndUnregisterReceiver();
+	if (intent != null)
+	    stopService(intent);
     }
 
     private void startIntentService()
     {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
-        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-        {
-            fetchInboxIntent = new Intent(this, UserIntentService.class);
-            fetchInboxIntent.setAction(UserIntentAction.INBOX.getAction());
-            fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
-            fetchInboxIntent.putExtra(StringConstants.PAGE, ++page);
+	if (!serviceRunning)
+	{
+	    SharedPreferences sharedPreferences = PreferenceManager
+		            .getDefaultSharedPreferences(getApplicationContext());
+	    if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+	    {
+		intent = new Intent(this, UserIntentService.class);
+		intent.setAction(StringConstants.INBOX_ITEMS);
+		intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
+		intent.putExtra(StringConstants.PAGE, ++page);
+		intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
 
-            startService(fetchInboxIntent);
-        }
-    }
+		progressBar.setVisibility(View.VISIBLE);
 
-    private void registerReceiver()
-    {
-        IntentFilter filter = new IntentFilter(UserIntentAction.INBOX.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
-    }
+		startService(intent);
 
-    private void stopServiceAndUnregisterReceiver()
-    {
-        if (fetchInboxIntent != null)
-        {
-            stopService(fetchInboxIntent);
-        }
-
-        try
-        {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-    }
-
-    private void displayInbox()
-    {
-        for (; itemCursor < inboxItems.size(); itemCursor++)
-        {
-            final RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(
-                    R.layout.user_item_row, null);
-            final InboxItem inboxItem = inboxItems.get(itemCursor);
-
-            TextView textView = (TextView) itemRow.findViewById(R.id.userItemTitle);
-            textView.setText(Html.fromHtml(inboxItem.title));
-
-            textView = (TextView) itemRow.findViewById(R.id.viewItem);
-            textView.setClickable(true);
-            textView.setText(R.string.viewMessage);
-            textView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Point size = new Point();
-                    getWindowManager().getDefaultDisplay().getSize(size);
-
-                    PopupBuilder.build(getLayoutInflater(), itemRow, inboxItem, size);
-                }
-            });
-
-            textView = (TextView) itemRow.findViewById(R.id.viewQuestion);
-            textView.setClickable(true);
-            textView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    Intent intent = new Intent(getApplicationContext(), QuestionActivity.class);
-                    Question question = new Question();
-                    question.id = inboxItem.questionId;
-                    question.title = inboxItem.title;
-                    intent.putExtra(StringConstants.QUESTION, question);
-                    intent.putExtra(QuestionIntentAction.QUESTION_FULL_DETAILS.getAction(), true);
-                    startActivity(intent);
-                }
-            });
-            questionsDisplayList.addView(itemRow, new LinearLayout.LayoutParams(
-                    LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        }
-
+		serviceRunning = true;
+	    }
+	}
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        boolean ret = super.onCreateOptionsMenu(menu);
+	boolean ret = super.onCreateOptionsMenu(menu);
 
-        menu.removeItem(R.id.menu_my_inbox);
+	menu.removeItem(R.id.menu_my_inbox);
 
-        return ret & true;
+	return ret & true;
     }
 
     @Override
     public void refresh()
     {
-        questionsDisplayList.removeAllViews();
-        inboxItems.clear();
-        page = 0;
-        itemCursor = 0;
-        startIntentService();
+	itemListAdapter.clear();
+	page = 0;
+	startIntentService();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData)
+    {
+	serviceRunning = false;
+	progressBar.setVisibility(View.GONE);
+
+	currentPageObject = (StackXPage<InboxItem>) resultData.getSerializable(StringConstants.INBOX_ITEMS);
+
+	if (currentPageObject != null)
+	{
+	    pages.add(currentPageObject);
+	    itemListAdapter.addAll(currentPageObject.items);
+	}
     }
 
     @Override
-    public Context getCurrentContext()
+    public View getView(InboxItem item, View convertView, ViewGroup parent)
     {
-        return UserInboxActivity.this;
+	RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.inbox_item, null);
+
+	TextView textView = (TextView) itemRow.findViewById(R.id.itemTitle);
+	textView.setText(Html.fromHtml(item.title));
+
+	if (item.body != null)
+	{
+	    textView = (TextView) itemRow.findViewById(R.id.itemBodyPreview);
+	    textView.setText(Html.fromHtml(item.body));
+	}
+
+	textView = (TextView) itemRow.findViewById(R.id.itemCreationTime);
+	textView.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
+
+	if (item.site != null)
+	{
+	    textView = (TextView) itemRow.findViewById(R.id.itemSite);
+	    textView.setText(item.site.name);
+	}
+
+	return itemRow;
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
+    {
+	if (!serviceRunning && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
+	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
+	{
+	    if (currentPageObject != null && currentPageObject.hasMore)
+	    {
+		Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
+		progressBar.setVisibility(View.VISIBLE);
+		startIntentService();
+	    }
+	}
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState)
+    {
+	Log.v(TAG, "onScrollStateChanged");
     }
 }

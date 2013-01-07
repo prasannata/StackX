@@ -94,14 +94,16 @@ public class UserIntentService extends AbstractIntentService
 		    receiver.send(0, bundle);
 		    break;
 		case GET_USER_INBOX:
-		    broadcastSerializableExtra(UserIntentAction.INBOX.getAction(), UserIntentAction.INBOX.getAction(),
-			            userService.getInbox(page));
+		    bundle.putSerializable(StringConstants.INBOX_ITEMS, userService.getInbox(page));
+		    receiver.send(0, bundle);
 		    break;
 		case GET_USER_UNREAD_INBOX:
 		    getUnreadInboxItems(intent);
 		    break;
 		case GET_USER_SITES:
-		    getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false));
+		    bundle.putSerializable(StringConstants.SITES,
+			            getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false)));
+		    receiver.send(0, bundle);
 		    break;
 		case DEAUTH_APP:
 		    deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
@@ -118,22 +120,11 @@ public class UserIntentService extends AbstractIntentService
 	}
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
-	Log.d(TAG, intent.getAction() == null ? "no action" : intent.getAction());
-
-	return super.onStartCommand(intent, flags, startId);
-    }
-
     private StackXPage<User> getUserDetail(boolean me, long userId, int page)
     {
 	try
 	{
-	    if (me)
-		return userService.getMe();
-	    else
-		return userService.getUserById(userId);
+	    return me ? userService.getMe() : userService.getUserById(userId);
 	}
 	catch (HttpErrorException e)
 	{
@@ -145,43 +136,34 @@ public class UserIntentService extends AbstractIntentService
 
     private HashMap<String, Account> getUserAccounts(boolean me, long userId)
     {
-	if (me)
-	    return userService.getAccounts(1);
-	else
-	    return userService.getAccounts(userId, 1);
+	return me ? userService.getAccounts(1) : userService.getAccounts(userId, 1);
     }
 
     private StackXPage<Question> getQuestions(boolean me, long userId, int page)
     {
-	if (me)
-	    return userService.getMyQuestions(page);
-	else
-	    return userService.getQuestionsByUser(userId, page);
+	return me ? userService.getMyQuestions(page) : userService.getQuestionsByUser(userId, page);
     }
 
     private StackXPage<Answer> getAnswers(boolean me, long userId, int page)
     {
-	if (me)
-	    return userService.getMyAnswers(page);
-	else
-	    return userService.getAnswersByUser(userId, page);
+	return me ? userService.getMyAnswers(page) : userService.getAnswersByUser(userId, page);
     }
 
     private void getUnreadInboxItems(Intent intent)
     {
 	int totalNewMsgs = 0;
 	int page = intent.getIntExtra(StringConstants.PAGE, 1);
-	ArrayList<InboxItem> unreadInboxItems = userService.getUnreadItemsInInbox(page);
+	StackXPage<InboxItem> pageObj = userService.getUnreadItemsInInbox(page);
 
-	if (unreadInboxItems != null && !unreadInboxItems.isEmpty())
+	if (pageObj != null && pageObj != null && !pageObj.items.isEmpty())
 	{
 	    Log.d(TAG, "New unread inbox items found. Notifying reeiver");
-	    totalNewMsgs += unreadInboxItems.size();
-	    broadcastUnreadItemsCount(totalNewMsgs, unreadInboxItems);
+	    totalNewMsgs += pageObj.items.size();
+	    broadcastUnreadItemsCount(totalNewMsgs, pageObj);
 	}
     }
 
-    private void broadcastUnreadItemsCount(int totalNewMsgs, ArrayList<InboxItem> unreadInboxItems)
+    private void broadcastUnreadItemsCount(int totalNewMsgs, StackXPage<InboxItem> unreadInboxItems)
     {
 	Intent broadcastIntent = new Intent();
 	broadcastIntent.setAction(UserIntentAction.NEW_MSG.getAction());
@@ -190,43 +172,37 @@ public class UserIntentService extends AbstractIntentService
 	sendBroadcast(broadcastIntent);
     }
 
-    private void getUserSites(boolean forAuthenicatedUser)
+    private ArrayList<Site> getUserSites(boolean forAuthenicatedUser)
     {
 	LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
-	if (forAuthenicatedUser)
+	if (!forAuthenicatedUser)
+	    return new ArrayList<Site>(linkSitesMap.values());
+
+	LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
+	HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
+
+	if (linkAccountsMap != null && linkSitesMap != null)
 	{
-	    LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
-	    HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
-
-	    if (linkAccountsMap != null && linkSitesMap != null)
+	    for (String siteUrl : linkAccountsMap.keySet())
 	    {
-		for (String siteUrl : linkAccountsMap.keySet())
+		if (linkSitesMap.containsKey(siteUrl))
 		{
-		    if (linkSitesMap.containsKey(siteUrl))
-		    {
-			Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
+		    Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
 
-			Site site = linkSitesMap.get(siteUrl);
-			site.userType = linkAccountsMap.get(siteUrl).userType;
-			regSitesFirstMap.put(siteUrl, site);
+		    Site site = linkSitesMap.get(siteUrl);
+		    site.userType = linkAccountsMap.get(siteUrl).userType;
+		    regSitesFirstMap.put(siteUrl, site);
 
-			linkSitesMap.remove(siteUrl);
-		    }
+		    linkSitesMap.remove(siteUrl);
 		}
-
-		regSitesFirstMap.putAll(linkSitesMap);
 	    }
 
-	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES, new ArrayList<Site>(
-		            regSitesFirstMap.values()));
+	    regSitesFirstMap.putAll(linkSitesMap);
+	}
 
-	}
-	else
-	{
-	    broadcastSerializableExtra(StringConstants.SITES, StringConstants.SITES,
-		            new ArrayList<Site>(linkSitesMap.values()));
-	}
+	return new ArrayList<Site>(regSitesFirstMap.values());
+
     }
 
     private void deauthenticateApp(String accessToken)

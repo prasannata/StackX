@@ -21,7 +21,6 @@ package com.prasanna.android.stacknetwork;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -106,12 +105,6 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     {
         // TODO: Find a way to inform the fragment within current selected tab
         // to refresh
-    }
-
-    @Override
-    public Context getCurrentContext()
-    {
-        return UserProfileActivity.this;
     }
 
     @Override

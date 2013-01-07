@@ -25,7 +25,7 @@ public class DateTimeUtils
     public static final String MINUTE = "m";
     public static final String HOUR = "h";
     public static final String DAY = "d";
-    public static final String MONTH = "M";
+    public static final String MONTH = "m";
     public static final String YEAR = "y";
     public static final int SECONDS_IN_MIN = 60;
     public static final int SECONDS_IN_HOUR = 3600;

@@ -19,8 +19,6 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import java.util.ArrayList;
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
@@ -32,11 +30,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.prasanna.android.stacknetwork.PageSelectAdapter;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -46,18 +46,25 @@ import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 public class AnswerFragment extends Fragment
 {
     private static final String TAG = AnswerFragment.class.getSimpleName();
-    private LinearLayout parentLayout;
+    private FrameLayout parentLayout;
     private LinearLayout answerBodyLayout;
     private Answer answer;
     private RelativeLayout answerMetaInfoLayout;
     private ImageView iv;
+    private PageSelectAdapter pageSelectAdapter;
 
-    public static AnswerFragment newFragment(Answer answer)
+    public static AnswerFragment newFragment(Answer answer, PageSelectAdapter pageSelectAdapter)
     {
 	AnswerFragment answerFragment = new AnswerFragment();
 	answerFragment.setRetainInstance(true);
 	answerFragment.setAnswer(answer);
+	answerFragment.setPageSelectAdapter(pageSelectAdapter);
 	return answerFragment;
+    }
+
+    private void setPageSelectAdapter(PageSelectAdapter pageSelectAdapter)
+    {
+	this.pageSelectAdapter = pageSelectAdapter;
     }
 
     @Override
@@ -65,7 +72,7 @@ public class AnswerFragment extends Fragment
     {
 	if (savedInstanceState == null)
 	{
-	    parentLayout = (LinearLayout) inflater.inflate(R.layout.answer, null);
+	    parentLayout = (FrameLayout) inflater.inflate(R.layout.answer, null);
 	    answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
 	    answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
 	    iv = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
@@ -96,6 +103,16 @@ public class AnswerFragment extends Fragment
 	textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
 	textView.setText(getAutherDisplayText(acceptRate));
 
+	textView = (TextView) parentLayout.findViewById(R.id.goBackToQ);
+	textView.setOnClickListener(new View.OnClickListener()
+	{
+	    @Override
+	    public void onClick(View v)
+	    {
+		pageSelectAdapter.selectQuestionPage();
+	    }
+	});
+
 	iv.setOnClickListener(new View.OnClickListener()
 	{
 	    @Override
@@ -105,9 +122,8 @@ public class AnswerFragment extends Fragment
 	    }
 	});
 
-	ArrayList<TextView> answerBodyTextViews = MarkdownFormatter.parse(getActivity(), answer.body);
-	for (TextView answer : answerBodyTextViews)
-	    answerBodyLayout.addView(answer);
+	for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
+	    answerBodyLayout.addView(answerView);
     }
 
     private String getAutherDisplayText(String acceptRate)

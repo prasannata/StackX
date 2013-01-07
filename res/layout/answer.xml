@@ -1,77 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp"
-    android:background="@color/white"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
 
-    <RelativeLayout
-        android:id="@+id/answerMetaInfo"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/answerFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginTop="2dp" >
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:background="@color/white"
+        android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/answerScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/rounded_border_delft"
-            android:textColor="@color/black"
-            android:textSize="10sp" />
-
-        <ImageView
-            android:id="@+id/answerOptionsContextMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:paddingBottom="3dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="-5dp"
-            android:paddingTop="3dp"
-            android:src="@drawable/control_bottom_right" />
-
-        <TextView
-            android:id="@+id/answerAuthor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/answerOptionsContextMenu"
-            android:textColor="@color/black"
-            android:textSize="9sp" />
-
-        <TextView
-            android:id="@+id/answerCommentsCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_toLeftOf="@id/answerAuthor"
-            android:layout_toRightOf="@id/answerScore"
-            android:textColor="@color/black"
-            android:textSize="9sp" />
-    </RelativeLayout>
-
-    <ScrollView
-        android:id="@+id/answerBodyScroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
-        android:layout_marginTop="2dp" >
-
-        <LinearLayout
-            android:id="@+id/answerBody"
+        <RelativeLayout
+            android:id="@+id/answerMetaInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:orientation="vertical" >
-        </LinearLayout>
-    </ScrollView>
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="2dp" >
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/answerScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/rounded_border_delft"
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/answerOptionsContextMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:paddingBottom="3dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="-5dp"
+                android:paddingTop="3dp"
+                android:src="@drawable/control_bottom_right" />
+
+            <TextView
+                android:id="@+id/answerAuthor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_toLeftOf="@id/answerOptionsContextMenu"
+                android:layout_toRightOf="@id/answerScore"
+                android:textColor="@color/black"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/answerCommentsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/answerScore"
+                android:layout_below="@id/answerScore"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/black"
+                android:textSize="9sp" />
+        </RelativeLayout>
+
+        <ScrollView
+            android:id="@+id/answerBodyScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:layout_marginTop="2dp" >
+
+            <LinearLayout
+                android:id="@+id/answerBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/goBackToQ"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:text="@string/question"
+        android:textColor="@color/black" />
+
+</FrameLayout>
