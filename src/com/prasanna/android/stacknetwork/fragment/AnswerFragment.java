@@ -166,6 +166,8 @@ public class AnswerFragment extends Fragment
             @Override
             public void onClick(View v)
             {
+                layout.startAnimation(AnimationUtils.loadAnimation(getActivity(),
+                        android.R.anim.slide_out_right));
                 layout.setVisibility(View.GONE);
                 questionViewAction.setVisibility(View.VISIBLE);
             }
