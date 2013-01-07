@@ -50,7 +50,7 @@ import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
-                StackXRestQueryResultReceiver
+                StackXRestQueryResultReceiver, PageSelectAdapter
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
@@ -101,7 +101,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	    if (position == 0)
 		return QuestionActivity.this.questionFragment;
 	    else
-		return AnswerFragment.newFragment(question.answers.get(position - 1));
+		return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
 	}
     }
 
@@ -410,5 +410,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
 	int numAnswersDisplayed = questionViewPageAdapter.getCount() - 1;
 	return (numAnswersDisplayed / 10) + 1;
+    }
+
+    @Override
+    public void selectQuestionPage()
+    {
+	if (viewPager != null && viewPager.getAdapter().getCount() > 0)
+	    viewPager.setCurrentItem(0);
     }
 }
