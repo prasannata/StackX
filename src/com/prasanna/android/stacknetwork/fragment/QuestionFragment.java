@@ -148,19 +148,14 @@ public class QuestionFragment extends Fragment
 		setupUserProfileInContextMenu();
 	    }
 
-	    TextView textView = (TextView) parentLayout.findViewById(R.id.questionScore);
+	    TextView textView = (TextView) parentLayout.findViewById(R.id.score);
 	    textView.setText(AppUtils.formatNumber(question.score));
 
 	    textView = (TextView) parentLayout.findViewById(R.id.answerCount);
+	    textView.setText(AppUtils.formatNumber(question.answerCount));
 
-	    if (question.answerCount == 0)
-		textView.setVisibility(View.GONE);
-	    else
-	    {
-		if (question.answered)
-		    textView.setBackgroundColor(getResources().getColor(R.color.lichen));
-		textView.setText(AppUtils.formatNumber(question.answerCount));
-	    }
+	    if (question.hasAcceptedAnswer)
+		textView.setBackgroundColor(getResources().getColor(R.color.lichen));
 
 	    textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
 	    textView.setText(Html.fromHtml(question.title));

@@ -27,19 +27,6 @@
             android:textSize="10sp" />
 
         <TextView
-            android:id="@+id/questionAnswersValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/questionViewsValue"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="3dp"
-            android:layout_toRightOf="@id/questionViewsValue"
-            android:gravity="center"
-            android:text="@string/answers"
-            android:textColor="@color/delft"
-            android:textSize="10sp" />
-
-        <TextView
             android:id="@+id/questionOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

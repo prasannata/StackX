@@ -22,7 +22,7 @@
             android:layout_alignParentLeft="true"
             android:background="@drawable/rounded_border_delft"
             android:textColor="@color/black"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
         <ImageView
             android:id="@+id/answerOptionsContextMenu"
@@ -40,18 +40,19 @@
             android:id="@+id/answerAuthor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
             android:layout_toLeftOf="@id/answerOptionsContextMenu"
+            android:layout_toRightOf="@id/answerScore"
             android:textColor="@color/black"
-            android:textSize="9sp" />
+            android:textSize="11sp" />
 
         <TextView
             android:id="@+id/answerCommentsCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_toLeftOf="@id/answerAuthor"
-            android:layout_toRightOf="@id/answerScore"
+            android:layout_alignLeft="@id/answerScore"
+            android:layout_below="@id/answerScore"
+            android:layout_marginTop="2dp"
             android:textColor="@color/black"
             android:textSize="9sp" />
     </RelativeLayout>

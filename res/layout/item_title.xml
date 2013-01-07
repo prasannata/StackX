@@ -2,9 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
+    android:layout_marginBottom="4dp"
     android:layout_marginLeft="2dp"
-    android:layout_marginRight="2dp" >
+    android:layout_marginRight="2dp"
+    android:background="@color/white" >
 
     <CheckBox
         android:id="@+id/deleteItemCheckbox"
@@ -16,16 +17,10 @@
         android:gravity="center"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/itemScore"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+    <include
+        android:id="@+id/scoreAndAns"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="4dp"
-        android:background="@drawable/rounded_border_delft"
-        android:textColor="@color/delft"
-        android:textSize="12sp" />
+        layout="@layout/score_answer_count" />
 
     <ImageView
         android:id="@+id/itemContextMenu"
@@ -33,20 +28,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:paddingBottom="6dp"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:paddingTop="6dp"
+        android:padding="6dp"
         android:src="@drawable/control_bottom_right" />
 
     <TextView
         android:id="@+id/itemTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
         android:layout_marginRight="2dp"
         android:layout_marginTop="2dp"
         android:layout_toLeftOf="@id/itemContextMenu"
-        android:layout_toRightOf="@id/itemScore"
+        android:layout_toRightOf="@id/scoreAndAns"
         android:textColor="@color/black"
         android:textSize="12sp" />
 

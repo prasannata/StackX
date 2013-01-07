@@ -19,8 +19,6 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import java.util.ArrayList;
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
@@ -105,9 +103,8 @@ public class AnswerFragment extends Fragment
 	    }
 	});
 
-	ArrayList<View> answerBodyTextViews = MarkdownFormatter.parse(getActivity(), answer.body);
-	for (View answer : answerBodyTextViews)
-	    answerBodyLayout.addView(answer);
+	for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
+	    answerBodyLayout.addView(answerView);
     }
 
     private String getAutherDisplayText(String acceptRate)
