@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
@@ -55,6 +56,7 @@ public class QuestionFragment extends Fragment
     private Question question;
     private ContextMenu menu;
     private boolean ctxMenuSetup = false;
+    private ProgressBar bodyLoadingProgress;
 
     private ImageView backIv;
 
@@ -89,6 +91,7 @@ public class QuestionFragment extends Fragment
         });
 
         backIv = (ImageView) parentLayout.findViewById(R.id.navigateBack);
+        bodyLoadingProgress = (ProgressBar) parentLayout.findViewById(R.id.loadingProgressBar);
         displayQuestion();
         registerForContextMenu(imageView);
     }
@@ -236,6 +239,9 @@ public class QuestionFragment extends Fragment
 
     public void displayBody(String text)
     {
+        if (bodyLoadingProgress != null)
+            bodyLoadingProgress.setVisibility(View.GONE);
+
         if (text != null)
         {
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout
