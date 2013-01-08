@@ -17,7 +17,9 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.stacknetwork.utils;
+package com.prasanna.android.cache;
+
+import com.prasanna.android.stacknetwork.utils.LruCache;
 
 import android.graphics.Bitmap;
 

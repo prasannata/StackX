@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,7 +61,6 @@ public class AnswerFragment extends Fragment
         answerFragment.setRetainInstance(true);
         answerFragment.setAnswer(answer);
         answerFragment.setPageSelectAdapter(pageSelectAdapter);
-        answerFragment.setHasOptionsMenu(true);
         return answerFragment;
     }
 
@@ -86,18 +84,6 @@ public class AnswerFragment extends Fragment
         }
 
         return parentLayout;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        if (answer != null)
-        {
-            Log.d(TAG, "Setting action bar title: " + answer.title);
-            getActivity().getActionBar().setTitle(Html.fromHtml(answer.title));
-        }
     }
 
     @Override

@@ -62,7 +62,6 @@ public class QuestionFragment extends Fragment
     {
         QuestionFragment questionFragment = new QuestionFragment();
         questionFragment.setRetainInstance(true);
-        questionFragment.setHasOptionsMenu(true);
         return questionFragment;
     }
 
@@ -90,9 +89,20 @@ public class QuestionFragment extends Fragment
         });
 
         backIv = (ImageView) parentLayout.findViewById(R.id.navigateBack);
-        
         displayQuestion();
         registerForContextMenu(imageView);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        Log.d(TAG, "onActivityCreated");
+
+        super.onActivityCreated(savedInstanceState);
+
+        Log.d(TAG, "Setting action bar title: " + question.title);
+
+        getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
     }
 
     @Override

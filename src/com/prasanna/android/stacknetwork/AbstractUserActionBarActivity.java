@@ -38,12 +38,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
+import com.prasanna.android.cache.IconCache;
 import com.prasanna.android.listener.MenuItemClickListener;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
-import com.prasanna.android.stacknetwork.utils.IconCache;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
@@ -95,6 +95,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+        Log.d(TAG, "onCreateOptionsMenu");
+
         if (getActionBar().getTitle() == null)
             getActionBar().setTitle(OperatingSite.getSite().name);
 
@@ -113,7 +115,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
             setupActionBarForAnyUser(menu);
 
         refreshMenuItem = menu.findItem(R.id.menu_refresh);
-
         return true;
     }
 
@@ -253,6 +254,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     protected void startRefreshAnimation()
     {
+        Log.d(TAG, "Starting refresh animation");
+
         ImageView refreshActionView = (ImageView) getLayoutInflater().inflate(
                 R.layout.refresh_action_view, null);
         Animation rotation = AnimationUtils.loadAnimation(this, R.animator.rotate_360);
@@ -264,6 +267,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     protected void hideRefreshActionAnimation()
     {
+        Log.d(TAG, "Stopping refresh animation");
+
         if (refreshMenuItem != null && refreshMenuItem.getActionView() != null)
         {
             refreshMenuItem.getActionView().clearAnimation();

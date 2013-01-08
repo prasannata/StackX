@@ -337,10 +337,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
                 questionFragment.setComments(question.comments);
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
+                hideRefreshActionAnimation();
                 serviceRunningForAnswers = false;
                 displayAnswers((ArrayList<Answer>) resultData
                         .getSerializable(StringConstants.ANSWERS));
-                hideRefreshActionAnimation();
                 break;
             default:
                 Log.d(TAG, "Unknown result code in receiver: " + resultCode);
