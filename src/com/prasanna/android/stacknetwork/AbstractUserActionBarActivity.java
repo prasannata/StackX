@@ -38,6 +38,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
+import com.prasanna.android.listener.MenuItemClickListener;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
@@ -59,8 +60,14 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private IconCache iconCache = IconCache.getInstance();
     private OnDiscardOptionListener discardOptionListener;
     private MenuItem refreshMenuItem;
+    private MenuItemClickListener menuItemClickListener;
 
     protected abstract void refresh();
+
+    protected void setMenuItemClickListener(MenuItemClickListener menuItemClickListener)
+    {
+        this.menuItemClickListener = menuItemClickListener;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -162,13 +169,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
         switch (item.getItemId())
         {
             case android.R.id.home:
-                if (!getClass().getSimpleName().equals("QuestionsActivity"))
-                {
-                    Intent intent = new Intent(this, QuestionsActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                }
-                return true;
+                return handleHomeButtonClick(item);
             case R.id.menu_refresh:
                 refresh();
                 return true;
@@ -216,6 +217,23 @@ public abstract class AbstractUserActionBarActivity extends Activity
         }
 
         return false;
+    }
+
+    private boolean handleHomeButtonClick(MenuItem item)
+    {
+        if (menuItemClickListener != null)
+            return menuItemClickListener.onClick(item);
+        else
+        {
+            if (!getClass().getSimpleName().equals("QuestionsActivity"))
+            {
+                Intent intent = new Intent(this, QuestionsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+
+            return true;
+        }
     }
 
     public boolean isAuthenticatedRealm()
