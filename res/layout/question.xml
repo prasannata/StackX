@@ -93,11 +93,6 @@
                 android:textSize="10sp" />
         </RelativeLayout>
 
-        <include
-            android:layout_gravity="center"
-            layout="@layout/progress_bar"
-            android:visibility="visible" />
-
         <ScrollView
             android:id="@+id/questionBodyScroll"
             android:layout_width="match_parent"
