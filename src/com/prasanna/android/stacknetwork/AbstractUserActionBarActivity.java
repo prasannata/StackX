@@ -95,7 +95,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        getActionBar().setTitle(OperatingSite.getSite().name);
+        if (getActionBar().getTitle() == null)
+            getActionBar().setTitle(OperatingSite.getSite().name);
 
         if (iconCache.containsKey(OperatingSite.getSite().name))
             setActionBarIcon(iconCache.get(OperatingSite.getSite().name));

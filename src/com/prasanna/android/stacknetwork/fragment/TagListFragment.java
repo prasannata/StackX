@@ -21,8 +21,6 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,9 +30,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -45,11 +43,10 @@ import com.prasanna.android.task.GetTagsAsyncTask;
 public class TagListFragment extends ListFragment
 {
     private static final String TAG = TagListFragment.class.getSimpleName();
-    private static final String FRAGMENT_TAG_PREFIX = "spinner-";
-    private static final String FRAGMENT_TAG_FRONT_PAGE = FRAGMENT_TAG_PREFIX + "-home";
-
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
+    private OnTagSelectListener tagSelectListener;
+    private ProgressBar progressBar;
 
     public class GetUserlistAdapterCompletionNotifier implements
             AsyncTaskCompletionNotifier<ArrayList<String>>
@@ -59,29 +56,50 @@ public class TagListFragment extends ListFragment
         {
             if (result != null)
             {
+                getProgressBar().setVisibility(View.GONE);
+
                 listAdapter.add(StringConstants.FRONT_PAGE);
                 listAdapter.addAll(result);
             }
         }
     }
 
+    public interface OnTagSelectListener
+    {
+        void onFrontPageSelected();
+
+        void onTagSelected(String tag);
+    }
+
+    public static TagListFragment newFragment(OnTagSelectListener onTagSelectListener)
+    {
+        TagListFragment tagListFragment = new TagListFragment();
+        tagListFragment.setRetainInstance(true);
+        tagListFragment.setOnTagSelectListener(onTagSelectListener);
+        return tagListFragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreateView");
+
         if (parentLayout == null)
         {
+            Log.d(TAG, "Creating view for tag list");
+
             parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             listAdapter = new ArrayAdapter<String>(getActivity(), R.layout.tags_list_item,
                     new ArrayList<String>());
-        }
 
-        if (listAdapter.isEmpty())
-        {
+            getProgressBar().setVisibility(View.VISIBLE);
+
             GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(
                     new GetUserlistAdapterCompletionNotifier(),
                     AppUtils.inRegisteredSite(getActivity()));
             fetchUserAsyncTask.execute(1);
         }
+
         return parentLayout;
     }
 
@@ -92,78 +110,38 @@ public class TagListFragment extends ListFragment
 
         super.onActivityCreated(savedInstanceState);
 
+        getListView().addFooterView(getProgressBar());
         setListAdapter(listAdapter);
+
+        getActivity().getActionBar().setTitle(StringConstants.TAGS);
+
+        if (listAdapter != null)
+            listAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        if (position >= 0 && position < listAdapter.getCount())
+        if (position >= 0 && position < listAdapter.getCount() && tagSelectListener != null)
         {
             if (position == 0)
-                loadFrontPage();
+                tagSelectListener.onFrontPageSelected();
             else
-                loadFaqForTag(position);
+                tagSelectListener.onTagSelected(listAdapter.getItem(position));
         }
 
     }
 
-    private void loadFrontPage()
+    public void setOnTagSelectListener(OnTagSelectListener tagSelectListener)
     {
-        Log.d(TAG, "Front page selected");
-
-        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_PREFIX
-                + "-home");
-
-        if (fragment == null)
-        {
-            Log.d(TAG, "Creating new fragment for front page");
-            fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE);
-        }
-
-        beginTransaction(fragment, FRAGMENT_TAG_FRONT_PAGE);
+        this.tagSelectListener = tagSelectListener;
     }
 
-    private void loadFaqForTag(int itemPosition)
+    protected ProgressBar getProgressBar()
     {
-        Log.d(TAG, listAdapter.getItem(itemPosition) + " selected");
-
-        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_PREFIX
-                + listAdapter.getItem(itemPosition));
-        if (fragment == null)
-            beginFaqForTagFragment(listAdapter.getItem(itemPosition));
-        else
-            beginTransaction(fragment, FRAGMENT_TAG_PREFIX + listAdapter.getItem(itemPosition));
-    }
-
-    private void beginFaqForTagFragment(String faqTag)
-    {
-        QuestionListFragment newFragment = QuestionListFragment
-                .newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG);
-        newFragment.getBundle().putString(StringConstants.TAG, faqTag);
-        beginTransaction(newFragment, FRAGMENT_TAG_PREFIX + faqTag);
-    }
-
-    private void beginTransaction(Fragment fragment, String fragmentTag)
-    {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        Fragment currentFragment = findFragment("tags");
-
-        if (currentFragment != null)
-            ft.remove(currentFragment);
-        ft.commit();
-
-        ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
-        ft.add(fragment, fragmentTag);
-        ft.commit();
-    }
-
-    private Fragment findFragment(String fragmentTag)
-    {
-        return getFragmentManager().findFragmentByTag(fragmentTag);
+        if (progressBar == null)
+            progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(
+                    R.layout.progress_bar, null);
+        return progressBar;
     }
 }

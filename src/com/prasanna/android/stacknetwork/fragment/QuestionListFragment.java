@@ -45,21 +45,15 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     private int currentPage = 0;
     private int action;
     private boolean created = false;
-    private int selectedNavigationIndex;
     private String sort;
+    private String tag;
 
-    public static QuestionListFragment newFragment(int action)
-    {
-        QuestionListFragment newFragment = new QuestionListFragment();
-        newFragment.action = action;
-        return newFragment;
-    }
-
-    public static QuestionListFragment newFragment(int action, String sort)
+    public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
         QuestionListFragment newFragment = new QuestionListFragment();
         newFragment.sort = sort;
         newFragment.action = action;
+        newFragment.tag = tag;
         return newFragment;
     }
 
@@ -84,6 +78,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         Log.d(TAG, "onActivityCreated");
 
         super.onActivityCreated(savedInstanceState);
+
+        if (tag != null)
+            getActivity().getActionBar().setTitle(tag);
 
         findActionAndStartService();
 
@@ -112,18 +109,17 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                     break;
             }
 
-            selectedNavigationIndex = getActivity().getActionBar().getSelectedNavigationIndex();
             created = true;
         }
         else
         {
-            Log.d(TAG, "Fragment was already created. Restoring");
-
-            if (getActivity().getActionBar().getNavigationItemCount() > 0)
-                getActivity().getActionBar().setSelectedNavigationItem(selectedNavigationIndex);
+            Log.d(TAG, "Fragment " + tag + " was already created. Restoring");
 
             if (itemListAdapter != null)
+            {
+                itemListAdapter.notifyDataSetInvalidated();
                 itemListAdapter.notifyDataSetChanged();
+            }
         }
     }
 

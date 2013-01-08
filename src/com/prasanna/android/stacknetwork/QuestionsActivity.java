@@ -21,8 +21,6 @@ package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
 
-import android.app.ActionBar;
-import android.app.ActionBar.OnNavigationListener;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
@@ -31,7 +29,6 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.prasanna.android.listener.MenuItemClickListener;
@@ -39,67 +36,21 @@ import com.prasanna.android.provider.RecentQueriesProvider;
 import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
 import com.prasanna.android.stacknetwork.fragment.TagListFragment;
+import com.prasanna.android.stacknetwork.fragment.TagListFragment.OnTagSelectListener;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
-import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.task.AsyncTaskCompletionNotifier;
-import com.prasanna.android.task.GetTagsAsyncTask;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements
-        OnContextItemSelectedListener<Question>, MenuItemClickListener
+        OnContextItemSelectedListener<Question>, MenuItemClickListener, OnTagSelectListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
-    private static final String FRAGMENT_TAG_FRONT_PAGE = "front_page";
-    private static final String FRAGMENT_TAG_SPINNER_ITEM_PREFIX = "spinner-";
+    private static final String FRAGMENT_TAG_PREFIX = "spinner_";
+    private static final String FRAGMENT_TAG_FRONT_PAGE = FRAGMENT_TAG_PREFIX + "front_page";
 
     private ArrayList<String> tags = new ArrayList<String>();
-    private ArrayAdapter<String> spinnerAdapter;
-
-    public class GetUserTagsCompletionNotifier implements
-            AsyncTaskCompletionNotifier<ArrayList<String>>
-    {
-        @Override
-        public void notifyOnCompletion(ArrayList<String> result)
-        {
-            if (result != null)
-            {
-                tags.add(StringConstants.FRONT_PAGE);
-                tags.addAll(result);
-
-                initActionBarSpinner();
-            }
-        }
-    }
-
-    private void initActionBarSpinner()
-    {
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
-        OnNavigationListener callback = new OnNavigationListener()
-        {
-            @Override
-            public boolean onNavigationItemSelected(int itemPosition, long itemId)
-            {
-                if (itemPosition >= 0 && itemPosition < tags.size())
-                {
-                    if (itemPosition == 0)
-                        loadFrontPage();
-                    else
-                        loadFaqForTag(itemPosition);
-
-                    return true;
-                }
-
-                return false;
-            }
-        };
-
-        spinnerAdapter = new ArrayAdapter<String>(this, R.layout.action_bar_spinner,
-                R.id.spinnertAdapterItem, tags);
-        getActionBar().setListNavigationCallbacks(spinnerAdapter, callback);
-    }
+    private String currentFragmentTag;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -113,8 +64,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         if (Intent.ACTION_SEARCH.equals(getIntent().getAction()))
         {
-            saveSearchQuery();
-            beginTransaction(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH), null);
+            String query = getIntent().getStringExtra(SearchManager.QUERY);
+            saveSearchQuery(query);
+            replaceFragment(
+                    QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null),
+                    null, true);
         }
         else if (StringConstants.RELATED.equals(getIntent().getAction()))
         {
@@ -122,43 +76,19 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         }
         else if (StringConstants.TAG.equals(getIntent().getAction()))
         {
-            beginFaqForTagFragment(getIntent().getStringExtra(StringConstants.TAG));
+            addFaqFragment(getIntent().getStringExtra(StringConstants.TAG));
         }
         else
         {
-            getSpinnerTags(savedInstanceState);
+            showFrontPageFragment();
         }
     }
 
-    private void saveSearchQuery()
+    private void saveSearchQuery(String query)
     {
         SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                 RecentQueriesProvider.AUTHORITY, RecentQueriesProvider.MODE);
-        suggestions.saveRecentQuery(getIntent().getStringExtra(SearchManager.QUERY), null);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void getSpinnerTags(Bundle savedInstanceState)
-    {
-        if (savedInstanceState != null)
-        {
-            Log.d(TAG, "Restoring tags from savedInstanceState");
-
-            tags = (ArrayList<String>) savedInstanceState.getSerializable(StringConstants.TAGS);
-            int lastSavedPosition = savedInstanceState.getInt(StringConstants.ITEM_POSITION);
-
-            initActionBarSpinner();
-
-            if (lastSavedPosition > 0)
-                getActionBar().setSelectedNavigationItem(lastSavedPosition);
-        }
-        else
-        {
-            GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(
-                    new GetUserTagsCompletionNotifier(),
-                    AppUtils.inRegisteredSite(getApplicationContext()));
-            fetchUserAsyncTask.execute(1);
-        }
+        suggestions.saveRecentQuery(query, null);
     }
 
     @Override
@@ -177,22 +107,76 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         super.onSaveInstanceState(outState);
     }
 
-    private void beginFaqForTagFragment(String faqTag)
+    private void addFaqFragment(String faqTag)
     {
-        QuestionListFragment newFragment = QuestionListFragment
-                .newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG);
+        QuestionListFragment newFragment = QuestionListFragment.newFragment(
+                QuestionsIntentService.GET_FAQ_FOR_TAG, faqTag, null);
         newFragment.getBundle().putString(StringConstants.TAG, faqTag);
-        beginTransaction(newFragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + faqTag);
+        addFragment(newFragment, FRAGMENT_TAG_PREFIX + faqTag, false);
     }
 
-    private void beginTransaction(Fragment questionListFragment, String fragmentTag)
+    private void removeFragment(String fragmentTag, boolean addToBackStack)
     {
+        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment != null)
+        {
+            Log.d(TAG, "Removing fragment " + fragmentTag);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.remove(fragment);
+            if (addToBackStack)
+                ft.addToBackStack(fragmentTag);
+            ft.commit();
+        }
+    }
+
+    private void hideFragment(String fragmentTag)
+    {
+        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment != null)
+        {
+            Log.d(TAG, "hiding fragment " + fragmentTag);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.hide(fragment);
+            ft.commit();
+        }
+    }
+
+    private void showFragment(String fragmentTag)
+    {
+        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment != null)
+        {
+            Log.d(TAG, "showing fragment " + fragmentTag);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.show(fragment);
+            ft.commit();
+        }
+    }
+
+    private void addFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
+    {
+        Log.d(TAG, "Adding fragment " + fragmentTag);
+
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        ft.replace(R.id.fragmentContainer, questionListFragment, fragmentTag);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        ft.addToBackStack(null);
+        ft.add(R.id.fragmentContainer, fragment, fragmentTag);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        if (addToBackStack)
+            ft.addToBackStack(fragmentTag);
         ft.commit();
+        currentFragmentTag = fragmentTag;
+    }
+
+    private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
+    {
+        Log.d(TAG, "Replacing current fragment with " + fragmentTag);
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        if (addToBackStack)
+            ft.addToBackStack(fragmentTag);
+        ft.commit();
+        currentFragmentTag = fragmentTag;
     }
 
     private Fragment findFragment(String fragmentTag)
@@ -202,10 +186,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
     private void beginRelatedQuestionsFragment(long questionId)
     {
-        QuestionListFragment newFragment = QuestionListFragment
-                .newFragment(QuestionsIntentService.GET_RELATED);
+        QuestionListFragment newFragment = QuestionListFragment.newFragment(
+                QuestionsIntentService.GET_RELATED, null, null);
         newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-        beginTransaction(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId);
+        replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, true);
     }
 
     private void emailQuestion(String subject, String body)
@@ -244,7 +228,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
         {
             Log.d(TAG, "Tag selected: " + item.getTitle());
-            beginFaqForTagFragment((String) item.getTitle());
+            addFaqFragment((String) item.getTitle());
             return true;
         }
 
@@ -264,35 +248,30 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         super.onBackPressed();
 
+        Log.d(TAG, "Num items in backstack: " + getFragmentManager().getBackStackEntryCount());
+
+        for (int i = getFragmentManager().getBackStackEntryCount() - 1; i >= 0; i--)
+            Log.d(TAG, "Backstack pos: " + i + " - "
+                    + getFragmentManager().getBackStackEntryAt(i).getName());
+
         if (getFragmentManager().getBackStackEntryCount() == 0)
             finish();
     }
 
-    private void loadFrontPage()
+    private void showFrontPageFragment()
     {
         Log.d(TAG, "Front page selected");
 
         QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_FRONT_PAGE);
-        
+
         if (fragment == null)
         {
             Log.d(TAG, "Creating new fragment for front page");
-            fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE);
+            fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE,
+                    StringConstants.FRONT_PAGE, null);
         }
 
-        beginTransaction(fragment, FRAGMENT_TAG_FRONT_PAGE);
-    }
-
-    private void loadFaqForTag(int itemPosition)
-    {
-        Log.d(TAG, tags.get(itemPosition) + " selected");
-
-        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_SPINNER_ITEM_PREFIX
-                + tags.get(itemPosition));
-        if (fragment == null)
-            beginFaqForTagFragment(tags.get(itemPosition));
-        else
-            beginTransaction(fragment, FRAGMENT_TAG_SPINNER_ITEM_PREFIX + tags.get(itemPosition));
+        replaceFragment(fragment, FRAGMENT_TAG_FRONT_PAGE, false);
     }
 
     @Override
@@ -300,10 +279,54 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         if (menuItem.getItemId() == android.R.id.home)
         {
-            beginTransaction(new TagListFragment(), "tags");
+            TagListFragment tagListFragment = (TagListFragment) getFragmentManager()
+                    .findFragmentByTag(StringConstants.TAGS);
+
+            if (tagListFragment == null)
+                tagListFragment = TagListFragment.newFragment(this);
+
+            hideFragment(currentFragmentTag);
+            addFragment(tagListFragment, StringConstants.TAGS, false);
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public void onFrontPageSelected()
+    {
+        Log.d(TAG, "Front page selected");
+
+        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_FRONT_PAGE);
+
+        if (fragment == null)
+        {
+            Log.d(TAG, "Creating new fragment for front page");
+            fragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE,
+                    StringConstants.FRONT_PAGE, null);
+            replaceFragment(fragment, FRAGMENT_TAG_FRONT_PAGE, true);
+        }
+        else
+        {
+            replaceFragment(fragment, FRAGMENT_TAG_FRONT_PAGE, false);
+        }
+
+    }
+
+    @Override
+    public void onTagSelected(String tag)
+    {
+        Log.d(TAG, tag + " selected");
+
+        QuestionListFragment fragment = (QuestionListFragment) findFragment(FRAGMENT_TAG_PREFIX
+                + tag);
+
+        removeFragment(StringConstants.TAGS, false);
+
+        if (fragment == null)
+            addFaqFragment(tag);
+        else
+            showFragment(FRAGMENT_TAG_PREFIX + tag);
     }
 }
