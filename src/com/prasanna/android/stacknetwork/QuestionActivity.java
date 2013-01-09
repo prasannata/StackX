@@ -35,6 +35,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
@@ -113,6 +114,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "onCreate");
 
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_PROGRESS);
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.viewpager_title_indicator);
@@ -143,7 +147,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         super.onResume();
 
         prepareIntentAndStartService();
-        hideRefreshActionAnimation();
     }
 
     private void setupViewPager()
@@ -161,6 +164,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
     {
         intent = new Intent(this, QuestionDetailsIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+
+        setProgress(20);
 
         if (StringConstants.QUESTION_ID.equals(getIntent().getAction()))
         {
@@ -229,7 +234,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
             {
                 Log.d(TAG, "Fetch next page of answers");
 
-                startRefreshAnimation();
+                setProgressBarIndeterminateVisibility(true);
                 startServiceForAnswers();
             }
         }
@@ -326,9 +331,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         {
             case QuestionDetailsIntentService.RESULT_CODE_Q:
                 question = (Question) resultData.getSerializable(StringConstants.QUESTION);
+                hideProgressBarIfNoAnswers();
                 displayQuestion();
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
+                hideProgressBarIfNoAnswers();
                 questionFragment.displayBody(resultData.getString(StringConstants.BODY));
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
@@ -338,14 +345,20 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
                 serviceRunningForAnswers = false;
+                setProgressBarIndeterminateVisibility(false);
                 displayAnswers((ArrayList<Answer>) resultData
                         .getSerializable(StringConstants.ANSWERS));
-                hideRefreshActionAnimation();
                 break;
             default:
                 Log.d(TAG, "Unknown result code in receiver: " + resultCode);
                 break;
         }
+    }
+
+    private void hideProgressBarIfNoAnswers()
+    {
+        if (question.answerCount == 0)
+            setProgressBarIndeterminateVisibility(false);
     }
 
     private void startServiceForAnswers()

@@ -17,22 +17,11 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.stacknetwork.utils;
+package com.prasanna.android.listener;
 
-import android.graphics.Bitmap;
+import android.view.MenuItem;
 
-public class IconCache extends LruCache<String, Bitmap>
+public interface MenuItemClickListener
 {
-    private static int CACHE_SIZE = 5;
-    private static final IconCache INSTANCE = new IconCache();
-
-    private IconCache()
-    {
-	super(CACHE_SIZE);
-    }
-
-    public static IconCache getInstance()
-    {
-	return INSTANCE;
-    }
+    boolean onClick(MenuItem menuItem);
 }

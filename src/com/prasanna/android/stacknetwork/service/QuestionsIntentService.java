@@ -25,7 +25,6 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsIntentService extends AbstractIntentService
@@ -35,6 +34,7 @@ public class QuestionsIntentService extends AbstractIntentService
     public static final int GET_FAQ_FOR_TAG = 2;
     public static final int SEARCH = 3;
     public static final int GET_RELATED = 4;
+    public static final int GET_QUESTIONS_FOR_TAG = 5;
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
@@ -54,6 +54,7 @@ public class QuestionsIntentService extends AbstractIntentService
 	final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 	final int action = intent.getIntExtra(StringConstants.ACTION, -1);
 	final int page = intent.getIntExtra(StringConstants.PAGE, 1);
+	final String sort = intent.getStringExtra(StringConstants.SORT);
 
 	try
 	{
@@ -63,10 +64,10 @@ public class QuestionsIntentService extends AbstractIntentService
 	    {
 		case GET_FRONT_PAGE:
 		    Log.d(TAG, "Get front page");
-		    bundle.putSerializable(StringConstants.QUESTIONS, questionService.getAllQuestions(page));
+		    bundle.putSerializable(StringConstants.QUESTIONS, questionService.getAllQuestions(sort, page));
 		    break;
 		case GET_FAQ_FOR_TAG:
-		    String tag = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ.getAction());
+		    String tag = intent.getStringExtra(StringConstants.TAG);
 		    Log.d(TAG, "Get FAQ for " + tag);
 		    bundle.putSerializable(StringConstants.QUESTIONS, questionService.getFaqForTag(tag, page));
 		    break;
@@ -77,12 +78,14 @@ public class QuestionsIntentService extends AbstractIntentService
 		    break;
 		case GET_RELATED:
 		    Log.d(TAG, "Get related questions");
-		    long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
-		    if (questionId > 0)
-			bundle.putSerializable(StringConstants.QUESTIONS,
-			                questionService.getRelatedQuestions(questionId, page));
+		    getRelatedQuestions(intent, page, bundle);
 		    break;
-
+		case GET_QUESTIONS_FOR_TAG:
+		    String seachTagged = intent.getStringExtra(StringConstants.TAG);
+		    Log.d(TAG, "Get questions for " + seachTagged);
+		    bundle.putSerializable(StringConstants.QUESTIONS,
+			            questionService.getQuestionsForTag(seachTagged, sort, page));
+		    break;
 		default:
 		    Log.e(TAG, "Unknown action: " + action);
 		    break;
@@ -94,5 +97,13 @@ public class QuestionsIntentService extends AbstractIntentService
 	{
 	    broadcastHttpErrorIntent(e.getError());
 	}
+    }
+
+    private void getRelatedQuestions(Intent intent, final int page, Bundle bundle)
+    {
+	long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
+	if (questionId > 0)
+	bundle.putSerializable(StringConstants.QUESTIONS,
+	                questionService.getRelatedQuestions(questionId, page));
     }
 }
