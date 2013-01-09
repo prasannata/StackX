@@ -20,9 +20,11 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ActionBar;
 import android.app.ListFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -42,7 +46,7 @@ public class TagListFragment extends ListFragment
     private OnTagSelectListener onTagSelectListener;
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
-
+    private ProgressBar progressBar;
     public interface OnTagSelectListener
     {
 	void onFrontPageSelected();
@@ -57,10 +61,37 @@ public class TagListFragment extends ListFragment
 	{
 	    if (result != null)
 	    {
+		getProgressBar().setVisibility(View.GONE);
 		listAdapter.add(StringConstants.FRONT_PAGE);
 		listAdapter.addAll(result);
 	    }
 	}
+    }
+
+    public class TagListAdapter extends ArrayAdapter<String>
+    {
+
+	public TagListAdapter(Context context, int textViewResourceId, List<String> objects)
+	{
+	    super(context, textViewResourceId, objects);
+	}
+
+	@Override
+	public View getView(final int position, View convertView, ViewGroup parent)
+	{
+	    LinearLayout layout = (LinearLayout) getActivity().getLayoutInflater()
+		            .inflate(R.layout.tag_list_item, null);
+	    TextView textView = (TextView) layout.findViewById(R.id.tagName);
+	    textView.setText(getItem(position));
+	    return layout;
+	}
+    }
+
+    private ProgressBar getProgressBar()
+    {
+	if (progressBar == null)
+	    progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
+	return progressBar;
     }
 
     @Override
@@ -69,15 +100,13 @@ public class TagListFragment extends ListFragment
 	if (parentLayout == null)
 	{
 	    parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-	    listAdapter = new ArrayAdapter<String>(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
+	    listAdapter = new TagListAdapter(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
+	    getProgressBar().setVisibility(View.VISIBLE);
 	    GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
 		            AppUtils.inRegisteredSite(getActivity()));
 	    fetchUserAsyncTask.execute(1);
 	}
 
-	if (listAdapter.isEmpty())
-	{
-	}
 	return parentLayout;
     }
 
@@ -89,7 +118,7 @@ public class TagListFragment extends ListFragment
 	super.onActivityCreated(savedInstanceState);
 
 	getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-	
+	getListView().addFooterView(getProgressBar());
 	setListAdapter(listAdapter);
     }
 
