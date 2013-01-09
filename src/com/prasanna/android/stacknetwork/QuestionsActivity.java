@@ -110,7 +110,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void addFaqFragment(String faqTag)
     {
         QuestionListFragment newFragment = QuestionListFragment.newFragment(
-                QuestionsIntentService.GET_FAQ_FOR_TAG, faqTag, null);
+                QuestionsIntentService.GET_QUESTIONS_FOR_TAG, faqTag, null);
         newFragment.getBundle().putString(StringConstants.TAG, faqTag);
         addFragment(newFragment, FRAGMENT_TAG_PREFIX + faqTag, false);
     }

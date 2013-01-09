@@ -35,64 +35,75 @@ public class QuestionsIntentService extends AbstractIntentService
     public static final int GET_FAQ_FOR_TAG = 2;
     public static final int SEARCH = 3;
     public static final int GET_RELATED = 4;
+    public static final int GET_QUESTIONS_FOR_TAG = 5;
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
     public QuestionsIntentService()
     {
-	this("UserQuestionsService");
+        this("UserQuestionsService");
     }
 
     public QuestionsIntentService(String name)
     {
-	super(name);
+        super(name);
     }
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
-	final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
-	final int action = intent.getIntExtra(StringConstants.ACTION, -1);
-	final int page = intent.getIntExtra(StringConstants.PAGE, 1);
+        final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
+        final int action = intent.getIntExtra(StringConstants.ACTION, -1);
+        final int page = intent.getIntExtra(StringConstants.PAGE, 1);
+        final String sort = intent.getStringExtra(StringConstants.SORT);
 
-	try
-	{
-	    Bundle bundle = new Bundle();
+        try
+        {
+            Bundle bundle = new Bundle();
 
-	    switch (action)
-	    {
-		case GET_FRONT_PAGE:
-		    Log.d(TAG, "Get front page");
-		    bundle.putSerializable(StringConstants.QUESTIONS, questionService.getAllQuestions(page));
-		    break;
-		case GET_FAQ_FOR_TAG:
-		    String tag = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ.getAction());
-		    Log.d(TAG, "Get FAQ for " + tag);
-		    bundle.putSerializable(StringConstants.QUESTIONS, questionService.getFaqForTag(tag, page));
-		    break;
-		case SEARCH:
-		    String query = intent.getStringExtra(SearchManager.QUERY);
-		    Log.d(TAG, "Received search query: " + query);
-		    bundle.putSerializable(StringConstants.QUESTIONS, questionService.search(query, page));
-		    break;
-		case GET_RELATED:
-		    Log.d(TAG, "Get related questions");
-		    long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
-		    if (questionId > 0)
-			bundle.putSerializable(StringConstants.QUESTIONS,
-			                questionService.getRelatedQuestions(questionId, page));
-		    break;
+            switch (action)
+            {
+                case GET_FRONT_PAGE:
+                    Log.d(TAG, "Get front page");
+                    bundle.putSerializable(StringConstants.QUESTIONS,
+                            questionService.getAllQuestions(page));
+                    break;
+                case GET_FAQ_FOR_TAG:
+                    String tag = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ.getAction());
+                    Log.d(TAG, "Get FAQ for " + tag);
+                    bundle.putSerializable(StringConstants.QUESTIONS,
+                            questionService.getFaqForTag(tag, page));
+                    break;
+                case SEARCH:
+                    String query = intent.getStringExtra(SearchManager.QUERY);
+                    Log.d(TAG, "Received search query: " + query);
+                    bundle.putSerializable(StringConstants.QUESTIONS,
+                            questionService.search(query, page));
+                    break;
+                case GET_RELATED:
+                    Log.d(TAG, "Get related questions");
+                    long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
+                    if (questionId > 0)
+                        bundle.putSerializable(StringConstants.QUESTIONS,
+                                questionService.getRelatedQuestions(questionId, page));
+                    break;
+                case GET_QUESTIONS_FOR_TAG:
+                    String seachTagged = intent.getStringExtra(QuestionIntentAction.TAGS_FAQ
+                            .getAction());
+                    Log.d(TAG, "Get FAQ for " + seachTagged);
+                    bundle.putSerializable(StringConstants.QUESTIONS,
+                            questionService.getQuestionsForTag(seachTagged, sort, page));
+                    break;
+                default:
+                    Log.e(TAG, "Unknown action: " + action);
+                    break;
+            }
 
-		default:
-		    Log.e(TAG, "Unknown action: " + action);
-		    break;
-	    }
-
-	    receiver.send(0, bundle);
-	}
-	catch (HttpErrorException e)
-	{
-	    broadcastHttpErrorIntent(e.getError());
-	}
+            receiver.send(0, bundle);
+        }
+        catch (HttpErrorException e)
+        {
+            broadcastHttpErrorIntent(e.getError());
+        }
     }
 }

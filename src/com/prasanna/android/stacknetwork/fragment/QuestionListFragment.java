@@ -98,6 +98,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                 case QuestionsIntentService.GET_FAQ_FOR_TAG:
                     getFaqsForTag();
                     break;
+                case QuestionsIntentService.GET_QUESTIONS_FOR_TAG:
+                    getQuestionsForTag();
+                    break;
                 case QuestionsIntentService.GET_RELATED:
                     getRelatedQuestions();
                     break;
@@ -209,6 +212,19 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent = getIntentForService(QuestionsIntentService.class,
                 QuestionIntentAction.TAGS_FAQ.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
+        intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(),
+                getBundle().getString(StringConstants.TAG, null));
+
+        showProgressBar();
+
+        startIntentService();
+    }
+
+    private void getQuestionsForTag()
+    {
+        intent = getIntentForService(QuestionsIntentService.class,
+                QuestionIntentAction.TAGS_FAQ.getAction());
+        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
         intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(),
                 getBundle().getString(StringConstants.TAG, null));
 
