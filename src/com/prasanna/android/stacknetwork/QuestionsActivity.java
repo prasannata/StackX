@@ -326,6 +326,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
 	if (menuItem.getItemId() == android.R.id.home)
 	{
+	    getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+	    getActionBar().setTitle(StringConstants.TAGS);
+	    
 	    TagListFragment tagListFragment = (TagListFragment) getFragmentManager().findFragmentByTag(
 		            StringConstants.TAGS);
 

@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.ActionBar;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -47,6 +46,7 @@ public class TagListFragment extends ListFragment
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
     private ProgressBar progressBar;
+
     public interface OnTagSelectListener
     {
 	void onFrontPageSelected();
@@ -113,11 +113,8 @@ public class TagListFragment extends ListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-	registerForContextMenu(getListView());
-
 	super.onActivityCreated(savedInstanceState);
 
-	getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 	getListView().addFooterView(getProgressBar());
 	setListAdapter(listAdapter);
     }
