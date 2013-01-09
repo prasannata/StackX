@@ -52,8 +52,8 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class QuestionActivity extends AbstractUserActionBarActivity implements
-        OnPageChangeListener, StackXRestQueryResultReceiver, PageSelectAdapter
+public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
+                StackXRestQueryResultReceiver, PageSelectAdapter
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
@@ -91,7 +91,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
             {
                 if (question.answers.get(position - 1).accepted)
                     return QuestionActivity.this.getString(R.string.accepted) + " "
-                            + QuestionActivity.this.getString(R.string.answer);
+                                    + QuestionActivity.this.getString(R.string.answer);
                 else
                     return QuestionActivity.this.getString(R.string.answer) + " " + position;
             }
@@ -104,8 +104,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
             if (position == 0)
                 return QuestionActivity.this.questionFragment;
             else
-                return AnswerFragment.newFragment(question.answers.get(position - 1),
-                        QuestionActivity.this);
+                return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
         }
     }
 
@@ -115,7 +114,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         Log.d(TAG, "onCreate");
 
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
 
         super.onCreate(savedInstanceState);
 
@@ -165,7 +163,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         intent = new Intent(this, QuestionDetailsIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
-        setProgress(20);
+        setProgressBarIndeterminateVisibility(true);
 
         if (StringConstants.QUESTION_ID.equals(getIntent().getAction()))
         {
@@ -229,8 +227,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
 
         if (numAnswersDisplayed < question.answerCount && numAnswersDisplayed - position < 2)
         {
-            if (question.answers != null && question.answers.size() == numAnswersDisplayed
-                    && !serviceRunningForAnswers)
+            if (question.answers != null && question.answers.size() == numAnswersDisplayed && !serviceRunningForAnswers)
             {
                 Log.d(TAG, "Fetch next page of answers");
 
@@ -331,34 +328,27 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         {
             case QuestionDetailsIntentService.RESULT_CODE_Q:
                 question = (Question) resultData.getSerializable(StringConstants.QUESTION);
-                hideProgressBarIfNoAnswers();
+                setProgressBarIndeterminateVisibility(false);
                 displayQuestion();
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
-                hideProgressBarIfNoAnswers();
                 questionFragment.displayBody(resultData.getString(StringConstants.BODY));
+                if (question.answerCount == 0)
+                    setProgressBarIndeterminateVisibility(false);
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
-                question.comments = (ArrayList<Comment>) resultData
-                        .getSerializable(StringConstants.COMMENTS);
+                question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);
                 questionFragment.setComments(question.comments);
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
                 serviceRunningForAnswers = false;
                 setProgressBarIndeterminateVisibility(false);
-                displayAnswers((ArrayList<Answer>) resultData
-                        .getSerializable(StringConstants.ANSWERS));
+                displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS));
                 break;
             default:
                 Log.d(TAG, "Unknown result code in receiver: " + resultCode);
                 break;
         }
-    }
-
-    private void hideProgressBarIfNoAnswers()
-    {
-        if (question.answerCount == 0)
-            setProgressBarIndeterminateVisibility(false);
     }
 
     private void startServiceForAnswers()
@@ -393,8 +383,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
         CommentFragment fragment = new CommentFragment();
         fragment.setComments(question.comments);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, fragment, question.id + "-"
-                + StringConstants.COMMENTS);
+        transaction.replace(R.id.fragmentContainer, fragment, question.id + "-" + StringConstants.COMMENTS);
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         transaction.addToBackStack(null);
         transaction.commit();
@@ -431,8 +420,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements
     private void archiveQuestion()
     {
         File directory = new File(this.getCacheDir(), StringConstants.QUESTIONS);
-        WriteObjectAsyncTask cacheTask = new WriteObjectAsyncTask(directory,
-                String.valueOf(question.id));
+        WriteObjectAsyncTask cacheTask = new WriteObjectAsyncTask(directory, String.valueOf(question.id));
         cacheTask.execute(question);
 
         Toast.makeText(this, "Question saved", Toast.LENGTH_SHORT).show();

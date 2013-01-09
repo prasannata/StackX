@@ -62,12 +62,15 @@ public class QuestionFragment extends Fragment
     {
         QuestionFragment questionFragment = new QuestionFragment();
         questionFragment.setRetainInstance(true);
+        questionFragment.setHasOptionsMenu(true);
         return questionFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreateView");
+
         if (parentLayout == null)
             createView(inflater);
 
@@ -77,8 +80,7 @@ public class QuestionFragment extends Fragment
     private void createView(LayoutInflater inflater)
     {
         parentLayout = (FrameLayout) inflater.inflate(R.layout.question, null);
-        ImageView imageView = (ImageView) parentLayout
-                .findViewById(R.id.questionOptionsContextMenu);
+        ImageView imageView = (ImageView) parentLayout.findViewById(R.id.questionOptionsContextMenu);
         imageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -89,29 +91,9 @@ public class QuestionFragment extends Fragment
         });
 
         backIv = (ImageView) parentLayout.findViewById(R.id.navigateBack);
+
         displayQuestion();
         registerForContextMenu(imageView);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
-        Log.d(TAG, "onActivityCreated");
-
-        super.onActivityCreated(savedInstanceState);
-
-        Log.d(TAG, "Setting action bar title: " + question.title);
-
-        getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        Log.d(TAG, "onCreate");
-
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -149,8 +131,7 @@ public class QuestionFragment extends Fragment
             MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
 
             if (userProfileMenuItem != null)
-                userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName)
-                        + "'s profile");
+                userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName) + "'s profile");
 
             ctxMenuSetup = true;
         }
@@ -191,14 +172,12 @@ public class QuestionFragment extends Fragment
             textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
             textView.setText(Html.fromHtml(question.title));
 
-            String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ")
-                    : "";
+            String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ") : "";
             textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
             textView.setText(getTimeAndOwnerDisplay(acceptRate));
 
             textView = (TextView) parentLayout.findViewById(R.id.questionViews);
-            textView.setText(getString(R.string.views) + ":"
-                    + AppUtils.formatNumber(question.viewCount));
+            textView.setText(getString(R.string.views) + ":" + AppUtils.formatNumber(question.viewCount));
 
             if (question.body != null)
                 displayBody(question.body);
@@ -208,8 +187,8 @@ public class QuestionFragment extends Fragment
     private String getTimeAndOwnerDisplay(String acceptRate)
     {
         return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
-                + question.owner.reputation + "]";
+                        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate + question.owner.reputation
+                        + "]";
     }
 
     private void showNumComments()
@@ -236,11 +215,9 @@ public class QuestionFragment extends Fragment
 
     public void displayBody(String text)
     {
-
-        if (text != null)
+        if (text != null && parentLayout != null)
         {
-            final LinearLayout questionBodyLayout = (LinearLayout) parentLayout
-                    .findViewById(R.id.questionBody);
+            final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
             for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
                 questionBodyLayout.addView(questionBodyTextView);
         }

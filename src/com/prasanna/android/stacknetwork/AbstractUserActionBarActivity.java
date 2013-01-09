@@ -123,8 +123,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     {
         Log.d(TAG, "In authenticated realm");
 
-        if (OperatingSite.getSite().userType == null
-                || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
+        if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
         {
             menu.removeItem(R.id.menu_my_profile);
             menu.removeItem(R.id.menu_my_inbox);
@@ -140,16 +139,15 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void loadIcon()
     {
-        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(
-                new AsyncTaskCompletionNotifier<Bitmap>()
-                {
-                    @Override
-                    public void notifyOnCompletion(Bitmap result)
-                    {
-                        setActionBarIcon(result);
-                        iconCache.add(OperatingSite.getSite().name, result);
-                    }
-                });
+        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+        {
+            @Override
+            public void notifyOnCompletion(Bitmap result)
+            {
+                setActionBarIcon(result);
+                iconCache.add(OperatingSite.getSite().name, result);
+            }
+        });
 
         fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
     }
@@ -173,8 +171,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
             case R.id.menu_search:
                 return false;
             case R.id.menu_my_profile:
-                Intent userProfileIntent = new Intent(getApplicationContext(),
-                        UserProfileActivity.class);
+                Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                 userProfileIntent.putExtra(StringConstants.ME, true);
                 startActivity(userProfileIntent);
                 return true;
@@ -183,8 +180,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 startActivity(archiveIntent);
                 return true;
             case R.id.menu_my_inbox:
-                Intent userInboxIntent = new Intent(getApplicationContext(),
-                        UserInboxActivity.class);
+                Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
                 userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
                 startActivity(userInboxIntent);
                 return true;
@@ -235,8 +231,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     public boolean isAuthenticatedRealm()
     {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
 
         return (accessToken != null);

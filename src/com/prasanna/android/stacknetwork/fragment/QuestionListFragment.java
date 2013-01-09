@@ -45,8 +45,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     private int currentPage = 0;
     private int action;
     private boolean created = false;
-    private String sort;
-    private String tag;
+
+    public String sort;
+    public String tag;
 
     public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
@@ -65,8 +66,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(),
-                    R.layout.question_snippet_layout, new ArrayList<Question>(), this);
+            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                            new ArrayList<Question>(), this);
         }
 
         return itemsContainer;
@@ -185,8 +186,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getFrontPage()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.QUESTIONS.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 
         showProgressBar();
@@ -196,11 +196,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getRelatedQuestions()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.QUESTIONS.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
-        intent.putExtra(StringConstants.QUESTION_ID,
-                getBundle().getLong(StringConstants.QUESTION_ID, 0));
+        intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 
         showProgressBar();
 
@@ -209,11 +207,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getFaqsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.TAGS_FAQ.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
-        intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(),
-                getBundle().getString(StringConstants.TAG, null));
+        intent.putExtra(StringConstants.TAG, tag);
 
         showProgressBar();
 
@@ -222,11 +218,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getQuestionsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.TAGS_FAQ.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
-        intent.putExtra(QuestionIntentAction.TAGS_FAQ.getAction(),
-                getBundle().getString(StringConstants.TAG, null));
+        intent.putExtra(StringConstants.TAG, tag);
 
         showProgressBar();
 
@@ -237,8 +231,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     {
         clean();
 
-        intent = getIntentForService(QuestionsIntentService.class,
-                QuestionIntentAction.QUESTION_SEARCH.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH);
         intent.putExtra(SearchManager.QUERY, query);
 

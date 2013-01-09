@@ -63,5 +63,7 @@ public class StackUri
         public static final String POPULAR = "popular";
         public static final String NAME = "name";
         public static final String VOTES = "votes";
+        public static final String CREATION = "creation";
+        public static final String WEEK = "week";
     }
 }
