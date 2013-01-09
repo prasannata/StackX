@@ -60,203 +60,191 @@ public class QuestionFragment extends Fragment
 
     public static QuestionFragment newFragment()
     {
-        QuestionFragment questionFragment = new QuestionFragment();
-        questionFragment.setRetainInstance(true);
-        questionFragment.setHasOptionsMenu(true);
-        return questionFragment;
+	QuestionFragment questionFragment = new QuestionFragment();
+	questionFragment.setRetainInstance(true);
+	questionFragment.setHasOptionsMenu(true);
+	return questionFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        if (parentLayout == null)
-            createView(inflater);
+	Log.d(TAG, "onCreateView");
+	
+	if (parentLayout == null)
+	    createView(inflater);
 
-        return parentLayout;
+	return parentLayout;
     }
 
     private void createView(LayoutInflater inflater)
     {
-        parentLayout = (FrameLayout) inflater.inflate(R.layout.question, null);
-        ImageView imageView = (ImageView) parentLayout
-                .findViewById(R.id.questionOptionsContextMenu);
-        imageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                QuestionFragment.this.getActivity().openContextMenu(v);
-            }
-        });
+	parentLayout = (FrameLayout) inflater.inflate(R.layout.question, null);
+	ImageView imageView = (ImageView) parentLayout.findViewById(R.id.questionOptionsContextMenu);
+	imageView.setOnClickListener(new View.OnClickListener()
+	{
+	    @Override
+	    public void onClick(View v)
+	    {
+		QuestionFragment.this.getActivity().openContextMenu(v);
+	    }
+	});
 
-        backIv = (ImageView) parentLayout.findViewById(R.id.navigateBack);
-        
-        displayQuestion();
-        registerForContextMenu(imageView);
-    }
+	backIv = (ImageView) parentLayout.findViewById(R.id.navigateBack);
 
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        Log.d(TAG, "onCreate");
-
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
+	displayQuestion();
+	registerForContextMenu(imageView);
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(TAG, "onCreateContextMenu");
+	Log.d(TAG, "onCreateContextMenu");
 
-        super.onCreateContextMenu(menu, v, menuInfo);
+	super.onCreateContextMenu(menu, v, menuInfo);
 
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.question_context_menu, menu);
-        this.menu = menu;
+	MenuInflater inflater = getActivity().getMenuInflater();
+	inflater.inflate(R.menu.question_context_menu, menu);
+	this.menu = menu;
 
-        setupUserProfileInContextMenu();
-        setupTagsInContextMenu();
-        enableCommentsInContextMenu();
+	setupUserProfileInContextMenu();
+	setupTagsInContextMenu();
+	enableCommentsInContextMenu();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
-        super.onCreateOptionsMenu(menu, inflater);
+	super.onCreateOptionsMenu(menu, inflater);
 
-        if (question != null)
-        {
-            Log.d(TAG, "Setting action bar title: " + question.title);
-            getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
-        }
+	if (question != null)
+	{
+	    Log.d(TAG, "Setting action bar title: " + question.title);
+	    getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
+	}
     }
 
     private void setupUserProfileInContextMenu()
     {
-        if (question != null && question.owner != null)
-        {
-            MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
+	if (question != null && question.owner != null)
+	{
+	    MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
 
-            if (userProfileMenuItem != null)
-                userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName)
-                        + "'s profile");
+	    if (userProfileMenuItem != null)
+		userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName) + "'s profile");
 
-            ctxMenuSetup = true;
-        }
+	    ctxMenuSetup = true;
+	}
     }
 
     private void setupTagsInContextMenu()
     {
-        if (question != null && question.tags != null)
-        {
-            MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_tags);
-            SubMenu subMenu = menuItem.getSubMenu();
-            for (int idx = 0; idx < question.tags.length; idx++)
-                subMenu.add(R.id.qContextTagsMenuGroup, Menu.NONE, idx, question.tags[idx]);
+	if (question != null && question.tags != null)
+	{
+	    MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_tags);
+	    SubMenu subMenu = menuItem.getSubMenu();
+	    for (int idx = 0; idx < question.tags.length; idx++)
+		subMenu.add(R.id.qContextTagsMenuGroup, Menu.NONE, idx, question.tags[idx]);
 
-            ctxMenuSetup = ctxMenuSetup & true;
-        }
+	    ctxMenuSetup = ctxMenuSetup & true;
+	}
     }
 
     private void displayQuestion()
     {
-        if (question != null)
-        {
-            if (!ctxMenuSetup && menu != null)
-            {
-                setupTagsInContextMenu();
-                setupUserProfileInContextMenu();
-            }
+	if (question != null)
+	{
+	    if (!ctxMenuSetup && menu != null)
+	    {
+		setupTagsInContextMenu();
+		setupUserProfileInContextMenu();
+	    }
 
-            TextView textView = (TextView) parentLayout.findViewById(R.id.score);
-            textView.setText(AppUtils.formatNumber(question.score));
+	    TextView textView = (TextView) parentLayout.findViewById(R.id.score);
+	    textView.setText(AppUtils.formatNumber(question.score));
 
-            textView = (TextView) parentLayout.findViewById(R.id.answerCount);
-            textView.setText(AppUtils.formatNumber(question.answerCount));
+	    textView = (TextView) parentLayout.findViewById(R.id.answerCount);
+	    textView.setText(AppUtils.formatNumber(question.answerCount));
 
-            if (question.hasAcceptedAnswer)
-                textView.setBackgroundColor(getResources().getColor(R.color.lichen));
+	    if (question.hasAcceptedAnswer)
+		textView.setBackgroundColor(getResources().getColor(R.color.lichen));
 
-            textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
-            textView.setText(Html.fromHtml(question.title));
+	    textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
+	    textView.setText(Html.fromHtml(question.title));
 
-            String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ")
-                    : "";
-            textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
-            textView.setText(getTimeAndOwnerDisplay(acceptRate));
+	    String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ") : "";
+	    textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
+	    textView.setText(getTimeAndOwnerDisplay(acceptRate));
 
-            textView = (TextView) parentLayout.findViewById(R.id.questionViews);
-            textView.setText(getString(R.string.views) + ":"
-                    + AppUtils.formatNumber(question.viewCount));
+	    textView = (TextView) parentLayout.findViewById(R.id.questionViews);
+	    textView.setText(getString(R.string.views) + ":" + AppUtils.formatNumber(question.viewCount));
 
-            if (question.body != null)
-                displayBody(question.body);
-        }
+	    if (question.body != null)
+		displayBody(question.body);
+	}
     }
 
     private String getTimeAndOwnerDisplay(String acceptRate)
     {
-        return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
-                + question.owner.reputation + "]";
+	return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
+	                + Html.fromHtml(question.owner.displayName) + " [" + acceptRate + question.owner.reputation
+	                + "]";
     }
 
     private void showNumComments()
     {
-        if (question.comments != null && !question.comments.isEmpty())
-        {
-            TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
-            textView.append(String.valueOf(question.comments.size()));
-            textView.setVisibility(View.VISIBLE);
+	if (question.comments != null && !question.comments.isEmpty())
+	{
+	    TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
+	    textView.append(String.valueOf(question.comments.size()));
+	    textView.setVisibility(View.VISIBLE);
 
-            enableCommentsInContextMenu();
-        }
+	    enableCommentsInContextMenu();
+	}
     }
 
     private void enableCommentsInContextMenu()
     {
-        if (menu != null)
-        {
-            MenuItem item = menu.findItem(R.id.q_ctx_comments);
-            item.setEnabled(true);
-            item.setVisible(true);
-        }
+	if (menu != null)
+	{
+	    MenuItem item = menu.findItem(R.id.q_ctx_comments);
+	    item.setEnabled(true);
+	    item.setVisible(true);
+	}
     }
 
     public void displayBody(String text)
     {
-        if (text != null)
-        {
-            final LinearLayout questionBodyLayout = (LinearLayout) parentLayout
-                    .findViewById(R.id.questionBody);
-            for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
-                questionBodyLayout.addView(questionBodyTextView);
-        }
+	if (text != null && parentLayout != null)
+	{
+	    final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
+	    for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
+		questionBodyLayout.addView(questionBodyTextView);
+	}
     }
 
     public void setQuestion(Question question)
     {
-        this.question = question;
+	this.question = question;
     }
 
     public void setComments(ArrayList<Comment> comments)
     {
-        question.comments = comments;
-        showNumComments();
+	question.comments = comments;
+	showNumComments();
     }
 
     public void setAndDisplay(Question question)
     {
-        setQuestion(question);
+	setQuestion(question);
 
-        if (parentLayout != null)
-            displayQuestion();
+	if (parentLayout != null)
+	    displayQuestion();
     }
 
     public void enableNavigationBack(OnClickListener clickListener)
     {
-        backIv.setVisibility(View.VISIBLE);
-        backIv.setOnClickListener(clickListener);
+	backIv.setVisibility(View.VISIBLE);
+	backIv.setOnClickListener(clickListener);
     }
 }
