@@ -35,6 +35,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.sqlite.TagsDbAdapter;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -46,6 +47,7 @@ public class TagListFragment extends ListFragment
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
     private ProgressBar progressBar;
+    private boolean tagsFetched = false;
 
     public interface OnTagSelectListener
     {
@@ -101,10 +103,6 @@ public class TagListFragment extends ListFragment
 	{
 	    parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view, null);
 	    listAdapter = new TagListAdapter(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
-	    getProgressBar().setVisibility(View.VISIBLE);
-	    GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
-		            AppUtils.inRegisteredSite(getActivity()));
-	    fetchUserAsyncTask.execute(1);
 	}
 
 	return parentLayout;
@@ -117,6 +115,15 @@ public class TagListFragment extends ListFragment
 
 	getListView().addFooterView(getProgressBar());
 	setListAdapter(listAdapter);
+
+	if (!tagsFetched)
+	{
+	    getProgressBar().setVisibility(View.VISIBLE);
+	    GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
+		            new TagsDbAdapter(getActivity()), AppUtils.inRegisteredSite(getActivity()));
+	    fetchUserAsyncTask.execute();
+	    tagsFetched = true;
+	}
     }
 
     @Override

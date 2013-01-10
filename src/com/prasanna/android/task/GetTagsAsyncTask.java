@@ -21,41 +21,63 @@ package com.prasanna.android.task;
 
 import java.util.ArrayList;
 
+import android.database.SQLException;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
+import com.prasanna.android.stacknetwork.sqlite.TagsDbAdapter;
 
-public class GetTagsAsyncTask extends AsyncTask<Integer, Void, ArrayList<String>>
+public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
 {
     private final String TAG = GetTagsAsyncTask.class.getSimpleName();
 
     private final AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier;
-    private final boolean registeredForSite;
+    private final boolean registeredUser;
+    private final TagsDbAdapter tagsDbAdapter;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier,
-	            boolean registeredForSite)
+	            TagsDbAdapter tagsDbAdapter, boolean registeredUser)
     {
 	super();
 
 	this.taskCompletionNotifier = taskCompletionNotifier;
-	this.registeredForSite = registeredForSite;
+	this.tagsDbAdapter = tagsDbAdapter;
+	this.registeredUser = registeredUser;
     }
 
     @Override
-    protected ArrayList<String> doInBackground(Integer... params)
+    protected ArrayList<String> doInBackground(Void... params)
     {
 	ArrayList<String> tags = null;
 	try
 	{
-	    tags = UserServiceHelper.getInstance().getTags(1, registeredForSite);
+	    tagsDbAdapter.open();
+
+	    tags = tagsDbAdapter.getMyTags();
+
 	    if (tags == null || tags.isEmpty())
-		tags = UserServiceHelper.getInstance().getTags(1, !registeredForSite);
+	    {
+		tags = UserServiceHelper.getInstance().getTags(1, registeredUser);
+
+		if (tags == null || tags.isEmpty())
+		    tags = UserServiceHelper.getInstance().getTags(1, !registeredUser);
+
+		tagsDbAdapter.insertMyTags(tags);
+	    }
 	}
 	catch (HttpErrorException e)
 	{
 	    Log.e(TAG, "Error fetching tags: " + e.getMessage());
+	}
+	catch (SQLException e)
+	{
+	    Log.e(TAG, e.getMessage());
+	}
+	finally
+	{
+	    tagsDbAdapter.close();
 	}
 	return tags;
     }
