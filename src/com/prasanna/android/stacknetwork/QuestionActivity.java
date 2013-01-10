@@ -129,6 +129,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     }
 
     @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return false;
+    }
+
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
         boolean ret = super.onPrepareOptionsMenu(menu);

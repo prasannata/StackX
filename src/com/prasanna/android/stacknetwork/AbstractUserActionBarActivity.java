@@ -33,11 +33,19 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MenuItem.OnActionExpandListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import com.prasanna.android.cache.IconCache;
 import com.prasanna.android.listener.MenuItemClickListener;
 import com.prasanna.android.listener.OnDiscardOptionListener;
+import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
@@ -57,8 +65,12 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private IconCache iconCache = IconCache.getInstance();
     private OnDiscardOptionListener discardOptionListener;
     private MenuItemClickListener menuItemClickListener;
+    private boolean showingSearchFilters = false;
+    private PopupWindow popupWindow;
 
     protected abstract void refresh();
+
+    protected abstract boolean shouldSearchViewBeEnabled();
 
     protected void setMenuItemClickListener(MenuItemClickListener menuItemClickListener)
     {
@@ -103,7 +115,13 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
         getMenuInflater().inflate(R.menu.action_menu, menu);
 
-        setupSearchView(menu);
+        if (shouldSearchViewBeEnabled())
+            setupSearchView(menu);
+        else
+        {
+            menu.removeItem(R.id.menu_search);
+            menu.removeItem(R.id.menu_search_filter);
+        }
 
         if (isAuthenticatedRealm())
             setupActionBarForAuthenticatedUser(menu);
@@ -130,11 +148,63 @@ public abstract class AbstractUserActionBarActivity extends Activity
         }
     }
 
-    private void setupSearchView(Menu menu)
+    private void setupSearchView(final Menu menu)
     {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        searchItem.setOnActionExpandListener(new OnActionExpandListener()
+        {
+
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item)
+            {
+                menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.menu_search_filter).setVisible(true);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item)
+            {
+                menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                menu.findItem(R.id.menu_search_filter).setVisible(false);
+                return true;
+            }
+        });
+        searchView = (SearchView) searchItem.getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        setupPopupForSearchOptions();
+    }
+
+    private void setupPopupForSearchOptions()
+    {
+        RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
+        popupWindow = new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
+                        SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
+
+        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyWithAnswersCB),
+                        SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
+
+        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyAnsweredCB),
+                        SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
+    }
+
+    private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName)
+    {
+        checkBox.setChecked(SharedPreferencesUtil.isOn(getApplicationContext(), prefName, false));
+
+        checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                SharedPreferencesUtil.setOnOff(getApplicationContext(), prefName, isChecked);
+            }
+        });
     }
 
     private void loadIcon()
@@ -168,8 +238,9 @@ public abstract class AbstractUserActionBarActivity extends Activity
             case R.id.menu_refresh:
                 refresh();
                 return true;
-            case R.id.menu_search:
-                return false;
+            case R.id.menu_search_filter:
+                showSearchFilterOptions(item);
+                return true;
             case R.id.menu_my_profile:
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                 userProfileIntent.putExtra(StringConstants.ME, true);
@@ -210,6 +281,23 @@ public abstract class AbstractUserActionBarActivity extends Activity
         }
 
         return false;
+    }
+
+    private void showSearchFilterOptions(MenuItem item)
+    {
+        if (showingSearchFilters)
+        {
+            item.setIcon(R.drawable.expand);
+            popupWindow.dismiss();
+            showingSearchFilters = false;
+        }
+        else
+        {
+            item.setIcon(R.drawable.navigation_collapse);
+            searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            popupWindow.showAsDropDown(searchView, 300, 0);
+            showingSearchFilters = true;
+        }
     }
 
     private boolean handleHomeButtonClick(MenuItem item)

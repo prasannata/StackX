@@ -151,6 +151,12 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     }
 
     @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return true;
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState)
     {
         Log.d(TAG, "Saving activity instance");

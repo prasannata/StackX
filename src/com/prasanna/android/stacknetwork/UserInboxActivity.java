@@ -68,155 +68,161 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-	Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate");
 
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	receiver = new RestQueryResultReceiver(new Handler());
-	receiver.setReceiver(this);
+        receiver = new RestQueryResultReceiver(new Handler());
+        receiver.setReceiver(this);
 
-	if (progressBar == null)
-	    progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
+        if (progressBar == null)
+            progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
 
-	if (pages == null)
-	    pages = new ArrayList<StackXPage<InboxItem>>();
+        if (pages == null)
+            pages = new ArrayList<StackXPage<InboxItem>>();
 
-	setContentView(R.layout.list_view);
+        setContentView(R.layout.list_view);
 
-	setupListView();
+        setupListView();
 
-	startIntentService();
+        startIntentService();
     }
 
     private void setupListView()
     {
-	listView = (ListView) findViewById(android.R.id.list);
-	listView.addFooterView(progressBar);
-	itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
-	                new ArrayList<InboxItem>(), this);
-	listView.setAdapter(itemListAdapter);
-	listView.setOnScrollListener(this);
+        listView = (ListView) findViewById(android.R.id.list);
+        listView.addFooterView(progressBar);
+        itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
+                        new ArrayList<InboxItem>(), this);
+        listView.setAdapter(itemListAdapter);
+        listView.setOnScrollListener(this);
     }
 
     @Override
     public void onResume()
     {
-	super.onResume();
+        super.onResume();
 
-	if (itemListAdapter != null)
-	    itemListAdapter.notifyDataSetChanged();
+        if (itemListAdapter != null)
+            itemListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onStop()
     {
-	super.onStop();
+        super.onStop();
 
-	if (intent != null)
-	    stopService(intent);
+        if (intent != null)
+            stopService(intent);
     }
 
     private void startIntentService()
     {
-	if (!serviceRunning)
-	{
-	    SharedPreferences sharedPreferences = PreferenceManager
-		            .getDefaultSharedPreferences(getApplicationContext());
-	    if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-	    {
-		intent = new Intent(this, UserIntentService.class);
-		intent.setAction(StringConstants.INBOX_ITEMS);
-		intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
-		intent.putExtra(StringConstants.PAGE, ++page);
-		intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+        if (!serviceRunning)
+        {
+            SharedPreferences sharedPreferences = PreferenceManager
+                            .getDefaultSharedPreferences(getApplicationContext());
+            if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
+            {
+                intent = new Intent(this, UserIntentService.class);
+                intent.setAction(StringConstants.INBOX_ITEMS);
+                intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
+                intent.putExtra(StringConstants.PAGE, ++page);
+                intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
 
-		progressBar.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
 
-		startService(intent);
+                startService(intent);
 
-		serviceRunning = true;
-	    }
-	}
+                serviceRunning = true;
+            }
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-	boolean ret = super.onCreateOptionsMenu(menu);
+        boolean ret = super.onCreateOptionsMenu(menu);
 
-	menu.removeItem(R.id.menu_my_inbox);
+        menu.removeItem(R.id.menu_my_inbox);
 
-	return ret & true;
+        return ret & true;
     }
 
     @Override
     public void refresh()
     {
-	itemListAdapter.clear();
-	page = 0;
-	startIntentService();
+        itemListAdapter.clear();
+        page = 0;
+        startIntentService();
+    }
+
+    @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return false;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-	serviceRunning = false;
-	progressBar.setVisibility(View.GONE);
+        serviceRunning = false;
+        progressBar.setVisibility(View.GONE);
 
-	currentPageObject = (StackXPage<InboxItem>) resultData.getSerializable(StringConstants.INBOX_ITEMS);
+        currentPageObject = (StackXPage<InboxItem>) resultData.getSerializable(StringConstants.INBOX_ITEMS);
 
-	if (currentPageObject != null)
-	{
-	    pages.add(currentPageObject);
-	    itemListAdapter.addAll(currentPageObject.items);
-	}
+        if (currentPageObject != null)
+        {
+            pages.add(currentPageObject);
+            itemListAdapter.addAll(currentPageObject.items);
+        }
     }
 
     @Override
     public View getView(InboxItem item, View convertView, ViewGroup parent)
     {
-	RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.inbox_item, null);
+        RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.inbox_item, null);
 
-	TextView textView = (TextView) itemRow.findViewById(R.id.itemTitle);
-	textView.setText(Html.fromHtml(item.title));
+        TextView textView = (TextView) itemRow.findViewById(R.id.itemTitle);
+        textView.setText(Html.fromHtml(item.title));
 
-	if (item.body != null)
-	{
-	    textView = (TextView) itemRow.findViewById(R.id.itemBodyPreview);
-	    textView.setText(Html.fromHtml(item.body));
-	}
+        if (item.body != null)
+        {
+            textView = (TextView) itemRow.findViewById(R.id.itemBodyPreview);
+            textView.setText(Html.fromHtml(item.body));
+        }
 
-	textView = (TextView) itemRow.findViewById(R.id.itemCreationTime);
-	textView.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
+        textView = (TextView) itemRow.findViewById(R.id.itemCreationTime);
+        textView.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
 
-	if (item.site != null)
-	{
-	    textView = (TextView) itemRow.findViewById(R.id.itemSite);
-	    textView.setText(item.site.name);
-	}
+        if (item.site != null)
+        {
+            textView = (TextView) itemRow.findViewById(R.id.itemSite);
+            textView.setText(item.site.name);
+        }
 
-	return itemRow;
+        return itemRow;
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
     {
-	if (!serviceRunning && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
-	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
-	{
-	    if (currentPageObject != null && currentPageObject.hasMore)
-	    {
-		Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
-		progressBar.setVisibility(View.VISIBLE);
-		startIntentService();
-	    }
-	}
+        if (!serviceRunning && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
+                        && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
+        {
+            if (currentPageObject != null && currentPageObject.hasMore)
+            {
+                Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
+                progressBar.setVisibility(View.VISIBLE);
+                startIntentService();
+            }
+        }
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState)
     {
-	Log.v(TAG, "onScrollStateChanged");
+        Log.v(TAG, "onScrollStateChanged");
     }
 }

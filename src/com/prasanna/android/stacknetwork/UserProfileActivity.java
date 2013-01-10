@@ -38,7 +38,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity implements
-        OnContextItemSelectedListener<StackXItem>
+                OnContextItemSelectedListener<StackXItem>
 {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
     private static final String[] PAGES =
@@ -105,6 +105,12 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     {
         // TODO: Find a way to inform the fragment within current selected tab
         // to refresh
+    }
+
+    @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return false;
     }
 
     @Override

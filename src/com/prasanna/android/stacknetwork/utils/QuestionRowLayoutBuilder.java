@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork.utils;
 import android.content.Context;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -33,8 +32,6 @@ import com.prasanna.android.stacknetwork.model.Question;
 
 public class QuestionRowLayoutBuilder
 {
-    private static final String TAG = QuestionRowLayoutBuilder.class.getSimpleName();
-
     private static QuestionRowLayoutBuilder builder = new QuestionRowLayoutBuilder();
 
     private QuestionRowLayoutBuilder()
@@ -62,8 +59,6 @@ public class QuestionRowLayoutBuilder
         DisplayMetrics display = context.getResources().getDisplayMetrics();
         int maxWidth = display.widthPixels - 10;
 
-        Log.d(TAG, "Max width for tag row: " + maxWidth);
-
         LinearLayout rowLayout = createNewRowForTags(context, 0);
 
         if (question.tags != null && question.tags.length > 0)
@@ -78,8 +73,6 @@ public class QuestionRowLayoutBuilder
 
                 tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 rowLayout.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-                Log.d(TAG, "Current textview width: " + rowLayout.getMeasuredWidth());
 
                 if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > maxWidth)
                 {

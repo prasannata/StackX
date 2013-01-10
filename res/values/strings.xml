@@ -67,7 +67,6 @@
     <string name="MB">MB</string>
     <string name="storage">Storage</string>
     <string name="account">Account</string>
-    <string name="searchInTitle">Search in title</string>
     <string name="clearCache">Clear cache</string>
     <string name="email">Email</string>
     <string name="similar">Similar</string>
@@ -76,6 +75,11 @@
     <string name="general">General</string>
     <string name="defaultSite">Default site</string>
     <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid this problem, it is recommended that you login. Continue?</string>
+
+    <!-- Search filter options -->
+    <string name="search_inTitle">Search in title</string>
+    <string name="search_hasAnswers">Has Answers</string>
+    <string name="search_isAnswered">Is Answered</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

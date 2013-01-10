@@ -54,118 +54,124 @@ public class ArchiveDisplayActivity extends AbstractUserActionBarActivity
 
     private class CacheReadCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<Object>>
     {
-	@Override
-	public void notifyOnCompletion(ArrayList<Object> result)
-	{
-	    Log.d(TAG, "Read cache task complete");
-	    questions = result;
-	    displayQuestions();
-	}
+        @Override
+        public void notifyOnCompletion(ArrayList<Object> result)
+        {
+            Log.d(TAG, "Read cache task complete");
+            questions = result;
+            displayQuestions();
+        }
 
-	private void displayQuestions()
-	{
-	    if (questions != null && questions.isEmpty() == false)
-	    {
-		Log.d(TAG, "displaying saved questions");
+        private void displayQuestions()
+        {
+            if (questions != null && questions.isEmpty() == false)
+            {
+                Log.d(TAG, "displaying saved questions");
 
-		for (Object obj : questions)
-		{
-		    final Question question = (Question) obj;
-		    LinearLayout row = QuestionRowLayoutBuilder.getInstance().build(getLayoutInflater(),
-			            ArchiveDisplayActivity.this, question);
-		    setupQuestionDelCheckbox(question, row);
-		    container.addView(row);
-		}
-	    }
-	    else
-	    {
-		displayNoSavedQuestions();
-	    }
-	}
+                for (Object obj : questions)
+                {
+                    final Question question = (Question) obj;
+                    LinearLayout row = QuestionRowLayoutBuilder.getInstance().build(getLayoutInflater(),
+                                    ArchiveDisplayActivity.this, question);
+                    setupQuestionDelCheckbox(question, row);
+                    container.addView(row);
+                }
+            }
+            else
+            {
+                displayNoSavedQuestions();
+            }
+        }
 
-	private void displayNoSavedQuestions()
-	{
-	    FrameLayout emptyDisplayLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.empty_items, null);
-	    TextView textView = (TextView) emptyDisplayLayout.findViewById(R.id.emptyStatus);
-	    textView.setText("Empty. Long press on title while viewing a question.");
-	    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-		            FrameLayout.LayoutParams.MATCH_PARENT);
-	    params.gravity = Gravity.CENTER;
-	    container.addView(emptyDisplayLayout, params);
-	}
+        private void displayNoSavedQuestions()
+        {
+            FrameLayout emptyDisplayLayout = (FrameLayout) getLayoutInflater().inflate(R.layout.empty_items, null);
+            TextView textView = (TextView) emptyDisplayLayout.findViewById(R.id.emptyStatus);
+            textView.setText("Empty. Long press on title while viewing a question.");
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT);
+            params.gravity = Gravity.CENTER;
+            container.addView(emptyDisplayLayout, params);
+        }
     }
 
     private void setupQuestionDelCheckbox(final Question question, LinearLayout row)
     {
-	CheckBox deleteQuestionCheckBox = (CheckBox) row.findViewById(R.id.deleteItemCheckbox);
+        CheckBox deleteQuestionCheckBox = (CheckBox) row.findViewById(R.id.deleteItemCheckbox);
 
-	deleteQuestionCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
-	{
-	    @Override
-	    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-	    {
-		if (isChecked)
-		{
-		    if (toDelQuestions.isEmpty())
-			menu.findItem(R.id.menu_discard).setVisible(true);
+        deleteQuestionCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if (isChecked)
+                {
+                    if (toDelQuestions.isEmpty())
+                        menu.findItem(R.id.menu_discard).setVisible(true);
 
-		    toDelQuestions.add(question.id);
-		}
-		else
-		{
-		    toDelQuestions.remove(question.id);
+                    toDelQuestions.add(question.id);
+                }
+                else
+                {
+                    toDelQuestions.remove(question.id);
 
-		    if (toDelQuestions.isEmpty())
-			menu.findItem(R.id.menu_discard).setVisible(false);
-		}
+                    if (toDelQuestions.isEmpty())
+                        menu.findItem(R.id.menu_discard).setVisible(false);
+                }
 
-	    }
-	});
+            }
+        });
 
-	deleteQuestionCheckBox.setVisibility(View.VISIBLE);
+        deleteQuestionCheckBox.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
-	// setContentView(R.layout.ll_whitebg_vertical);
+        super.onCreate(savedInstanceState);
+        // setContentView(R.layout.ll_whitebg_vertical);
 
-	// container = (LinearLayout) findViewById(R.id.fragmentContainer);
+        // container = (LinearLayout) findViewById(R.id.fragmentContainer);
 
-	// refresh();
+        // refresh();
     }
 
     @Override
     public void refresh()
     {
-	File directory = new File(getCacheDir(), StringConstants.QUESTIONS);
-	ReadObjectAsyncTask asyncTask = new ReadObjectAsyncTask(directory, null, new CacheReadCompletionNotifier());
-	asyncTask.execute((Void) null);
+        File directory = new File(getCacheDir(), StringConstants.QUESTIONS);
+        ReadObjectAsyncTask asyncTask = new ReadObjectAsyncTask(directory, null, new CacheReadCompletionNotifier());
+        asyncTask.execute((Void) null);
+    }
+
+    @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return false;
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu)
     {
-	boolean ret = super.onCreateOptionsMenu(menu);
+        boolean ret = super.onCreateOptionsMenu(menu);
 
-	this.menu = menu;
-	menu.removeItem(R.id.menu_refresh);
-	setOnDiscardOptionClick(new OnDiscardOptionListener()
-	{
-	    @Override
-	    public void onDiscardOptionClick()
-	    {
-		menu.findItem(R.id.menu_discard).setVisible(false);
+        this.menu = menu;
+        menu.removeItem(R.id.menu_refresh);
+        setOnDiscardOptionClick(new OnDiscardOptionListener()
+        {
+            @Override
+            public void onDiscardOptionClick()
+            {
+                menu.findItem(R.id.menu_discard).setVisible(false);
 
-		for (Long questionId : toDelQuestions)
-		{
-		    SharedPreferencesUtil.deleteQuestion(getCacheDir(), questionId);
-		    container.removeView(findViewById(questionId.intValue()));
-		}
-	    }
-	});
+                for (Long questionId : toDelQuestions)
+                {
+                    SharedPreferencesUtil.deleteQuestion(getCacheDir(), questionId);
+                    container.removeView(findViewById(questionId.intValue()));
+                }
+            }
+        });
 
-	return ret & true;
+        return ret & true;
     }
 }

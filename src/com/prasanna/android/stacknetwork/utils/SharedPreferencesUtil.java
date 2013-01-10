@@ -59,10 +59,21 @@ public class SharedPreferencesUtil
         public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
     }
 
+    public static void setOnOff(Context context, String name, boolean on)
+    {
+        Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        prefEditor.putBoolean(name, on);
+        prefEditor.commit();
+    }
+
+    public static boolean isOn(Context context, String name, boolean defaultValue)
+    {
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(name, defaultValue);
+    }
+
     public static boolean isFirstRun(Context context)
     {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
-                StringConstants.IS_FIRST_RUN, true);
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(StringConstants.IS_FIRST_RUN, true);
     }
 
     public static void setFirstRunComplete(Context context)
@@ -90,8 +101,8 @@ public class SharedPreferencesUtil
 
     public static String getDefaultSiteName(Context context)
     {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(
-                SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.KEY_PREF_DEFAULT_SITE,
+                        null);
     }
 
     public static void setDefaultSite(Context context, Site site)
@@ -171,7 +182,7 @@ public class SharedPreferencesUtil
             }
 
             SoftReference<ArrayList<Site>> registeredSitesSoftReference = new SoftReference<ArrayList<Site>>(
-                    registeredSites);
+                            registeredSites);
 
             if (!registeredSites.isEmpty())
                 cacheRegisteredSites(cacheDir, registeredSitesSoftReference.get());
@@ -225,8 +236,7 @@ public class SharedPreferencesUtil
     public static HashMap<String, Site> getRegisteredSitesForUser(File cacheDir)
     {
         Log.d(TAG, cacheDir.toString());
-        return (HashMap<String, Site>) readObject(new File(cacheDir,
-                CacheFileName.REGD_SITE_CACHE_FILE_NAME));
+        return (HashMap<String, Site>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
     }
 
     /**
@@ -320,8 +330,7 @@ public class SharedPreferencesUtil
                 File file = new File(directory, fileName);
                 if (file.isDirectory())
                 {
-                    ArrayList<Object> childObjects = readObjects(directory, depth != null ? --depth
-                            : depth);
+                    ArrayList<Object> childObjects = readObjects(directory, depth != null ? --depth : depth);
                     if (childObjects != null)
                     {
                         objects.addAll(childObjects);
@@ -447,8 +456,7 @@ public class SharedPreferencesUtil
     {
         if (userAccessToken == null && context != null)
         {
-            SharedPreferences sharedPreferences = PreferenceManager
-                    .getDefaultSharedPreferences(context);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             userAccessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
         }
 
@@ -510,8 +518,7 @@ public class SharedPreferencesUtil
 
         int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
 
-        return String.format(Locale.US, "%.1f %sB", size / Math.pow(BYTE_UNIT, exp),
-                sizeUnit[exp - 1]);
+        return String.format(Locale.US, "%.1f %sB", size / Math.pow(BYTE_UNIT, exp), sizeUnit[exp - 1]);
     }
 
     public static String getQuestionDirSize(File cacheDir)
@@ -546,7 +553,8 @@ public class SharedPreferencesUtil
         {
             File dir = new File(cacheDir, StringConstants.ME);
             File file = new File(dir, OperatingSite.getSite().name + "." + StringConstants.ME);
-            if (file.exists()) return (User) readObject(file);
+            if (file.exists())
+                return (User) readObject(file);
         }
 
         return null;
@@ -568,7 +576,8 @@ public class SharedPreferencesUtil
         {
             File dir = new File(cacheDir, StringConstants.ME);
             File file = new File(dir, StringConstants.ACCOUNTS);
-            if (file.exists()) return (ArrayList<Account>) readObject(file);
+            if (file.exists())
+                return (ArrayList<Account>) readObject(file);
         }
 
         return null;

@@ -50,8 +50,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 
-public class SettingsFragment extends PreferenceFragment implements
-        OnSharedPreferenceChangeListener
+public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
 {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
@@ -64,6 +63,9 @@ public class SettingsFragment extends PreferenceFragment implements
     public static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
     public static final String KEY_PREF_CLEAR_CACHE = "pref_clearCache";
     public static final String KEY_PREF_DEFAULT_SITE = "pref_defaultSite";
+    public static final String KEY_PREF_SEARCH_IN_TITLE = "pref_searchInTitle";
+    public static final String KEY_PREF_SEARCH_ONLY_WITH_ANSWERS = "pref_searchOnlyWithAnswers";
+    public static final String KEY_PREF_SEARCH_ONLY_ANSWERED = "pref_searchOnlyAnswered";
 
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
@@ -77,32 +79,30 @@ public class SettingsFragment extends PreferenceFragment implements
 
     public static int getInboxRefreshInterval(Context context)
     {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return Integer.parseInt(sharedPreferences.getString(KEY_PREF_INBOX_REFRESH_INTERVAL, "-1"));
     }
 
     public static boolean isNotificationEnabled(Context context)
     {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(KEY_PREF_INBOX_NOTIFICATION, false);
     }
 
     public static boolean isVibrateEnabled(Context context)
     {
-        if (!isNotificationEnabled(context)) return false;
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        if (!isNotificationEnabled(context))
+            return false;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
     }
 
     public static Uri getRingtone(Context context)
     {
-        if (!isNotificationEnabled(context)) return null;
+        if (!isNotificationEnabled(context))
+            return null;
 
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return Uri.parse(sharedPreferences.getString(KEY_PREF_NOTIF_RINGTONE, ""));
     }
 
@@ -213,8 +213,8 @@ public class SettingsFragment extends PreferenceFragment implements
             {
                 accountActionPref.getDialog().dismiss();
 
-                AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(),
-                        R.string.logoutMsg, dialogClickListener);
+                AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg,
+                                dialogClickListener);
                 yesNoDialog.show();
 
                 return true;
@@ -255,8 +255,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private void setupCacheMaxSizePreference()
     {
-        String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity()
-                .getCacheDir());
+        String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity().getCacheDir());
 
         cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
         cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
@@ -264,8 +263,7 @@ public class SettingsFragment extends PreferenceFragment implements
 
     private String getCacheSizeSummary(String currentCacheSize)
     {
-        return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: "
-                + currentCacheSize;
+        return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: " + currentCacheSize;
     }
 
     private void setupRingtonePreference()
@@ -281,8 +279,8 @@ public class SettingsFragment extends PreferenceFragment implements
             }
         });
 
-        Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(
-                KEY_PREF_NOTIF_RINGTONE, DEFAULT_RINGTONE));
+        Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
+                        DEFAULT_RINGTONE));
         setRingtoneSummary(ringtoneUri);
     }
 
@@ -297,8 +295,7 @@ public class SettingsFragment extends PreferenceFragment implements
     public void onPause()
     {
         super.onPause();
-        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(
-                this);
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
