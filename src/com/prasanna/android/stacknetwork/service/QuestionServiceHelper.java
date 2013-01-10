@@ -21,6 +21,7 @@ package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +39,7 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionServiceHelper extends AbstractBaseServiceHelper
 {
@@ -74,6 +76,9 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                         JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                         answers.add(getSerializedAnswerObject(jsonObject));
                     }
+
+                    if (!answers.isEmpty())
+                        getCommentsForAnswers(answers);
                 }
             }
             catch (JSONException e)
@@ -82,6 +87,51 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             }
         }
         return answers;
+    }
+
+    private void getCommentsForAnswers(ArrayList<Answer> answers)
+    {
+        StringBuilder stringBuilder = new StringBuilder();
+        WeakHashMap<Long, Answer> idAnswerMap = new WeakHashMap<Long, Answer>();
+
+        for (Answer answer : answers)
+        {
+            stringBuilder.append(answer.id).append(";");
+            idAnswerMap.put(answer.id, answer);
+        }
+
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+
+        getCommensAndUpdateAnswer(stringBuilder.toString(), idAnswerMap);
+    }
+
+    private void getCommensAndUpdateAnswer(String answerIds, WeakHashMap<Long, Answer> idAnswerMap)
+    {
+        boolean hasMore = true;
+        int page = 1;
+        while (hasMore)
+        {
+            StackXPage<Comment> commentsPage = getComments(StringConstants.ANSWERS, answerIds, page++);
+
+            if (commentsPage != null && commentsPage.items != null)
+            {
+                for (Comment comment : commentsPage.items)
+                {
+                    if (idAnswerMap.containsKey(comment.post_id))
+                    {
+                        if (idAnswerMap.get(comment.post_id).comments == null)
+                            idAnswerMap.get(comment.post_id).comments = new ArrayList<Comment>();
+
+                        idAnswerMap.get(comment.post_id).comments.add(comment);
+                    }
+                }
+
+                hasMore = commentsPage.hasMore;
+            }
+            else
+                hasMore = false;
+
+        }
     }
 
     public String getQuestionBodyForId(long id)
@@ -111,19 +161,23 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return questionBody;
     }
 
-    public ArrayList<Comment> getComments(String parent, String parentId)
+    public StackXPage<Comment> getComments(String parent, String parentId, int page)
     {
-        ArrayList<Comment> comments = null;
+        StackXPage<Comment> commentsPage = null;
+
         String restEndPoint = parent + "/" + parentId + "/comments";
         Map<String, String> queryParams = getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+
         JSONObjectWrapper commentsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
 
         if (commentsJsonResponse != null)
         {
             try
             {
-                JSONArray jsonArray = commentsJsonResponse.getJSONArray(JsonFields.ITEMS);
+                getPageInfo(commentsJsonResponse, commentsPage);
 
+                JSONArray jsonArray = commentsJsonResponse.getJSONArray(JsonFields.ITEMS);
                 for (int count = 0; count < jsonArray.length(); count++)
                 {
                     Comment comment = new Comment();
@@ -136,20 +190,22 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                     comment.owner = getSerializableUserSnippetObject(JSONObjectWrapper.wrap(jsonObject
                                     .getJSONObject(JsonFields.Comment.OWNER)));
 
-                    if (comments == null)
+                    if (commentsPage == null)
                     {
-                        comments = new ArrayList<Comment>();
+                        commentsPage = new StackXPage<Comment>();
+                        commentsPage.items = new ArrayList<Comment>();
                     }
 
-                    comments.add(comment);
+                    commentsPage.items.add(comment);
                 }
+
             }
             catch (JSONException e)
             {
                 Log.d(TAG, e.getMessage());
             }
         }
-        return comments;
+        return commentsPage;
     }
 
     private Map<String, String> getDefaultQueryParams()
@@ -185,6 +241,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
         return getQuestionModel(questionsJsonResponse);
     }
+
     @Override
     protected String getLogTag()
     {

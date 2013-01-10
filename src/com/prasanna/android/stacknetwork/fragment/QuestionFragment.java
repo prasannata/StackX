@@ -196,7 +196,7 @@ public class QuestionFragment extends Fragment
         if (question.comments != null && !question.comments.isEmpty())
         {
             TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
-            textView.append(String.valueOf(question.comments.size()));
+            textView.setText(getString(R.string.comments) + ":" + String.valueOf(question.comments.size()));
             textView.setVisibility(View.VISIBLE);
 
             enableCommentsInContextMenu();

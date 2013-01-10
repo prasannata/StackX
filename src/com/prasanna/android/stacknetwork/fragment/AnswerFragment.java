@@ -78,9 +78,6 @@ public class AnswerFragment extends Fragment
             answerBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.answerBody);
             answerMetaInfoLayout = (RelativeLayout) parentLayout.findViewById(R.id.answerMetaInfo);
             iv = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
-
-            if (answer != null)
-                displayAnswer();
         }
 
         return parentLayout;
@@ -94,6 +91,9 @@ public class AnswerFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         registerForContextMenu(iv);
+
+        if (answer != null)
+            displayAnswer();
     }
 
     private void displayAnswer()
@@ -104,6 +104,14 @@ public class AnswerFragment extends Fragment
         String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
         textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
         textView.setText(getAutherDisplayText(acceptRate));
+
+        if (answer.comments != null && !answer.comments.isEmpty())
+        {
+            textView = (TextView) parentLayout.findViewById(R.id.answerCommentsCount);
+            textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
+            textView.setVisibility(View.VISIBLE);
+
+        }
 
         final ImageView imageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
         imageView.setOnClickListener(new View.OnClickListener()
@@ -131,8 +139,7 @@ public class AnswerFragment extends Fragment
     private void setupQuestionTitleAction(final ImageView questionViewAction)
     {
         final LinearLayout layout = (LinearLayout) parentLayout.findViewById(R.id.qTitleLayout);
-        layout.startAnimation(AnimationUtils.loadAnimation(getActivity(),
-                android.R.anim.slide_in_left));
+        layout.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_in_left));
 
         HtmlTextView tv = (HtmlTextView) parentLayout.findViewById(R.id.qTitle);
         tv.setText(answer.title);
@@ -153,8 +160,7 @@ public class AnswerFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                layout.startAnimation(AnimationUtils.loadAnimation(getActivity(),
-                        android.R.anim.slide_out_right));
+                layout.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.slide_out_right));
                 layout.setVisibility(View.GONE);
                 questionViewAction.setVisibility(View.VISIBLE);
             }
@@ -168,8 +174,8 @@ public class AnswerFragment extends Fragment
     private String getAutherDisplayText(String acceptRate)
     {
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by "
-                + Html.fromHtml(answer.owner.displayName) + " [" + acceptRate
-                + AppUtils.formatReputation(answer.owner.reputation) + "]";
+                        + Html.fromHtml(answer.owner.displayName) + " [" + acceptRate
+                        + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
     private void setAnswer(Answer answer)
