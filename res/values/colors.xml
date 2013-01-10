@@ -3,22 +3,14 @@
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="blue">#0000FF</color>
     <color name="lightGrey">#CDCDCD</color>
-    <color name="honeydew">#E0EEE0</color>
-    <color name="orange">#F0A804</color>
     <color name="delft">#22316C</color>
-    <color name="darkSeaGreen">#C3FDB8</color>
-    <color name="veryLightGrey">#F5F5F5</color>
     <color name="darkGreen">#006400</color>
     <color name="gold">#D4A017</color>
     <color name="silver">#C0C0C0</color>
     <color name="bronze">#8C7853</color>
     <color name="lichen">#C0D9AF</color>
-    <color name="azure">#C0D9D9</color>
-    <color name="signRed">#AF1E2D</color>
     <color name="tagBlue">#E0EAF1</color>
     <color name="codeBg">#EAEAEA</color>
-    <color name="transparent">#80000000</color>
 
 </resources>
