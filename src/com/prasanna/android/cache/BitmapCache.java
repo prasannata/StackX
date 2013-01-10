@@ -23,17 +23,17 @@ import com.prasanna.android.stacknetwork.utils.LruCache;
 
 import android.graphics.Bitmap;
 
-public class IconCache extends LruCache<String, Bitmap>
+public class BitmapCache extends LruCache<String, Bitmap>
 {
     private static int CACHE_SIZE = 5;
-    private static final IconCache INSTANCE = new IconCache();
+    private static final BitmapCache INSTANCE = new BitmapCache();
 
-    private IconCache()
+    private BitmapCache()
     {
 	super(CACHE_SIZE);
     }
 
-    public static IconCache getInstance()
+    public static BitmapCache getInstance()
     {
 	return INSTANCE;
     }

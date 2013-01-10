@@ -44,7 +44,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
-import com.prasanna.android.cache.IconCache;
+import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.listener.MenuItemClickListener;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
@@ -64,7 +64,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private String accessToken;
     protected SearchView searchView;
-    private IconCache iconCache = IconCache.getInstance();
+    private BitmapCache iconCache = BitmapCache.getInstance();
     private OnDiscardOptionListener discardOptionListener;
     private MenuItemClickListener menuItemClickListener;
     private boolean showingSearchFilters = false;
