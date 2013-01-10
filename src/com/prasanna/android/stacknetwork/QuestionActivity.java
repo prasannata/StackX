@@ -272,8 +272,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             switch (item.getItemId())
             {
                 case R.id.q_ctx_comments:
-                    if (question.comments != null && !question.comments.isEmpty())
-                        displayCommentFragment(question.id + "-" + StringConstants.COMMENTS, question.comments);
+                    displayQuestionComments();
                     return true;
                 case R.id.q_ctx_related:
                     Intent questionsIntent = new Intent(this, QuestionsActivity.class);
@@ -323,7 +322,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             switch (item.getItemId())
             {
                 case R.id.q_ctx_comments:
-                    displayCommentsForAnswer(answer);
+                    displayAnswerComments(answer);
                     return true;
                 case R.id.q_ctx_menu_user_profile:
                     viewUserProfile(answer.owner.id);
@@ -337,7 +336,15 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         return false;
     }
 
-    private void displayCommentsForAnswer(Answer answer)
+    private void displayQuestionComments()
+    {
+        if (question.comments != null && !question.comments.isEmpty())
+            displayCommentFragment(question.id + "-" + StringConstants.COMMENTS, question.comments);
+        else
+            Toast.makeText(this, "No comments for question", Toast.LENGTH_SHORT).show();
+    }
+
+    private void displayAnswerComments(Answer answer)
     {
         if (answer.comments != null && !answer.comments.isEmpty())
             displayCommentFragment(answer.id + "-" + StringConstants.COMMENTS, answer.comments);

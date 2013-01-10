@@ -44,8 +44,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class UserAnswerListFragment extends ItemListFragment<Answer> implements
-        ListItemView<Answer>
+public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
 {
     private static final String TAG = UserAnswerListFragment.class.getSimpleName();
     private int page = 1;
@@ -63,8 +62,9 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
-                    new ArrayList<Answer>(), this);
+                            new ArrayList<Answer>(), this);
 
+            itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
             showProgressBar();
         }
         return itemsContainer;
@@ -73,13 +73,10 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
     @Override
     protected void startIntentService()
     {
-        intent = getIntentForService(UserIntentService.class,
-                UserIntentAction.ANSWERS_BY_USER.getAction());
+        intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
         intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
-        intent.putExtra(StringConstants.ME,
-                getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-        intent.putExtra(StringConstants.USER_ID,
-                getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+        intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+        intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         intent.putExtra(StringConstants.PAGE, page++);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
@@ -147,16 +144,13 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements
     @Override
     public View getView(final Answer answer, View convertView, ViewGroup parent)
     {
-        LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(
-                R.layout.answer_snippet, null);
-
-        TextView textView = (TextView) answerRow.findViewById(R.id.score);
-        textView.setVisibility(View.GONE);
+        LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater()
+                        .inflate(R.layout.answer_snippet, null);
 
         if (answer.accepted)
             answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
 
-        textView = (TextView) answerRow.findViewById(R.id.itemTitle);
+        TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
         textView.setText(Html.fromHtml(answer.title));
         RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
         layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);

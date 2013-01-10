@@ -12,7 +12,34 @@
         android:src="@color/lichen"
         android:visibility="gone" />
 
-    <include layout="@layout/item_title" />
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp" >
+
+        <ImageView
+            android:id="@+id/itemContextMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="6dp"
+            android:src="@drawable/control_bottom_right" />
+
+        <TextView
+            android:id="@+id/itemTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_toLeftOf="@id/itemContextMenu"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/answerBodyPreview"
