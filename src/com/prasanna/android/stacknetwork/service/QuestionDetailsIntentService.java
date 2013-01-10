@@ -94,8 +94,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void getAnswersForQuestion(final ResultReceiver receiver, long questionId, int page)
     {
-	ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
-	sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, answers);
+	ArrayList<Answer> answers = getAnswersAndSend(receiver, questionId, page);
 
 	QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
     }
@@ -135,20 +134,21 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
 
 	if (question.answerCount > 0)
-	{
-	    question.answers = questionService.getAnswersForQuestion(question.id, 1);
-	    sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, question.answers);
-	}
+	    question.answers = getAnswersAndSend(receiver, question.id, 1);
     }
 
     private Question getQuestionMetaAndBodyAndSend(ResultReceiver receiver, long questionId)
     {
 	Question question = questionService.getQuestionFullDetails(questionId);
-
-	Bundle bundle = new Bundle();
-	bundle.putSerializable(StringConstants.QUESTION, question);
-	receiver.send(RESULT_CODE_Q, bundle);
+	sendSerializable(receiver, RESULT_CODE_Q, StringConstants.QUESTION, question);
 	return question;
+    }
+
+    private ArrayList<Answer> getAnswersAndSend(final ResultReceiver receiver, long questionId, int page)
+    {
+	ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
+	sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, answers);
+	return answers;
     }
 
     private void sendSerializable(ResultReceiver receiver, int resultCode, String key, Serializable value)
@@ -157,4 +157,5 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 	bundle.putSerializable(key, value);
 	receiver.send(resultCode, bundle);
     }
+
 }
