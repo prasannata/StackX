@@ -30,13 +30,15 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -168,6 +170,11 @@ public abstract class AbstractUserActionBarActivity extends Activity
             {
                 menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 menu.findItem(R.id.menu_search_filter).setVisible(false);
+                if (popupWindow.isShowing())
+                    popupWindow.dismiss();
+                menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
+
+                showingSearchFilters = false;
                 return true;
             }
         });
@@ -290,6 +297,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
             item.setIcon(R.drawable.expand);
             popupWindow.dismiss();
             showingSearchFilters = false;
+            searchView.requestFocus();
         }
         else
         {
@@ -297,7 +305,9 @@ public abstract class AbstractUserActionBarActivity extends Activity
             searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             popupWindow.showAsDropDown(searchView, 300, 0);
             showingSearchFilters = true;
+            searchView.clearFocus();
         }
+
     }
 
     private boolean handleHomeButtonClick(MenuItem item)
