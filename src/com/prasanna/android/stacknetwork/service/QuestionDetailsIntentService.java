@@ -19,6 +19,7 @@
 
 package com.prasanna.android.stacknetwork.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import android.content.Intent;
@@ -41,7 +42,8 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     public static final int RESULT_CODE_Q = 0x01;
     public static final int RESULT_CODE_Q_BODY = 0x02;
     public static final int RESULT_CODE_Q_COMMENTS = 0x03;
-    public static final int RESULT_CODE_Q_ANSWERS = 0x04;
+    public static final int RESULT_CODE_ANSWERS = 0x04;
+    public static final int RESULT_CODE_ANSWERS_COMMENTS = 0x05;
 
     public QuestionDetailsIntentService()
     {
@@ -81,77 +83,78 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 		int page = intent.getIntExtra(StringConstants.PAGE, 0);
 
 		if (questionId > 0 && page > 0)
-		{
-		    ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
-		    if (answers != null)
-		    {
-			QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
-
-			Bundle bundle = new Bundle();
-			bundle.putSerializable(StringConstants.ANSWERS, answers);
-			receiver.send(RESULT_CODE_Q_ANSWERS, bundle);
-		    }
-		}
+		    getAnswersForQuestion(receiver, questionId, page);
 	    }
 	    else
 	    {
-
 		getQuestionDetail(receiver, intent);
 	    }
 	}
     }
 
+    private void getAnswersForQuestion(final ResultReceiver receiver, long questionId, int page)
+    {
+	ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
+	sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, answers);
+
+	QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
+    }
+
     private void getQuestionDetail(ResultReceiver receiver, Intent intent)
     {
-	Bundle bundle = new Bundle();
 	long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
-
 	Question question = QuestionsCache.getInstance().get(questionId);
 
 	if (question != null)
 	{
 	    Log.d(TAG, "Question " + questionId + " recovered from cache.");
-	    bundle.putSerializable(StringConstants.QUESTION, question);
-	    receiver.send(RESULT_CODE_Q, bundle);
+	    sendSerializable(receiver, RESULT_CODE_Q, StringConstants.QUESTION, question);
 	}
 	else
 	{
-	    question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
-
 	    if (StringConstants.QUESTION.equals(intent.getAction()))
 	    {
-		question.body = questionService.getQuestionBodyForId(questionId);
-		bundle.putString(StringConstants.BODY, question.body);
-		receiver.send(RESULT_CODE_Q_BODY, bundle);
-
-		getCommentsAndSend(question, receiver, bundle, questionId);
-
-		if (question.answerCount > 0)
-		    getAnswersAndSend(question, receiver, bundle, questionId);
-
+		question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
+		getQuestionAndAnswers(receiver, question);
 	    }
 	    else
 	    {
-		question = questionService.getQuestionFullDetails(questionId);
-		bundle.putSerializable(StringConstants.QUESTION, question);
-		receiver.send(RESULT_CODE_Q, bundle);
+		question = getQuestionMetaAndBodyAndSend(receiver, questionId);
 	    }
 
 	    QuestionsCache.getInstance().add(question.id, question);
 	}
     }
 
-    public void getAnswersAndSend(Question question, ResultReceiver receiver, Bundle bundle, long questionId)
+    private void getQuestionAndAnswers(ResultReceiver receiver, Question question)
     {
-	question.answers = questionService.getAnswersForQuestion(questionId, 1);
-	bundle.putSerializable(StringConstants.ANSWERS, question.answers);
-	receiver.send(RESULT_CODE_Q_ANSWERS, bundle);
+	question.body = questionService.getQuestionBodyForId(question.id);
+	sendSerializable(receiver, RESULT_CODE_Q_BODY, StringConstants.BODY, question.body);
+
+	question.comments = questionService.getComments(StringConstants.QUESTIONS, String.valueOf(question.id));
+	sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
+
+	if (question.answerCount > 0)
+	{
+	    question.answers = questionService.getAnswersForQuestion(question.id, 1);
+	    sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, question.answers);
+	}
     }
 
-    public void getCommentsAndSend(Question question, ResultReceiver receiver, Bundle bundle, long questionId)
+    private Question getQuestionMetaAndBodyAndSend(ResultReceiver receiver, long questionId)
     {
-	question.comments = questionService.getComments(StringConstants.QUESTIONS, String.valueOf(questionId));
-	bundle.putSerializable(StringConstants.COMMENTS, question.comments);
-	receiver.send(RESULT_CODE_Q_COMMENTS, bundle);
+	Question question = questionService.getQuestionFullDetails(questionId);
+
+	Bundle bundle = new Bundle();
+	bundle.putSerializable(StringConstants.QUESTION, question);
+	receiver.send(RESULT_CODE_Q, bundle);
+	return question;
+    }
+
+    private void sendSerializable(ResultReceiver receiver, int resultCode, String key, Serializable value)
+    {
+	Bundle bundle = new Bundle();
+	bundle.putSerializable(key, value);
+	receiver.send(resultCode, bundle);
     }
 }

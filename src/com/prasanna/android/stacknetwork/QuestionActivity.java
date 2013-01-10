@@ -346,7 +346,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);
                 questionFragment.setComments(question.comments);
                 break;
-            case QuestionDetailsIntentService.RESULT_CODE_Q_ANSWERS:
+            case QuestionDetailsIntentService.RESULT_CODE_ANSWERS:
                 serviceRunningForAnswers = false;
                 setProgressBarIndeterminateVisibility(false);
                 displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS));
