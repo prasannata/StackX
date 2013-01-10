@@ -35,7 +35,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.sqlite.TagsDbAdapter;
+import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -120,7 +120,7 @@ public class TagListFragment extends ListFragment
 	{
 	    getProgressBar().setVisibility(View.VISIBLE);
 	    GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
-		            new TagsDbAdapter(getActivity()), AppUtils.inRegisteredSite(getActivity()));
+		            new TagDAO(getActivity()), AppUtils.inRegisteredSite(getActivity()));
 	    fetchUserAsyncTask.execute();
 	    tagsFetched = true;
 	}

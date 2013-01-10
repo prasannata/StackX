@@ -27,7 +27,7 @@ import android.util.Log;
 
 import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
-import com.prasanna.android.stacknetwork.sqlite.TagsDbAdapter;
+import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 
 public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
 {
@@ -35,10 +35,10 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
 
     private final AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier;
     private final boolean registeredUser;
-    private final TagsDbAdapter tagsDbAdapter;
+    private final TagDAO tagsDbAdapter;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier,
-	            TagsDbAdapter tagsDbAdapter, boolean registeredUser)
+	            TagDAO tagsDbAdapter, boolean registeredUser)
     {
 	super();
 

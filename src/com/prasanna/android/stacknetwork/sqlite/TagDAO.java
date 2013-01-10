@@ -30,14 +30,14 @@ import android.util.Log;
 
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsTable;
 
-public class TagsDbAdapter
+public class TagDAO
 {
-    private static final String TAG = TagsDbAdapter.class.getSimpleName();
+    private static final String TAG = TagDAO.class.getSimpleName();
 
     private final DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
-    public TagsDbAdapter(Context context)
+    public TagDAO(Context context)
     {
 	databaseHelper = new DatabaseHelper(context);
     }
