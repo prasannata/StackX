@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="labelComments">"Comments: "</string>
-    <string name="labelViews">"Views: "</string>
-    <string name="labelReputation">"Reputation: "</string>
-    <string name="labelAcceptRate">"Accept %: "</string>
-
-</resources>
