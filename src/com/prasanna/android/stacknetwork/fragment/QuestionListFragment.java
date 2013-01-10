@@ -33,7 +33,10 @@ import android.widget.LinearLayout;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.SearchCriteria;
+import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -49,194 +52,214 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     public String sort;
     public String tag;
 
+    private SearchCriteria criteria;
+
     public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
-        QuestionListFragment newFragment = new QuestionListFragment();
-        newFragment.sort = sort;
-        newFragment.action = action;
-        newFragment.tag = tag;
-        return newFragment;
+	QuestionListFragment newFragment = new QuestionListFragment();
+	newFragment.sort = sort;
+	newFragment.action = action;
+	newFragment.tag = tag;
+	return newFragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
+	Log.d(TAG, "onCreateView");
 
-        if (itemsContainer == null)
-        {
-            itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                            new ArrayList<Question>(), this);
-        }
+	if (itemsContainer == null)
+	{
+	    itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
+	    itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+		            new ArrayList<Question>(), this);
+	}
 
-        return itemsContainer;
+	return itemsContainer;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
+	Log.d(TAG, "onActivityCreated");
 
-        super.onActivityCreated(savedInstanceState);
+	super.onActivityCreated(savedInstanceState);
 
-        if (tag != null)
-            getActivity().getActionBar().setTitle(tag);
+	if (tag != null)
+	    getActivity().getActionBar().setTitle(tag);
 
-        findActionAndStartService();
+	findActionAndStartService();
 
     }
 
     private void findActionAndStartService()
     {
-        if (!created)
-        {
-            switch (action)
-            {
-                case QuestionsIntentService.GET_FRONT_PAGE:
-                    getFrontPage();
-                    break;
-                case QuestionsIntentService.GET_FAQ_FOR_TAG:
-                    getFaqsForTag();
-                    break;
-                case QuestionsIntentService.GET_QUESTIONS_FOR_TAG:
-                    getQuestionsForTag();
-                    break;
-                case QuestionsIntentService.GET_RELATED:
-                    getRelatedQuestions();
-                    break;
-                case QuestionsIntentService.SEARCH:
-                    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
-                    break;
-                default:
-                    Log.d(TAG, "Unknown action: " + action);
-                    break;
-            }
+	if (!created)
+	{
+	    switch (action)
+	    {
+		case QuestionsIntentService.GET_FRONT_PAGE:
+		    getFrontPage();
+		    break;
+		case QuestionsIntentService.GET_FAQ_FOR_TAG:
+		    getFaqsForTag();
+		    break;
+		case QuestionsIntentService.GET_QUESTIONS_FOR_TAG:
+		    getQuestionsForTag();
+		    break;
+		case QuestionsIntentService.GET_RELATED:
+		    getRelatedQuestions();
+		    break;
+		case QuestionsIntentService.SEARCH:
+		    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
+		    break;
+		default:
+		    Log.d(TAG, "Unknown action: " + action);
+		    break;
+	    }
 
-            created = true;
-        }
-        else
-        {
-            Log.d(TAG, "Fragment " + tag + " was already created. Restoring");
+	    created = true;
+	}
+	else
+	{
+	    Log.d(TAG, "Fragment " + tag + " was already created. Restoring");
 
-            if (itemListAdapter != null)
-            {
-                itemListAdapter.notifyDataSetInvalidated();
-                itemListAdapter.notifyDataSetChanged();
-            }
-        }
+	    if (itemListAdapter != null)
+	    {
+		itemListAdapter.notifyDataSetInvalidated();
+		itemListAdapter.notifyDataSetChanged();
+	    }
+	}
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "Saving instance state");
+	Log.d(TAG, "Saving instance state");
 
-        super.onSaveInstanceState(outState);
+	super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onStop()
     {
-        Log.d(getLogTag(), "onStop");
+	Log.d(getLogTag(), "onStop");
 
-        super.onStop();
+	super.onStop();
 
-        stopService(intent);
+	stopService(intent);
     }
 
     @Override
     protected void startIntentService()
     {
-        intent.putExtra(StringConstants.PAGE, ++currentPage);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        intent.putExtra(StringConstants.SORT, sort);
-        startService(intent);
+	intent.putExtra(StringConstants.PAGE, ++currentPage);
+	intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+	intent.putExtra(StringConstants.SORT, sort);
+	startService(intent);
     }
 
     @Override
     public String getLogTag()
     {
-        return TAG;
+	return TAG;
     }
 
     @Override
     public void refresh()
     {
-        clean();
-        created = false;
-        showProgressBar();
-        findActionAndStartService();
+	clean();
+	created = false;
+	showProgressBar();
+	findActionAndStartService();
     }
 
     private void stopRunningServiceAndReceiver()
     {
-        if (isServiceRunning())
-            getActivity().stopService(intent);
+	if (isServiceRunning())
+	    getActivity().stopService(intent);
     }
 
     private void clean()
     {
-        stopRunningServiceAndReceiver();
+	stopRunningServiceAndReceiver();
 
-        itemListAdapter.clear();
+	itemListAdapter.clear();
 
-        currentPage = 0;
+	currentPage = 0;
     }
 
     private void getFrontPage()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 
-        showProgressBar();
+	showProgressBar();
 
-        startIntentService();
+	startIntentService();
     }
 
     private void getRelatedQuestions()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
-        intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
+	intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 
-        showProgressBar();
+	showProgressBar();
 
-        startIntentService();
+	startIntentService();
     }
 
     private void getFaqsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
-        intent.putExtra(StringConstants.TAG, tag);
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
+	intent.putExtra(StringConstants.TAG, tag);
 
-        showProgressBar();
-
-        startIntentService();
+	showProgressBar();
+	startIntentService();
     }
 
     private void getQuestionsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
-        intent.putExtra(StringConstants.TAG, tag);
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
+	intent.putExtra(StringConstants.TAG, tag);
 
-        showProgressBar();
-
-        startIntentService();
+	showProgressBar();
+	startIntentService();
     }
 
-    public void search(String query)
+    private void search(String query)
     {
-        clean();
+	clean();
 
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH);
-        intent.putExtra(SearchManager.QUERY, query);
+	if (criteria == null)
+	    buildSearchCriteria(query);
+	else
+	    criteria = criteria.nextPage();
 
-        showProgressBar();
+	intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
+	intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
+	intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
 
-        startIntentService();
+	showProgressBar();
+	startIntentService();
+    }
+
+    private void buildSearchCriteria(String query)
+    {
+	criteria = SearchCriteria.newCriteria(query);
+
+	if (SharedPreferencesUtil.isOn(getActivity(), SettingsFragment.KEY_PREF_SEARCH_IN_TITLE, false))
+	    criteria = criteria.queryMustInTitle();
+
+	if (SharedPreferencesUtil.isOn(getActivity(), SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS, false))
+	    criteria = criteria.setMinAnswers(1);
+
+	if (SharedPreferencesUtil.isOn(getActivity(), SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED, false))
+	    criteria = criteria.mustBeAnswered();
+
+	criteria = criteria.sortBy(SearchSort.RELEVANCE).build();
     }
 }

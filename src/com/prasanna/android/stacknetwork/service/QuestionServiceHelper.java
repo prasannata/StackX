@@ -31,6 +31,7 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
@@ -173,6 +174,17 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return getQuestionModel(questionsJsonResponse);
     }
 
+    public StackXPage<Question> searchAdvanced(SearchCriteria searchCriteria)
+    {
+        String restEndPoint = "search/advanced";
+        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.putAll(searchCriteria.getMap());
+
+        JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+
+        return getQuestionModel(questionsJsonResponse);
+    }
     @Override
     protected String getLogTag()
     {

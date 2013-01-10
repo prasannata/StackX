@@ -66,6 +66,8 @@ public class StringConstants
 
     public static final String TEXT = "text";
 
+    public static final String SEARCH_CRITERIA = "search_criteria";
+
     public static final class HttpError
     {
         public static final String CODE = "code";
