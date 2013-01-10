@@ -34,31 +34,31 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     public static final class TagsTable
     {
-	public static final String COLUMN_ID = "_id";
-	public static final String COLUMN_VALUE = "_value";
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_VALUE = "_value";
 
-	private static final String CREATE_TABLE = "create table " + TABLE_TAGS + "(" + COLUMN_ID
-	                + " integer primary key autoincrement, " + COLUMN_VALUE + ");";
-	private static final String CREATE_MY_TABLE = "create table " + TABLE_MY_TAGS + "(" + COLUMN_ID
-	                + " integer primary key autoincrement, " + COLUMN_VALUE + ");";
+        private static final String CREATE_TABLE = "create table " + TABLE_TAGS + "(" + COLUMN_ID
+                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null);";
+        private static final String CREATE_MY_TABLE = "create table " + TABLE_MY_TAGS + "(" + COLUMN_ID
+                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null);";
     }
 
     public DatabaseHelper(Context context)
     {
-	super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-	db.execSQL(TagsTable.CREATE_TABLE);
-	db.execSQL(TagsTable.CREATE_MY_TABLE);
+        db.execSQL(TagsTable.CREATE_TABLE);
+        db.execSQL(TagsTable.CREATE_MY_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
     }
 
 }
