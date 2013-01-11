@@ -54,6 +54,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
     private ArrayList<String> tags = new ArrayList<String>();
     private String currentFragmentTag;
+    private boolean showTagsFragment = false;
 
     public class TabListener implements ActionBar.TabListener
     {
@@ -100,20 +101,25 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         }
         else if (StringConstants.RELATED.equals(getIntent().getAction()))
         {
-            beginRelatedQuestionsFragment(getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
+            showRelatedQuestionsFragment(getIntent().getLongExtra(StringConstants.QUESTION_ID, 0));
         }
         else if (StringConstants.TAG.equals(getIntent().getAction()))
         {
-            addFaqFragment(getIntent().getStringExtra(StringConstants.TAG));
+            String tag = getIntent().getStringExtra(StringConstants.TAG);
+
+            QuestionListFragment newFragment = QuestionListFragment.newFragment(
+                            QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, null);
+            newFragment.getBundle().putString(StringConstants.TAG, tag);
+            replaceFragment(newFragment, FRAGMENT_TAG_PREFIX + tag, false);
         }
         else
         {
-            // showFrontPageFragment();
-            setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, StringConstants.FRONT_PAGE, true);
+            showTagsFragment = true;
+            setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, StringConstants.FRONT_PAGE);
         }
     }
 
-    private void setupActionBarTabs(int action, String tag, boolean isFrontPage)
+    private void setupActionBarTabs(int action, String tag)
     {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(OperatingSite.getSite().name);
@@ -164,93 +170,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         super.onSaveInstanceState(outState);
     }
 
-    private void addFaqFragment(String faqTag)
-    {
-        QuestionListFragment newFragment = QuestionListFragment.newFragment(
-                        QuestionsIntentService.GET_QUESTIONS_FOR_TAG, faqTag, null);
-        newFragment.getBundle().putString(StringConstants.TAG, faqTag);
-        addFragment(newFragment, FRAGMENT_TAG_PREFIX + faqTag, false);
-    }
-
-    private void removeFragment(String fragmentTag, boolean addToBackStack)
-    {
-
-        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
-        if (fragment != null)
-        {
-            Log.d(TAG, "Removing fragment " + fragmentTag);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.remove(fragment);
-            if (addToBackStack)
-                ft.addToBackStack(fragmentTag);
-            ft.commit();
-        }
-    }
-
-    private void hideFragment(String fragmentTag)
-    {
-        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
-        if (fragment != null)
-        {
-            Log.d(TAG, "hiding fragment " + fragmentTag);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.hide(fragment);
-            ft.commit();
-        }
-    }
-
-    private void showFragment(String fragmentTag)
-    {
-        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
-        if (fragment != null)
-        {
-            Log.d(TAG, "showing fragment " + fragmentTag);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.show(fragment);
-            ft.commit();
-        }
-    }
-
-    private void addFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
-    {
-        Log.d(TAG, "Adding fragment " + fragmentTag);
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.fragmentContainer, fragment, fragmentTag);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        if (addToBackStack)
-            ft.addToBackStack(fragmentTag);
-        ft.commit();
-        currentFragmentTag = fragmentTag;
-    }
-
-    private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
-    {
-        Log.d(TAG, "Replacing current fragment with " + fragmentTag);
-
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        if (addToBackStack)
-            ft.addToBackStack(fragmentTag);
-        ft.commit();
-        currentFragmentTag = fragmentTag;
-    }
-
-    private void beginRelatedQuestionsFragment(long questionId)
-    {
-        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
-                        null);
-        newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-        replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, true);
-    }
-
-    private void emailQuestion(String subject, String body)
-    {
-        Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
-        startActivity(Intent.createChooser(emailIntent, ""));
-    }
-
     @Override
     public boolean onContextItemSelected(MenuItem item, Question question)
     {
@@ -268,7 +187,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                     startActivity(userProfileIntent);
                     break;
                 case R.id.q_ctx_related:
-                    beginRelatedQuestionsFragment(question.id);
+                    startRelatedQuestionsActivity(question);
                     return true;
                 case R.id.q_ctx_menu_email:
                     emailQuestion(question.title, question.link);
@@ -280,19 +199,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
         {
             Log.d(TAG, "Tag selected: " + item.getTitle());
-            addFaqFragment((String) item.getTitle());
+            startTagQuestionsActivity((String) item.getTitle());
             return true;
         }
 
         return false;
-    }
-
-    private void showComments(Question question)
-    {
-        if (question != null && question.comments != null && question.comments.size() > 0)
-            Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
-        else
-            Toast.makeText(this, "No comments", Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -309,28 +220,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             finish();
     }
 
-    // private void showFrontPageFragment()
-    // {
-    // Log.d(TAG, "Front page selected");
-    //
-    // QuestionListFragment fragment = (QuestionListFragment)
-    // findFragment(FRAGMENT_TAG_FRONT_PAGE);
-    //
-    // if (fragment == null)
-    // {
-    // Log.d(TAG, "Creating new fragment for front page");
-    // fragment =
-    // QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE,
-    // StringConstants.FRONT_PAGE, null);
-    // }
-    //
-    // replaceFragment(fragment, FRAGMENT_TAG_FRONT_PAGE, false);
-    // }
-
     @Override
     public boolean onClick(MenuItem menuItem)
     {
-        if (menuItem.getItemId() == android.R.id.home)
+        if (showTagsFragment && menuItem.getItemId() == android.R.id.home)
         {
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             getActionBar().setTitle(StringConstants.TAGS);
@@ -348,18 +241,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                 removeFragment(currentFragmentTag, false);
                 showFragment(StringConstants.TAGS);
             }
-            // addFragment(tagListFragment, StringConstants.TAGS, false);
             return true;
         }
 
         return false;
-    }
-
-    private void hideTagFragmentAndSetupTabsForTag(int action, String tag, boolean isFrontPage)
-    {
-        getActionBar().removeAllTabs();
-        hideFragment(StringConstants.TAGS);
-        setupActionBarTabs(action, tag, isFrontPage);
     }
 
     @Override
@@ -367,23 +252,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "Front page selected");
 
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, StringConstants.FRONT_PAGE, true);
-        // QuestionListFragment fragment = (QuestionListFragment)
-        // findFragment(FRAGMENT_TAG_FRONT_PAGE);
-        //
-        // if (fragment == null)
-        // {
-        // Log.d(TAG, "Creating new fragment for front page");
-        // fragment =
-        // QuestionListFragment.newFragment(QuestionsIntentService.GET_FRONT_PAGE,
-        // StringConstants.FRONT_PAGE, null);
-        // replaceFragment(fragment, FRAGMENT_TAG_FRONT_PAGE, true);
-        // }
-        // else
-        // {
-        // replaceFragment(fragment, FRAGMENT_TAG_FRONT_PAGE, false);
-        // }
-
+        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, StringConstants.FRONT_PAGE);
     }
 
     @Override
@@ -391,13 +260,104 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, tag + " selected");
 
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
-        // QuestionListFragment fragment = (QuestionListFragment)
-        // findFragment(FRAGMENT_TAG_PREFIX + tag);
-        // if (fragment == null)
-        // addFaqFragment(tag);
-        // else
-        // showFragment(FRAGMENT_TAG_PREFIX + tag);
+        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag);
     }
 
+    private void showComments(Question question)
+    {
+        if (question != null && question.comments != null && question.comments.size() > 0)
+            Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
+        else
+            Toast.makeText(this, "No comments", Toast.LENGTH_LONG).show();
+    }
+
+    private void startRelatedQuestionsActivity(Question question)
+    {
+        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.RELATED);
+        questionsIntent.putExtra(StringConstants.QUESTION_ID, question.id);
+        startActivity(questionsIntent);
+    }
+
+    private void startTagQuestionsActivity(String tag)
+    {
+        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.TAG);
+        questionsIntent.putExtra(StringConstants.TAG, tag);
+        startActivity(questionsIntent);
+    }
+
+    private void showRelatedQuestionsFragment(long questionId)
+    {
+        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
+                        null);
+        newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+        replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, true);
+    }
+
+    private void emailQuestion(String subject, String body)
+    {
+        Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
+        startActivity(Intent.createChooser(emailIntent, ""));
+    }
+
+    private void hideTagFragmentAndSetupTabsForTag(int action, String tag)
+    {
+        getActionBar().removeAllTabs();
+        hideFragment(StringConstants.TAGS);
+        setupActionBarTabs(action, tag);
+    }
+
+    private void showFragment(String fragmentTag)
+    {
+        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment != null)
+        {
+            Log.d(TAG, "showing fragment " + fragmentTag);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.show(fragment);
+            ft.commit();
+        }
+    }
+
+    private void hideFragment(String fragmentTag)
+    {
+        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment != null)
+        {
+            Log.d(TAG, "hiding fragment " + fragmentTag);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.hide(fragment);
+            ft.commit();
+        }
+    }
+
+    private void removeFragment(String fragmentTag, boolean addToBackStack)
+    {
+        Fragment fragment = getFragmentManager().findFragmentByTag(fragmentTag);
+        if (fragment != null)
+        {
+            Log.d(TAG, "Removing fragment " + fragmentTag);
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.remove(fragment);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            if (addToBackStack)
+                ft.addToBackStack(fragmentTag);
+            ft.commit();
+            currentFragmentTag = null;
+        }
+    }
+
+    private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
+    {
+        Log.d(TAG, "Replacing current fragment with " + fragmentTag);
+
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        if (addToBackStack)
+            ft.addToBackStack(fragmentTag);
+        ft.commit();
+        currentFragmentTag = fragmentTag;
+    }
 }
