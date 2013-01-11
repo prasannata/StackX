@@ -25,9 +25,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -35,12 +41,14 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
+import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -52,6 +60,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     private static final int ANSWER_PREVIEW_LEN = 200;
     private static final String ANS_CONTNUES = "...";
     private static final String MULTIPLE_NEW_LINES_AT_END = "[\\n]+$";
+
+    private int position;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -68,6 +78,56 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             showProgressBar();
         }
         return itemsContainer;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    {
+        Log.d(TAG, "onCreateContextMenu");
+
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
+        position = info.position;
+
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.question_context_menu, menu);
+
+        menu.removeItem(R.id.q_ctx_menu_archive);
+        menu.removeItem(R.id.q_ctx_comments);
+        menu.removeItem(R.id.q_ctx_menu_tags);
+        menu.removeItem(R.id.q_ctx_menu_user_profile);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        Log.d(TAG, "onContextItemSelected");
+
+        if (item.getGroupId() == R.id.qContextMenuGroup)
+        {
+
+            Log.d(TAG, "Context item selected: " + item.getTitle());
+
+            switch (item.getItemId())
+            {
+                case R.id.q_ctx_related:
+                    Intent questionsIntent = new Intent(getActivity(), QuestionsActivity.class);
+                    questionsIntent.setAction(StringConstants.RELATED);
+                    questionsIntent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
+                    startActivity(questionsIntent);
+                    return true;
+                case R.id.q_ctx_menu_email:
+                    Intent emailIntent = IntentUtils.createEmailIntent(itemListAdapter.getItem(position).title,
+                                    itemListAdapter.getItem(position).link);
+                    startActivity(Intent.createChooser(emailIntent, ""));
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -105,6 +165,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         registerForContextMenu(getListView());
 
         super.onActivityCreated(savedInstanceState);
+
+        registerForContextMenu(getListView());
 
         startIntentService();
     }
@@ -177,6 +239,16 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             else
                 textView.setText(Html.fromHtml(answerBody));
         }
+
+        ImageView imageView = (ImageView) answerRow.findViewById(R.id.itemContextMenu);
+        imageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                getActivity().openContextMenu(v);
+            }
+        });
         return answerRow;
     }
 

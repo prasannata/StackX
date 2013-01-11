@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/acceptedAnswer"
         android:layout_width="match_parent"
-        android:layout_height="3dp"
+        android:layout_height="2dp"
         android:src="@color/lichen"
         android:visibility="gone" />
 

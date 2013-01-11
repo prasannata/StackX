@@ -26,7 +26,6 @@ import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
@@ -123,13 +122,6 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
 
             switch (item.getItemId())
             {
-                case R.id.q_ctx_comments:
-                    Toast.makeText(this, "Fetch comments", Toast.LENGTH_LONG).show();
-                    return true;
-                case R.id.q_ctx_menu_user_profile:
-                    Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-                    userProfileIntent.putExtra(StringConstants.USER_ID, stackXItem.owner.id);
-                    startActivity(userProfileIntent);
                 case R.id.q_ctx_related:
                     Intent questionsIntent = new Intent(this, QuestionsActivity.class);
                     questionsIntent.setAction(StringConstants.RELATED);
@@ -137,7 +129,8 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
                     startActivity(questionsIntent);
                     return true;
                 case R.id.q_ctx_menu_email:
-                    IntentUtils.createEmailIntent(stackXItem.title, stackXItem.link);
+                    Intent emailIntent = IntentUtils.createEmailIntent(stackXItem.title, stackXItem.link);
+                    startActivity(Intent.createChooser(emailIntent, ""));
                     return true;
                 default:
                     return false;
