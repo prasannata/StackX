@@ -89,7 +89,7 @@
         android:layout_gravity="bottom|left"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="7dp"
-        android:src="@drawable/question_mark_small" />
+        android:src="@drawable/question_mark_normal" />
 
     <LinearLayout
         android:id="@+id/qTitleLayout"
