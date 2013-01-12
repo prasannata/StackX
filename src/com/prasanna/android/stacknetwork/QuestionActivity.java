@@ -128,6 +128,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             questionFragment = QuestionFragment.newFragment();
 
         setupViewPager();
+        
+        prepareIntentAndStartService();
     }
 
     @Override
@@ -145,14 +147,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             menu.removeItem(R.id.menu_search);
 
         return ret;
-    }
-
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-
-        prepareIntentAndStartService();
     }
 
     private void setupViewPager()
