@@ -85,12 +85,16 @@ public abstract class AbstractUserActionBarActivity extends Activity
 	super.onCreate(savedInstanceState);
 
 	refreshOperationSite();
+	initializeActionBar();
+    }
 
+    private void initializeActionBar()
+    {
 	if (getActionBar().getTitle() == null)
 	    getActionBar().setTitle(OperatingSite.getSite().name);
 
 	if (iconCache.containsKey(OperatingSite.getSite().name))
-	    setActionBarIcon(iconCache.get(OperatingSite.getSite().name));
+	    setActionBarHomeIcon(iconCache.get(OperatingSite.getSite().name));
 	else
 	    loadIcon();
     }
@@ -243,7 +247,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 	    @Override
 	    public void notifyOnCompletion(Bitmap result)
 	    {
-		setActionBarIcon(result);
+		setActionBarHomeIcon(result);
 		iconCache.add(OperatingSite.getSite().name, result);
 	    }
 	});
@@ -251,7 +255,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 	fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
     }
 
-    private void setActionBarIcon(Bitmap result)
+    private void setActionBarHomeIcon(Bitmap result)
     {
 	getActionBar().setIcon(new BitmapDrawable(getResources(), result));
 	getActionBar().setHomeButtonEnabled(true);
