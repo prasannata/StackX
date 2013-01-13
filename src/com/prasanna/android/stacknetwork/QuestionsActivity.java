@@ -52,6 +52,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private static final String TAG = QuestionsActivity.class.getSimpleName();
     private static final String FRAGMENT_TAG_PREFIX = "spinner_";
 
+    private static final String TAB_TITLE_ACTIVE = "Active";
+    private static final String TAB_TITLE_NEW = "New";
+    private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
+
     private ArrayList<String> tags = new ArrayList<String>();
     private String currentFragmentTag;
     private boolean showTagsFragment = false;
@@ -124,17 +128,17 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         Tab activeQuestionsTab = actionBar.newTab();
-        activeQuestionsTab.setText("Active").setTabListener(
+        activeQuestionsTab.setText(TAB_TITLE_ACTIVE).setTabListener(
                         new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.ACTIVITY)));
         actionBar.addTab(activeQuestionsTab);
 
         Tab newQuestionsTab = actionBar.newTab();
-        newQuestionsTab.setText("New").setTabListener(
+        newQuestionsTab.setText(TAB_TITLE_NEW).setTabListener(
                         new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.CREATION)));
         actionBar.addTab(newQuestionsTab);
 
         Tab votedQuestionsTab = actionBar.newTab();
-        votedQuestionsTab.setText("Most Voted").setTabListener(
+        votedQuestionsTab.setText(TAB_TITLE_MOST_VOTED).setTabListener(
                         new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.VOTES)));
         actionBar.addTab(votedQuestionsTab);
     }
