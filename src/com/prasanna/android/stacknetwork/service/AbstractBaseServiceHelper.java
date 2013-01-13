@@ -36,8 +36,10 @@ import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -254,5 +256,13 @@ public abstract class AbstractBaseServiceHelper
         }
 
         return response;
+    }
+    
+    protected Map<String, String> getDefaultQueryParams()
+    {
+        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
+        return queryParams;
     }
 }

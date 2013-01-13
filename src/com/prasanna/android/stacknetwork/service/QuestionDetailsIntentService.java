@@ -45,7 +45,6 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     public static final int RESULT_CODE_Q_BODY = 0x02;
     public static final int RESULT_CODE_Q_COMMENTS = 0x03;
     public static final int RESULT_CODE_ANSWERS = 0x04;
-    public static final int RESULT_CODE_ANSWERS_COMMENTS = 0x05;
 
     public QuestionDetailsIntentService()
     {

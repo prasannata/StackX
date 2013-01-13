@@ -30,13 +30,18 @@ public class JsonFields
     {
         public static final String SCORE = "score";
         public static final String OWNER = "owner";
-        public static final String POST_ID = "post_id";
         public static final String BODY = "body";
         public static final String TITLE = "title";
         public static final String CREATION_DATE = "creation_date";
         public static final String LINK = "link";
     }
 
+    public static class Post extends CommonFields
+    {
+        public static final String POST_ID = "post_id";
+        public static final String POST_TYPE = "post_type";
+    }
+    
     public static class Question extends CommonFields
     {
         public static final String QUESTION_ID = "question_id";
@@ -56,6 +61,7 @@ public class JsonFields
 
     public static class Comment extends CommonFields
     {
+        public static final String POST_ID = "post_id";
         public static final String COMMENT_ID = "comment_id";
     }
 

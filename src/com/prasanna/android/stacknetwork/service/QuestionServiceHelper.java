@@ -208,13 +208,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return commentsPage;
     }
 
-    private Map<String, String> getDefaultQueryParams()
-    {
-        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
-        return queryParams;
-    }
 
     public StackXPage<Question> search(String query, int page)
     {

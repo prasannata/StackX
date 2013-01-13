@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white" >
+
+    <include
+        android:id="@+id/inboxItemTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        layout="@layout/inbox_item" />
+
+    <TextView
+        android:id="@+id/responseUserAndTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/inboxItemTitle"
+        android:layout_margin="3dp"
+        android:textColor="@color/black"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/responseItemScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/inboxItemTitle"
+        android:layout_margin="3dp"
+        android:background="@drawable/rounded_border_delft"
+        android:textColor="@color/black"
+        android:textSize="10sp" />
+
+    <ScrollView
+        android:id="@+id/postBodyScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/inboxItemTitle"
+        android:layout_alignRight="@id/inboxItemTitle"
+        android:layout_below="@id/responseUserAndTime"
+        android:layout_marginTop="5dp"
+        android:scrollbars="vertical" >
+
+        <LinearLayout
+            android:id="@+id/postBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>

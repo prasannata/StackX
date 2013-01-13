@@ -34,10 +34,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
@@ -73,7 +76,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         super.onCreate(savedInstanceState);
 
         getActionBar().setTitle(getString(R.string.inbox));
-        
+
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
 
@@ -98,6 +101,32 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
                         new ArrayList<InboxItem>(), this);
         listView.setAdapter(itemListAdapter);
         listView.setOnScrollListener(this);
+        listView.setOnItemClickListener(new OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View view, int position, long id)
+            {
+                InboxItem item = (InboxItem) adapter.getItemAtPosition(position);
+
+                if (item.itemType != null)
+                {
+                    boolean isSupportedItem = item.itemType.equals(InboxItem.ItemType.COMMENT)
+                                    || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER);
+
+                    if (isSupportedItem)
+                    {
+                        Intent intent = new Intent(UserInboxActivity.this, InboxItemActivity.class);
+                        intent.putExtra(StringConstants.INBOX_ITEM, item);
+                        startActivity(intent);
+                    }
+                    else
+                    {
+                        Toast.makeText(UserInboxActivity.this, "Sorry, this message type not supported by application",
+                                        Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });
     }
 
     @Override

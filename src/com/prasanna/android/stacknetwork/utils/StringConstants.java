@@ -38,6 +38,8 @@ public class StringConstants
     public static final String ANSWERS = "answers";
     public static final String ANSWER_COUNT = "answer_count";
 
+    public static final String COMMENT_ID = "comment_id";
+    public static final String COMMENT = "comment";
     public static final String COMMENTS = "comments";
 
     public static final String USER = "user";
@@ -62,11 +64,15 @@ public class StringConstants
 
     public static final String BODY = "body";
 
+    public static final String INBOX_ITEM = "inbox_item";
     public static final String INBOX_ITEMS = "inbox_items";
 
     public static final String TEXT = "text";
 
     public static final String SEARCH_CRITERIA = "search_criteria";
+
+    public static final String POST_ID = "post_id";
+    public static final String POST = "post";
 
     public static final class HttpError
     {
