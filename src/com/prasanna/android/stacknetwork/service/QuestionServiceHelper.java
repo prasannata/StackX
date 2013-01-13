@@ -20,8 +20,8 @@
 package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,7 +92,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
     private void getCommentsForAnswers(ArrayList<Answer> answers)
     {
         StringBuilder stringBuilder = new StringBuilder();
-        WeakHashMap<Long, Answer> idAnswerMap = new WeakHashMap<Long, Answer>();
+        HashMap<Long, Answer> idAnswerMap = new HashMap<Long, Answer>();
 
         for (Answer answer : answers)
         {
@@ -105,7 +105,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         getCommensAndUpdateAnswer(stringBuilder.toString(), idAnswerMap);
     }
 
-    private void getCommensAndUpdateAnswer(String answerIds, WeakHashMap<Long, Answer> idAnswerMap)
+    private void getCommensAndUpdateAnswer(String answerIds, HashMap<Long, Answer> idAnswerMap)
     {
         boolean hasMore = true;
         int page = 1;

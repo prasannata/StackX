@@ -19,6 +19,8 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
 import android.util.Log;
@@ -30,15 +32,24 @@ public class LruCache<K, T>
     private static final String TAG = LruCache.class.getSimpleName();
     
     private final int size;
-    private final LRU<K, WeakReference<T>> lru;
+    private final LRU<K, Reference<T>> lru;
 
     public LruCache(int size)
     {
 	this.size = size;
-	lru = new LRU<K, WeakReference<T>>(size);
+	lru = new LRU<K, Reference<T>>(size);
     }
 
     public void add(K key, T value)
+    {
+	if (key != null && value != null)
+	{
+	    Log.d(TAG, "Adding " + key);
+	    lru.put(key, new SoftReference<T>(value));
+	}
+    }
+
+    public void addWeak(K key, T value)
     {
 	if (key != null && value != null)
 	{

@@ -78,8 +78,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         public void onTabReselected(Tab tab, FragmentTransaction ft)
         {
-            onTabUnselected(tab, ft);
-            onTabSelected(tab, ft);
         }
     }
 

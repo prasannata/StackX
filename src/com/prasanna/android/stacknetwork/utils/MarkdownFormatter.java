@@ -53,8 +53,11 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.Html;
 import android.text.util.Linkify;
@@ -67,6 +70,8 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.FullscreenTextActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.GetImageAsyncTask;
 
 public class MarkdownFormatter
 {
@@ -79,6 +84,45 @@ public class MarkdownFormatter
 	public static final String IMG = "img";
 	public static final String BR = "br";
     }
+
+    public static class Attributes
+    {
+	public static final String SRC = "src";
+    }
+
+    private static class AsyncTaskCompletionNotifierImagePopup implements AsyncTaskCompletionNotifier<Bitmap>
+    {
+	private Context context;
+
+	public AsyncTaskCompletionNotifierImagePopup(Context context)
+	{
+	    this.context = context;
+	}
+
+	@Override
+	public void notifyOnCompletion(Bitmap result)
+	{
+	    ImageView imageView = new ImageView(context);
+	    imageView.setImageBitmap(result);
+	    showImageDialog(context, imageView);
+	}
+
+	private void showImageDialog(final Context context, ImageView imageView)
+	{
+	    AlertDialog.Builder imageDialog = new AlertDialog.Builder(context);
+	    imageDialog.setView(imageView);
+	    String hide = context.getResources().getString(R.string.hide);
+	    imageDialog.setPositiveButton(hide,
+		            new DialogInterface.OnClickListener()
+		            {
+		                public void onClick(DialogInterface dialog, int which)
+		                {
+			            dialog.dismiss();
+		                }
+		            });
+	    imageDialog.show();
+	}
+    };
 
     public static String escapeHtml(CharSequence text)
     {
@@ -160,6 +204,13 @@ public class MarkdownFormatter
 		    {
 			if (xmlPullParser.getName().equals(Tags.CODE))
 			    codeFound = true;
+			else if (xmlPullParser.getName().equals(Tags.IMG))
+			{
+			    addSimpleTextToView(context, views, buffer, params);
+
+			    String attributeValue = xmlPullParser.getAttributeValue(null, Attributes.SRC);
+			    addImgLinkText(context, views, attributeValue, params);
+			}
 			else
 			    buffer.append("<" + xmlPullParser.getName() + ">");
 		    }
@@ -177,6 +228,10 @@ public class MarkdownFormatter
 				views.add(getTextViewForCode(context, code.toString()));
 				buffer.delete(0, code.length());
 			    }
+			}
+			else if (xmlPullParser.getName().equals(Tags.IMG))
+			{
+			    Log.v(TAG, "Ignore img tag");
 			}
 			else
 			{
@@ -237,16 +292,43 @@ public class MarkdownFormatter
 	}
     }
 
+    private static void addImgLinkText(final Context context, ArrayList<View> views, final String url,
+	            LinearLayout.LayoutParams params)
+    {
+	final TextView textView = new TextView(context);
+	textView.setTextColor(Color.BLUE);
+	textView.setLayoutParams(params);
+	textView.setText("View image");
+	textView.setTextSize(11f);
+	textView.setPadding(3, 3, 3, 3);
+	textView.setTag(url);
+	textView.setClickable(true);
+	setupOnLinkClick(context, url, textView);
+	views.add(textView);
+    }
+
+    private static void setupOnLinkClick(final Context context, final String url, final TextView textView)
+    {
+	textView.setOnClickListener(new View.OnClickListener()
+	{
+	    @Override
+	    public void onClick(View v)
+	    {
+		new GetImageAsyncTask(new AsyncTaskCompletionNotifierImagePopup(context)).execute(url);
+	    }
+	});
+    }
+
     private static TextView getTextView(Context context, LinearLayout.LayoutParams params, StringBuffer buffer)
     {
 	TextView textView = new TextView(context);
-	textView.setTag("text");
 	textView.setTextColor(Color.BLACK);
 	textView.setLayoutParams(params);
-	textView.setAutoLinkMask(Linkify.WEB_URLS);
 	textView.setTextSize(11f);
 	textView.setTextIsSelectable(true);
 	textView.setText(Html.fromHtml(buffer.toString()));
+	textView.setLinksClickable(true);
+	textView.setAutoLinkMask(Linkify.WEB_URLS);
 	return textView;
     }
 

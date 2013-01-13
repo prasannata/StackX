@@ -74,6 +74,7 @@
     <string name="related">Related</string>
     <string name="general">General</string>
     <string name="defaultSite">Default site</string>
+    <string name="hide">Hide</string>
     <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid this problem, it is recommended that you login. Continue?</string>
 
     <!-- Search filter options -->

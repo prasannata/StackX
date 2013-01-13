@@ -15,21 +15,21 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.task;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
+import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.http.SecureHttpHelper;
 
 public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 {
     private final AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl;
 
-    public GetImageAsyncTask(
-		    AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl)
+    public GetImageAsyncTask(AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl)
     {
 	this.imageFetchAsyncTaskCompleteNotiferImpl = imageFetchAsyncTaskCompleteNotiferImpl;
     }
@@ -37,21 +37,24 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
     @Override
     protected Bitmap doInBackground(String... urls)
     {
-	Bitmap bitmap = null;
 	if (urls != null && urls.length == 1)
 	{
-	    bitmap = SecureHttpHelper.getInstance().fetchImage((String) urls[0]);
+	    Bitmap bitmap = BitmapCache.getInstance().get(urls[0]);
+
+	    if (bitmap == null)
+		bitmap = SecureHttpHelper.getInstance().fetchImage((String) urls[0]);
+
+	    return bitmap;
 	}
-	return bitmap;
+
+	return null;
     }
 
     @Override
     protected void onPostExecute(Bitmap bitmap)
     {
 	if (imageFetchAsyncTaskCompleteNotiferImpl != null)
-	{
 	    imageFetchAsyncTaskCompleteNotiferImpl.notifyOnCompletion(bitmap);
-	}
     }
 
 }

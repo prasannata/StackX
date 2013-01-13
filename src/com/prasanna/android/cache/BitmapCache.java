@@ -19,9 +19,9 @@
 
 package com.prasanna.android.cache;
 
-import com.prasanna.android.stacknetwork.utils.LruCache;
-
 import android.graphics.Bitmap;
+
+import com.prasanna.android.stacknetwork.utils.LruCache;
 
 public class BitmapCache extends LruCache<String, Bitmap>
 {
@@ -37,4 +37,11 @@ public class BitmapCache extends LruCache<String, Bitmap>
     {
 	return INSTANCE;
     }
+
+    @Override
+    public void add(String key, Bitmap value)
+    {
+	addWeak(key, value);
+    }
+
 }
