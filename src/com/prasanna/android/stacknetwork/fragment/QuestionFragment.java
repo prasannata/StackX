@@ -29,7 +29,6 @@ import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
@@ -103,8 +102,7 @@ public class QuestionFragment extends Fragment
 
 	super.onCreateContextMenu(menu, v, menuInfo);
 
-	MenuInflater inflater = getActivity().getMenuInflater();
-	inflater.inflate(R.menu.question_context_menu, menu);
+	getActivity().getMenuInflater().inflate(R.menu.question_context_menu, menu);
 	this.menu = menu;
 
 	setupUserProfileInContextMenu();
@@ -116,7 +114,7 @@ public class QuestionFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
 	super.onActivityCreated(savedInstanceState);
-	
+
 	if (question != null)
 	{
 	    Log.d(TAG, "Setting action bar title: " + question.title);
@@ -231,7 +229,8 @@ public class QuestionFragment extends Fragment
     public void setComments(ArrayList<Comment> comments)
     {
 	question.comments = comments;
-	showNumComments();
+	if (parentLayout != null)
+	    showNumComments();
     }
 
     public void setAndDisplay(Question question)
@@ -239,7 +238,12 @@ public class QuestionFragment extends Fragment
 	setQuestion(question);
 
 	if (parentLayout != null)
+	{
+	    if (isAdded())
+		getActivity().getActionBar().setTitle(question.title);
+
 	    displayQuestion();
+	}
     }
 
     public void enableNavigationBack(OnClickListener clickListener)

@@ -54,6 +54,10 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipData.Item;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,7 +70,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.FullscreenTextActivity;
 import com.prasanna.android.stacknetwork.R;
@@ -112,14 +118,13 @@ public class MarkdownFormatter
 	    AlertDialog.Builder imageDialog = new AlertDialog.Builder(context);
 	    imageDialog.setView(imageView);
 	    String hide = context.getResources().getString(R.string.hide);
-	    imageDialog.setPositiveButton(hide,
-		            new DialogInterface.OnClickListener()
-		            {
-		                public void onClick(DialogInterface dialog, int which)
-		                {
-			            dialog.dismiss();
-		                }
-		            });
+	    imageDialog.setPositiveButton(hide, new DialogInterface.OnClickListener()
+	    {
+		public void onClick(DialogInterface dialog, int which)
+		{
+		    dialog.dismiss();
+		}
+	    });
 	    imageDialog.show();
 	}
     };
@@ -332,14 +337,28 @@ public class MarkdownFormatter
 	return textView;
     }
 
-    private static LinearLayout getTextViewForCode(final Context context, String text)
+    private static RelativeLayout getTextViewForCode(final Context context, final String text)
     {
-	LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	LinearLayout codeLayout = (LinearLayout) inflater.inflate(R.layout.code, null);
+	final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	final RelativeLayout codeLayout = (RelativeLayout) inflater.inflate(R.layout.code, null);
 	final TextView textView = (TextView) codeLayout.findViewById(R.id.code);
 	textView.setText(text);
 
-	ImageView imageView = (ImageView) codeLayout.findViewById(R.id.fullScreenImg);
+	ImageView imageView = (ImageView) codeLayout.findViewById(R.id.copyCode);
+	imageView.setOnClickListener(new View.OnClickListener()
+	{
+	    @Override
+	    public void onClick(View v)
+	    {
+		ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+		ClipDescription clipDescription = new ClipDescription("Stackx code",
+		                new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN });
+		clipboard.setPrimaryClip(new ClipData(clipDescription, new Item(text)));
+		Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show();
+	    }
+	});
+
+	imageView = (ImageView) codeLayout.findViewById(R.id.fullScreenImg);
 	imageView.setOnClickListener(new View.OnClickListener()
 	{
 	    @Override

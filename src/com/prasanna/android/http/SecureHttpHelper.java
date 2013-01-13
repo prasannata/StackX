@@ -111,6 +111,8 @@ public final class SecureHttpHelper
         {
             if (absoluteUrl != null)
             {
+        	Log.d(TAG, "Get image: " + absoluteUrl);
+        	
                 DefaultHttpClient client = createHttpClient();
                 HttpGet request = new HttpGet(absoluteUrl);
 

@@ -354,7 +354,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 	{
 	    case QuestionDetailsIntentService.RESULT_CODE_Q:
 		question = (Question) resultData.getSerializable(StringConstants.QUESTION);
-		setProgressBarIndeterminateVisibility(false);
+
+		if (question == null || question.answerCount == 0)
+		    setProgressBarIndeterminateVisibility(false);
+
 		displayQuestion();
 		break;
 	    case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
