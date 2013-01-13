@@ -97,6 +97,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         else
         {
             Log.d(TAG, "Not fetching, display existing user");
+            
+            getActivity().getActionBar().setTitle(user.displayName);
             displayUserDetail();
             displayUserAccounts();
         }
@@ -156,6 +158,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (user != null && profileHomeLayout != null)
         {
+            if(isAdded())
+        	getActivity().getActionBar().setTitle(user.displayName);
             updateProfileInfo();
 
             TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);

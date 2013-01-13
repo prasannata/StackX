@@ -72,6 +72,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
         super.onCreate(savedInstanceState);
 
+        getActionBar().setTitle(getString(R.string.inbox));
+        
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
 
@@ -195,6 +197,9 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
         textView = (TextView) itemRow.findViewById(R.id.itemCreationTime);
         textView.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
+
+        textView = (TextView) itemRow.findViewById(R.id.itemType);
+        textView.setText(item.itemType.getRepr());
 
         if (item.site != null)
         {
