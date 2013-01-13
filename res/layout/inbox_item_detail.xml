@@ -4,42 +4,111 @@
     android:layout_height="match_parent"
     android:background="@color/white" >
 
-    <include
-        android:id="@+id/inboxItemTitle"
+    <RelativeLayout
+        android:id="@+id/postTitleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="3dp"
-        layout="@layout/inbox_item" />
+        android:layout_margin="2dp"
+        android:background="@drawable/rounded_border_grey"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/responseUserAndTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/inboxItemTitle"
-        android:layout_margin="3dp"
-        android:textColor="@color/black"
-        android:textSize="11sp" />
+        <TextView
+            android:id="@+id/postTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="3dp"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/postSite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/postTitle"
+            android:layout_margin="3dp"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/viewQuestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/postTitle"
+            android:layout_marginRight="2dp"
+            android:background="@drawable/rounded_border_delft"
+            android:gravity="left"
+            android:text="@string/viewQuestion"
+            android:textColor="@color/black"
+            android:textSize="11sp" />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/responseItemScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/inboxItemTitle"
-        android:layout_margin="3dp"
+        android:layout_below="@id/postTitleLayout"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:background="@drawable/rounded_border_delft"
         android:textColor="@color/black"
         android:textSize="10sp" />
+
+    <ImageView
+        android:id="@+id/responseContextMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/postTitleLayout"
+        android:layout_centerVertical="true"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="-5dp"
+        android:paddingTop="5dp"
+        android:src="@drawable/control_bottom_right" />
+
+    <TextView
+        android:id="@+id/responseUserAndTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/responseItemScore"
+        android:layout_alignTop="@id/responseItemScore"
+        android:layout_below="@id/postTitleLayout"
+        android:layout_margin="3dp"
+        android:layout_toLeftOf="@id/responseContextMenu"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/postType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/responseItemScore"
+        android:layout_alignTop="@id/responseItemScore"
+        android:layout_below="@id/postTitleLayout"
+        android:layout_marginLeft="2dp"
+        android:layout_toRightOf="@id/responseItemScore"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="11sp"
+        android:textStyle="bold" />
 
     <ScrollView
         android:id="@+id/postBodyScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/inboxItemTitle"
-        android:layout_alignRight="@id/inboxItemTitle"
+        android:layout_alignLeft="@id/postTitleLayout"
+        android:layout_alignRight="@id/postTitleLayout"
         android:layout_below="@id/responseUserAndTime"
-        android:layout_marginTop="5dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_marginTop="8dp"
         android:scrollbars="vertical" >
 
         <LinearLayout
