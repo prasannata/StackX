@@ -21,6 +21,7 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 
+import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -86,7 +87,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         super.onActivityCreated(savedInstanceState);
 
         if (tag != null)
+        {
+            if (getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
+                getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             getActivity().getActionBar().setTitle(tag);
+        }
 
         findActionAndStartService();
 
@@ -126,8 +131,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
             if (itemListAdapter != null)
             {
-                itemListAdapter.notifyDataSetInvalidated();
+                Log.d(TAG, "Notifying item list adapter");
+                
+                Log.d(TAG, itemListAdapter.getItem(0).title);
                 itemListAdapter.notifyDataSetChanged();
+                itemListAdapter.notifyDataSetInvalidated();
             }
         }
     }

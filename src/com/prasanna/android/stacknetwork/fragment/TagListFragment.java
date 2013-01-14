@@ -22,9 +22,11 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +45,7 @@ import com.prasanna.android.task.GetTagsAsyncTask;
 
 public class TagListFragment extends ListFragment
 {
+    private static final String TAG = TagListFragment.class.getSimpleName();
     private OnTagSelectListener onTagSelectListener;
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
@@ -51,98 +54,116 @@ public class TagListFragment extends ListFragment
 
     public interface OnTagSelectListener
     {
-	void onFrontPageSelected();
+        void onFrontPageSelected();
 
-	void onTagSelected(String tag);
+        void onTagSelected(String tag);
     }
 
     public class GetUserlistAdapterCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<String>>
     {
-	@Override
-	public void notifyOnCompletion(ArrayList<String> result)
-	{
-	    if (result != null)
-	    {
-		getProgressBar().setVisibility(View.GONE);
-		listAdapter.add(StringConstants.FRONT_PAGE);
-		listAdapter.addAll(result);
-	    }
-	}
+        @Override
+        public void notifyOnCompletion(ArrayList<String> result)
+        {
+            if (result != null)
+            {
+                getProgressBar().setVisibility(View.GONE);
+                listAdapter.add(StringConstants.FRONT_PAGE);
+                listAdapter.addAll(result);
+            }
+        }
     }
 
     public class TagListAdapter extends ArrayAdapter<String>
     {
 
-	public TagListAdapter(Context context, int textViewResourceId, List<String> objects)
-	{
-	    super(context, textViewResourceId, objects);
-	}
+        public TagListAdapter(Context context, int textViewResourceId, List<String> objects)
+        {
+            super(context, textViewResourceId, objects);
+        }
 
-	@Override
-	public View getView(final int position, View convertView, ViewGroup parent)
-	{
-	    LinearLayout layout = (LinearLayout) getActivity().getLayoutInflater()
-		            .inflate(R.layout.tag_list_item, null);
-	    TextView textView = (TextView) layout.findViewById(R.id.tagName);
-	    textView.setText(getItem(position));
-	    return layout;
-	}
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent)
+        {
+            LinearLayout layout = (LinearLayout) getActivity().getLayoutInflater()
+                            .inflate(R.layout.tag_list_item, null);
+            TextView textView = (TextView) layout.findViewById(R.id.tagName);
+            textView.setText(getItem(position));
+            return layout;
+        }
     }
 
     private ProgressBar getProgressBar()
     {
-	if (progressBar == null)
-	    progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
-	return progressBar;
+        if (progressBar == null)
+            progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
+        return progressBar;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-	if (parentLayout == null)
-	{
-	    parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-	    listAdapter = new TagListAdapter(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
-	}
+        if (parentLayout == null)
+        {
+            parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view, null);
+            listAdapter = new TagListAdapter(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
+        }
 
-	return parentLayout;
+        return parentLayout;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-	super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
-	getListView().addFooterView(getProgressBar());
-	setListAdapter(listAdapter);
+        getListView().addFooterView(getProgressBar());
+        setListAdapter(listAdapter);
 
-	if (!tagsFetched)
-	{
-	    getProgressBar().setVisibility(View.VISIBLE);
-	    GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
-		            new TagDAO(getActivity()), AppUtils.inRegisteredSite(getActivity()));
-	    fetchUserAsyncTask.execute();
-	    tagsFetched = true;
-	}
+        if (!tagsFetched)
+        {
+            getProgressBar().setVisibility(View.VISIBLE);
+            GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
+                            new TagDAO(getActivity()), AppUtils.inRegisteredSite(getActivity()));
+            fetchUserAsyncTask.execute();
+            tagsFetched = true;
+        }
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-	if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
-	{
-	    if (position == 0)
-		onTagSelectListener.onFrontPageSelected();
-	    else
-		onTagSelectListener.onTagSelected(listAdapter.getItem(position));
-	}
+        if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
+        {
+            if (position == 0)
+                onTagSelectListener.onFrontPageSelected();
+            else
+                onTagSelectListener.onTagSelected(listAdapter.getItem(position));
+        }
+    }
 
+    @Override
+    public void onHiddenChanged(boolean hidden)
+    {
+        if (parentLayout != null)
+        {
+            Log.d(TAG, "onHiddenChanged: " + hidden);
+
+            if (hidden)
+            {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.detach(this);
+                ft.commit();
+                parentLayout.setVisibility(View.GONE);
+            }
+            else
+                parentLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     public static TagListFragment newFragment(OnTagSelectListener onTagSelectListener)
     {
-	TagListFragment fragment = new TagListFragment();
-	fragment.onTagSelectListener = onTagSelectListener;
-	return fragment;
+        TagListFragment fragment = new TagListFragment();
+        fragment.onTagSelectListener = onTagSelectListener;
+        return fragment;
     }
 }

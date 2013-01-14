@@ -70,8 +70,8 @@ public final class SecureHttpHelper
     private static final String SCHEME_HTTP = "http";
     private static final String SCHEME_HTTPS = "https";
     private static final String GZIP = "gzip";
-    private static final HttpGzipResponseInterceptor gzipHttpInterceptor = new HttpGzipResponseInterceptor(
-            GZIP, GzipDecompressingEntity.class);
+    private static final HttpGzipResponseInterceptor gzipHttpInterceptor = new HttpGzipResponseInterceptor(GZIP,
+                    GzipDecompressingEntity.class);
 
     private static class GzipDecompressingEntity extends HttpEntityWrapper
     {
@@ -111,8 +111,8 @@ public final class SecureHttpHelper
         {
             if (absoluteUrl != null)
             {
-        	Log.d(TAG, "Get image: " + absoluteUrl);
-        	
+                Log.d(TAG, "Get image: " + absoluteUrl);
+
                 DefaultHttpClient client = createHttpClient();
                 HttpGet request = new HttpGet(absoluteUrl);
 
@@ -151,8 +151,7 @@ public final class SecureHttpHelper
         return bitmap;
     }
 
-    public JSONObjectWrapper executeForGzipResponse(String host, String path,
-            Map<String, String> queryParams)
+    public JSONObjectWrapper executeForGzipResponse(String host, String path, Map<String, String> queryParams)
     {
         JSONObjectWrapper jsonObject = null;
         try
@@ -177,13 +176,18 @@ public final class SecureHttpHelper
                 Log.d(TAG, "Http request failed: " + statusCode);
                 Log.d(TAG, "Http request failure message: " + jsonText);
 
-                JSONObject error = new JSONObject(jsonText);
-                error.put(StringConstants.ERROR, true);
-                error.put(StringConstants.STATUS_CODE, statusCode);
-                jsonObject = new JSONObjectWrapper(error);
+                try
+                {
+                    jsonObject = new JSONObjectWrapper(getErrorJsonPayload(jsonText, statusCode));
+                }
+                finally
+                {
+                    Log.d(TAG, "Response parsing failed");
+
+                    jsonObject = new JSONObjectWrapper(getErrorJsonPayload(null, statusCode));
+                }
             }
         }
-
         catch (ClientProtocolException e)
         {
             Log.e(TAG, e.getMessage());
@@ -220,18 +224,30 @@ public final class SecureHttpHelper
         return jsonObject;
     }
 
-    private DefaultHttpClient getClientForGzipResponse() throws KeyStoreException,
-            NoSuchAlgorithmException, CertificateException, IOException, KeyManagementException,
-            UnrecoverableKeyException
+    private JSONObject getErrorJsonPayload(String jsonText, int statusCode) throws JSONException
+    {
+        JSONObject error = null;
+
+        if (jsonText == null)
+            error = new JSONObject();
+        else
+            error = new JSONObject(jsonText);
+
+        error.put(StringConstants.ERROR, true);
+        error.put(StringConstants.STATUS_CODE, statusCode);
+        return error;
+    }
+
+    private DefaultHttpClient getClientForGzipResponse() throws KeyStoreException, NoSuchAlgorithmException,
+                    CertificateException, IOException, KeyManagementException, UnrecoverableKeyException
     {
         DefaultHttpClient client = createHttpClient();
         client.addResponseInterceptor(gzipHttpInterceptor);
         return client;
     }
 
-    private DefaultHttpClient createHttpClient() throws KeyStoreException, IOException,
-            NoSuchAlgorithmException, CertificateException, KeyManagementException,
-            UnrecoverableKeyException
+    private DefaultHttpClient createHttpClient() throws KeyStoreException, IOException, NoSuchAlgorithmException,
+                    CertificateException, KeyManagementException, UnrecoverableKeyException
     {
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         trustStore.load(null, null);
@@ -244,8 +260,7 @@ public final class SecureHttpHelper
         HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme(SCHEME_HTTPS, sf, HTTPS_PORT));
-        schemeRegistry.register(new Scheme(SCHEME_HTTP, PlainSocketFactory.getSocketFactory(),
-                HTTP_PORT));
+        schemeRegistry.register(new Scheme(SCHEME_HTTP, PlainSocketFactory.getSocketFactory(), HTTP_PORT));
 
         SingleClientConnManager mgr = new SingleClientConnManager(params, schemeRegistry);
         return new DefaultHttpClient(mgr, params);

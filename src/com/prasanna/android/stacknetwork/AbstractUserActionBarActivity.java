@@ -76,298 +76,300 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     protected void setMenuItemClickListener(MenuItemClickListener menuItemClickListener)
     {
-	this.menuItemClickListener = menuItemClickListener;
+        this.menuItemClickListener = menuItemClickListener;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	refreshOperationSite();
-	initializeActionBar();
+        refreshOperationSite();
+        initializeActionBar();
     }
 
     private void initializeActionBar()
     {
-	if (getActionBar().getTitle() == null)
-	    getActionBar().setTitle(OperatingSite.getSite().name);
+        if (getActionBar().getTitle() == null)
+            getActionBar().setTitle(OperatingSite.getSite().name);
 
-	if (iconCache.containsKey(OperatingSite.getSite().name))
-	    setActionBarHomeIcon(iconCache.get(OperatingSite.getSite().name));
-	else
-	    loadIcon();
+        if (iconCache.containsKey(OperatingSite.getSite().name))
+            setActionBarHomeIcon(iconCache.get(OperatingSite.getSite().name));
+        else
+            loadIcon();
     }
 
     @Override
     public void onResume()
     {
-	super.onResume();
+        super.onResume();
 
-	SharedPreferencesUtil.loadAccessToken(getApplicationContext());
-	refreshOperationSite();
+        SharedPreferencesUtil.loadAccessToken(getApplicationContext());
+        refreshOperationSite();
     }
 
     public void refreshOperationSite()
     {
-	if (OperatingSite.getSite() == null)
-	    OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(getApplicationContext()));
+        if (OperatingSite.getSite() == null)
+            OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(getApplicationContext()));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-	Log.d(TAG, "onCreateOptionsMenu");
+        Log.d(TAG, "onCreateOptionsMenu");
 
-	getMenuInflater().inflate(R.menu.action_menu, menu);
+        getMenuInflater().inflate(R.menu.action_menu, menu);
 
-	if (shouldSearchViewBeEnabled())
-	    setupSearchItem(menu);
-	else
-	{
-	    menu.removeItem(R.id.menu_search);
-	    menu.removeItem(R.id.menu_search_filter);
-	}
+        if (shouldSearchViewBeEnabled())
+            setupSearchItem(menu);
+        else
+        {
+            menu.removeItem(R.id.menu_search);
+            menu.removeItem(R.id.menu_search_filter);
+        }
 
-	if (isAuthenticatedRealm())
-	    setupActionBarForAuthenticatedUser(menu);
-	else
-	    setupActionBarForAnyUser(menu);
+        if (isAuthenticatedRealm())
+            setupActionBarForAuthenticatedUser(menu);
+        else
+            setupActionBarForAnyUser(menu);
 
-	return true;
+        return true;
     }
 
     private void setupActionBarForAnyUser(Menu menu)
     {
-	menu.removeItem(R.id.menu_my_profile);
-	menu.removeItem(R.id.menu_my_inbox);
+        menu.removeItem(R.id.menu_my_profile);
+        menu.removeItem(R.id.menu_my_inbox);
     }
 
     private void setupActionBarForAuthenticatedUser(Menu menu)
     {
-	Log.d(TAG, "In authenticated realm");
+        Log.d(TAG, "In authenticated realm");
 
-	if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
-	{
-	    menu.removeItem(R.id.menu_my_profile);
-	    menu.removeItem(R.id.menu_my_inbox);
-	}
+        if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
+        {
+            menu.removeItem(R.id.menu_my_profile);
+            menu.removeItem(R.id.menu_my_inbox);
+        }
     }
 
     private void setupSearchItem(final Menu menu)
     {
-	searchView = setupSearchMenuItemAndGetActionView(menu);
-	setupSearchActionView(menu);
-	setupPopupForSearchOptions();
+        searchView = setupSearchMenuItemAndGetActionView(menu);
+        setupSearchActionView(menu);
+        setupPopupForSearchOptions();
     }
 
     private void setupSearchActionView(final Menu menu)
     {
-	SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-	searchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener()
-	{
-	    @Override
-	    public void onFocusChange(View v, boolean hasFocus)
-	    {
-		if (hasFocus && popupWindow.isShowing())
-		{
-		    popupWindow.dismiss();
-		    menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
-		    showingSearchFilters = false;
-		}
-	    }
-	});
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus && popupWindow.isShowing())
+                {
+                    popupWindow.dismiss();
+                    menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
+                    showingSearchFilters = false;
+                }
+            }
+        });
     }
 
     private SearchView setupSearchMenuItemAndGetActionView(final Menu menu)
     {
-	MenuItem searchItem = menu.findItem(R.id.menu_search);
-	searchItem.setOnActionExpandListener(new OnActionExpandListener()
-	{
-	    @Override
-	    public boolean onMenuItemActionExpand(MenuItem item)
-	    {
-		menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-		menu.findItem(R.id.menu_search_filter).setVisible(true);
-		return true;
-	    }
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        searchItem.setOnActionExpandListener(new OnActionExpandListener()
+        {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item)
+            {
+                menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.findItem(R.id.menu_search_filter).setVisible(true);
+                return true;
+            }
 
-	    @Override
-	    public boolean onMenuItemActionCollapse(MenuItem item)
-	    {
-		menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-		menu.findItem(R.id.menu_search_filter).setVisible(false);
-		if (popupWindow.isShowing())
-		    popupWindow.dismiss();
-		menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item)
+            {
+                menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+                menu.findItem(R.id.menu_search_filter).setVisible(false);
+                if (popupWindow.isShowing())
+                    popupWindow.dismiss();
+                menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
 
-		showingSearchFilters = false;
-		return true;
-	    }
-	});
+                showingSearchFilters = false;
+                return true;
+            }
+        });
 
-	return ((SearchView) searchItem.getActionView());
+        return ((SearchView) searchItem.getActionView());
     }
 
     private void setupPopupForSearchOptions()
     {
-	RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
-	popupWindow = new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
-	                RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
+        popupWindow = new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-	setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
-	                SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
+        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
+                        SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
 
-	setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyAnsweredCB),
-	                SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
+        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyAnsweredCB),
+                        SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
 
-	setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyWithAnswersCB),
-	                SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
+        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyWithAnswersCB),
+                        SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
 
     }
 
     private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName)
     {
-	checkBox.setChecked(SharedPreferencesUtil.isOn(getApplicationContext(), prefName, false));
-	checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
-	{
-	    @Override
-	    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-	    {
-		SharedPreferencesUtil.setOnOff(getApplicationContext(), prefName, isChecked);
-	    }
-	});
+        checkBox.setChecked(SharedPreferencesUtil.isOn(getApplicationContext(), prefName, false));
+        checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                SharedPreferencesUtil.setOnOff(getApplicationContext(), prefName, isChecked);
+            }
+        });
     }
 
     private void loadIcon()
     {
-	GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
-	{
-	    @Override
-	    public void notifyOnCompletion(Bitmap result)
-	    {
-		setActionBarHomeIcon(result);
-		iconCache.add(OperatingSite.getSite().name, result);
-	    }
-	});
+        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+        {
+            @Override
+            public void notifyOnCompletion(Bitmap result)
+            {
+                setActionBarHomeIcon(result);
+                iconCache.add(OperatingSite.getSite().name, result);
+            }
+        });
 
-	fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
+        fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
     }
 
     private void setActionBarHomeIcon(Bitmap result)
     {
-	getActionBar().setIcon(new BitmapDrawable(getResources(), result));
-	getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setIcon(new BitmapDrawable(getResources(), result));
+        getActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-	switch (item.getItemId())
-	{
-	    case android.R.id.home:
-		return handleHomeButtonClick(item);
-	    case R.id.menu_refresh:
-		refresh();
-		return true;
-	    case R.id.menu_search_filter:
-		showSearchFilterOptions(item);
-		return true;
-	    case R.id.menu_my_profile:
-		Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-		userProfileIntent.putExtra(StringConstants.ME, true);
-		startActivity(userProfileIntent);
-		return true;
-	    case R.id.menu_option_archive:
-		Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
-		startActivity(archiveIntent);
-		return true;
-	    case R.id.menu_my_inbox:
-		Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
-		userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
-		startActivity(userInboxIntent);
-		return true;
-	    case R.id.menu_option_change_site:
-		Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
-		startActivity(siteListIntent);
-		return true;
-	    case R.id.menu_option_settings:
-		Intent settingsIntent = new Intent(this, SettingsActivity.class);
-		startActivity(settingsIntent);
-		return true;
-	    case R.id.menu_discard:
-		if (discardOptionListener != null)
-		    discardOptionListener.onDiscardOptionClick();
-		return true;
-	    case R.id.menu_option_test_gen_notify:
-		Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.getAction());
-		ArrayList<InboxItem> unreadInboxItems = new ArrayList<InboxItem>();
-		InboxItem inboxItem = new InboxItem();
-		inboxItem.itemType = ItemType.NEW_ANSWER;
-		inboxItem.title = "Python unit testing functions by using mocks";
-		inboxItem.body = "You can use mock library by Michael Foord, which is part Python 3. It makes this kind of mocking ...";
-		unreadInboxItems.add(inboxItem);
-		notifyIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadInboxItems);
-		sendBroadcast(notifyIntent);
-		return true;
-	}
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                return handleHomeButtonClick(item);
+            case R.id.menu_refresh:
+                refresh();
+                return true;
+            case R.id.menu_search_filter:
+                showSearchFilterOptions(item);
+                return true;
+            case R.id.menu_my_profile:
+                Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                userProfileIntent.putExtra(StringConstants.ME, true);
+                startActivity(userProfileIntent);
+                return true;
+            case R.id.menu_option_archive:
+                Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
+                startActivity(archiveIntent);
+                return true;
+            case R.id.menu_my_inbox:
+                Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
+                userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
+                startActivity(userInboxIntent);
+                return true;
+            case R.id.menu_option_change_site:
+                Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
+                siteListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                siteListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(siteListIntent);
+                return true;
+            case R.id.menu_option_settings:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            case R.id.menu_discard:
+                if (discardOptionListener != null)
+                    discardOptionListener.onDiscardOptionClick();
+                return true;
+            case R.id.menu_option_test_gen_notify:
+                Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.getAction());
+                ArrayList<InboxItem> unreadInboxItems = new ArrayList<InboxItem>();
+                InboxItem inboxItem = new InboxItem();
+                inboxItem.itemType = ItemType.NEW_ANSWER;
+                inboxItem.title = "Python unit testing functions by using mocks";
+                inboxItem.body = "You can use mock library by Michael Foord, which is part Python 3. It makes this kind of mocking ...";
+                unreadInboxItems.add(inboxItem);
+                notifyIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadInboxItems);
+                sendBroadcast(notifyIntent);
+                return true;
+        }
 
-	return false;
+        return false;
     }
 
     private void showSearchFilterOptions(MenuItem item)
     {
-	if (showingSearchFilters)
-	{
-	    item.setIcon(R.drawable.expand);
-	    popupWindow.dismiss();
-	    showingSearchFilters = false;
-	    searchView.requestFocus();
-	}
-	else
-	{
-	    item.setIcon(R.drawable.navigation_collapse);
-	    searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    popupWindow.showAsDropDown(searchView, 300, 0);
-	    showingSearchFilters = true;
-	    searchView.clearFocus();
-	}
+        if (showingSearchFilters)
+        {
+            item.setIcon(R.drawable.expand);
+            popupWindow.dismiss();
+            showingSearchFilters = false;
+            searchView.requestFocus();
+        }
+        else
+        {
+            item.setIcon(R.drawable.navigation_collapse);
+            searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            popupWindow.showAsDropDown(searchView, 300, 0);
+            showingSearchFilters = true;
+            searchView.clearFocus();
+        }
 
     }
 
     private boolean handleHomeButtonClick(MenuItem item)
     {
-	if (menuItemClickListener != null)
-	    return menuItemClickListener.onClick(item);
-	else
-	{
-	    if (!getClass().getSimpleName().equals("QuestionsActivity"))
-	    {
-		Intent intent = new Intent(this, QuestionsActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(intent);
-	    }
+        if (menuItemClickListener != null)
+            return menuItemClickListener.onClick(item);
+        else
+        {
+            if (!getClass().getSimpleName().equals("QuestionsActivity"))
+            {
+                Intent intent = new Intent(this, QuestionsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
 
-	    return true;
-	}
+            return true;
+        }
     }
 
     public boolean isAuthenticatedRealm()
     {
-	SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
 
-	return (accessToken != null);
+        return (accessToken != null);
     }
 
     protected void setOnDiscardOptionClick(OnDiscardOptionListener discardOptionListener)
     {
-	this.discardOptionListener = discardOptionListener;
+        this.discardOptionListener = discardOptionListener;
     }
 
     public String getAccessToken()
     {
-	return accessToken;
+        return accessToken;
     }
 }
