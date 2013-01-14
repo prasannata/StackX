@@ -22,11 +22,9 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +43,6 @@ import com.prasanna.android.task.GetTagsAsyncTask;
 
 public class TagListFragment extends ListFragment
 {
-    private static final String TAG = TagListFragment.class.getSimpleName();
     private OnTagSelectListener onTagSelectListener;
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
@@ -138,25 +135,6 @@ public class TagListFragment extends ListFragment
                 onTagSelectListener.onFrontPageSelected();
             else
                 onTagSelectListener.onTagSelected(listAdapter.getItem(position));
-        }
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden)
-    {
-        if (parentLayout != null)
-        {
-            Log.d(TAG, "onHiddenChanged: " + hidden);
-
-            if (hidden)
-            {
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.detach(this);
-                ft.commit();
-                parentLayout.setVisibility(View.GONE);
-            }
-            else
-                parentLayout.setVisibility(View.VISIBLE);
         }
     }
 
