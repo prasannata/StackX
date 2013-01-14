@@ -60,7 +60,13 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
-        String fragmentTag = FRAGMENT_TAG_PREFIX + "_" + tag.replaceAll(" ", "_") + "_" + sort;
+        String fragmentTag = null;
+
+        if (tag != null)
+            fragmentTag = FRAGMENT_TAG_PREFIX + "_" + tag.replaceAll(" ", "_");
+
+        if (sort != null)
+            fragmentTag = fragmentTag + "_" + sort;
 
         QuestionListFragment newFragment = QuestionsActivity.getFragment(fragmentTag);
 
@@ -103,7 +109,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
         if (tag != null)
         {
-            if (getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
+            if ((action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG || action == QuestionsIntentService.GET_FAQ_FOR_TAG)
+                            && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             getActivity().getActionBar().setTitle(tag);
         }

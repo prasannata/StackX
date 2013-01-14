@@ -126,8 +126,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void showSearchFragment()
     {
         String query = getIntent().getStringExtra(SearchManager.QUERY);
+        Log.d(TAG, "Launching search fragment for " + query);
         saveSearchQuery(query);
-        replaceFragment(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null), null, true);
+        replaceFragment(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null), null, false);
     }
 
     private void showFrontPageForSite()
