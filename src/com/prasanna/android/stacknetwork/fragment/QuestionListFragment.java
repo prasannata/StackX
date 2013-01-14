@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -44,6 +45,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class QuestionListFragment extends AbstractQuestionListFragment
 {
     private static final String TAG = QuestionListFragment.class.getSimpleName();
+    private static final String FRAGMENT_TAG_PREFIX = "fragment_q";
 
     private Intent intent;
     private int currentPage = 0;
@@ -52,15 +54,28 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     public String sort;
     public String tag;
+    public String fragmentTag;
 
     private SearchCriteria criteria;
 
     public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
-        QuestionListFragment newFragment = new QuestionListFragment();
-        newFragment.sort = sort;
-        newFragment.action = action;
-        newFragment.tag = tag;
+        String fragmentTag = FRAGMENT_TAG_PREFIX + "_" + tag.replaceAll(" ", "_") + "_" + sort;
+
+        QuestionListFragment newFragment = QuestionsActivity.getFragment(fragmentTag);
+
+        if (newFragment == null)
+        {
+            Log.d(TAG, "Creating new fragment: " + fragmentTag);
+
+            newFragment = new QuestionListFragment();
+            newFragment.fragmentTag = fragmentTag;
+            newFragment.sort = sort;
+            newFragment.action = action;
+            newFragment.tag = tag;
+            newFragment.setRetainInstance(true);
+        }
+
         return newFragment;
     }
 
@@ -95,6 +110,26 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
         findActionAndStartService();
 
+    }
+
+    @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        if (itemListAdapter != null && itemListAdapter.getCount() > 0)
+            itemListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onStop()
+    {
+        Log.d(getLogTag(), "onStop");
+
+        super.onStop();
+
+        stopService(intent);
     }
 
     private void findActionAndStartService()
@@ -137,24 +172,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                 itemListAdapter.notifyDataSetInvalidated();
             }
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        Log.d(TAG, "Saving instance state");
-
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onStop()
-    {
-        Log.d(getLogTag(), "onStop");
-
-        super.onStop();
-
-        stopService(intent);
     }
 
     @Override

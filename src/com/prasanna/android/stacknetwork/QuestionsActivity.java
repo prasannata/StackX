@@ -48,13 +48,21 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                 OnContextItemSelectedListener<Question>, MenuItemClickListener, OnTagSelectListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
-
     private static final String TAB_TITLE_ACTIVE = "Active";
     private static final String TAB_TITLE_NEW = "New";
     private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
+    private static QuestionsActivity me;
 
     private boolean showTagsFragment = false;
     private TagListFragment tagListFragment;
+
+    public static QuestionListFragment getFragment(String fragmentTag)
+    {
+        if (me != null)
+            return (QuestionListFragment) me.getFragmentManager().findFragmentByTag(fragmentTag);
+        else
+            return null;
+    }
 
     public class TabListener implements ActionBar.TabListener
     {
@@ -67,7 +75,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         public void onTabSelected(Tab tab, FragmentTransaction ft)
         {
-            ft.add(R.id.fragmentContainer, fragment, null);
+            ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
@@ -87,6 +95,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         super.onCreate(savedInstanceState);
 
+        me = this;
+
         setContentView(R.layout.fragment_container);
         String action = getIntent().getAction();
 
@@ -98,6 +108,13 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             showTagQuestionListFragment();
         else
             showHomePageForSite();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+        super.onSaveInstanceState(outState);
     }
 
     private void showHomePageForSite()

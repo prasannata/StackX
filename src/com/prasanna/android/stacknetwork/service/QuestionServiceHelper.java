@@ -74,7 +74,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                     for (int i = 0; i < jsonArray.length(); i++)
                     {
                         JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
-                        answers.add(getSerializedAnswerObject(jsonObject));
+                        Answer answer = getSerializedAnswerObject(jsonObject);
+                        if (answer.accepted && answers.size() > 0)
+                            answers.add(0, answer);
+                        else
+                            answers.add(answer);
                     }
 
                     if (!answers.isEmpty())
@@ -207,7 +211,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         }
         return commentsPage;
     }
-
 
     public StackXPage<Question> search(String query, int page)
     {

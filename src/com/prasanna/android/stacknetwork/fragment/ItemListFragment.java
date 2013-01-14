@@ -47,6 +47,7 @@ import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 
 public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements OnScrollListener,
@@ -61,6 +62,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     protected RestQueryResultReceiver resultReceiver;
     protected List<StackXPage<T>> pages;
     protected LinearLayout itemsContainer;
+    protected ArrayList<T> items;
     protected ItemListAdapter<T> itemListAdapter;
     private StackXPage<T> currentPageObject;
 
@@ -72,202 +74,222 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     public interface OnContextItemSelectedListener<T>
     {
-	boolean onContextItemSelected(MenuItem item, T stackXItem);
+        boolean onContextItemSelected(MenuItem item, T stackXItem);
     }
 
     protected void registerHttpErrorReceiver()
     {
-	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
+        httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
 
-	IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.getAction());
-	filter.addCategory(Intent.CATEGORY_DEFAULT);
-	getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
+        IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.getAction());
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
     }
 
     protected boolean isServiceRunning()
     {
-	return serviceRunning;
+        return serviceRunning;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate");
 
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	if (resultReceiver == null)
-	    resultReceiver = new RestQueryResultReceiver(new Handler());
+        if (resultReceiver == null)
+            resultReceiver = new RestQueryResultReceiver(new Handler());
 
-	resultReceiver.setReceiver(this);
+        resultReceiver.setReceiver(this);
 
-	if (pages == null)
-	    pages = new ArrayList<StackXPage<T>>();
+        if (pages == null)
+            pages = new ArrayList<StackXPage<T>>();
 
-	registerHttpErrorReceiver();
+        registerHttpErrorReceiver();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-	Log.d(TAG, "onActivityCreated");
+        Log.d(TAG, "onActivityCreated");
 
-	super.onActivityCreated(savedInstanceState);
+        super.onActivityCreated(savedInstanceState);
 
-	getListView().addFooterView(getProgressBar());
-	setListAdapter(itemListAdapter);
-	getListView().setOnScrollListener(this);
+        getListView().addFooterView(getProgressBar());
+        setListAdapter(itemListAdapter);
+        getListView().setOnScrollListener(this);
+
+        if (savedInstanceState != null)
+        {
+            items = (ArrayList<T>) savedInstanceState.getSerializable(StringConstants.ITEMS);
+            if (items != null)
+                itemListAdapter.addAll(items);
+        }
     }
 
     @Override
     public void onResume()
     {
-	super.onResume();
+        super.onResume();
 
-	if (itemListAdapter != null)
-	    itemListAdapter.notifyDataSetChanged();
+        if (itemListAdapter != null)
+            itemListAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onStop()
     {
-	Log.d(TAG, "onStop");
+        Log.d(TAG, "onStop");
 
-	super.onStop();
+        super.onStop();
 
-	unregisterReceivers();
+        unregisterReceivers();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+
+        super.onSaveInstanceState(outState);
     }
 
     protected void unregisterReceivers()
     {
-	try
-	{
-	    Log.d(TAG, "unregistering receivers");
-	    getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
-	}
-	catch (IllegalArgumentException e)
-	{
-	    Log.d(getLogTag(), e.getMessage());
-	}
+        try
+        {
+            Log.d(TAG, "unregistering receivers");
+            getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+            Log.d(getLogTag(), e.getMessage());
+        }
     }
 
     protected void showProgressBar()
     {
-	getProgressBar().setVisibility(View.VISIBLE);
+        getProgressBar().setVisibility(View.VISIBLE);
     }
 
     protected void dismissProgressBar()
     {
-	getProgressBar().setVisibility(View.GONE);
+        getProgressBar().setVisibility(View.GONE);
     }
 
     protected Intent getIntentForService(Class<?> clazz, String action)
     {
-	if (!serviceRunning)
-	{
-	    Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
-	    intentForService.setAction(action);
-	    return intentForService;
-	}
+        if (!serviceRunning)
+        {
+            Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
+            intentForService.setAction(action);
+            return intentForService;
+        }
 
-	return null;
+        return null;
     }
 
     protected void startService(Intent intent)
     {
-	if (!isServiceRunning() && intent != null)
-	{
-	    getActivity().startService(intent);
-	    serviceRunning = true;
-	}
+        if (!isServiceRunning() && intent != null)
+        {
+            getActivity().startService(intent);
+            serviceRunning = true;
+        }
     }
 
     protected void stopService(Intent intent)
     {
-	if (intent != null)
-	{
-	    getActivity().stopService(intent);
-	    serviceRunning = false;
-	}
+        if (intent != null)
+        {
+            getActivity().stopService(intent);
+            serviceRunning = false;
+        }
     }
 
     protected ViewGroup getParentLayout()
     {
-	return itemsContainer;
+        return itemsContainer;
     }
 
     public void refresh()
     {
-	showProgressBar();
-	startIntentService();
+        showProgressBar();
+        startIntentService();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-	serviceRunning = false;
+        serviceRunning = false;
 
-	currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
-	if (currentPageObject != null)
-	{
-	    pages.add(currentPageObject);
-	    displayItems(currentPageObject.items);
-	}
+        currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
+        if (currentPageObject != null)
+        {
+            pages.add(currentPageObject);
+            displayItems(currentPageObject.items);
+        }
     }
 
     protected void displayItems(ArrayList<T> newItems)
     {
-	dismissProgressBar();
+        dismissProgressBar();
 
-	if (itemListAdapter != null && newItems != null)
-	{
-	    Log.d(TAG, "Updating list adpater with questions");
-	    itemListAdapter.addAll(newItems);
-	}
+        if (itemListAdapter != null && newItems != null)
+        {
+            Log.d(TAG, "Updating list adpater with questions");
+            if (items == null)
+                items = new ArrayList<T>();
+
+            items.addAll(newItems);
+            itemListAdapter.addAll(newItems);
+        }
     }
 
     @Override
     public void onHttpError(int code, String text)
     {
-	Log.d(TAG, "Http error " + code + " " + text);
+        Log.d(TAG, "Http error " + code + " " + text);
 
-	dismissProgressBar();
-	RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
-	                null);
-	TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
-	textView.setText(code + " " + text);
+        dismissProgressBar();
+        RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
+                        null);
+        TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
+        textView.setText(code + " " + text);
 
-	getParentLayout().removeAllViews();
-	getParentLayout().addView(errorDisplayLayout);
+        getParentLayout().removeAllViews();
+        getParentLayout().addView(errorDisplayLayout);
     }
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
     {
-	if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
-	                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
-	{
-	    Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
+        if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
+                        && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
+        {
+            Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
 
-	    if (currentPageObject != null && currentPageObject.hasMore)
-	    {
-		showProgressBar();
-		startIntentService();
-	    }
-	}
+            if (currentPageObject != null && currentPageObject.hasMore)
+            {
+                showProgressBar();
+                startIntentService();
+            }
+        }
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState)
     {
-	Log.v(TAG, "onScrollStateChanged");
+        Log.v(TAG, "onScrollStateChanged");
     }
 
     protected ProgressBar getProgressBar()
     {
-	if (progressBar == null)
-	    progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
-	return progressBar;
+        if (progressBar == null)
+            progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
+        return progressBar;
     }
 }

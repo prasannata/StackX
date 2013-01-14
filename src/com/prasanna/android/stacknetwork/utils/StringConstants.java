@@ -49,9 +49,13 @@ public class StringConstants
     public static final String PAGE = "page";
     public static final String OAUTH_REDIRECT_URL = "http://oauth.prasanna.stackx.com";
     public static final String FRONT_PAGE = "Front page";
+
     public static final String TAGS = "tags";
     public static final String TAG = "tag";
+
+    public static final String ITEMS = "items";
     public static final String ITEM_POSITION = "item_position";
+
     public static final String CACHED = "cached";
     public static final String STATUS_CODE = "statusCode";
     public static final String ERROR = "error";

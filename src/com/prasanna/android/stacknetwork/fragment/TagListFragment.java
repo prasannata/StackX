@@ -127,6 +127,15 @@ public class TagListFragment extends ListFragment
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if (listAdapter != null)
+            listAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
         if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
