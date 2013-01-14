@@ -39,71 +39,78 @@ public class TagDAO
 
     public TagDAO(Context context)
     {
-	databaseHelper = new DatabaseHelper(context);
+        databaseHelper = new DatabaseHelper(context);
     }
 
     public void open() throws SQLException
     {
-	database = databaseHelper.getWritableDatabase();
+        database = databaseHelper.getWritableDatabase();
     }
 
     public void close()
     {
-	databaseHelper.close();
+        databaseHelper.close();
     }
 
     public void insert(ArrayList<String> tags)
     {
-	insertTags(DatabaseHelper.TABLE_TAGS, tags);
+        insertTags(DatabaseHelper.TABLE_TAGS, tags);
     }
 
     public void insertMyTags(ArrayList<String> tags)
     {
-	insertTags(DatabaseHelper.TABLE_MY_TAGS, tags);
+        insertTags(DatabaseHelper.TABLE_MY_TAGS, tags);
     }
 
     private void insertTags(String tableName, ArrayList<String> tags)
     {
-	if (tags != null)
-	{
-	    Log.d(TAG, "inserting tags into DB");
+        if (tags != null)
+        {
+            Log.d(TAG, "inserting tags into DB");
 
-	    for (String tag : tags)
-	    {
-		ContentValues values = new ContentValues();
-		values.put(TagsTable.COLUMN_VALUE, tag);
-		database.insert(tableName, null, values);
-	    }
-	}
+            for (String tag : tags)
+            {
+                ContentValues values = new ContentValues();
+                values.put(TagsTable.COLUMN_VALUE, tag);
+                database.insert(tableName, null, values);
+            }
+        }
     }
 
     public ArrayList<String> getTags()
     {
-	return selectTagsSortAlphabetically(DatabaseHelper.TABLE_TAGS, new String[] { TagsTable.COLUMN_VALUE });
+        return selectTagsSortAlphabetically(DatabaseHelper.TABLE_TAGS, new String[]
+        { TagsTable.COLUMN_VALUE });
     }
 
     public ArrayList<String> getMyTags()
     {
-	return selectTagsSortAlphabetically(DatabaseHelper.TABLE_MY_TAGS, new String[] { TagsTable.COLUMN_VALUE });
+        return selectTagsSortAlphabetically(DatabaseHelper.TABLE_MY_TAGS, new String[]
+        { TagsTable.COLUMN_VALUE });
     }
 
     private ArrayList<String> selectTagsSortAlphabetically(String tableName, String[] cols)
     {
-	Cursor cursor = database.query(tableName, cols, null, null, null, null, null);
-	if (cursor == null || cursor.getCount() == 0)
-	    return null;
+        Cursor cursor = database.query(tableName, cols, null, null, null, null, null);
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
 
-	Log.d(TAG, "Tags retrieved from DB");
+        Log.d(TAG, "Tags retrieved from DB");
 
-	ArrayList<String> tags = new ArrayList<String>();
+        ArrayList<String> tags = new ArrayList<String>();
 
-	cursor.moveToFirst();
-	while (!cursor.isAfterLast())
-	{
-	    tags.add(cursor.getString(0));
-	    cursor.moveToNext();
-	}
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast())
+        {
+            tags.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
 
-	return tags;
+        return tags;
+    }
+
+    public void deleteAll()
+    {
+        database.delete(DatabaseHelper.TABLE_MY_TAGS, null, null);
     }
 }

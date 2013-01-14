@@ -225,7 +225,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         setuOnClickForContextMenu();
 
         LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
-        for (View view : MarkdownFormatter.parse(getApplicationContext(), stackXItem.body))
+        for (View view : MarkdownFormatter.parse(this, stackXItem.body))
             postBodyLayout.addView(view);
     }
 

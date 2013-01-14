@@ -132,8 +132,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
             if (itemListAdapter != null)
             {
                 Log.d(TAG, "Notifying item list adapter");
-                
-                Log.d(TAG, itemListAdapter.getItem(0).title);
+
                 itemListAdapter.notifyDataSetChanged();
                 itemListAdapter.notifyDataSetInvalidated();
             }

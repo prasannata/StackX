@@ -85,13 +85,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "onCreate");
 
-        getActionBar().setDisplayUseLogoEnabled(false);
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fragment_container);
-        setMenuItemClickListener(this);
-
         String action = getIntent().getAction();
 
         if (Intent.ACTION_SEARCH.equals(action))
@@ -101,7 +97,13 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         else if (StringConstants.TAG.equals(action))
             showTagQuestionListFragment();
         else
-            showFrontPageForSite();
+            showHomePageForSite();
+    }
+
+    private void showHomePageForSite()
+    {
+        setMenuItemClickListener(this);
+        showFrontPageForSite();
     }
 
     private void showSearchFragment()
@@ -114,7 +116,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void showFrontPageForSite()
     {
         showTagsFragment = true;
-        getActionBar().setDisplayUseLogoEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name);
     }
 
@@ -205,6 +207,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     @Override
     public boolean onClick(MenuItem menuItem)
     {
+        Log.d(TAG, "Home button clicked");
+
         if (showTagsFragment && menuItem.getItemId() == android.R.id.home)
         {
             tagListFragment = (TagListFragment) getFragmentManager().findFragmentByTag(StringConstants.TAGS);
@@ -216,8 +220,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             }
 
             showTagFragment();
+
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             getActionBar().setTitle(StringConstants.TAGS);
+            actionBarMenu.findItem(R.id.menu_search).setVisible(false);
+            actionBarMenu.findItem(R.id.menu_refresh).setVisible(false);
 
             return true;
         }
@@ -230,7 +237,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "Front page selected");
 
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, StringConstants.FRONT_PAGE);
+        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name);
     }
 
     @Override
@@ -293,6 +300,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void hideTagFragmentAndSetupTabsForTag(int action, String tag)
     {
         getActionBar().removeAllTabs();
+        actionBarMenu.findItem(R.id.menu_search).setVisible(true);
+        actionBarMenu.findItem(R.id.menu_refresh).setVisible(true);
         hideTagFragment();
         setupActionBarTabs(action, tag);
     }

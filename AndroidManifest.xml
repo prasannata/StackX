@@ -80,7 +80,6 @@
         <activity
             android:name=".QuestionsActivity"
             android:configChanges="orientation|screenSize"
-            android:logo="@drawable/labels"
             android:exported="false"
             android:label="@string/app_name" >
             <intent-filter>

@@ -70,6 +70,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private boolean showingSearchFilters = false;
     private PopupWindow popupWindow;
 
+    protected Menu actionBarMenu;
+
     protected abstract void refresh();
 
     protected abstract boolean shouldSearchViewBeEnabled();
@@ -134,6 +136,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
         else
             setupActionBarForAnyUser(menu);
 
+        this.actionBarMenu = menu;
         return true;
     }
 
@@ -344,13 +347,13 @@ public abstract class AbstractUserActionBarActivity extends Activity
             return menuItemClickListener.onClick(item);
         else
         {
-            if (!getClass().getSimpleName().equals("QuestionsActivity"))
-            {
-                Intent intent = new Intent(this, QuestionsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
+            if (this instanceof QuestionsActivity)
+                finish();
 
+            Intent intent = new Intent(this, QuestionsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             return true;
         }
     }
