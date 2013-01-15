@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tagName"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_border_grey_min_padding" >
-
-    <TextView
-        android:id="@+id/tagName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:textColor="@color/black"
-        android:textSize="25sp" />
-
-</LinearLayout>
+    android:layout_margin="3dp"
+    android:background="@drawable/rounded_border_grey_min_padding"
+    android:padding="10dp"
+    android:textColor="@color/black"
+    android:textSize="20sp" />

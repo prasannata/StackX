@@ -341,6 +341,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         getActionBar().removeAllTabs();
         actionBarMenu.findItem(R.id.menu_search).setVisible(true);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         hideTagFragment();
         setupActionBarTabs(action, tag, frontPage);
     }
@@ -349,6 +350,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "Showing tag list fragment");
 
+        getActionBar().setDisplayHomeAsUpEnabled(false);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

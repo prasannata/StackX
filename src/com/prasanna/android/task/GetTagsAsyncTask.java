@@ -59,10 +59,10 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
 
             if (tags == null || tags.isEmpty())
             {
-                tags = UserServiceHelper.getInstance().getTags(1, 0, registeredUser);
+                tags = UserServiceHelper.getInstance().getTags(1, 100, registeredUser);
 
                 if (tags == null || tags.isEmpty())
-                    tags = UserServiceHelper.getInstance().getTags(1, 0, !registeredUser);
+                    tags = UserServiceHelper.getInstance().getTags(1, 100, !registeredUser);
 
                 tagsDbAdapter.insertMyTags(tags);
             }

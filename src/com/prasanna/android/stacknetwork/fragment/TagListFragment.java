@@ -20,19 +20,23 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.ListFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
@@ -48,6 +52,9 @@ public class TagListFragment extends ListFragment
     private LinearLayout parentLayout;
     private ProgressBar progressBar;
     private boolean tagsFetched = false;
+    private EditText filterListInputText;
+    private Button clearFilterInputText;
+    private CharSequence defaultHint;
 
     public interface OnTagSelectListener
     {
@@ -70,25 +77,6 @@ public class TagListFragment extends ListFragment
         }
     }
 
-    public class TagListAdapter extends ArrayAdapter<String>
-    {
-
-        public TagListAdapter(Context context, int textViewResourceId, List<String> objects)
-        {
-            super(context, textViewResourceId, objects);
-        }
-
-        @Override
-        public View getView(final int position, View convertView, ViewGroup parent)
-        {
-            LinearLayout layout = (LinearLayout) getActivity().getLayoutInflater()
-                            .inflate(R.layout.tag_list_item, null);
-            TextView textView = (TextView) layout.findViewById(R.id.tagName);
-            textView.setText(getItem(position));
-            return layout;
-        }
-    }
-
     private ProgressBar getProgressBar()
     {
         if (progressBar == null)
@@ -101,11 +89,71 @@ public class TagListFragment extends ListFragment
     {
         if (parentLayout == null)
         {
-            parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            listAdapter = new TagListAdapter(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
+            parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view_with_search, null);
+            listAdapter = new ArrayAdapter<String>(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
+            filterListInputText = (EditText) parentLayout.findViewById(R.id.searchList);
+            defaultHint = filterListInputText.getHint();
         }
 
         return parentLayout;
+    }
+
+    private void setupFilterEditText()
+    {
+
+        filterListInputText.setOnFocusChangeListener(new OnFocusChangeListener()
+        {
+
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus)
+                {
+                    filterListInputText.setHint("");
+                    clearFilterInputText.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    clearFilterInputText.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        filterListInputText.addTextChangedListener(new TextWatcher()
+        {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                listAdapter.getFilter().filter(s);
+            }
+        });
+
+        clearFilterInputText = (Button) parentLayout.findViewById(R.id.clearTextAndFocus);
+        clearFilterInputText.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v)
+            {
+                filterListInputText.setText("");
+                filterListInputText.setHint(defaultHint);
+                getListView().requestFocus();
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
+                                Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            }
+        });
     }
 
     @Override
@@ -113,6 +161,8 @@ public class TagListFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
 
+        setupFilterEditText();
+        getListView().setTextFilterEnabled(true);
         getListView().addFooterView(getProgressBar());
         setListAdapter(listAdapter);
 
