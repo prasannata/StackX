@@ -51,6 +51,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private static final String TAB_TITLE_ACTIVE = "Active";
     private static final String TAB_TITLE_NEW = "New";
     private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
+    private static final String TAB_TITLE_FAQ = "FAQ";
+
     private static QuestionsActivity me;
 
     private boolean showTagsFragment = false;
@@ -135,7 +137,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         showTagsFragment = true;
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name);
+        setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
     }
 
     private void showTagQuestionListFragment()
@@ -145,10 +147,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         QuestionListFragment newFragment = QuestionListFragment.newFragment(
                         QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, null);
         newFragment.getBundle().putString(StringConstants.TAG, tag);
-        setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag);
+        setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
-    private void setupActionBarTabs(int action, String tag)
+    private void setupActionBarTabs(int action, String tag, boolean frontPage)
     {
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -167,6 +169,16 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         votedQuestionsTab.setText(TAB_TITLE_MOST_VOTED).setTabListener(
                         new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.VOTES)));
         actionBar.addTab(votedQuestionsTab);
+
+        if (!frontPage)
+        {
+            Tab faqTab = actionBar.newTab();
+            faqTab.setText(TAB_TITLE_FAQ).setTabListener(
+                            new TabListener(QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG,
+                                            tag, null)));
+            actionBar.addTab(faqTab);
+        }
+
     }
 
     private void saveSearchQuery(String query)
@@ -255,7 +267,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "Front page selected");
 
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name);
+        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
     }
 
     @Override
@@ -264,7 +276,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         Log.d(TAG, tag + " selected");
 
         getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag);
+        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
     private void showUserProfile(long userId)
@@ -315,13 +327,13 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         ft.commit();
     }
 
-    private void hideTagFragmentAndSetupTabsForTag(int action, String tag)
+    private void hideTagFragmentAndSetupTabsForTag(int action, String tag, boolean frontPage)
     {
         getActionBar().removeAllTabs();
         actionBarMenu.findItem(R.id.menu_search).setVisible(true);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(true);
         hideTagFragment();
-        setupActionBarTabs(action, tag);
+        setupActionBarTabs(action, tag, frontPage);
     }
 
     private void showTagFragment()
