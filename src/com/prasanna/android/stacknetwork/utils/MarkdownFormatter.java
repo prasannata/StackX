@@ -65,7 +65,8 @@ import com.prasanna.android.task.GetImageAsyncTask;
 public class MarkdownFormatter
 {
     private static final String TAG = MarkdownFormatter.class.getSimpleName();
-    private static final String NEW_LINE_STR = System.getProperty("line.separator");
+    private static final String NEW_LINE = System.getProperty("line.separator");
+    private static final String CR = "\r";
 
     public static class Tags
     {
@@ -246,9 +247,9 @@ public class MarkdownFormatter
 
                         if (codeFound)
                         {
-                            if (!text.contains(NEW_LINE_STR))
+                            if (!text.contains(NEW_LINE))
                             {
-                                if (buffer.length() > 0 && buffer.lastIndexOf(NEW_LINE_STR) == buffer.length() - 1)
+                                if (buffer.length() > 0 && buffer.lastIndexOf(NEW_LINE) == buffer.length() - 1)
                                     buffer.setCharAt(buffer.length() - 1, ' ');
 
                                 buffer.append(text);
@@ -261,7 +262,7 @@ public class MarkdownFormatter
                         }
                         else
                         {
-                            text = text.replace("\n", " ").replace("\r", " ");
+                            text = text.replace(NEW_LINE, " ").replace(CR, " ");
                             buffer.append(text);
                         }
                     }

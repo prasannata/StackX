@@ -38,58 +38,58 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
     private final TagDAO tagsDbAdapter;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier,
-	            TagDAO tagsDbAdapter, boolean registeredUser)
+                    TagDAO tagsDbAdapter, boolean registeredUser)
     {
-	super();
+        super();
 
-	this.taskCompletionNotifier = taskCompletionNotifier;
-	this.tagsDbAdapter = tagsDbAdapter;
-	this.registeredUser = registeredUser;
+        this.taskCompletionNotifier = taskCompletionNotifier;
+        this.tagsDbAdapter = tagsDbAdapter;
+        this.registeredUser = registeredUser;
     }
 
     @Override
     protected ArrayList<String> doInBackground(Void... params)
     {
-	ArrayList<String> tags = null;
-	try
-	{
-	    tagsDbAdapter.open();
+        ArrayList<String> tags = null;
+        try
+        {
+            tagsDbAdapter.open();
 
-	    tags = tagsDbAdapter.getMyTags();
+            tags = tagsDbAdapter.getMyTags();
 
-	    if (tags == null || tags.isEmpty())
-	    {
-		tags = UserServiceHelper.getInstance().getTags(1, registeredUser);
+            if (tags == null || tags.isEmpty())
+            {
+                tags = UserServiceHelper.getInstance().getTags(1, 0, registeredUser);
 
-		if (tags == null || tags.isEmpty())
-		    tags = UserServiceHelper.getInstance().getTags(1, !registeredUser);
+                if (tags == null || tags.isEmpty())
+                    tags = UserServiceHelper.getInstance().getTags(1, 0, !registeredUser);
 
-		tagsDbAdapter.insertMyTags(tags);
-	    }
-	}
-	catch (HttpErrorException e)
-	{
-	    Log.e(TAG, "Error fetching tags: " + e.getMessage());
-	}
-	catch (SQLException e)
-	{
-	    Log.e(TAG, e.getMessage());
-	}
-	finally
-	{
-	    tagsDbAdapter.close();
-	}
-	return tags;
+                tagsDbAdapter.insertMyTags(tags);
+            }
+        }
+        catch (HttpErrorException e)
+        {
+            Log.e(TAG, "Error fetching tags: " + e.getMessage());
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            tagsDbAdapter.close();
+        }
+        return tags;
     }
 
     @Override
     protected void onPostExecute(ArrayList<String> result)
     {
-	if (taskCompletionNotifier != null)
-	{
-	    taskCompletionNotifier.notifyOnCompletion(result);
-	}
+        if (taskCompletionNotifier != null)
+        {
+            taskCompletionNotifier.notifyOnCompletion(result);
+        }
 
-	super.onPostExecute(result);
+        super.onPostExecute(result);
     }
 }
