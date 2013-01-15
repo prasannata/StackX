@@ -41,7 +41,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements
@@ -145,33 +145,24 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
     private void setupActionBarTabs(int action, String tag, boolean frontPage)
     {
-        ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        Tab activeQuestionsTab = actionBar.newTab();
-        activeQuestionsTab.setText(TAB_TITLE_ACTIVE).setTabListener(
-                        new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.ACTIVITY)));
-        actionBar.addTab(activeQuestionsTab);
-
-        Tab newQuestionsTab = actionBar.newTab();
-        newQuestionsTab.setText(TAB_TITLE_NEW).setTabListener(
-                        new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.CREATION)));
-        actionBar.addTab(newQuestionsTab);
-
-        Tab votedQuestionsTab = actionBar.newTab();
-        votedQuestionsTab.setText(TAB_TITLE_MOST_VOTED).setTabListener(
-                        new TabListener(QuestionListFragment.newFragment(action, tag, StackUri.Sort.VOTES)));
-        actionBar.addTab(votedQuestionsTab);
+        createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
+        createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
+        createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES));
 
         if (!frontPage)
         {
-            Tab faqTab = actionBar.newTab();
-            faqTab.setText(TAB_TITLE_FAQ).setTabListener(
-                            new TabListener(QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG,
-                                            tag, null)));
-            actionBar.addTab(faqTab);
+            createTab(TAB_TITLE_FAQ,
+                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
         }
+    }
 
+    private void createTab(String title, QuestionListFragment fragment)
+    {
+        Tab tab = getActionBar().newTab();
+        tab.setText(title).setTabListener(new TabListener(fragment));
+        getActionBar().addTab(tab);
     }
 
     private void saveSearchQuery(String query)
@@ -242,12 +233,12 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                 addAndHideFragment(tagListFragment, StringConstants.TAGS);
             }
 
-            showTagFragment();
-
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
             getActionBar().setTitle(StringConstants.TAGS);
             actionBarMenu.findItem(R.id.menu_search).setVisible(false);
             actionBarMenu.findItem(R.id.menu_refresh).setVisible(false);
+
+            showTagFragment();
 
             return true;
         }
