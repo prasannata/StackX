@@ -35,6 +35,8 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipData.Item;
 import android.content.ClipDescription;
@@ -51,6 +53,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,16 +82,21 @@ public class MarkdownFormatter
 
     private static class AsyncTaskCompletionNotifierImagePopup implements AsyncTaskCompletionNotifier<Bitmap>
     {
-        private Context context;
+        private final Context context;
+        private Dialog progressDialog;
 
-        public AsyncTaskCompletionNotifierImagePopup(Context context)
+        public AsyncTaskCompletionNotifierImagePopup(Context context, Dialog progressDialog)
         {
             this.context = context;
+            this.progressDialog = progressDialog;
         }
 
         @Override
         public void notifyOnCompletion(Bitmap result)
         {
+            if (progressDialog != null)
+                progressDialog.dismiss();
+
             ImageView imageView = new ImageView(context);
             imageView.setImageBitmap(result);
             showImageDialog(context, imageView);
@@ -300,7 +308,12 @@ public class MarkdownFormatter
             @Override
             public void onClick(View v)
             {
-                new GetImageAsyncTask(new AsyncTaskCompletionNotifierImagePopup(context)).execute(url);
+                AlertDialog.Builder imageDialog = new AlertDialog.Builder(context);
+                ProgressBar progressBar = new ProgressBar(context);
+                imageDialog.setView(progressBar);
+                AlertDialog progressDialog = imageDialog.create();
+                progressDialog.show();
+                new GetImageAsyncTask(new AsyncTaskCompletionNotifierImagePopup(context, progressDialog)).execute(url);
             }
         });
     }
@@ -332,8 +345,8 @@ public class MarkdownFormatter
             public void onClick(View v)
             {
                 ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipDescription clipDescription = new ClipDescription("Stackx code",
-                                new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN });
+                ClipDescription clipDescription = new ClipDescription("Stackx code", new String[]
+                { ClipDescription.MIMETYPE_TEXT_PLAIN });
                 clipboard.setPrimaryClip(new ClipData(clipDescription, new Item(text)));
                 Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show();
             }
