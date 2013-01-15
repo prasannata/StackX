@@ -112,13 +112,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             showHomePageForSite();
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        Log.d(TAG, "onSaveInstanceState");
-        super.onSaveInstanceState(outState);
-    }
-
     private void showHomePageForSite()
     {
         setMenuItemClickListener(this);
