@@ -366,14 +366,15 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
+        Log.d(TAG, "ResultReceiver resultCode: " + resultCode);
         switch (resultCode)
         {
+            case QuestionDetailsIntentService.RESULT_CODE_Q_CACHED:
+                setProgressBarIndeterminateVisibility(false);
             case QuestionDetailsIntentService.RESULT_CODE_Q:
                 question = (Question) resultData.getSerializable(StringConstants.QUESTION);
-
-                if (question == null || question.answerCount == 0)
+                if (question.answerCount == 0)
                     setProgressBarIndeterminateVisibility(false);
-
                 displayQuestion();
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:

@@ -45,6 +45,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     public static final int RESULT_CODE_Q_BODY = 0x02;
     public static final int RESULT_CODE_Q_COMMENTS = 0x03;
     public static final int RESULT_CODE_ANSWERS = 0x04;
+    public static final int RESULT_CODE_Q_CACHED = 0x05;
 
     public QuestionDetailsIntentService()
     {
@@ -108,7 +109,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
         if (question != null)
         {
             Log.d(TAG, "Question " + questionId + " recovered from cache.");
-            sendSerializable(receiver, RESULT_CODE_Q, StringConstants.QUESTION, question);
+            sendSerializable(receiver, RESULT_CODE_Q_CACHED, StringConstants.QUESTION, question);
         }
         else
         {
