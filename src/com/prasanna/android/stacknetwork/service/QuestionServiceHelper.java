@@ -368,4 +368,31 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
         return questions;
     }
+
+    public StackXPage<Question> getSimilar(String title, int page)
+    {
+        StackXPage<Question> questions = null;
+
+        if (title != null)
+        {
+            String restEndPoint = "similar";
+            Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+
+            queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+            queryParams.put(StackUri.QueryParams.TITLE, title);
+            queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.RELEVANCE);
+            queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+            queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+
+            JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+
+            if (questionsJsonResponse != null)
+            {
+                questions = getQuestionModel(questionsJsonResponse);
+            }
+        }
+
+        return questions;
+    }
+
 }

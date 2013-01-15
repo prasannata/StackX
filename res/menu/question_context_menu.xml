@@ -18,20 +18,24 @@
             android:title="@string/comments"
             android:visible="false"/>
         <item
-            android:id="@+id/q_ctx_related"
+            android:id="@+id/q_ctx_similar"
             android:orderInCategory="2"
+            android:title="@string/similar"/>
+        <item
+            android:id="@+id/q_ctx_related"
+            android:orderInCategory="3"
             android:title="@string/related"/>
         <item
             android:id="@+id/q_ctx_menu_user_profile"
-            android:orderInCategory="3"
+            android:orderInCategory="4"
             android:title=""/>
         <item
             android:id="@+id/q_ctx_menu_archive"
-            android:orderInCategory="4"
+            android:orderInCategory="5"
             android:title="@string/archive"/>
         <item
             android:id="@+id/q_ctx_menu_email"
-            android:orderInCategory="5"
+            android:orderInCategory="6"
             android:title="@string/email"/>
     </group>
 

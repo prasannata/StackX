@@ -154,6 +154,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                 case QuestionsIntentService.GET_QUESTIONS_FOR_TAG:
                     getQuestionsForTag();
                     break;
+                case QuestionsIntentService.GET_SIMILAR:
+                    getSimilarQuestions();
+                    break;
                 case QuestionsIntentService.GET_RELATED:
                     getRelatedQuestions();
                     break;
@@ -230,6 +233,16 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         startIntentService();
     }
 
+    private void getSimilarQuestions()
+    {
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_SIMILAR);
+        intent.putExtra(StringConstants.TITLE, getBundle().getString(StringConstants.TITLE));
+
+        showProgressBar();
+        startIntentService();
+    }
+
     private void getRelatedQuestions()
     {
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
@@ -237,7 +250,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 
         showProgressBar();
-
         startIntentService();
     }
 

@@ -78,6 +78,10 @@ public class StringConstants
     public static final String POST_ID = "post_id";
     public static final String POST = "post";
 
+    public static final String TITLE = "title";
+
+    public static final String SIMILAR = "similar";
+
     public static final class HttpError
     {
         public static final String CODE = "code";

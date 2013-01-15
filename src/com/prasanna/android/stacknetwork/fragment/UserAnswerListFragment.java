@@ -96,6 +96,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         menu.removeItem(R.id.q_ctx_menu_archive);
         menu.removeItem(R.id.q_ctx_comments);
         menu.removeItem(R.id.q_ctx_menu_tags);
+        menu.removeItem(R.id.q_ctx_similar);
         menu.removeItem(R.id.q_ctx_menu_user_profile);
     }
 

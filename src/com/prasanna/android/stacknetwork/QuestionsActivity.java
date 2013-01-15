@@ -104,6 +104,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         if (Intent.ACTION_SEARCH.equals(action))
             showSearchFragment();
+        else if (StringConstants.SIMILAR.equals(action))
+            showSimilarQuestionListFragment();
         else if (StringConstants.RELATED.equals(action))
             showRelatedQuestionListFragment();
         else if (StringConstants.TAG.equals(action))
@@ -131,6 +133,27 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         showTagsFragment = true;
         getActionBar().setDisplayHomeAsUpEnabled(true);
         setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
+    }
+
+    private void showSimilarQuestionListFragment()
+    {
+        String title = getIntent().getStringExtra(StringConstants.TITLE);
+
+        getActionBar().setTitle(getString(R.string.similar) + " to " + title);
+
+        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null,
+                        null);
+        newFragment.getBundle().putString(StringConstants.TITLE, title);
+        replaceFragment(newFragment, StringConstants.SIMILAR + "-" + title.hashCode(), false);
+    }
+
+    private void showRelatedQuestionListFragment()
+    {
+        long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
+        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
+                        null);
+        newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+        replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, false);
     }
 
     private void showTagQuestionListFragment()
@@ -197,6 +220,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                 case R.id.q_ctx_menu_user_profile:
                     showUserProfile(question.owner.id);
                     break;
+                case R.id.q_ctx_similar:
+                    startSimirarQuestionsActivity(question.title);
+                    return true;
                 case R.id.q_ctx_related:
                     startRelatedQuestionsActivity(question.id);
                     return true;
@@ -263,11 +289,12 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
-    private void showUserProfile(long userId)
+    private void startSimirarQuestionsActivity(String title)
     {
-        Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
-        startActivity(userProfileIntent);
+        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.SIMILAR);
+        questionsIntent.putExtra(StringConstants.TITLE, title);
+        startActivity(questionsIntent);
     }
 
     private void startRelatedQuestionsActivity(long questionId)
@@ -286,13 +313,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         startActivity(questionsIntent);
     }
 
-    private void showRelatedQuestionListFragment()
+    private void showUserProfile(long userId)
     {
-        long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
-        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
-                        null);
-        newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-        replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, false);
+        Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
+        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+        startActivity(userProfileIntent);
     }
 
     private void emailQuestion(String subject, String body)

@@ -268,11 +268,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 case R.id.q_ctx_comments:
                     displayQuestionComments();
                     return true;
+                case R.id.q_ctx_similar:
+                    startSimilarQuestionsActivity();
+                    return true;
                 case R.id.q_ctx_related:
-                    Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-                    questionsIntent.setAction(StringConstants.RELATED);
-                    questionsIntent.putExtra(StringConstants.QUESTION_ID, question.id);
-                    startActivity(questionsIntent);
+                    startRelatedQuestionsActivity();
                     return true;
                 case R.id.q_ctx_menu_user_profile:
                     viewUserProfile(question.owner.id);
@@ -301,6 +301,22 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
 
         return false;
+    }
+
+    private void startRelatedQuestionsActivity()
+    {
+        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.RELATED);
+        questionsIntent.putExtra(StringConstants.QUESTION_ID, question.id);
+        startActivity(questionsIntent);
+    }
+
+    private void startSimilarQuestionsActivity()
+    {
+        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.SIMILAR);
+        questionsIntent.putExtra(StringConstants.TITLE, question.title);
+        startActivity(questionsIntent);
     }
 
     private boolean onContextItemSelectedForAnswer(MenuItem item, int answerPosition)

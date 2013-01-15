@@ -40,6 +40,7 @@ public class StackUri
         public static final String REDIRECT_URI = "redirect_uri";
         public static final String SINCE = "since";
         public static final String TAGGED = "tagged";
+        public static final String TITLE = "title";
     }
 
     public static class QueryParamDefaultValues
@@ -65,5 +66,6 @@ public class StackUri
         public static final String VOTES = "votes";
         public static final String CREATION = "creation";
         public static final String WEEK = "week";
+        public static final String RELEVANCE = "relevance";
     }
 }

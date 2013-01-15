@@ -136,6 +136,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         menu.removeItem(R.id.q_ctx_menu_archive);
         menu.removeItem(R.id.q_ctx_menu_email);
         menu.removeItem(R.id.q_ctx_menu_tags);
+        menu.removeItem(R.id.q_ctx_similar);
         menu.removeItem(R.id.q_ctx_related);
 
         this.menu = menu;
