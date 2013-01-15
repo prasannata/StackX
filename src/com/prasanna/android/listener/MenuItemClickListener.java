@@ -23,5 +23,5 @@ import android.view.MenuItem;
 
 public interface MenuItemClickListener
 {
-    boolean onClick(MenuItem menuItem);
+    boolean onMenuItemClick(MenuItem menuItem);
 }

@@ -245,7 +245,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     }
 
     @Override
-    public boolean onClick(MenuItem menuItem)
+    public boolean onMenuItemClick(MenuItem menuItem)
     {
         Log.d(TAG, "Home button clicked");
 

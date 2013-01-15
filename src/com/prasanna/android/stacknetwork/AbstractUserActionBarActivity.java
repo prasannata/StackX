@@ -344,7 +344,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private boolean handleHomeButtonClick(MenuItem item)
     {
         if (menuItemClickListener != null)
-            return menuItemClickListener.onClick(item);
+            return menuItemClickListener.onMenuItemClick(item);
         else
         {
             if (this instanceof QuestionsActivity)
