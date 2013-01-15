@@ -188,8 +188,8 @@ public class QuestionFragment extends Fragment
     private String getTimeAndOwnerDisplay(String acceptRate)
     {
         return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate + question.owner.reputation
-                        + "]";
+                        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
+                        + AppUtils.formatNumber(question.owner.reputation) + "]";
     }
 
     private void showNumComments()
