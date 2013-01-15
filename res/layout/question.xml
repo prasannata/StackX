@@ -64,12 +64,13 @@
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="9sp" />
+                android:textSize="9.5sp" />
 
             <TextView
                 android:id="@+id/questionComments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/questionViews"
                 android:layout_alignTop="@id/questionViews"
                 android:layout_below="@id/titleAndScore"
                 android:layout_marginLeft="2dp"
@@ -77,18 +78,19 @@
                 android:layout_toRightOf="@+id/questionViews"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="9sp"
+                android:textSize="9.5sp"
                 android:visibility="gone" />
 
             <TextView
                 android:id="@+id/questionOwner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/questionViews"
                 android:layout_alignParentRight="true"
                 android:layout_alignTop="@id/questionViews"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="10sp" />
+                android:textSize="9.5sp" />
         </RelativeLayout>
 
         <ScrollView
