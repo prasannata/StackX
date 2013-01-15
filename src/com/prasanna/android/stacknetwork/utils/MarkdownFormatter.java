@@ -46,7 +46,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.Html;
-import android.text.util.Linkify;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -205,7 +205,16 @@ public class MarkdownFormatter
                             addImgLinkText(context, views, attributeValue, params);
                         }
                         else
-                            buffer.append("<" + xmlPullParser.getName() + ">");
+                        {
+                            buffer.append("<" + xmlPullParser.getName());
+                            for (int i = 0; i < xmlPullParser.getAttributeCount(); i++)
+                            {
+                                buffer.append(" " + xmlPullParser.getAttributeName(i) + "=\""
+                                                + xmlPullParser.getAttributeValue(i) + "\"");
+                            }
+
+                            buffer.append(">");
+                        }
                     }
                     else if (eventType == XmlPullParser.END_TAG)
                     {
@@ -228,7 +237,7 @@ public class MarkdownFormatter
                         }
                         else
                         {
-                            buffer.append("<" + xmlPullParser.getName() + "/>");
+                            buffer.append("</" + xmlPullParser.getName() + ">");
                         }
                     }
                     else if (eventType == XmlPullParser.TEXT)
@@ -322,11 +331,9 @@ public class MarkdownFormatter
         TextView textView = new TextView(context);
         textView.setTextColor(Color.BLACK);
         textView.setLayoutParams(params);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setTextSize(12f);
-        textView.setTextIsSelectable(true);
         textView.setText(Html.fromHtml(buffer.toString()));
-        textView.setLinksClickable(true);
-        textView.setAutoLinkMask(Linkify.WEB_URLS);
         return textView;
     }
 
@@ -365,4 +372,4 @@ public class MarkdownFormatter
 
         return codeLayout;
     }
-}
+};
