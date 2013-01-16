@@ -68,4 +68,11 @@ public class StackUri
         public static final String WEEK = "week";
         public static final String RELEVANCE = "relevance";
     }
+    
+    public static class Order
+    {
+        public static final String ASC = "asc";
+        public static final String DESC = "desc";
+        
+    }
 }

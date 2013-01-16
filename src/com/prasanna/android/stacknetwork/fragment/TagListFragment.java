@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import android.app.ListFragment;
 import android.content.Context;
@@ -63,10 +64,10 @@ public class TagListFragment extends ListFragment
         void onTagSelected(String tag);
     }
 
-    public class GetUserlistAdapterCompletionNotifier implements AsyncTaskCompletionNotifier<ArrayList<String>>
+    public class GetTagListCompletionNotifier implements AsyncTaskCompletionNotifier<LinkedHashSet<String>>
     {
         @Override
-        public void notifyOnCompletion(ArrayList<String> result)
+        public void notifyOnCompletion(LinkedHashSet<String> result)
         {
             if (result != null)
             {
@@ -169,8 +170,8 @@ public class TagListFragment extends ListFragment
         if (!tagsFetched)
         {
             getProgressBar().setVisibility(View.VISIBLE);
-            GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetUserlistAdapterCompletionNotifier(),
-                            new TagDAO(getActivity()), AppUtils.inRegisteredSite(getActivity()));
+            GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
+                            getActivity()), AppUtils.inRegisteredSite(getActivity()));
             fetchUserAsyncTask.execute();
             tagsFetched = true;
         }

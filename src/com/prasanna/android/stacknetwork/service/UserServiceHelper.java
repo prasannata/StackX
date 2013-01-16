@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -46,6 +47,9 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StackUri.Order;
+import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
+import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class UserServiceHelper extends AbstractBaseServiceHelper
@@ -393,42 +397,69 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return error;
     }
 
-    public ArrayList<String> getTags(int page, int pageSize, boolean meTags)
+    public LinkedHashSet<String> getTags(int page, int pageSize, boolean meTags)
     {
-        ArrayList<String> tags = null;
+        LinkedHashSet<String> tags = null;
         String restEndPoint = meTags ? "/me/tags" : "/tags";
+        boolean hasMore = true;
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
-        queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        if (pageSize > 0)
-            queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
+        queryParams.put(StackUri.QueryParams.SORT, meTags ? Sort.NAME : Sort.POPULAR);
+        queryParams.put(StackUri.QueryParams.ORDER, meTags ? Order.ASC : Order.DESC);
 
-        JSONObjectWrapper jsonObjectWrapper = executeHttpRequest(restEndPoint, queryParams);
-
-        if (jsonObjectWrapper != null)
+        while (hasMore)
         {
-            JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
-            if (jsonArray != null && jsonArray.length() > 0)
+            queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
+            JSONObjectWrapper jsonObjectWrapper = executeHttpRequest(restEndPoint, queryParams);
+
+            if (jsonObjectWrapper != null)
             {
-                tags = new ArrayList<String>();
-                for (int i = 0; i < jsonArray.length(); i++)
+                JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+                if (jsonArray != null && jsonArray.length() > 0)
                 {
-                    try
+                    if (tags == null)
+                        tags = new LinkedHashSet<String>();
+
+                    for (int i = 0; i < jsonArray.length(); i++)
                     {
-                        JSONObjectWrapper tagJson = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
-                        tags.add(tagJson.getString(JsonFields.Tag.NAME));
-                    }
-                    catch (JSONException e)
-                    {
-                        Log.d(getLogTag(), e.getMessage());
+                        try
+                        {
+                            JSONObjectWrapper tagJson = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
+                            tags.add(tagJson.getString(JsonFields.Tag.NAME));
+                        }
+                        catch (JSONException e)
+                        {
+                            Log.d(getLogTag(), e.getMessage());
+                        }
                     }
                 }
+
+                /* Get all the tags only for a registered user */
+                hasMore = meTags ? jsonObjectWrapper.getBoolean(JsonFields.HAS_MORE) : false;
+
+                /*
+                 * Dont bombard the server if the user has like 10-15 pages of
+                 * tags, delay each request by 100ms
+                 */
+                sleep(100);
             }
         }
 
         return tags;
+    }
+
+    private void sleep(long ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
     }
 }

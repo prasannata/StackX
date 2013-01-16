@@ -19,7 +19,7 @@
 
 package com.prasanna.android.task;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
 import android.database.SQLException;
 import android.os.AsyncTask;
@@ -29,15 +29,15 @@ import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 
-public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
+public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String>>
 {
     private final String TAG = GetTagsAsyncTask.class.getSimpleName();
 
-    private final AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier;
+    private final AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier;
     private final boolean registeredUser;
     private final TagDAO tagsDbAdapter;
 
-    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<ArrayList<String>> taskCompletionNotifier,
+    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier,
                     TagDAO tagsDbAdapter, boolean registeredUser)
     {
         super();
@@ -48,9 +48,9 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
     }
 
     @Override
-    protected ArrayList<String> doInBackground(Void... params)
+    protected LinkedHashSet<String> doInBackground(Void... params)
     {
-        ArrayList<String> tags = null;
+        LinkedHashSet<String> tags = null;
         try
         {
             tagsDbAdapter.open();
@@ -83,7 +83,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, ArrayList<String>>
     }
 
     @Override
-    protected void onPostExecute(ArrayList<String> result)
+    protected void onPostExecute(LinkedHashSet<String> result)
     {
         if (taskCompletionNotifier != null)
         {

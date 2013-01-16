@@ -19,7 +19,8 @@
 
 package com.prasanna.android.stacknetwork.sqlite;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -52,17 +53,17 @@ public class TagDAO
         databaseHelper.close();
     }
 
-    public void insert(ArrayList<String> tags)
+    public void insert(HashSet<String> tags)
     {
         insertTags(DatabaseHelper.TABLE_TAGS, tags);
     }
 
-    public void insertMyTags(ArrayList<String> tags)
+    public void insertMyTags(HashSet<String> tags)
     {
         insertTags(DatabaseHelper.TABLE_MY_TAGS, tags);
     }
 
-    private void insertTags(String tableName, ArrayList<String> tags)
+    private void insertTags(String tableName, HashSet<String> tags)
     {
         if (tags != null)
         {
@@ -77,19 +78,19 @@ public class TagDAO
         }
     }
 
-    public ArrayList<String> getTags()
+    public LinkedHashSet<String> getTags()
     {
-        return selectTagsSortAlphabetically(DatabaseHelper.TABLE_TAGS, new String[]
+        return selectTags(DatabaseHelper.TABLE_TAGS, new String[]
         { TagsTable.COLUMN_VALUE });
     }
 
-    public ArrayList<String> getMyTags()
+    public LinkedHashSet<String> getMyTags()
     {
         return selectTagsSortAlphabetically(DatabaseHelper.TABLE_MY_TAGS, new String[]
         { TagsTable.COLUMN_VALUE });
     }
 
-    private ArrayList<String> selectTagsSortAlphabetically(String tableName, String[] cols)
+    private LinkedHashSet<String> selectTags(String tableName, String[] cols)
     {
         Cursor cursor = database.query(tableName, cols, null, null, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -97,7 +98,24 @@ public class TagDAO
 
         Log.d(TAG, "Tags retrieved from DB");
 
-        ArrayList<String> tags = new ArrayList<String>();
+        return getTagSet(cursor);
+    }
+
+    private LinkedHashSet<String> selectTagsSortAlphabetically(String tableName, String[] cols)
+    {
+        Cursor cursor = database.query(tableName, cols, null, null, null, null, TagsTable.COLUMN_VALUE
+                        + " Collate NOCASE");
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        Log.d(TAG, "Tags retrieved from DB");
+
+        return getTagSet(cursor);
+    }
+
+    private LinkedHashSet<String> getTagSet(Cursor cursor)
+    {
+        LinkedHashSet<String> tags = new LinkedHashSet<String>();
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast())
