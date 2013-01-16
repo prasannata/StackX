@@ -346,7 +346,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         getActionBar().setDisplayHomeAsUpEnabled(false);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.show(tagListFragment);
         ft.commit();
     }
@@ -365,8 +364,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         Log.d(TAG, "Replacing current fragment with " + fragmentTag);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         if (addToBackStack)
             ft.addToBackStack(fragmentTag);
         ft.commit();
