@@ -24,7 +24,6 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -35,28 +34,26 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.prasanna.android.http.HttpErrorBroadcastReceiver;
-import com.prasanna.android.listener.HttpErrorListener;
+import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.service.AbstractIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 
 public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements OnScrollListener,
-                HttpErrorListener, StackXRestQueryResultReceiver
+                StackXRestQueryResultReceiver
 {
     private static final String TAG = ItemListFragment.class.getSimpleName();
 
     private boolean serviceRunning = false;
-    private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
     private ProgressBar progressBar;
 
     protected RestQueryResultReceiver resultReceiver;
@@ -75,15 +72,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     public interface OnContextItemSelectedListener<T>
     {
         boolean onContextItemSelected(MenuItem item, T stackXItem);
-    }
-
-    protected void registerHttpErrorReceiver()
-    {
-        httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
-
-        IntentFilter filter = new IntentFilter(ErrorIntentAction.HTTP_ERROR.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(httpErrorBroadcastReceiver, filter);
     }
 
     protected boolean isServiceRunning()
@@ -105,8 +93,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         if (pages == null)
             pages = new ArrayList<StackXPage<T>>();
-
-        registerHttpErrorReceiver();
     }
 
     @SuppressWarnings("unchecked")
@@ -144,8 +130,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         Log.d(TAG, "onStop");
 
         super.onStop();
-
-        unregisterReceivers();
     }
 
     @Override
@@ -154,19 +138,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         Log.d(TAG, "onSaveInstanceState");
 
         super.onSaveInstanceState(outState);
-    }
-
-    protected void unregisterReceivers()
-    {
-        try
-        {
-            Log.d(TAG, "unregistering receivers");
-            getActivity().unregisterReceiver(httpErrorBroadcastReceiver);
-        }
-        catch (IllegalArgumentException e)
-        {
-            Log.d(getLogTag(), e.getMessage());
-        }
     }
 
     protected void showProgressBar()
@@ -226,11 +197,18 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     {
         serviceRunning = false;
 
-        currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
-        if (currentPageObject != null)
+        if (resultCode == AbstractIntentService.ERROR)
         {
-            pages.add(currentPageObject);
-            displayItems(currentPageObject.items);
+            onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+        }
+        else
+        {
+            currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
+            if (currentPageObject != null)
+            {
+                pages.add(currentPageObject);
+                displayItems(currentPageObject.items);
+            }
         }
     }
 
@@ -260,19 +238,14 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         }
     }
 
-    @Override
-    public void onHttpError(int code, String text)
+    private void onHttpError(HttpException e)
     {
-        Log.d(TAG, "Http error " + code + " " + text);
+        Log.d(TAG, "Http error " + e.getStatusCode() + " " + e.getErrorResponse());
 
         dismissProgressBar();
-        RelativeLayout errorDisplayLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.error,
-                        null);
-        TextView textView = (TextView) errorDisplayLayout.findViewById(R.id.errorMsg);
-        textView.setText(code + " " + text);
 
         getParentLayout().removeAllViews();
-        getParentLayout().addView(errorDisplayLayout);
+        getParentLayout().addView(AppUtils.getErrorView(getActivity(), e));
     }
 
     @Override

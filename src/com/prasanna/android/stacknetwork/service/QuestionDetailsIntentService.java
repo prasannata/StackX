@@ -27,7 +27,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.prasanna.android.http.HttpErrorException;
+import com.prasanna.android.http.ServerException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -61,21 +61,23 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     protected void onHandleIntent(Intent intent)
     {
         Log.d(TAG, "Action: " + intent.getAction());
+        final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
         try
         {
-            handleIntent(intent);
+            handleIntent(intent, receiver);
         }
-        catch (HttpErrorException e)
+        catch (ServerException e)
         {
-            broadcastHttpErrorIntent(e.getError());
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(StringConstants.EXCEPTION, e);
+            receiver.send(ERROR, bundle);
         }
     }
 
-    private void handleIntent(Intent intent)
+    private void handleIntent(Intent intent, ResultReceiver receiver)
     {
         final String action = intent.getAction();
-        final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
         if (action != null)
         {

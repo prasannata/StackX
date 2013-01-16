@@ -27,72 +27,90 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.prasanna.android.http.HttpException;
+import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.model.StackXError;
 
 public class AppUtils
 {
     public static String formatReputation(int reputation)
     {
-	String reputationString = "";
+        String reputationString = "";
 
-	if (reputation > 10000)
-	{
-	    float reputationInThousands = ((float) reputation) / 1000f;
-	    reputationString += String.format("%.1fk", reputationInThousands);
-	}
-	else
-	{
-	    reputationString += reputation;
-	}
-	return reputationString;
+        if (reputation > 10000)
+        {
+            float reputationInThousands = ((float) reputation) / 1000f;
+            reputationString += String.format("%.1fk", reputationInThousands);
+        }
+        else
+        {
+            reputationString += reputation;
+        }
+        return reputationString;
     }
 
     public static String formatNumber(int reputation)
     {
-	String reputationString = "";
+        String reputationString = "";
 
-	if (reputation > 10000)
-	{
-	    float reputationInThousands = ((float) reputation) / 1000f;
-	    reputationString += String.format("%.1fk", reputationInThousands);
-	}
-	else
-	{
-	    reputationString += reputation;
-	}
+        if (reputation > 10000)
+        {
+            float reputationInThousands = ((float) reputation) / 1000f;
+            reputationString += String.format("%.1fk", reputationInThousands);
+        }
+        else
+        {
+            reputationString += reputation;
+        }
 
-	return reputationString;
+        return reputationString;
     }
 
     public static boolean inAuthenticatedRealm(Context context)
     {
-	return SharedPreferencesUtil.getAccessToken(context) == null ? false : true;
+        return SharedPreferencesUtil.getAccessToken(context) == null ? false : true;
     }
 
     public static boolean inRegisteredSite(Context context)
     {
-	return inAuthenticatedRealm(context)
-	                && SharedPreferencesUtil.getRegisteredSitesForUser(context.getCacheDir()).containsKey(
-	                                OperatingSite.getSite().name);
+        return inAuthenticatedRealm(context)
+                        && SharedPreferencesUtil.getRegisteredSitesForUser(context.getCacheDir()).containsKey(
+                                        OperatingSite.getSite().name);
     }
 
     public static Map<String, String> getDefaultQueryParams()
     {
-	Map<String, String> queryParams = new HashMap<String, String>();
-	queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
+        Map<String, String> queryParams = new HashMap<String, String>();
+        queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
 
-	String accessToken = SharedPreferencesUtil.getAccessToken(null);
-	if (accessToken != null)
-	{
-	    queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);
-	    queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
-	}
+        String accessToken = SharedPreferencesUtil.getAccessToken(null);
+        if (accessToken != null)
+        {
+            queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);
+            queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
+        }
 
-	return queryParams;
+        return queryParams;
     }
 
     public static SoftReference<Bitmap> getBitmap(Resources resources, int drawable)
     {
-	Bitmap bitmap = BitmapFactory.decodeResource(resources, drawable);
-	return new SoftReference<Bitmap>(bitmap);
+        Bitmap bitmap = BitmapFactory.decodeResource(resources, drawable);
+        return new SoftReference<Bitmap>(bitmap);
+    }
+
+    public static ViewGroup getErrorView(Context context, HttpException e)
+    {
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        RelativeLayout errorLayout = (RelativeLayout) inflater.inflate(R.layout.error, null);
+        StackXError error = StackXError.deserialize(e.getErrorResponse());
+        TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
+        textView.setText(error.name);
+        return errorLayout;
     }
 }

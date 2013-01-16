@@ -28,11 +28,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.prasanna.android.http.HttpErrorException;
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
@@ -41,14 +39,12 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractBaseServiceHelper
 {
     protected abstract String getLogTag();
 
-    protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper,
-            StackXPage<? extends StackXItem> page)
+    protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper, StackXPage<? extends StackXItem> page)
     {
         if (jsonObjectWrapper != null && page != null)
         {
@@ -67,8 +63,8 @@ public abstract class AbstractBaseServiceHelper
         if (jsonObject != null)
         {
             JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
-            JSONObjectWrapper userJsonObject = JSONObjectWrapper.wrap(getIndexFromArray(jsonArray,
-                    0, JSONObject.class));
+            JSONObjectWrapper userJsonObject = JSONObjectWrapper
+                            .wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
 
             page.items = new ArrayList<User>();
 
@@ -87,8 +83,7 @@ public abstract class AbstractBaseServiceHelper
                 user.upvoteCount = userJsonObject.getInt(JsonFields.User.UP_VOTE_COUNT);
                 user.downvoteCount = userJsonObject.getInt(JsonFields.User.DOWN_VOTE_COUNT);
                 user.profileViews = userJsonObject.getInt(JsonFields.User.VIEW_COUNT);
-                user.badgeCounts = getBadgeCounts(userJsonObject
-                        .getJSONObject(JsonFields.User.BADGE_COUNTS));
+                user.badgeCounts = getBadgeCounts(userJsonObject.getJSONObject(JsonFields.User.BADGE_COUNTS));
                 user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
                 user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
                 user.creationDate = userJsonObject.getLong(JsonFields.User.CREATION_DATE);
@@ -101,8 +96,7 @@ public abstract class AbstractBaseServiceHelper
 
     protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject)
     {
-        int[] badgeCounts =
-        { 0, 0, 0 };
+        int[] badgeCounts = { 0, 0, 0 };
 
         if (badgeCountJsonObject != null)
         {
@@ -129,8 +123,7 @@ public abstract class AbstractBaseServiceHelper
                 {
                     try
                     {
-                        JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray
-                                .getJSONObject(i));
+                        JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                         page.items.add(getSerializedQuestionObject(jsonObject));
                     }
                     catch (JSONException e)
@@ -144,8 +137,7 @@ public abstract class AbstractBaseServiceHelper
         return page;
     }
 
-    protected Question getSerializedQuestionObject(JSONObjectWrapper jsonObject)
-            throws JSONException
+    protected Question getSerializedQuestionObject(JSONObjectWrapper jsonObject) throws JSONException
     {
         Question question = new Question();
 
@@ -164,8 +156,7 @@ public abstract class AbstractBaseServiceHelper
             question.hasAcceptedAnswer = true;
         }
 
-        question.owner = getSerializableUserSnippetObject(jsonObject
-                .getJSONObject(JsonFields.Question.OWNER));
+        question.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Question.OWNER));
         return question;
     }
 
@@ -196,8 +187,7 @@ public abstract class AbstractBaseServiceHelper
         answer.creationDate = jsonObject.getLong(JsonFields.Answer.CREATION_DATE);
         answer.accepted = jsonObject.getBoolean(JsonFields.Answer.IS_ACCEPTED);
 
-        answer.owner = getSerializableUserSnippetObject(jsonObject
-                .getJSONObject(JsonFields.Answer.OWNER));
+        answer.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Answer.OWNER));
         return answer;
     }
 
@@ -238,26 +228,13 @@ public abstract class AbstractBaseServiceHelper
         return wrapperObject;
     }
 
-    protected JSONObjectWrapper executeHttpRequest(String restEndPoint,
-            Map<String, String> queryParams)
+    protected JSONObjectWrapper executeHttpRequest(String restEndPoint, Map<String, String> queryParams)
     {
-        JSONObjectWrapper response = SecureHttpHelper.getInstance().executeForGzipResponse(
-                StackUri.STACKX_API_HOST, restEndPoint, queryParams);
+        return SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
+                        restEndPoint, queryParams);
 
-        if (response.isErrorResponse())
-        {
-            Log.d(getLogTag(), "Error " + response);
-            StackXError error = new StackXError();
-            error.statusCode = response.getInt(StringConstants.STATUS_CODE);
-            error.id = response.getInt(StringConstants.HttpError.ERROR_ID);
-            error.name = response.getString(StringConstants.HttpError.ERROR_NAME);
-            error.msg = response.getString(StringConstants.HttpError.ERROR_MESSAGE);
-            throw new HttpErrorException(error);
-        }
-
-        return response;
     }
-    
+
     protected Map<String, String> getDefaultQueryParams()
     {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();

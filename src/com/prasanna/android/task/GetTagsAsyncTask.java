@@ -25,7 +25,7 @@ import android.database.SQLException;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.prasanna.android.http.HttpErrorException;
+import com.prasanna.android.http.ServerException;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 
@@ -67,7 +67,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
                 tagsDbAdapter.insertMyTags(tags);
             }
         }
-        catch (HttpErrorException e)
+        catch (ServerException e)
         {
             Log.e(TAG, "Error fetching tags: " + e.getMessage());
         }

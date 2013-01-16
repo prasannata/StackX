@@ -21,19 +21,19 @@ package com.prasanna.android.http;
 
 import com.prasanna.android.stacknetwork.model.StackXError;
 
-public class HttpErrorException extends RuntimeException
+public class ClientException extends RuntimeException
 {
-    private static final long serialVersionUID = 653718270475335315L;
+    private static final long serialVersionUID = -6758967927788004257L;
     private final StackXError error;
 
-    public HttpErrorException(StackXError error)
+    public ClientException(StackXError error)
     {
-	super(error.name + " - " + error.msg);
-	this.error = error;
+        super(error.name + " - " + error.msg);
+        this.error = error;
     }
 
     public StackXError getError()
     {
-	return error;
+        return error;
     }
 }

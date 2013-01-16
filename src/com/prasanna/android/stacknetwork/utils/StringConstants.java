@@ -82,6 +82,8 @@ public class StringConstants
 
     public static final String SIMILAR = "similar";
 
+    public static final String EXCEPTION = "exception";
+
     public static final class HttpError
     {
         public static final String CODE = "code";

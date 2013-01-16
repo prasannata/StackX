@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.prasanna.android.http.HttpErrorException;
+import com.prasanna.android.http.ServerException;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -58,10 +58,10 @@ public class QuestionsIntentService extends AbstractIntentService
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final int page = intent.getIntExtra(StringConstants.PAGE, 1);
         final String sort = intent.getStringExtra(StringConstants.SORT);
+        Bundle bundle = new Bundle();
 
         try
         {
-            Bundle bundle = new Bundle();
 
             switch (action)
             {
@@ -107,9 +107,10 @@ public class QuestionsIntentService extends AbstractIntentService
 
             receiver.send(0, bundle);
         }
-        catch (HttpErrorException e)
+        catch (ServerException e)
         {
-            broadcastHttpErrorIntent(e.getError());
+            bundle.putSerializable(StringConstants.EXCEPTION, e);
+            receiver.send(ERROR, bundle);
         }
     }
 

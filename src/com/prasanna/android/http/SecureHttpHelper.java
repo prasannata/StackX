@@ -58,7 +58,6 @@ import android.net.Uri.Builder;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.Validate;
 
 public final class SecureHttpHelper
@@ -72,6 +71,12 @@ public final class SecureHttpHelper
     private static final String GZIP = "gzip";
     private static final HttpGzipResponseInterceptor gzipHttpInterceptor = new HttpGzipResponseInterceptor(GZIP,
                     GzipDecompressingEntity.class);
+
+    public static class HttpErrorFamily
+    {
+        public static final int CLIENT_ERROR = 400;
+        public static final int SERVER_ERROR = 500;
+    }
 
     private static class GzipDecompressingEntity extends HttpEntityWrapper
     {
@@ -176,16 +181,8 @@ public final class SecureHttpHelper
                 Log.d(TAG, "Http request failed: " + statusCode);
                 Log.d(TAG, "Http request failure message: " + jsonText);
 
-                try
-                {
-                    jsonObject = new JSONObjectWrapper(getErrorJsonPayload(jsonText, statusCode));
-                }
-                finally
-                {
-                    Log.d(TAG, "Response parsing failed");
-
-                    jsonObject = new JSONObjectWrapper(getErrorJsonPayload(null, statusCode));
-                }
+                if (statusCode >= HttpErrorFamily.SERVER_ERROR)
+                    throw new ServerException(statusCode, jsonText);
             }
         }
         catch (ClientProtocolException e)
@@ -222,20 +219,6 @@ public final class SecureHttpHelper
         }
 
         return jsonObject;
-    }
-
-    private JSONObject getErrorJsonPayload(String jsonText, int statusCode) throws JSONException
-    {
-        JSONObject error = null;
-
-        if (jsonText == null)
-            error = new JSONObject();
-        else
-            error = new JSONObject(jsonText);
-
-        error.put(StringConstants.ERROR, true);
-        error.put(StringConstants.STATUS_CODE, statusCode);
-        return error;
     }
 
     private DefaultHttpClient getClientForGzipResponse() throws KeyStoreException, NoSuchAlgorithmException,

@@ -214,11 +214,11 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
 
         TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
-        textView.setText(Html.fromHtml(answer.title));
         RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
         layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         textView.setLayoutParams(layoutParams);
+        textView.setText(Html.fromHtml(answer.title));
 
         textView = (TextView) answerRow.findViewById(R.id.answerScore);
         textView.setText("Answer Score: " + answer.score);

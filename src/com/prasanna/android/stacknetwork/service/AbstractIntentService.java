@@ -32,30 +32,32 @@ public abstract class AbstractIntentService extends IntentService
 {
     private static final String TAG = AbstractIntentService.class.getSimpleName();
 
+    public static final int ERROR = -1;
+
     public AbstractIntentService(String name)
     {
-	super(name);
+        super(name);
     }
 
     protected void broadcastHttpErrorIntent(StackXError error)
     {
-	Log.d(TAG, "broadcastHttpErrorIntent: " + error.msg);
+        Log.d(TAG, "broadcastHttpErrorIntent: " + error.msg);
 
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(StringConstants.ERROR, error);
-	sendBroadcast(broadcastIntent);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(StringConstants.ERROR, error);
+        sendBroadcast(broadcastIntent);
     }
 
     protected void broadcastSerializableExtra(String action, String extraName, Serializable extra)
     {
-	Log.d(TAG, "broadcastSerializableExtra: " + action);
+        Log.d(TAG, "broadcastSerializableExtra: " + action);
 
-	Intent broadcastIntent = new Intent();
-	broadcastIntent.setAction(action);
-	broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-	broadcastIntent.putExtra(extraName, extra);
-	sendBroadcast(broadcastIntent);
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(action);
+        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        broadcastIntent.putExtra(extraName, extra);
+        sendBroadcast(broadcastIntent);
     }
 }

@@ -7,45 +7,6 @@
 
     <include layout="@layout/stack_exchange_header" />
 
-    <!--
-         <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/delft" >
-
-        <Button
-            android:id="@+id/reorderDoneToggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="5dp"
-            android:background="@drawable/sort_white"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/dragAndDropHint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:text="@string/dragAndDropHint"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/cancelSiteListReorder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/cancel_white"
-            android:visibility="invisible" />
-    </RelativeLayout>
-    -->
-
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"

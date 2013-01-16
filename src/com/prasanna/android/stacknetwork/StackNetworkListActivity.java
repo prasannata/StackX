@@ -29,11 +29,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.prasanna.android.http.HttpErrorBroadcastReceiver;
-import com.prasanna.android.listener.HttpErrorListener;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
@@ -44,157 +41,137 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class StackNetworkListActivity extends ListActivity implements HttpErrorListener, StackXRestQueryResultReceiver
+public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver
 {
     private static final String TAG = StackNetworkListActivity.class.getSimpleName();
 
     private ProgressDialog progressDialog;
-
     private Intent intent = null;
-
     private ArrayList<Site> sites;
-
     private SiteListAdapter siteListAdapter;
-
     private RestQueryResultReceiver receiver;
-
-    private HttpErrorBroadcastReceiver httpErrorBroadcastReceiver;
 
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
-	setContentView(R.layout.sitelist);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.sitelist);
 
-	receiver = new RestQueryResultReceiver(new Handler());
-	receiver.setReceiver(this);
+        receiver = new RestQueryResultReceiver(new Handler());
+        receiver.setReceiver(this);
 
-	httpErrorBroadcastReceiver = new HttpErrorBroadcastReceiver(this);
+        Object lastSavedInstance = null;
+        if (savedInstanceState != null)
+            lastSavedInstance = (ArrayList<Site>) savedInstanceState.getSerializable(StringConstants.SITES);
 
-	Object lastSavedInstance = null;
-	if (savedInstanceState != null)
-	{
-	    lastSavedInstance = savedInstanceState.getSerializable(StringConstants.SITES);
-	}
-
-	if (lastSavedInstance == null && SharedPreferencesUtil.hasSiteListCache(getCacheDir()) == false)
-	{
-	    registerReceiverAndStartService();
-	}
-	else
-	{
-	    if (lastSavedInstance != null)
-	    {
-		sites = (ArrayList<Site>) lastSavedInstance;
-		updateView(sites);
-	    }
-	    else
-	    {
-		sites = SharedPreferencesUtil.getSiteListFromCache(getCacheDir());
-		updateView(sites);
-	    }
-	}
+        if (lastSavedInstance == null && SharedPreferencesUtil.hasSiteListCache(getCacheDir()) == false)
+        {
+            registerReceiverAndStartService();
+        }
+        else
+        {
+            if (lastSavedInstance != null)
+            {
+                sites = (ArrayList<Site>) lastSavedInstance;
+                updateView(sites);
+            }
+            else
+            {
+                sites = SharedPreferencesUtil.getSiteListFromCache(getCacheDir());
+                updateView(sites);
+            }
+        }
     }
 
     @Override
     protected void onListItemClick(ListView listView, View v, int position, long id)
     {
-	Log.d(TAG, "Clicking on list item " + position);
+        Log.d(TAG, "Clicking on list item " + position);
 
-	Site site = sites.get(position);
-	OperatingSite.setSite(site);
-	startActivity(new Intent(this, QuestionsActivity.class));
-    }
-
-    private void stopServiceAndUnregisterReceiver()
-    {
-	if (intent != null)
-	    stopService(intent);
-
-	try
-	{
-	    unregisterReceiver(httpErrorBroadcastReceiver);
-	}
-	catch (IllegalArgumentException e)
-	{
-	    Log.d(TAG, e.getMessage());
-	}
+        Site site = sites.get(position);
+        OperatingSite.setSite(site);
+        startActivity(new Intent(this, QuestionsActivity.class));
     }
 
     @Override
     protected void onDestroy()
     {
-	super.onDestroy();
-	stopServiceAndUnregisterReceiver();
+        super.onDestroy();
+
+        if (intent != null)
+            stopService(intent);
     }
 
     @Override
     public void onStop()
     {
-	super.onStop();
+        super.onStop();
 
-	stopServiceAndUnregisterReceiver();
+        if (intent != null)
+            stopService(intent);
     }
 
     private void registerReceiverAndStartService()
     {
-	progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
+        progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
 
-	startIntentService();
+        startIntentService();
     }
 
     private void startIntentService()
     {
-	intent = new Intent(this, UserIntentService.class);
-	intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
-	intent.putExtra(StringConstants.AUTHENTICATED, AppUtils.inAuthenticatedRealm(getApplicationContext()));
-	intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
-	startService(intent);
+        intent = new Intent(this, UserIntentService.class);
+        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
+        intent.putExtra(StringConstants.AUTHENTICATED, AppUtils.inAuthenticatedRealm(getApplicationContext()));
+        intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+        startService(intent);
     }
 
     private void updateView(ArrayList<Site> sites)
     {
-	if (sites != null && sites.isEmpty() == false)
-	{
-	    siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView());
-	    setListAdapter(siteListAdapter);
-	}
+        if (sites != null && sites.isEmpty() == false)
+        {
+            siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView());
+            setListAdapter(siteListAdapter);
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-	outState.putSerializable(StringConstants.SITES, sites);
-	super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onHttpError(int code, String text)
-    {
-	RelativeLayout relativeLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.error, null);
-	TextView textView = (TextView) relativeLayout.findViewById(R.id.errorMsg);
-
-	textView.setText(code + " " + text);
+        outState.putSerializable(StringConstants.SITES, sites);
+        super.onSaveInstanceState(outState);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-	// TODO Auto-generated method stub
-	if (progressDialog != null)
-	{
-	    progressDialog.dismiss();
-	}
+        if (progressDialog != null)
+            progressDialog.dismiss();
 
-	sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
+        if (resultCode == UserIntentService.ERROR)
+        {
+            showError();
+        }
+        else
+        {
+            sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
 
-	if (sites != null)
-	{
-	    SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
-	    updateView(sites);
-	}
+            if (sites != null)
+            {
+                SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
+                updateView(sites);
+            }
+        }
+    }
 
+    private void showError()
+    {
+        View errorView = getLayoutInflater().inflate(R.layout.error, null);
+        TextView errorTextView = (TextView) errorView.findViewById(R.id.errorMsg);
+        errorTextView.setText("Failed to fetch sites");
+        getListView().addFooterView(errorView);
     }
 }

@@ -38,6 +38,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
+import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
@@ -47,6 +48,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
@@ -390,6 +392,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 serviceRunningForAnswers = false;
                 setProgressBarIndeterminateVisibility(false);
                 displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS));
+                break;
+            case QuestionDetailsIntentService.ERROR:
+                setProgressBarIndeterminateVisibility(false);
+                HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
+                Log.d(TAG, e.getErrorResponse());
+                AppUtils.getErrorView(this, e);
                 break;
             default:
                 Log.d(TAG, "Unknown result code in receiver: " + resultCode);
