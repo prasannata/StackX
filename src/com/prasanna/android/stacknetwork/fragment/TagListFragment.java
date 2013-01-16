@@ -189,6 +189,9 @@ public class TagListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
         if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
         {
             if (position == 0)

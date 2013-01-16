@@ -48,7 +48,6 @@ import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.Order;
-import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
