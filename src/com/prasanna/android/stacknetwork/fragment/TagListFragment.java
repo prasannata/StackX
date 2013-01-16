@@ -38,6 +38,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
@@ -69,13 +70,19 @@ public class TagListFragment extends ListFragment
         @Override
         public void notifyOnCompletion(LinkedHashSet<String> result)
         {
+            getProgressBar().setVisibility(View.GONE);
+            
             if (result != null)
             {
-                getProgressBar().setVisibility(View.GONE);
                 listAdapter.add(StringConstants.FRONT_PAGE);
                 listAdapter.addAll(result);
             }
+            else
+            {
+                showError();
+            }
         }
+ 
     }
 
     private ProgressBar getProgressBar()
@@ -201,6 +208,15 @@ public class TagListFragment extends ListFragment
         }
     }
 
+    private void showError()
+    {
+        View errorView = getActivity().getLayoutInflater().inflate(R.layout.error, null);
+        TextView errorTextView = (TextView) errorView.findViewById(R.id.errorMsg);
+        errorTextView.setText("Failed to fetch tags");
+        getListView().removeFooterView(progressBar);
+        getListView().addFooterView(errorView);
+    }
+    
     public static TagListFragment newFragment(OnTagSelectListener onTagSelectListener)
     {
         TagListFragment fragment = new TagListFragment();
