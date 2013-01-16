@@ -45,7 +45,6 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import com.prasanna.android.cache.BitmapCache;
-import com.prasanna.android.listener.MenuItemClickListener;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
@@ -66,7 +65,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
     protected SearchView searchView;
     private BitmapCache iconCache = BitmapCache.getInstance();
     private OnDiscardOptionListener discardOptionListener;
-    private MenuItemClickListener menuItemClickListener;
     private boolean showingSearchFilters = false;
     private PopupWindow popupWindow;
 
@@ -75,11 +73,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
     protected abstract void refresh();
 
     protected abstract boolean shouldSearchViewBeEnabled();
-
-    protected void setMenuItemClickListener(MenuItemClickListener menuItemClickListener)
-    {
-        this.menuItemClickListener = menuItemClickListener;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -270,7 +263,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
         switch (item.getItemId())
         {
             case android.R.id.home:
-                return handleHomeButtonClick(item);
+                return onActionBarHomeButtonClick(item);
             case R.id.menu_refresh:
                 refresh();
                 return true;
@@ -341,21 +334,16 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     }
 
-    private boolean handleHomeButtonClick(MenuItem item)
+    protected boolean onActionBarHomeButtonClick(MenuItem item)
     {
-        if (menuItemClickListener != null)
-            return menuItemClickListener.onMenuItemClick(item);
-        else
-        {
-            if (this instanceof QuestionsActivity)
-                finish();
+        if (this instanceof QuestionsActivity)
+            finish();
 
-            Intent intent = new Intent(this, QuestionsActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            return true;
-        }
+        Intent intent = new Intent(this, QuestionsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        return true;
     }
 
     public boolean isAuthenticatedRealm()

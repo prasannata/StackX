@@ -31,7 +31,6 @@ import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.prasanna.android.listener.MenuItemClickListener;
 import com.prasanna.android.provider.RecentQueriesProvider;
 import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
@@ -45,7 +44,7 @@ import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements
-                OnContextItemSelectedListener<Question>, MenuItemClickListener, OnTagSelectListener
+                OnContextItemSelectedListener<Question>, OnTagSelectListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
     private static final String TAB_TITLE_ACTIVE = "Active";
@@ -111,13 +110,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         else if (StringConstants.TAG.equals(action))
             showTagQuestionListFragment();
         else
-            showHomePageForSite();
-    }
-
-    private void showHomePageForSite()
-    {
-        setMenuItemClickListener(this);
-        showFrontPageForSite();
+            showFrontPageForSite();
     }
 
     private void showSearchFragment()
@@ -245,7 +238,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     }
 
     @Override
-    public boolean onMenuItemClick(MenuItem menuItem)
+    protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
     {
         Log.d(TAG, "Home button clicked");
 
