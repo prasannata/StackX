@@ -142,8 +142,7 @@
                 android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="10sp"
-                android:visibility="gone" />
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/profileViews"

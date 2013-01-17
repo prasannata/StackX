@@ -221,12 +221,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
         textView.setText(getString(R.string.views) + " " + user.profileViews);
 
-        if (user.acceptRate > 0)
-        {
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
-            textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
-            textView.setVisibility(View.VISIBLE);
-        }
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
+        textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
         textView.setText(getString(R.string.lastSeen) + " "
