@@ -28,14 +28,16 @@ public class User extends StackXItem implements Serializable
 {
     public static enum UserType
     {
-        REGISTERED("registered"), UNREGISTERED("unregistered"), MODERATOR("moderator"), DOES_NOT_EXIST("does_not_exist");
+        REGISTERED("registered"),
+        UNREGISTERED("unregistered"),
+        MODERATOR("moderator"),
+        DOES_NOT_EXIST("does_not_exist");
 
         private final String value;
 
         UserType(String value)
         {
             this.value = value;
-
         }
 
         public String getValue()
