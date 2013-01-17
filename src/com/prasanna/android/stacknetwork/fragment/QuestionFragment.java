@@ -125,6 +125,16 @@ public class QuestionFragment extends Fragment
         registerForContextMenu(ctxMenuImage);
     }
 
+    @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+
+        super.onResume();
+
+        displayQuestion();
+    }
+
     private void setupUserProfileInContextMenu()
     {
         if (question != null && question.owner != null)

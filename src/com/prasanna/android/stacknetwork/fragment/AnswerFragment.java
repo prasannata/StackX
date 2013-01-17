@@ -89,8 +89,17 @@ public class AnswerFragment extends Fragment
 
         registerForContextMenu(answerCtxMenuImageView);
 
-        if (answer != null)
-            displayAnswer();
+        displayAnswer();
+    }
+
+    @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+
+        super.onResume();
+
+        displayAnswer();
     }
 
     @Override
@@ -116,29 +125,32 @@ public class AnswerFragment extends Fragment
 
     private void displayAnswer()
     {
-        TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
-        textView.setText(AppUtils.formatNumber(answer.score));
-        if (answer.accepted)
-            textView.setBackgroundColor(getResources().getColor(R.color.lichen));
-
-        String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
-        textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
-        textView.setText(getAutherDisplayText(acceptRate));
-
-        if (answer.comments != null && !answer.comments.isEmpty())
+        if (answer != null)
         {
-            textView = (TextView) parentLayout.findViewById(R.id.answerCommentsCount);
-            textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
-            textView.setVisibility(View.VISIBLE);
+            TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
+            textView.setText(AppUtils.formatNumber(answer.score));
+            if (answer.accepted)
+                textView.setBackgroundColor(getResources().getColor(R.color.lichen));
+
+            String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
+            textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
+            textView.setText(getAutherDisplayText(acceptRate));
+
+            if (answer.comments != null && !answer.comments.isEmpty())
+            {
+                textView = (TextView) parentLayout.findViewById(R.id.answerCommentsCount);
+                textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
+                textView.setVisibility(View.VISIBLE);
+            }
+
+            final ImageView questionMarkImageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
+            showQuestionTitleOnClick(questionMarkImageView);
+            gotoQuestionPageOnLongClick(questionMarkImageView);
+            setupContextMenuForAnswer();
+
+            for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
+                answerBodyLayout.addView(answerView);
         }
-
-        final ImageView questionMarkImageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
-        showQuestionTitleOnClick(questionMarkImageView);
-        gotoQuestionPageOnLongClick(questionMarkImageView);
-        setupContextMenuForAnswer();
-
-        for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
-            answerBodyLayout.addView(answerView);
     }
 
     private void setupContextMenuForAnswer()

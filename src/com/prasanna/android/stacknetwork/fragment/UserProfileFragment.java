@@ -120,6 +120,17 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     }
 
     @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+
+        super.onResume();
+
+        displayUserDetail();
+        displayUserAccounts();
+    }
+
+    @Override
     public void onStop()
     {
         super.onStop();
