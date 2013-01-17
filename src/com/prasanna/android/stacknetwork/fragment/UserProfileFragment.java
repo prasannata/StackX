@@ -193,7 +193,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                         + DateTimeUtils.getElapsedDurationSince(user.creationDate));
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
-        textView.setText(AppUtils.formatReputation(user.reputation));
+        textView.setText(AppUtils.formatNumber(user.reputation));
 
         if (user.badgeCounts != null && user.badgeCounts.length == 3)
         {
