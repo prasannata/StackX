@@ -22,6 +22,8 @@ package com.prasanna.android.stacknetwork.fragment;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -211,8 +213,9 @@ public class AnswerFragment extends Fragment
 
     private String getAutherDisplayText(String acceptRate)
     {
-        return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by "
-                        + Html.fromHtml(answer.owner.displayName) + " [" + acceptRate
+        Spanned authorName = answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
+                        : new SpannableString("");
+        return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
                         + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
