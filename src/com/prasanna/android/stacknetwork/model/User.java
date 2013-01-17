@@ -28,8 +28,7 @@ public class User extends StackXItem implements Serializable
 {
     public static enum UserType
     {
-        REGISTERED("registered"), UNREGISTERED("unregistered"), MODERATOR("moderator"), DOES_NOT_EXIST(
-                "does_not_exist");
+        REGISTERED("registered"), UNREGISTERED("unregistered"), MODERATOR("moderator"), DOES_NOT_EXIST("does_not_exist");
 
         private final String value;
 
@@ -72,33 +71,31 @@ public class User extends StackXItem implements Serializable
 
     private static final long serialVersionUID = -5427063287288616795L;
 
-    public long accountId;
+    public long accountId = 0L;
 
-    public String displayName;
+    public String displayName = "";
 
     public Bitmap avatar;
 
-    public int reputation;
+    public String profileImageLink;
+
+    public int reputation = -1;
 
     public int[] badgeCounts;
 
-    public String profileImageLink;
-
     public int acceptRate = 0;
 
-    public int questionCount;
+    public int questionCount = 0;
 
-    public int answerCount;
+    public int answerCount = 0;
 
-    public int upvoteCount;
+    public int upvoteCount = 0;
 
-    public int downvoteCount;
+    public int downvoteCount = 0;
 
-    public int profileViews;
+    public int profileViews = 0;
+
+    public long lastAccessTime = 0L;
 
     public ArrayList<Account> accounts;
-
-    public long lastAccessTime;
-
-    public String accessToken;
 }
