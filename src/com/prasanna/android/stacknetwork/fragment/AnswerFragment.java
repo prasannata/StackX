@@ -228,7 +228,7 @@ public class AnswerFragment extends Fragment
         Spanned authorName = answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
                         : new SpannableString("");
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
-                        + AppUtils.formatNumber(answer.owner.reputation) + "]";
+                        + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
     private void enableCommentsInContextMenu(ContextMenu menu)

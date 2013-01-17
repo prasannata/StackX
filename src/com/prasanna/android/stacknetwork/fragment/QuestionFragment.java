@@ -199,7 +199,7 @@ public class QuestionFragment extends Fragment
     {
         return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
                         + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
-                        + AppUtils.formatNumber(question.owner.reputation) + "]";
+                        + AppUtils.formatReputation(question.owner.reputation) + "]";
     }
 
     private void showNumComments()

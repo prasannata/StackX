@@ -38,21 +38,26 @@ import com.prasanna.android.stacknetwork.model.StackXError;
 
 public class AppUtils
 {
-    public static String formatNumber(int reputation)
+    public static String formatReputation(int reputation)
+    {
+        if (reputation > 0)
+            return formatNumber(reputation);
+
+        return "";
+    }
+
+    public static String formatNumber(int number)
     {
         String reputationString = "";
 
-        if (reputation >= 0)
+        if (number > 10000)
         {
-            if (reputation > 10000)
-            {
-                float reputationInThousands = ((float) reputation) / 1000f;
-                reputationString += String.format("%.1fk", reputationInThousands);
-            }
-            else
-            {
-                reputationString += reputation;
-            }
+            float reputationInThousands = ((float) number) / 1000f;
+            reputationString += String.format("%.1fk", reputationInThousands);
+        }
+        else
+        {
+            reputationString += number;
         }
 
         return reputationString;
