@@ -34,6 +34,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri;
@@ -51,120 +52,136 @@ public class OAuthActivity extends Activity
 
     private class OAuthWebViewClient extends WebViewClient
     {
-	@Override
-	public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error)
-	{
-	    handler.proceed();
-	}
+        @Override
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error)
+        {
+            handler.proceed();
+        }
 
-	@Override
-	public boolean shouldOverrideUrlLoading(WebView view, String url)
-	{
-	    Log.d(TAG, url);
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url)
+        {
+            Log.d(TAG, url);
 
-	    if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
-	    {
-		Intent listStackNetworkIntent = new Intent(view.getContext(), StackNetworkListActivity.class);
-		listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
+            {
+                Intent listStackNetworkIntent = new Intent(view.getContext(), StackNetworkListActivity.class);
+                listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-		Uri uri = Uri.parse(url);
-		String accessToken = uri.getFragment();
-		if (accessToken != null)
-		{
-		    String[] nameValuePair = accessToken.split("=");
-		    if (nameValuePair != null && nameValuePair.length == 2
-			            && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
-		    {
-			SharedPreferencesUtil.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
-		    }
-		}
+                Uri uri = Uri.parse(url);
+                String accessToken = uri.getFragment();
+                if (accessToken != null)
+                {
+                    String[] nameValuePair = accessToken.split("=");
+                    if (nameValuePair != null && nameValuePair.length == 2
+                                    && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
+                    {
+                        SharedPreferencesUtil.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
+                    }
+                }
 
-		AlarmUtils.setInboxRefreshAlarm(OAuthActivity.this);
-		startActivity(listStackNetworkIntent);
-		OAuthActivity.this.finish();
-	    }
-	    else
-	    {
-		view.loadUrl(url);
-	    }
-	    return true;
-	}
+                deleteStoredTags();
+                AlarmUtils.setInboxRefreshAlarm(OAuthActivity.this);
+                startActivity(listStackNetworkIntent);
+                OAuthActivity.this.finish();
+            }
+            else
+            {
+                view.loadUrl(url);
+            }
+            return true;
+        }
 
-	@Override
-	public void onPageFinished(WebView view, String url)
-	{
-	    Log.d(TAG, "onPageFinished: " + url);
+        @Override
+        public void onPageFinished(WebView view, String url)
+        {
+            Log.d(TAG, "onPageFinished: " + url);
 
-	    if (oauthUrl != null && url.startsWith(StackUri.OAUTH_DIALOG_URL) && progressDialog != null)
-	    {
-		progressDialog.dismiss();
-		progressDialog = null;
-	    }
-	    else
-	    {
-		/*
-	         * Yahoo's login page does not seem to support horizontal
-	         * scrolling inside webview, so enabling wide view port. Not
-	         * good.
-	         */
-		if (url.startsWith(YAHOO_LOGIN_URL))
-		{
-		    view.getSettings().setUseWideViewPort(true);
-		}
-	    }
-	    super.onPageFinished(view, url);
-	}
+            if (oauthUrl != null && url.startsWith(StackUri.OAUTH_DIALOG_URL) && progressDialog != null)
+            {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+            else
+            {
+                /*
+                 * Yahoo's login page does not seem to support horizontal
+                 * scrolling inside webview, so enabling wide view port. Not
+                 * good.
+                 */
+                if (url.startsWith(YAHOO_LOGIN_URL))
+                {
+                    view.getSettings().setUseWideViewPort(true);
+                }
+            }
+            super.onPageFinished(view, url);
+        }
     }
 
+    private void deleteStoredTags()
+    {
+        TagDAO tagDAO = new TagDAO(this);
+
+        try
+        {
+            tagDAO.open();
+            tagDAO.deleteAll();
+        }
+        finally
+        {
+            tagDAO.close();
+        }
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	super.onCreate(savedInstanceState);
-	
-	progressDialog = ProgressDialog.show(OAuthActivity.this, "", PROGRESS_BAR_TEXT);
-	setContentView(R.layout.webview);
-	WebView webview = initWebview();
+        super.onCreate(savedInstanceState);
 
-	Builder uriBuilder = Uri.parse(StackUri.OAUTH_DIALOG_URL).buildUpon();
-	uriBuilder.appendQueryParameter(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
-	uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
-	uriBuilder.appendQueryParameter(StackUri.QueryParams.REDIRECT_URI,
-	                StackUri.QueryParamDefaultValues.REDIRECT_URI);
+        progressDialog = ProgressDialog.show(OAuthActivity.this, "", PROGRESS_BAR_TEXT);
+        setContentView(R.layout.webview);
+        WebView webview = initWebview();
 
-	oauthUrl = uriBuilder.build().toString();
-	
-	SharedPreferencesUtil.clearDefaultSite(getApplicationContext());
-	webview.loadUrl(oauthUrl);
+        Builder uriBuilder = Uri.parse(StackUri.OAUTH_DIALOG_URL).buildUpon();
+        uriBuilder.appendQueryParameter(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
+        uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
+        uriBuilder.appendQueryParameter(StackUri.QueryParams.REDIRECT_URI,
+                        StackUri.QueryParamDefaultValues.REDIRECT_URI);
+
+        oauthUrl = uriBuilder.build().toString();
+
+        SharedPreferencesUtil.clearDefaultSite(getApplicationContext());
+        webview.loadUrl(oauthUrl);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private WebView initWebview()
     {
-	WebView webview = (WebView) findViewById(R.id.web_view);
-	webview.setVerticalScrollBarEnabled(true);
-	webview.setHorizontalScrollBarEnabled(true);
-	webview.getSettings().setJavaScriptEnabled(true);
-	webview.getSettings().setDomStorageEnabled(true);
-	webview.getSettings().setLoadsImagesAutomatically(true);
-	webview.getSettings().setSaveFormData(false);
-	webview.getSettings().setSavePassword(false);
-	webview.getSettings().setBlockNetworkImage(false);
-	webview.getSettings().setUseWideViewPort(false);
-	webview.setWebChromeClient(new WebChromeClient()
-	{
-	    public void onProgressChanged(WebView view, int progress)
-	    {
-		setTitle("Loading...");
-		setProgress(progress * 100);
-		if (progress == 100)
-		{
-		    setTitle(LOGIN);
-		}
-	    }
-	});
-	webview.setWebViewClient(new OAuthWebViewClient());
-	webview.requestFocus(View.FOCUS_DOWN);
-	return webview;
+        WebView webview = (WebView) findViewById(R.id.web_view);
+        webview.setVerticalScrollBarEnabled(true);
+        webview.setHorizontalScrollBarEnabled(true);
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.getSettings().setDomStorageEnabled(true);
+        webview.getSettings().setLoadsImagesAutomatically(true);
+        webview.getSettings().setSaveFormData(false);
+        webview.getSettings().setSavePassword(false);
+        webview.getSettings().setBlockNetworkImage(false);
+        webview.getSettings().setUseWideViewPort(false);
+        webview.setWebChromeClient(new WebChromeClient()
+        {
+            public void onProgressChanged(WebView view, int progress)
+            {
+                setTitle("Loading...");
+                setProgress(progress * 100);
+                if (progress == 100)
+                {
+                    setTitle(LOGIN);
+                }
+            }
+        });
+        webview.setWebViewClient(new OAuthWebViewClient());
+        webview.requestFocus(View.FOCUS_DOWN);
+        return webview;
     }
 }

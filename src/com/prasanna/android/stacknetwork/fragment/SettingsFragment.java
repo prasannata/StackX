@@ -45,7 +45,6 @@ import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.StackNetworkListActivity;
-import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
@@ -173,8 +172,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             {
                 accountActionPref.getDialog().dismiss();
                 
-                deleteStoredTags();
-                
                 Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
                 SharedPreferencesUtil.clearDefaultSite(getActivity());
                 SharedPreferencesUtil.clearSiteListCache(getActivity().getCacheDir());
@@ -182,21 +179,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 return true;
             }
         });
-    }
-
-    private void deleteStoredTags()
-    {
-        TagDAO tagDAO = new TagDAO(getActivity());
-        
-        try
-        {
-            tagDAO.open();
-            tagDAO.deleteAll();
-        }
-        finally
-        {
-            tagDAO.close();
-        }
     }
 
     private void setupLogoutPreference()
