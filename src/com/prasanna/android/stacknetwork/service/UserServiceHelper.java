@@ -396,7 +396,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return error;
     }
 
-    public LinkedHashSet<String> getTags(int page, int pageSize, boolean meTags)
+    public LinkedHashSet<String> getTags(String site, int page, int pageSize, boolean meTags)
     {
         LinkedHashSet<String> tags = null;
         String restEndPoint = meTags ? "/me/tags" : "/tags";

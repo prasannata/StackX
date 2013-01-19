@@ -127,7 +127,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         super.onResume();
 
         if (itemListAdapter != null)
+        {
+            Log.d(TAG, "Num items in adapter: " + itemListAdapter.getCount());
+            
             itemListAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

@@ -26,7 +26,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String TABLE_TAGS = "TAGS";
-    public static final String TABLE_MY_TAGS = "MY_TAGS";
     public static final String TABLE_USER_PROFILE = "USER_PROFILE";
 
     private static final String DATABASE_NAME = "stackx.db";
@@ -36,11 +35,11 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_VALUE = "_value";
+        public static final String COLUMN_SITE = "_site";
 
         private static final String CREATE_TABLE = "create table " + TABLE_TAGS + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null);";
-        private static final String CREATE_MY_TABLE = "create table " + TABLE_MY_TAGS + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null);";
+                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null, " + COLUMN_SITE
+                        + " text not null);";
     }
 
     public DatabaseHelper(Context context)
@@ -52,7 +51,6 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(TagsTable.CREATE_TABLE);
-        db.execSQL(TagsTable.CREATE_MY_TABLE);
     }
 
     @Override

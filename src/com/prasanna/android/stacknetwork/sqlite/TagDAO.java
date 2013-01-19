@@ -53,17 +53,7 @@ public class TagDAO
         databaseHelper.close();
     }
 
-    public void insert(HashSet<String> tags)
-    {
-        insertTags(DatabaseHelper.TABLE_TAGS, tags);
-    }
-
-    public void insertMyTags(HashSet<String> tags)
-    {
-        insertTags(DatabaseHelper.TABLE_MY_TAGS, tags);
-    }
-
-    private void insertTags(String tableName, HashSet<String> tags)
+    public void insert(String site, HashSet<String> tags)
     {
         if (tags != null)
         {
@@ -73,38 +63,20 @@ public class TagDAO
             {
                 ContentValues values = new ContentValues();
                 values.put(TagsTable.COLUMN_VALUE, tag);
-                database.insert(tableName, null, values);
+                values.put(TagsTable.COLUMN_SITE, site);
+                database.insert(DatabaseHelper.TABLE_TAGS, null, values);
             }
         }
     }
 
-    public LinkedHashSet<String> getTags()
+    public LinkedHashSet<String> getTags(String site)
     {
-        return selectTags(DatabaseHelper.TABLE_TAGS, new String[]
-        { TagsTable.COLUMN_VALUE });
-    }
+        String[] cols = new String[] { TagsTable.COLUMN_VALUE };
+        String selection = DatabaseHelper.TagsTable.COLUMN_SITE + " = ?";
+        String[] selectionArgs = { site };
+        String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
-    public LinkedHashSet<String> getMyTags()
-    {
-        return selectTagsSortAlphabetically(DatabaseHelper.TABLE_MY_TAGS, new String[]
-        { TagsTable.COLUMN_VALUE });
-    }
-
-    private LinkedHashSet<String> selectTags(String tableName, String[] cols)
-    {
-        Cursor cursor = database.query(tableName, cols, null, null, null, null, null);
-        if (cursor == null || cursor.getCount() == 0)
-            return null;
-
-        Log.d(TAG, "Tags retrieved from DB");
-
-        return getTagSet(cursor);
-    }
-
-    private LinkedHashSet<String> selectTagsSortAlphabetically(String tableName, String[] cols)
-    {
-        Cursor cursor = database.query(tableName, cols, null, null, null, null, TagsTable.COLUMN_VALUE
-                        + " Collate NOCASE");
+        Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS, cols, selection, selectionArgs, null, null, orderBy);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
@@ -129,6 +101,6 @@ public class TagDAO
 
     public void deleteAll()
     {
-        database.delete(DatabaseHelper.TABLE_MY_TAGS, null, null);
+        database.delete(DatabaseHelper.TABLE_TAGS, null, null);
     }
 }

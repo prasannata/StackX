@@ -28,6 +28,7 @@ import android.util.Log;
 import com.prasanna.android.http.ServerException;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
 public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String>>
 {
@@ -36,6 +37,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
     private final AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier;
     private final boolean registeredUser;
     private final TagDAO tagsDbAdapter;
+    private boolean persistTags = false;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier,
                     TagDAO tagsDbAdapter, boolean registeredUser)
@@ -53,31 +55,23 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         LinkedHashSet<String> tags = null;
         try
         {
-            tagsDbAdapter.open();
-
-            tags = tagsDbAdapter.getMyTags();
-
+            tags = getTagsFromDb(OperatingSite.getSite().name);
+            
             if (tags == null || tags.isEmpty())
             {
-                tags = UserServiceHelper.getInstance().getTags(1, 100, registeredUser);
+                tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
+                                registeredUser);
 
                 if (tags == null || tags.isEmpty())
-                    tags = UserServiceHelper.getInstance().getTags(1, 100, !registeredUser);
+                    tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
+                                    !registeredUser);
 
-                tagsDbAdapter.insertMyTags(tags);
+                persistTags = true;
             }
         }
         catch (ServerException e)
         {
             Log.e(TAG, "Error fetching tags: " + e.getMessage());
-        }
-        catch (SQLException e)
-        {
-            Log.e(TAG, e.getMessage());
-        }
-        finally
-        {
-            tagsDbAdapter.close();
         }
         return tags;
     }
@@ -90,6 +84,45 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
             taskCompletionNotifier.notifyOnCompletion(result);
         }
 
+        if (persistTags)
+            persistTags(result);
+
         super.onPostExecute(result);
+    }
+
+    private LinkedHashSet<String> getTagsFromDb(String site)
+    {
+        try
+        {
+            tagsDbAdapter.open();
+            return tagsDbAdapter.getTags(OperatingSite.getSite().apiSiteParameter);
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            tagsDbAdapter.close();
+        }
+        
+        return null;
+    }
+    
+    private void persistTags(LinkedHashSet<String> result)
+    {
+        try
+        {
+            tagsDbAdapter.open();
+            tagsDbAdapter.insert(OperatingSite.getSite().apiSiteParameter, result);
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            tagsDbAdapter.close();
+        }
     }
 }
