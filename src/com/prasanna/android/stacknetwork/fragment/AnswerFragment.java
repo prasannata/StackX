@@ -88,15 +88,7 @@ public class AnswerFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         registerForContextMenu(answerCtxMenuImageView);
-    }
-
-    @Override
-    public void onResume()
-    {
-        Log.d(TAG, "onResume");
-
-        super.onResume();
-
+        
         displayAnswer();
     }
 
