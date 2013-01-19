@@ -88,8 +88,6 @@ public class AnswerFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         registerForContextMenu(answerCtxMenuImageView);
-
-        displayAnswer();
     }
 
     @Override

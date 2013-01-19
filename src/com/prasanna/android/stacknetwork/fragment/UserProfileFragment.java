@@ -94,13 +94,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
             userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
         }
-        else
-        {
-            Log.d(TAG, "Not fetching, display existing user");
-
-            displayUserDetail();
-            displayUserAccounts();
-        }
 
         return profileHomeLayout;
     }

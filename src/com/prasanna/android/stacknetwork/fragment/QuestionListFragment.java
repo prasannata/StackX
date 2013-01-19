@@ -123,9 +123,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     public void onResume()
     {
         Log.d(TAG, "onResume");
+        
         super.onResume();
 
-        if (itemListAdapter != null && itemListAdapter.getCount() > 0)
+        if (itemListAdapter != null)
             itemListAdapter.notifyDataSetChanged();
     }
 
