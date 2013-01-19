@@ -88,10 +88,16 @@ public class AnswerFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
 
         registerForContextMenu(answerCtxMenuImageView);
-        
-        displayAnswer();
     }
 
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+        
+        super.onResume();
+
+        displayAnswer();
+    }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
@@ -138,6 +144,8 @@ public class AnswerFragment extends Fragment
             gotoQuestionPageOnLongClick(questionMarkImageView);
             setupContextMenuForAnswer();
 
+            answerBodyLayout.removeAllViews();
+            
             for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
                 answerBodyLayout.addView(answerView);
         }
