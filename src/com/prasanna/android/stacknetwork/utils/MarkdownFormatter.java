@@ -229,7 +229,7 @@ public class MarkdownFormatter
                             {
                                 addSimpleTextToView(context, views, buffer, params);
                                 views.add(getTextViewForCode(context, code.toString()));
-                                buffer.delete(0, code.length());
+                                code.delete(0, code.length());
                             }
                         }
                         else if (xmlPullParser.getName().equals(Tags.IMG))
