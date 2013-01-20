@@ -36,8 +36,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
 
     private final AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier;
     private final boolean registeredUser;
-    private final TagDAO tagsDbAdapter;
-    private boolean persistTags = false;
+    private final TagDAO tagDao;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier,
                     TagDAO tagsDbAdapter, boolean registeredUser)
@@ -45,7 +44,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         super();
 
         this.taskCompletionNotifier = taskCompletionNotifier;
-        this.tagsDbAdapter = tagsDbAdapter;
+        this.tagDao = tagsDbAdapter;
         this.registeredUser = registeredUser;
     }
 
@@ -55,8 +54,8 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         LinkedHashSet<String> tags = null;
         try
         {
-            tags = getTagsFromDb(OperatingSite.getSite().name);
-            
+            tags = getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
+
             if (tags == null || tags.isEmpty())
             {
                 tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
@@ -66,7 +65,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
                     tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
                                     !registeredUser);
 
-                persistTags = true;
+                persistTags(tags);
             }
         }
         catch (ServerException e)
@@ -80,12 +79,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
     protected void onPostExecute(LinkedHashSet<String> result)
     {
         if (taskCompletionNotifier != null)
-        {
             taskCompletionNotifier.notifyOnCompletion(result);
-        }
-
-        if (persistTags)
-            persistTags(result);
 
         super.onPostExecute(result);
     }
@@ -94,8 +88,17 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
     {
         try
         {
-            tagsDbAdapter.open();
-            return tagsDbAdapter.getTags(OperatingSite.getSite().apiSiteParameter);
+            tagDao.open();
+            long lastUpdateTime = tagDao.getLastUpdateTime(site);
+            
+            if (tagsOlderThanDay(lastUpdateTime))
+            {
+                Log.d(TAG, "Tags older than day, deleting...");
+                tagDao.deleteTagsForSite(site);
+            }
+            else
+                return tagDao.getTags(site);
+
         }
         catch (SQLException e)
         {
@@ -103,18 +106,27 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         }
         finally
         {
-            tagsDbAdapter.close();
+            tagDao.close();
         }
-        
+
         return null;
     }
-    
+
+    private boolean tagsOlderThanDay(long lastUpdateTime)
+    {
+        long MILLISECONDS_IN_DAY = 86400000L;
+
+        Log.d(TAG, "Tags last updated: " + lastUpdateTime);
+        
+        return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
+    }
+
     private void persistTags(LinkedHashSet<String> result)
     {
         try
         {
-            tagsDbAdapter.open();
-            tagsDbAdapter.insert(OperatingSite.getSite().apiSiteParameter, result);
+            tagDao.open();
+            tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
         }
         catch (SQLException e)
         {
@@ -122,7 +134,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         }
         finally
         {
-            tagsDbAdapter.close();
+            tagDao.close();
         }
     }
 }

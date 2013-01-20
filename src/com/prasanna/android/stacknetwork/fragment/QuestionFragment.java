@@ -229,6 +229,7 @@ public class QuestionFragment extends Fragment
         if (text != null && parentLayout != null)
         {
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
+            questionBodyLayout.removeAllViews();
             for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
                 questionBodyLayout.addView(questionBodyTextView);
         }

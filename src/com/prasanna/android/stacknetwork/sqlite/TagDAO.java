@@ -29,6 +29,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsAuditTable;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsTable;
 
 public class TagDAO
@@ -55,7 +56,7 @@ public class TagDAO
 
     public void insert(String site, HashSet<String> tags)
     {
-        if (tags != null)
+        if (tags != null && !tags.isEmpty())
         {
             Log.d(TAG, "inserting tags into DB");
 
@@ -66,7 +67,38 @@ public class TagDAO
                 values.put(TagsTable.COLUMN_SITE, site);
                 database.insert(DatabaseHelper.TABLE_TAGS, null, values);
             }
+
+            insertAuditEntry(site);
         }
+    }
+
+    private void insertAuditEntry(String site)
+    {
+        ContentValues values = new ContentValues();
+        values.put(TagsAuditTable.COLUMN_SITE, site);
+        values.put(TagsAuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
+        Log.d(TAG, "Audit entry for tags: " +  values.toString());
+        database.insert(DatabaseHelper.TABLE_TAGS_AUDIT, null, values);
+    }
+
+    public long getLastUpdateTime(String site)
+    {
+        String[] cols = new String[] { TagsAuditTable.COLUMN_LAST_UPDATE_TIME };
+        String selection = DatabaseHelper.TagsAuditTable.COLUMN_SITE + " = ?";
+        String[] selectionArgs = { site };
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS_AUDIT, cols, selection, selectionArgs, null,
+                        null, null);
+
+        if (cursor == null || cursor.getCount() == 0)
+        {
+            Log.d(TAG, "getLastUpdateTime for " + site + ", no entries found");
+            return 0L;
+        }
+
+        cursor.moveToFirst();
+
+        return cursor.getLong(0);
     }
 
     public LinkedHashSet<String> getTags(String site)
@@ -103,4 +135,21 @@ public class TagDAO
     {
         database.delete(DatabaseHelper.TABLE_TAGS, null, null);
     }
+
+    public void deleteTagsForSite(String site)
+    {
+        String whereClause = TagsTable.COLUMN_SITE + " = ?";
+        String[] whereArgs = { site };
+        database.delete(DatabaseHelper.TABLE_TAGS, whereClause, whereArgs);
+        
+        deleteAuditEntry(site);
+    }
+
+    private void deleteAuditEntry(String site)
+    {
+        String whereClause = TagsTable.COLUMN_SITE + " = ?";
+        String[] whereArgs = { site };
+        database.delete(DatabaseHelper.TABLE_TAGS_AUDIT, whereClause, whereArgs);
+    }
+
 }
