@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="5dp"
         android:button="@drawable/checkbox" />
 
@@ -22,11 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="2dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/searchInTitleCB"
         android:paddingRight="4dp"
-        android:paddingTop="7dp"
         android:text="@string/search_inTitle"
         android:textColor="@color/black"
         android:textSize="15sp" />
@@ -38,7 +37,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/searchInTitleCB"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="3dp"
         android:button="@drawable/checkbox" />
 
@@ -52,7 +51,6 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/searchOnlyAnsweredCB"
         android:paddingRight="4dp"
-        android:paddingTop="7dp"
         android:text="@string/search_isAnswered"
         android:textColor="@color/black"
         android:textSize="15sp" />
@@ -64,7 +62,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/searchOnlyAnsweredCB"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginTop="3dp"
         android:button="@drawable/checkbox" />
 
@@ -78,7 +76,6 @@
         android:layout_centerInParent="true"
         android:layout_toRightOf="@id/searchOnlyWithAnswersCB"
         android:paddingRight="4dp"
-        android:paddingTop="7dp"
         android:text="@string/search_hasAnswers"
         android:textColor="@color/black"
         android:textSize="15sp" />
