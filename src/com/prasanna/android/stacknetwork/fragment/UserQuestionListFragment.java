@@ -43,6 +43,14 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     private static final String TAG = UserQuestionListFragment.class.getSimpleName();
     private Intent intent;
     private int page = 0;
+    private int action;
+
+    public static UserQuestionListFragment newFragment(int action)
+    {
+        UserQuestionListFragment userQuestionListFragment = new UserQuestionListFragment();
+        userQuestionListFragment.action = action;
+        return userQuestionListFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -114,7 +122,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         Log.d(TAG, "startIntentService");
 
         intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
-        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_QUESTIONS);
+        intent.putExtra(StringConstants.ACTION, action);
         intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
         intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         intent.putExtra(StringConstants.PAGE, ++page);

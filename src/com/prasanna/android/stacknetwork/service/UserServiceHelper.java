@@ -154,6 +154,34 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getQuestions(restEndPoint, queryParams);
     }
 
+    public StackXPage<Question> getMyFavorites(int page)
+    {
+        String restEndPoint = "/me/favorites";
+
+        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+        queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
+        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+
+        return getQuestions(restEndPoint, queryParams);
+    }
+
+    public StackXPage<Question> getFavoritesByUser(long userId, int page)
+    {
+        String restEndPoint = "/users/" + userId + "/favorites";
+
+        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
+        queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
+        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+
+        return getQuestions(restEndPoint, queryParams);
+    }
+
     public StackXPage<User> getMe()
     {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();

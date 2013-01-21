@@ -42,13 +42,14 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class UserIntentService extends AbstractIntentService
 {
     private static final String TAG = UserIntentService.class.getSimpleName();
-    public static final int GET_USER_PROFILE = 1;
-    public static final int GET_USER_QUESTIONS = 2;
-    public static final int GET_USER_ANSWERS = 3;
-    public static final int GET_USER_INBOX = 4;
-    public static final int GET_USER_UNREAD_INBOX = 5;
-    public static final int GET_USER_SITES = 6;
-    public static final int DEAUTH_APP = 7;
+    public static final int GET_USER_PROFILE = 0x1;
+    public static final int GET_USER_QUESTIONS = 0x2;
+    public static final int GET_USER_ANSWERS = 0x3;
+    public static final int GET_USER_INBOX = 0x4;
+    public static final int GET_USER_UNREAD_INBOX = 0x5;
+    public static final int GET_USER_SITES = 0x6;
+    public static final int GET_USER_FAVORITES = 0x7;
+    public static final int DEAUTH_APP = 0x101;
 
     private UserServiceHelper userService = UserServiceHelper.getInstance();
 
@@ -104,6 +105,11 @@ public class UserIntentService extends AbstractIntentService
                                     getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false)));
                     receiver.send(0, bundle);
                     break;
+                case GET_USER_FAVORITES:
+                    Log.d(TAG, "getQuestions");
+                    bundle.putSerializable(StringConstants.QUESTIONS, getFavorites(me, userId, page));
+                    receiver.send(0, bundle);
+                    break;
                 case DEAUTH_APP:
                     deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
                     break;
@@ -138,6 +144,11 @@ public class UserIntentService extends AbstractIntentService
     private StackXPage<Answer> getAnswers(boolean me, long userId, int page)
     {
         return me ? userService.getMyAnswers(page) : userService.getAnswersByUser(userId, page);
+    }
+
+    private StackXPage<Question> getFavorites(boolean me, long userId, int page)
+    {
+        return me ? userService.getMyFavorites(page) : userService.getFavoritesByUser(userId, page);
     }
 
     private void getUnreadInboxItems(Intent intent)

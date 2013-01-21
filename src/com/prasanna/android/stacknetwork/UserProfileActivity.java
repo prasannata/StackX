@@ -33,6 +33,7 @@ import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
 import com.prasanna.android.stacknetwork.model.StackXItem;
+import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
@@ -42,7 +43,7 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
 {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
     private static final String[] PAGES =
-    { "Profile", "Questions", "Answers" };
+    { "Profile", "Questions", "Answers", "Favorites" };
 
     private ProfileViewPageAdapter profileViewPageAdapter;
     private ViewPager viewPager;
@@ -74,9 +75,11 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
                 case 0:
                     return new UserProfileFragment();
                 case 1:
-                    return new UserQuestionListFragment();
+                    return UserQuestionListFragment.newFragment(UserIntentService.GET_USER_QUESTIONS);
                 case 2:
                     return new UserAnswerListFragment();
+                case 3:
+                    return UserQuestionListFragment.newFragment(UserIntentService.GET_USER_FAVORITES);
 
                 default:
                     return null;

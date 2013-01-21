@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
+        android:layout_margin="5dp"
         android:button="@drawable/checkbox" />
 
     <TextView
@@ -37,8 +36,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/searchInTitleCB"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="3dp"
+        android:layout_margin="5dp"
         android:button="@drawable/checkbox" />
 
     <TextView
@@ -62,8 +60,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/searchOnlyAnsweredCB"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="3dp"
+        android:layout_margin="5dp"
         android:button="@drawable/checkbox" />
 
     <TextView
