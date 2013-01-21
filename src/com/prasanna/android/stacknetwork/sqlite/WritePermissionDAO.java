@@ -31,7 +31,6 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.Permission;
 import com.prasanna.android.stacknetwork.model.Permission.ObjectType;
-import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsTable;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
@@ -87,15 +86,36 @@ public class WritePermissionDAO
         }
     }
 
-    public ArrayList<Permission> getPermission(ObjectType objectType)
+    public Permission getPermission(String site, ObjectType objectType)
     {
-        String[] cols = new String[]
-        { TagsTable.COLUMN_VALUE };
-        String selection = WritePermissionTable.COLUMN_OBJECT_TYPE + " = ?";
-        String[] selectionArgs =
-        { objectType.getValue() };
+        if (site == null || objectType == null)
+            return null;
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, selection, selectionArgs, null,
+        String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
+                        + " = ?";
+        String[] selectionArgs =
+        { site, objectType.getValue() };
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
+                        null, null);
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        Log.d(TAG, "Permission retrieved from DB");
+
+        return getPermission(cursor);
+    }
+
+    public ArrayList<Permission> getPermissions(String site)
+    {
+        if (site == null)
+            return null;
+
+        String selection = WritePermissionTable.COLUMN_SITE + " = ?";
+        String[] selectionArgs =
+        { site };
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
@@ -108,24 +128,28 @@ public class WritePermissionDAO
     private ArrayList<Permission> getPermissions(Cursor cursor)
     {
         ArrayList<Permission> permissions = new ArrayList<Permission>();
-        int colIdx = 0;
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast())
         {
-            Permission permission = new Permission();
-            permission.canAdd = cursor.getInt(colIdx++) == 1;
-            permission.canDelete = cursor.getInt(colIdx++) == 1;
-            permission.canEdit = cursor.getInt(colIdx++) == 1;
-            permission.maxDailyActions = cursor.getInt(colIdx++);
-            permission.minSecondsBetweenActions = cursor.getInt(colIdx++);
-            permission.objectType = ObjectType.getEnum(cursor.getString(colIdx++));
-            permissions.add(permission);
+            permissions.add(getPermission(cursor));
 
             cursor.moveToNext();
-            colIdx = 0;
         }
 
         return permissions;
+    }
+
+    private Permission getPermission(Cursor cursor)
+    {
+        int colIdx = 0;
+        Permission permission = new Permission();
+        permission.canAdd = cursor.getInt(colIdx++) == 1;
+        permission.canDelete = cursor.getInt(colIdx++) == 1;
+        permission.canEdit = cursor.getInt(colIdx++) == 1;
+        permission.maxDailyActions = cursor.getInt(colIdx++);
+        permission.minSecondsBetweenActions = cursor.getInt(colIdx++);
+        permission.objectType = ObjectType.getEnum(cursor.getString(colIdx++));
+        return permission;
     }
 }
