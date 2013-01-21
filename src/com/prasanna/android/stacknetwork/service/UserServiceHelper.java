@@ -36,13 +36,13 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
-import com.prasanna.android.stacknetwork.model.Permission;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
-import com.prasanna.android.stacknetwork.model.Permission.ObjectType;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
@@ -275,9 +275,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getAnswers(restEndPoint, queryParams);
     }
 
-    public ArrayList<Permission> checkForWritePermission(String site)
+    public ArrayList<WritePermission> checkForWritePermission(String site)
     {
-        ArrayList<Permission> permissions = new ArrayList<Permission>();
+        ArrayList<WritePermission> permissions = new ArrayList<WritePermission>();
 
         String restEndPoint = "me/write-permissions";
 
@@ -296,7 +296,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                     {
                         JSONObjectWrapper permissionJsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
 
-                        Permission permission = new Permission();
+                        WritePermission permission = new WritePermission();
                         permission.canAdd = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_ADD);
                         permission.canDelete = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_DELETE);
                         permission.canEdit = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_EDIT);

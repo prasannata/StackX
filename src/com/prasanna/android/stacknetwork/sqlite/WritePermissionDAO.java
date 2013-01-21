@@ -29,8 +29,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
-import com.prasanna.android.stacknetwork.model.Permission;
-import com.prasanna.android.stacknetwork.model.Permission.ObjectType;
+import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
@@ -59,13 +59,13 @@ public class WritePermissionDAO
         databaseHelper.close();
     }
 
-    public void insertAll(String site, ArrayList<Permission> permissions)
+    public void insertAll(String site, ArrayList<WritePermission> permissions)
     {
         if (permissions != null)
         {
             Log.d(TAG, "Storing permissions");
 
-            for (Permission permission : permissions)
+            for (WritePermission permission : permissions)
             {
                 ContentValues values = new ContentValues();
                 values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
@@ -86,7 +86,7 @@ public class WritePermissionDAO
         }
     }
 
-    public Permission getPermission(String site, ObjectType objectType)
+    public WritePermission getPermission(String site, ObjectType objectType)
     {
         if (site == null || objectType == null)
             return null;
@@ -106,7 +106,7 @@ public class WritePermissionDAO
         return getPermission(cursor);
     }
 
-    public ArrayList<Permission> getPermissions(String site)
+    public ArrayList<WritePermission> getPermissions(String site)
     {
         if (site == null)
             return null;
@@ -125,9 +125,9 @@ public class WritePermissionDAO
         return getPermissions(cursor);
     }
 
-    private ArrayList<Permission> getPermissions(Cursor cursor)
+    private ArrayList<WritePermission> getPermissions(Cursor cursor)
     {
-        ArrayList<Permission> permissions = new ArrayList<Permission>();
+        ArrayList<WritePermission> permissions = new ArrayList<WritePermission>();
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast())
@@ -140,10 +140,10 @@ public class WritePermissionDAO
         return permissions;
     }
 
-    private Permission getPermission(Cursor cursor)
+    private WritePermission getPermission(Cursor cursor)
     {
         int colIdx = 0;
-        Permission permission = new Permission();
+        WritePermission permission = new WritePermission();
         permission.canAdd = cursor.getInt(colIdx++) == 1;
         permission.canDelete = cursor.getInt(colIdx++) == 1;
         permission.canEdit = cursor.getInt(colIdx++) == 1;

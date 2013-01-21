@@ -33,7 +33,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
-import com.prasanna.android.stacknetwork.model.Permission;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
@@ -162,7 +162,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         {
             if (UserIntentService.CHECK_WRITE_PERMISSION == resultCode)
             {
-                ArrayList<Permission> permissions = (ArrayList<Permission>) resultData
+                ArrayList<WritePermission> permissions = (ArrayList<WritePermission>) resultData
                                 .getSerializable(StringConstants.PERMISSION);
                 persistPermissions(resultData.getString(StringConstants.SITE), permissions);
             }
@@ -179,7 +179,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
     }
 
-    private void persistPermissions(String site, ArrayList<Permission> permissions)
+    private void persistPermissions(String site, ArrayList<WritePermission> permissions)
     {
         WritePermissionDAO writePermissionDAO = new WritePermissionDAO(this);
 

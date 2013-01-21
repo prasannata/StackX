@@ -196,7 +196,7 @@ public class UserIntentService extends AbstractIntentService
 
                     Site site = linkSitesMap.get(siteUrl);
                     site.userType = linkAccountsMap.get(siteUrl).userType;
-                    regSitesFirstMap.put(siteUrl, site);
+                    site.writePermissions = userService.checkForWritePermission(site.apiSiteParameter);
 
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(StringConstants.PERMISSION,
@@ -204,6 +204,7 @@ public class UserIntentService extends AbstractIntentService
                     bundle.putSerializable(StringConstants.SITE, site.apiSiteParameter);
                     receiver.send(CHECK_WRITE_PERMISSION, bundle);
 
+                    regSitesFirstMap.put(siteUrl, site);
                     linkSitesMap.remove(siteUrl);
                 }
             }
