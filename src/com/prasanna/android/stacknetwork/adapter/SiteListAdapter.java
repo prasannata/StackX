@@ -48,6 +48,7 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
     public static final String TAG = SiteListAdapter.class.getSimpleName();
 
     private final LayoutInflater layoutInflater;
+    private final String CHANGE_SITE_HINT = "change_site_hint";
 
     public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites, ListView listView)
     {
@@ -101,7 +102,6 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
                 else
                 {
                     iv.setImageResource(R.drawable.circle_delft);
-                    SharedPreferencesUtil.setDefaultSiteName(getContext(), dataSet.get(position).name);
                     SharedPreferencesUtil.setDefaultSite(getContext(), dataSet.get(position));
                     notifyDataSetChanged();
                     Toast.makeText(getContext(), dataSet.get(position).name + " set as default site.",
@@ -126,13 +126,16 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
                 {
                     Log.d(TAG, "Clicking on list item " + position);
 
-                    Site site = dataSet.get(position);
-                    OperatingSite.setSite(site);
-                    Intent startQuestionActivityIntent = new Intent(listView.getContext(), QuestionsActivity.class);
-                    startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    listView.getContext().startActivity(startQuestionActivityIntent);
-                    Toast.makeText(getContext(), "Use options menu to change site any time.", Toast.LENGTH_LONG).show();
+                    OperatingSite.setSite(dataSet.get(position));
+
+                    if (SharedPreferencesUtil.isOn(getContext(), CHANGE_SITE_HINT, true))
+                    {
+                        Toast.makeText(getContext(), "Use options menu to change site any time.", Toast.LENGTH_LONG)
+                                        .show();
+                        SharedPreferencesUtil.setOnOff(getContext(), CHANGE_SITE_HINT, false);
+                    }
+
+                    startQuestionsActivity();
                 }
             }
         });
@@ -147,5 +150,13 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
     public String getTag()
     {
         return TAG;
+    }
+
+    private void startQuestionsActivity()
+    {
+        Intent startQuestionActivityIntent = new Intent(listView.getContext(), QuestionsActivity.class);
+        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        listView.getContext().startActivity(startQuestionActivityIntent);
     }
 }

@@ -48,10 +48,7 @@ import com.prasanna.android.stacknetwork.model.User.UserType;
 public class SharedPreferencesUtil
 {
     private static final String TAG = SharedPreferencesUtil.class.getSimpleName();
-    private static final int BYTE_UNIT = 1024;
     private static String userAccessToken;
-    private static final String[] sizeUnit =
-    { "K", "M" };
 
     public static class CacheFileName
     {
@@ -59,50 +56,61 @@ public class SharedPreferencesUtil
         public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
     }
 
-    public static void setOnOff(Context context, String name, boolean on)
+    public static void setOnOff(Context context, String key, boolean on)
     {
-        Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        prefEditor.putBoolean(name, on);
-        prefEditor.commit();
-    }
-
-    public static boolean isOn(Context context, String name, boolean defaultValue)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(name, defaultValue);
-    }
-
-    public static boolean isFirstRun(Context context)
-    {
-        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(StringConstants.IS_FIRST_RUN, true);
-    }
-
-    public static void setFirstRunComplete(Context context)
-    {
-        if (context != null)
+        if (context != null && key != null)
         {
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-            prefEditor.putBoolean(StringConstants.IS_FIRST_RUN, false);
+            prefEditor.putBoolean(key, on);
             prefEditor.commit();
         }
     }
 
-    public static void clearDefaultSite(Context context)
+    public static boolean isOn(Context context, String name, boolean defaultValue)
     {
-        SharedPreferencesUtil.setDefaultSiteName(context, null);
-        SharedPreferencesUtil.removeDefaultSite(context);
+        if (context == null || name == null)
+            return defaultValue;
+
+        return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(name, defaultValue);
     }
 
-    public static void setDefaultSiteName(Context context, String name)
+    public static void setString(Context context, String key, String value)
     {
-        Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        prefEditor.putString(SettingsFragment.KEY_PREF_DEFAULT_SITE, name);
-        prefEditor.commit();
+        if (context != null && key != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.putString(key, value);
+            prefEditor.commit();
+        }
+    }
+
+    public static String getString(Context context, String key, String defaultValue)
+    {
+        if (context != null && key != null)
+            return PreferenceManager.getDefaultSharedPreferences(context).getString(key, defaultValue);
+
+        return defaultValue;
+    }
+
+    public static boolean isFirstRun(Context context)
+    {
+        return isOn(context, StringConstants.IS_FIRST_RUN, true);
+    }
+
+    public static void setFirstRunComplete(Context context)
+    {
+        setOnOff(context, StringConstants.IS_FIRST_RUN, false);
+    }
+
+    public static void clearDefaultSite(Context context)
+    {
+        SharedPreferencesUtil.setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
+        SharedPreferencesUtil.removeDefaultSite(context);
     }
 
     public static String getDefaultSiteName(Context context)
     {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(SettingsFragment.KEY_PREF_DEFAULT_SITE,
-                        null);
+        return getString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
     }
 
     public static void setDefaultSite(Context context, Site site)
@@ -111,6 +119,8 @@ public class SharedPreferencesUtil
         {
             File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
             writeObject(site, dir, StringConstants.SITE);
+
+            setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, site.name);
         }
     }
 
@@ -509,6 +519,9 @@ public class SharedPreferencesUtil
      */
     public static String getHumanReadableCacheSize(File cacheDir)
     {
+        final int BYTE_UNIT = 1024;
+        final String[] sizeUnit =
+        { "K", "M" };
         long size = size(cacheDir);
 
         if (size < BYTE_UNIT)
