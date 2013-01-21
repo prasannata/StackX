@@ -69,6 +69,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
+    public static final String PREFIX_KEY_PREF_WRITE_PERMISSION = "pref_writePermission_";
+
     private ListPreference refreshIntervalPref;
     private ListPreference accountActionPref;
     private ListPreference defaultSitePref;
@@ -122,26 +124,23 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         setupStoragePreferences();
     }
 
-    private void setupStoragePreferences()
+    private void setupDefaultSitePreference()
     {
-        setupCacheClearPreference();
+        defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
+        String entry = (String) defaultSitePref.getValue();
+        defaultSitePref.setEntryValues(new String[0]);
+        defaultSitePref.setEntries(new String[0]);
+        defaultSitePref.setSummary(entry != null ? entry : "None");
 
-        setupCacheMaxSizePreference();
-    }
-
-    private void setupCacheClearPreference()
-    {
-        clearCacheDialogPreference = (DialogPreferenceImpl) findPreference(KEY_PREF_CLEAR_CACHE);
-        clearCacheDialogPreference.setOnClickListener(new DialogInterface.OnClickListener()
+        defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
             @Override
-            public void onClick(DialogInterface dialog, int which)
+            public boolean onPreferenceClick(Preference preference)
             {
-                if (DialogInterface.BUTTON_POSITIVE == which)
-                {
-                    SharedPreferencesUtil.deleteAllQuestions(getActivity().getCacheDir());
-                    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
-                }
+                defaultSitePref.getDialog().dismiss();
+
+                startActivity(new Intent(getActivity(), StackNetworkListActivity.class));
+                return true;
             }
         });
     }
@@ -171,7 +170,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             public boolean onPreferenceClick(Preference preference)
             {
                 accountActionPref.getDialog().dismiss();
-                
+
                 Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
                 SharedPreferencesUtil.clearDefaultSite(getActivity());
                 SharedPreferencesUtil.clearSiteListCache(getActivity().getCacheDir());
@@ -222,27 +221,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         });
     }
 
-    private void setupDefaultSitePreference()
-    {
-        defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
-        String entry = (String) defaultSitePref.getValue();
-        defaultSitePref.setEntryValues(new String[0]);
-        defaultSitePref.setEntries(new String[0]);
-        defaultSitePref.setSummary(entry != null ? entry : "None");
-
-        defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                defaultSitePref.getDialog().dismiss();
-
-                startActivity(new Intent(getActivity(), StackNetworkListActivity.class));
-                return true;
-            }
-        });
-    }
-
     private void setupInboxPreference()
     {
         inboxPrefCategory = (PreferenceCategory) findPreference(KEY_PREF_INBOX);
@@ -251,19 +229,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
 
         setupRingtonePreference();
-    }
-
-    private void setupCacheMaxSizePreference()
-    {
-        String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity().getCacheDir());
-
-        cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
-        cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
-    }
-
-    private String getCacheSizeSummary(String currentCacheSize)
-    {
-        return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: " + currentCacheSize;
     }
 
     private void setupRingtonePreference()
@@ -282,6 +247,43 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
                         DEFAULT_RINGTONE));
         setRingtoneSummary(ringtoneUri);
+    }
+
+    private void setupStoragePreferences()
+    {
+        setupCacheClearPreference();
+
+        setupCacheMaxSizePreference();
+    }
+
+    private void setupCacheClearPreference()
+    {
+        clearCacheDialogPreference = (DialogPreferenceImpl) findPreference(KEY_PREF_CLEAR_CACHE);
+        clearCacheDialogPreference.setOnClickListener(new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                if (DialogInterface.BUTTON_POSITIVE == which)
+                {
+                    SharedPreferencesUtil.deleteAllQuestions(getActivity().getCacheDir());
+                    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void setupCacheMaxSizePreference()
+    {
+        String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity().getCacheDir());
+
+        cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
+        cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
+    }
+
+    private String getCacheSizeSummary(String currentCacheSize)
+    {
+        return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: " + currentCacheSize;
     }
 
     @Override

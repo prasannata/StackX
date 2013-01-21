@@ -7,8 +7,8 @@
         android:title="@string/general" >
         <ListPreference
             android:key="pref_defaultSite"
-            android:title="@string/defaultSite"
-            android:persistent="true" />
+            android:persistent="true"
+            android:title="@string/defaultSite" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_storage"

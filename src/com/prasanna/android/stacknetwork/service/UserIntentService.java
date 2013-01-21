@@ -49,7 +49,8 @@ public class UserIntentService extends AbstractIntentService
     public static final int GET_USER_UNREAD_INBOX = 0x5;
     public static final int GET_USER_SITES = 0x6;
     public static final int GET_USER_FAVORITES = 0x7;
-    public static final int DEAUTH_APP = 0x101;
+    public static final int CHECK_WRITE_PERMISSION = 0x101;
+    public static final int DEAUTH_APP = 0x201;
 
     private UserServiceHelper userService = UserServiceHelper.getInstance();
 
@@ -101,8 +102,9 @@ public class UserIntentService extends AbstractIntentService
                     getUnreadInboxItems(intent);
                     break;
                 case GET_USER_SITES:
-                    bundle.putSerializable(StringConstants.SITES,
-                                    getUserSites(intent.getBooleanExtra(StringConstants.AUTHENTICATED, false)));
+                    bundle.putSerializable(
+                                    StringConstants.SITES,
+                                    getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, false)));
                     receiver.send(0, bundle);
                     break;
                 case GET_USER_FAVORITES:
@@ -174,7 +176,7 @@ public class UserIntentService extends AbstractIntentService
         sendBroadcast(broadcastIntent);
     }
 
-    private ArrayList<Site> getUserSites(boolean forAuthenicatedUser)
+    private ArrayList<Site> getUserSites(ResultReceiver receiver, boolean forAuthenicatedUser)
     {
         LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
@@ -195,6 +197,12 @@ public class UserIntentService extends AbstractIntentService
                     Site site = linkSitesMap.get(siteUrl);
                     site.userType = linkAccountsMap.get(siteUrl).userType;
                     regSitesFirstMap.put(siteUrl, site);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(StringConstants.PERMISSION,
+                                    userService.checkForWritePermission(site.apiSiteParameter));
+                    bundle.putSerializable(StringConstants.SITE, site.apiSiteParameter);
+                    receiver.send(CHECK_WRITE_PERMISSION, bundle);
 
                     linkSitesMap.remove(siteUrl);
                 }

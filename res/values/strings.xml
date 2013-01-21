@@ -82,6 +82,7 @@
     <string name="search_hasAnswers">Has Answers</string>
     <string name="search_isAnswered">Is Answered</string>
     <string name="searchForTag">Search for tag</string>
+    <string name="writePermissions">Write Permissions</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

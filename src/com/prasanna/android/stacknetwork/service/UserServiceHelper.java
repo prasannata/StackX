@@ -36,11 +36,13 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
+import com.prasanna.android.stacknetwork.model.Permission;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.model.Permission.ObjectType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
@@ -271,6 +273,51 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
         return getAnswers(restEndPoint, queryParams);
+    }
+
+    public ArrayList<Permission> checkForWritePermission(String site)
+    {
+        ArrayList<Permission> permissions = new ArrayList<Permission>();
+
+        String restEndPoint = "me/write-permissions";
+
+        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.SITE, site);
+        JSONObjectWrapper jsonObjectWrapper = executeHttpRequest(restEndPoint, queryParams);
+
+        if (jsonObjectWrapper != null)
+        {
+            JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+            if (jsonArray != null && jsonArray.length() > 0)
+            {
+                try
+                {
+                    for (int i = 0; i < jsonArray.length(); i++)
+                    {
+                        JSONObjectWrapper permissionJsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
+
+                        Permission permission = new Permission();
+                        permission.canAdd = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_ADD);
+                        permission.canDelete = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_DELETE);
+                        permission.canEdit = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_EDIT);
+                        permission.maxDailyActions = permissionJsonObject
+                                        .getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
+                        permission.minSecondsBetweenActions = permissionJsonObject
+                                        .getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
+                        permission.objectType = ObjectType.getEnum(permissionJsonObject
+                                        .getString(JsonFields.Permission.OBJECT_TYPE));
+                        permission.userId = permissionJsonObject.getLong(JsonFields.Permission.USER_ID);
+                        permissions.add(permission);
+                    }
+                }
+                catch (JSONException e)
+                {
+                    Log.d(getLogTag(), e.getMessage());
+                }
+            }
+        }
+
+        return permissions;
     }
 
     public StackXPage<InboxItem> getInbox(int page)

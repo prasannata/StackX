@@ -41,7 +41,7 @@ public class JsonFields
         public static final String POST_ID = "post_id";
         public static final String POST_TYPE = "post_type";
     }
-    
+
     public static class Question extends CommonFields
     {
         public static final String QUESTION_ID = "question_id";
@@ -123,6 +123,17 @@ public class JsonFields
         public static final String ERROR_ID = "error_id";
         public static final String ERROR_NAME = "error_name";
         public static final String ERROR_MESSAGE = "error_message";
+    }
+
+    public static class Permission
+    {
+        public static final String CAN_ADD = "can_add";
+        public static final String CAN_DELETE = "can_delete";
+        public static final String CAN_EDIT = "can_edit";
+        public static final String MAX_DAILY_ACTIONS = "max_daily_actions";
+        public static final String MIN_SECONDS_BETWEEN_ACTIONS = "min_seconds_between_actions";
+        public static final String OBJECT_TYPE = "object_type";
+        public static final String USER_ID = "user_id";
     }
 
     public static class Tag

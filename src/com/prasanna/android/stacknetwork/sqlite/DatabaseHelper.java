@@ -28,6 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final String TABLE_TAGS = "TAGS";
     public static final String TABLE_TAGS_AUDIT = "TAGS_AUDIT";
     public static final String TABLE_USER_PROFILE = "USER_PROFILE";
+    public static final String TABLE_WRITE_PERMISSION = "WRITE_PERMISSION";
 
     private static final String DATABASE_NAME = "stackx.db";
     private static final int DATABASE_VERSION = 1;
@@ -54,6 +55,24 @@ public class DatabaseHelper extends SQLiteOpenHelper
                         + COLUMN_LAST_UPDATE_TIME + " long not null);";
     }
 
+    public static final class WritePermissionTable
+    {
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_ADD = "can_add";
+        public static final String COLUMN_DEL = "can_del";
+        public static final String COLUMN_EDIT = "can_edit";
+        public static final String COLUMN_MAX_DAILY_ACTIONS = "maxDailyActions";
+        public static final String COLUMN_WAIT_TIME = "waitBetweenWrite";
+        public static final String COLUMN_OBJECT_TYPE = "objectType";
+        public static final String COLUMN_SITE = "site";
+
+        private static final String CREATE_TABLE = "create table " + TABLE_WRITE_PERMISSION + "(" + COLUMN_ID
+                        + " integer primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
+                        + " integer not null, " + COLUMN_EDIT + " integer not null, " + COLUMN_MAX_DAILY_ACTIONS
+                        + " integer not null, " + COLUMN_WAIT_TIME + " integer not null, " + COLUMN_OBJECT_TYPE
+                        + " text not null, " + COLUMN_SITE + " text not null);";
+    }
+
     public DatabaseHelper(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -64,6 +83,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     {
         db.execSQL(TagsTable.CREATE_TABLE);
         db.execSQL(TagsAuditTable.CREATE_TABLE);
+        db.execSQL(WritePermissionTable.CREATE_TABLE);
     }
 
     @Override

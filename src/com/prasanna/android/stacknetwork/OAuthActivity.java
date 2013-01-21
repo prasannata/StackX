@@ -65,25 +65,11 @@ public class OAuthActivity extends Activity
 
             if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
             {
-                Intent listStackNetworkIntent = new Intent(view.getContext(), StackNetworkListActivity.class);
-                listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                Uri uri = Uri.parse(url);
-                String accessToken = uri.getFragment();
-                if (accessToken != null)
-                {
-                    String[] nameValuePair = accessToken.split("=");
-                    if (nameValuePair != null && nameValuePair.length == 2
-                                    && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
-                    {
-                        SharedPreferencesUtil.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
-                    }
-                }
-
                 deleteStoredTags();
                 AlarmUtils.setInboxRefreshAlarm(OAuthActivity.this);
-                startActivity(listStackNetworkIntent);
+
+                cacheAccessToken(url);
+                startSiteListActivity(view);
                 OAuthActivity.this.finish();
             }
             else
@@ -119,6 +105,29 @@ public class OAuthActivity extends Activity
         }
     }
 
+    private void startSiteListActivity(WebView view)
+    {
+        Intent listStackNetworkIntent = new Intent(view.getContext(), StackNetworkListActivity.class);
+        listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(listStackNetworkIntent);
+    }
+
+    private void cacheAccessToken(String url)
+    {
+        Uri uri = Uri.parse(url);
+        String accessToken = uri.getFragment();
+        if (accessToken != null)
+        {
+            String[] nameValuePair = accessToken.split("=");
+            if (nameValuePair != null && nameValuePair.length == 2
+                            && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
+            {
+                SharedPreferencesUtil.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
+            }
+        }
+    }
+
     private void deleteStoredTags()
     {
         TagDAO tagDAO = new TagDAO(this);
@@ -133,7 +142,7 @@ public class OAuthActivity extends Activity
             tagDAO.close();
         }
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -32,10 +33,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
+import com.prasanna.android.stacknetwork.model.Permission;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -87,7 +90,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     @Override
     protected void onListItemClick(ListView listView, View v, int position, long id)
     {
-        Log.d(TAG, "Clicking on list item " + position);
+        Log.d(TAG, "Clicked item " + sites.get(position).name);
 
         Site site = sites.get(position);
         OperatingSite.setSite(site);
@@ -157,13 +160,41 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
         else
         {
-            sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
-
-            if (sites != null)
+            if (UserIntentService.CHECK_WRITE_PERMISSION == resultCode)
             {
-                SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
-                updateView(sites);
+                ArrayList<Permission> permissions = (ArrayList<Permission>) resultData
+                                .getSerializable(StringConstants.PERMISSION);
+                persistPermissions(resultData.getString(StringConstants.SITE), permissions);
             }
+            else
+            {
+                sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
+
+                if (sites != null)
+                {
+                    SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
+                    updateView(sites);
+                }
+            }
+        }
+    }
+
+    private void persistPermissions(String site, ArrayList<Permission> permissions)
+    {
+        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(this);
+
+        try
+        {
+            writePermissionDAO.open();
+            writePermissionDAO.insertAll(site, permissions);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            writePermissionDAO.close();
         }
     }
 

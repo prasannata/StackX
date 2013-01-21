@@ -84,6 +84,8 @@ public class StringConstants
 
     public static final String EXCEPTION = "exception";
 
+    public static final String PERMISSION = "permission";
+
     public static final class HttpError
     {
         public static final String CODE = "code";
