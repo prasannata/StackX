@@ -76,7 +76,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         public void onTabSelected(Tab tab, FragmentTransaction ft)
         {
-            ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
+            Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+
+            if (currentFragment == null || !currentFragment.getTag().equals(fragment.fragmentTag))
+                ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
