@@ -93,8 +93,7 @@ public class WritePermissionDAO
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
                         + " = ?";
-        String[] selectionArgs =
-        { site, objectType.getValue() };
+        String[] selectionArgs = { site, objectType.getValue() };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);
@@ -106,14 +105,31 @@ public class WritePermissionDAO
         return getPermission(cursor);
     }
 
+    public ArrayList<String> getSites()
+    {
+        String[] cols = { WritePermissionTable.COLUMN_SITE };
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, null, null, null, null, null);
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+        
+        ArrayList<String> sites = new ArrayList<String>();
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast())
+        {
+            sites.add(cursor.getString(0));
+            cursor.moveToNext();
+        }
+        return sites;
+    }
+
     public ArrayList<WritePermission> getPermissions(String site)
     {
         if (site == null)
             return null;
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs =
-        { site };
+        String[] selectionArgs = { site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);
