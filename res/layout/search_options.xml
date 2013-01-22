@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_marginLeft="2dp"
     android:layout_marginRight="2dp"
+    android:padding="10dp"
     android:background="@drawable/rounded_border_grey_min_padding" >
 
     <CheckBox
@@ -12,8 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="5dp"
-        android:button="@drawable/checkbox" />
+        android:button="@drawable/checkbox"
+        android:padding="5dp" />
 
     <TextView
         android:id="@+id/searchInTitle"
@@ -21,10 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="5dp"
+        android:layout_margin="5dp"
         android:layout_toRightOf="@id/searchInTitleCB"
-        android:paddingRight="4dp"
+        android:gravity="center"
+        android:paddingRight="5dp"
         android:text="@string/search_inTitle"
         android:textColor="@color/black"
         android:textSize="15sp" />
@@ -36,8 +37,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/searchInTitleCB"
         android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:button="@drawable/checkbox" />
+        android:button="@drawable/checkbox"
+        android:padding="5dp" />
 
     <TextView
         android:id="@+id/searchOnlyAnswered"
@@ -47,8 +48,10 @@
         android:layout_alignTop="@id/searchOnlyAnsweredCB"
         android:layout_below="@id/searchInTitle"
         android:layout_centerVertical="true"
+        android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/searchOnlyAnsweredCB"
-        android:paddingRight="4dp"
+        android:gravity="center"
+        android:paddingRight="5dp"
         android:text="@string/search_isAnswered"
         android:textColor="@color/black"
         android:textSize="15sp" />
@@ -60,8 +63,8 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/searchOnlyAnsweredCB"
         android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:button="@drawable/checkbox" />
+        android:button="@drawable/checkbox"
+        android:padding="5dp" />
 
     <TextView
         android:id="@+id/searchOnlyWithAnswers"
@@ -71,8 +74,10 @@
         android:layout_alignTop="@id/searchOnlyWithAnswersCB"
         android:layout_below="@id/searchOnlyAnswered"
         android:layout_centerInParent="true"
+        android:layout_marginTop="5dp"
         android:layout_toRightOf="@id/searchOnlyWithAnswersCB"
-        android:paddingRight="4dp"
+        android:gravity="center"
+        android:paddingRight="5dp"
         android:text="@string/search_hasAnswers"
         android:textColor="@color/black"
         android:textSize="15sp" />
