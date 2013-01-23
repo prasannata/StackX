@@ -28,7 +28,15 @@ public class WritePermission implements Serializable
             if (value == null)
                 return null;
 
-            return ObjectType.valueOf(value.toUpperCase());
+            try
+            {
+                return valueOf(value.toUpperCase());
+            }
+            catch (IllegalArgumentException e)
+            {
+            }
+
+            return null;
         }
     }
 
