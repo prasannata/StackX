@@ -218,7 +218,8 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         if (itemListAdapter != null && newItems != null)
         {
-            Log.d(TAG, "Updating list adpater with questions");
+            Log.d(TAG, "Updating list adpater with items");
+
             if (items == null)
                 items = new ArrayList<T>();
 
@@ -226,6 +227,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
             if (items.isEmpty())
             {
+                itemsContainer.removeAllViews();
                 View noItemsFoundView = getActivity().getLayoutInflater().inflate(R.layout.empty_items, null);
                 TextView tv = (TextView) noItemsFoundView.findViewById(R.id.emptyStatus);
                 tv.setText("No results found");
