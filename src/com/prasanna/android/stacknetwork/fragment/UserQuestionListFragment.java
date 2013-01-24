@@ -44,6 +44,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     private Intent intent;
     private int page = 0;
     private int action;
+    private boolean activityCreated = false;
 
     public static UserQuestionListFragment newFragment(int action)
     {
@@ -62,7 +63,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "Creating question fragment");
+        Log.d(TAG, "onCreateView");
 
         if (itemsContainer == null)
         {
@@ -82,7 +83,11 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
 
         super.onActivityCreated(savedInstanceState);
 
-        startIntentService();
+        if (!activityCreated)
+        {
+            startIntentService();
+            activityCreated = true;
+        }
     }
 
     @Override

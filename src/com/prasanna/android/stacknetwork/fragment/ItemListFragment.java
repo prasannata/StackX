@@ -53,15 +53,16 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 {
     private static final String TAG = ItemListFragment.class.getSimpleName();
 
+    private boolean activityCreated = false;
     private boolean serviceRunning = false;
     private ProgressBar progressBar;
+    private StackXPage<T> currentPageObject;
 
     protected RestQueryResultReceiver resultReceiver;
     protected List<StackXPage<T>> pages;
     protected LinearLayout itemsContainer;
     protected ArrayList<T> items;
     protected ItemListAdapter<T> itemListAdapter;
-    private StackXPage<T> currentPageObject;
 
     protected abstract String getReceiverExtraName();
 
@@ -103,9 +104,13 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         super.onActivityCreated(savedInstanceState);
 
-        getListView().addFooterView(getProgressBar());
-        setListAdapter(itemListAdapter);
-        getListView().setOnScrollListener(this);
+        if (!activityCreated)
+        {
+            getListView().addFooterView(getProgressBar());
+            setListAdapter(itemListAdapter);
+            getListView().setOnScrollListener(this);
+            activityCreated = true;
+        }
 
         if (savedInstanceState != null)
         {
@@ -120,7 +125,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     {
         super.onResume();
 
-        if (itemListAdapter != null)
+        if (itemListAdapter != null && itemListAdapter.getCount() > 0)
             itemListAdapter.notifyDataSetChanged();
     }
 
@@ -227,11 +232,14 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
             if (items.isEmpty())
             {
-                itemsContainer.removeAllViews();
-                View noItemsFoundView = getActivity().getLayoutInflater().inflate(R.layout.empty_items, null);
-                TextView tv = (TextView) noItemsFoundView.findViewById(R.id.emptyStatus);
-                tv.setText("No results found");
-                itemsContainer.addView(noItemsFoundView);
+                if (itemsContainer.findViewById(R.id.emptyStatus) == null)
+                {
+                    View noItemsFoundView = getActivity().getLayoutInflater().inflate(R.layout.empty_items, null);
+                    TextView tv = (TextView) noItemsFoundView.findViewById(R.id.emptyStatus);
+                    tv.setText("Nada");
+                    tv.setTextSize(15f);
+                    itemsContainer.addView(noItemsFoundView);
+                }
             }
             else
             {
