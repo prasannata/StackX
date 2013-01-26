@@ -48,6 +48,7 @@ import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
+import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -306,7 +307,11 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 inboxItem.title = "Python unit testing functions by using mocks";
                 inboxItem.body = "You can use mock library by Michael Foord, which is part Python 3. It makes this kind of mocking ...";
                 unreadInboxItems.add(inboxItem);
-                notifyIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadInboxItems);
+                
+                StackXPage<InboxItem> inboxItems = new StackXPage<InboxItem>();
+                inboxItems.items = unreadInboxItems;
+                inboxItems.hasMore = false;
+                notifyIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), inboxItems);
                 sendBroadcast(notifyIntent);
                 return true;
         }
