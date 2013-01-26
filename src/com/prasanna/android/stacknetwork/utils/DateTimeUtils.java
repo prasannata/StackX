@@ -21,12 +21,16 @@ package com.prasanna.android.stacknetwork.utils;
 
 public class DateTimeUtils
 {
+    private static final String JUST_NOW = "just now";
+    private static final String AGO = "ago";
+    
     public static final String SECOND = "s";
     public static final String MINUTE = "m";
     public static final String HOUR = "h";
     public static final String DAY = "d";
     public static final String MONTH = "m";
     public static final String YEAR = "y";
+    
     public static final int SECONDS_IN_MIN = 60;
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = 3600 * 24;
@@ -83,14 +87,14 @@ public class DateTimeUtils
 	}
 
 	if (count == 0)
-	    return "now";
+            return JUST_NOW;
 	
 	String duration = new String(count + unit);
 
 	if (residue > 0)
-	    duration += " and " + residue + residueUnit;
+	    duration += " " + residue + residueUnit;
 
-	duration += " ago";
+	duration += " " + AGO;
 	return duration;
     }
 }
