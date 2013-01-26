@@ -37,6 +37,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -53,9 +54,10 @@ import com.prasanna.android.task.GetTagsAsyncTask;
 
 public class TagListFragment extends ListFragment
 {
-    private static final String TAG = TagListFragment.class.getSimpleName();
-
     public static final String TAGS_DIRTY = "dirty";
+
+    private static final String TAG = TagListFragment.class.getSimpleName();
+    private final ArrayList<Tag> tags = new ArrayList<Tag>();
 
     private boolean activityCreated = false;
     private OnTagSelectListener onTagSelectListener;
@@ -65,6 +67,7 @@ public class TagListFragment extends ListFragment
     private EditText filterListInputText;
     private Button clearFilterInputText;
     private CharSequence defaultHint;
+    private Object tagFilterLock = new Object();
 
     public interface OnTagSelectListener
     {
@@ -82,8 +85,9 @@ public class TagListFragment extends ListFragment
 
             if (result != null)
             {
-                listAdapter.add(new Tag(StringConstants.FRONT_PAGE));
-                listAdapter.addAll(result);
+                tags.add(new Tag(StringConstants.FRONT_PAGE));
+                tags.addAll(result);
+                listAdapter.addAll(tags);
             }
             else
             {
@@ -92,8 +96,61 @@ public class TagListFragment extends ListFragment
         }
     }
 
+    public class TagFilter extends Filter
+    {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            FilterResults result = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0)
+            {
+                synchronized (tagFilterLock)
+                {
+
+                    ArrayList<Tag> filteredTags = new ArrayList<Tag>();
+
+                    for (Tag tag : tags)
+                    {
+                        if (tag.name.startsWith((String) constraint))
+                            filteredTags.add(tag);
+                    }
+
+                    result.count = filteredTags.size();
+                    result.values = filteredTags;
+                }
+            }
+            else
+            {
+                synchronized (tagFilterLock)
+                {
+                    result.count = tags.size();
+                    result.values = tags;
+                }
+            }
+            return result;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void publishResults(CharSequence constraint, FilterResults results)
+        {
+            ArrayList<Tag> filteredTags = (ArrayList<Tag>) results.values;
+
+            listAdapter.notifyDataSetChanged();
+            listAdapter.clear();
+
+            listAdapter.addAll(filteredTags);
+            listAdapter.notifyDataSetInvalidated();
+        }
+
+    }
+
     public class TagArrayAdapter extends ArrayAdapter<Tag>
     {
+        private Filter filter;
+
         public TagArrayAdapter(Context context, int textViewResourceId, List<Tag> objects)
         {
             super(context, textViewResourceId, objects);
@@ -102,23 +159,33 @@ public class TagListFragment extends ListFragment
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
-            TextView textView = (TextView) convertView;
-            if (textView == null)
+            if (convertView == null)
             {
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
                                 Context.LAYOUT_INFLATER_SERVICE);
-                textView = (TextView) inflater.inflate(R.layout.tag_list_item, null);
+                convertView = inflater.inflate(R.layout.tag_list_item, null);
             }
 
             TagArrayAdapter adapter = (TagArrayAdapter) getListAdapter();
-            textView.setText(adapter.getItem(position).name);
+            ((TextView) convertView).setText(adapter.getItem(position).name);
 
             if (adapter.getItem(position).local)
-                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.make_available_offline, 0);
+                ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                                R.drawable.make_available_offline, 0);
+            else
+                ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
-            return textView;
+            return convertView;
         }
 
+        @Override
+        public Filter getFilter()
+        {
+            if (filter == null)
+                filter = new TagFilter();
+
+            return filter;
+        }
     }
 
     private ProgressBar getProgressBar()
@@ -212,7 +279,6 @@ public class TagListFragment extends ListFragment
             getListView().addFooterView(getProgressBar());
             setListAdapter(listAdapter);
 
-            runGetTagsTask(true);
             activityCreated = true;
         }
     }
