@@ -62,7 +62,7 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
     public View getView(final int position, View convertView, ViewGroup parent)
     {
         RelativeLayout layoutForSites = (RelativeLayout) convertView;
-        if (dataSet != null && position >= 0 && position < dataSet.size())
+        if (layoutForSites == null && dataSet != null && position >= 0 && position < dataSet.size())
         {
             layoutForSites = (RelativeLayout) layoutInflater.inflate(R.layout.sitelist_row, null);
             TextView textView = (TextView) layoutForSites.findViewById(R.id.siteName);

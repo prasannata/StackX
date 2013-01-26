@@ -36,14 +36,15 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
-import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.model.StackXPage;
+import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.model.User;
-import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.model.User.UserType;
+import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
@@ -475,9 +476,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return error;
     }
 
-    public LinkedHashSet<String> getTags(String site, int page, int pageSize, boolean meTags)
+    public LinkedHashSet<Tag> getTags(String site, int page, int pageSize, boolean meTags)
     {
-        LinkedHashSet<String> tags = null;
+        LinkedHashSet<Tag> tags = null;
         String restEndPoint = meTags ? "/me/tags" : "/tags";
         boolean hasMore = true;
 
@@ -499,14 +500,14 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                 if (jsonArray != null && jsonArray.length() > 0)
                 {
                     if (tags == null)
-                        tags = new LinkedHashSet<String>();
+                        tags = new LinkedHashSet<Tag>();
 
                     for (int i = 0; i < jsonArray.length(); i++)
                     {
                         try
                         {
                             JSONObjectWrapper tagJson = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
-                            tags.add(tagJson.getString(JsonFields.Tag.NAME));
+                            tags.add(new Tag(tagJson.getString(JsonFields.Tag.NAME)));
                         }
                         catch (JSONException e)
                         {

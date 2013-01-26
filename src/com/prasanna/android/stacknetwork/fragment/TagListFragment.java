@@ -21,12 +21,10 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import android.app.ListFragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -45,6 +43,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -58,11 +57,11 @@ public class TagListFragment extends ListFragment
 
     public static final String TAGS_DIRTY = "dirty";
 
+    private boolean activityCreated = false;
     private OnTagSelectListener onTagSelectListener;
-    private ArrayAdapter<String> listAdapter;
+    private ArrayAdapter<Tag> listAdapter;
     private LinearLayout parentLayout;
     private ProgressBar progressBar;
-    private boolean activityCreated = false;
     private EditText filterListInputText;
     private Button clearFilterInputText;
     private CharSequence defaultHint;
@@ -74,16 +73,16 @@ public class TagListFragment extends ListFragment
         void onTagSelected(String tag);
     }
 
-    public class GetTagListCompletionNotifier implements AsyncTaskCompletionNotifier<LinkedHashSet<String>>
+    public class GetTagListCompletionNotifier implements AsyncTaskCompletionNotifier<LinkedHashSet<Tag>>
     {
         @Override
-        public void notifyOnCompletion(LinkedHashSet<String> result)
+        public void notifyOnCompletion(LinkedHashSet<Tag> result)
         {
             getProgressBar().setVisibility(View.GONE);
 
             if (result != null)
             {
-                listAdapter.add(StringConstants.FRONT_PAGE);
+                listAdapter.add(new Tag(StringConstants.FRONT_PAGE));
                 listAdapter.addAll(result);
             }
             else
@@ -91,6 +90,35 @@ public class TagListFragment extends ListFragment
                 showError();
             }
         }
+    }
+
+    public class TagArrayAdapter extends ArrayAdapter<Tag>
+    {
+        public TagArrayAdapter(Context context, int textViewResourceId, List<Tag> objects)
+        {
+            super(context, textViewResourceId, objects);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            TextView textView = (TextView) convertView;
+            if (textView == null)
+            {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
+                                Context.LAYOUT_INFLATER_SERVICE);
+                textView = (TextView) inflater.inflate(R.layout.tag_list_item, null);
+            }
+
+            TagArrayAdapter adapter = (TagArrayAdapter) getListAdapter();
+            textView.setText(adapter.getItem(position).name);
+
+            if (adapter.getItem(position).local)
+                textView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.make_available_offline, 0);
+
+            return textView;
+        }
+
     }
 
     private ProgressBar getProgressBar()
@@ -106,7 +134,7 @@ public class TagListFragment extends ListFragment
         if (parentLayout == null)
         {
             parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view_with_search, null);
-            listAdapter = new ArrayAdapter<String>(getActivity(), R.layout.tag_list_item, new ArrayList<String>());
+            listAdapter = new TagArrayAdapter(getActivity(), R.layout.tag_list_item, new ArrayList<Tag>());
             filterListInputText = (EditText) parentLayout.findViewById(R.id.searchList);
             defaultHint = filterListInputText.getHint();
         }
@@ -235,7 +263,7 @@ public class TagListFragment extends ListFragment
             if (listAdapter.getItem(position).equals(StringConstants.FRONT_PAGE))
                 onTagSelectListener.onFrontPageSelected();
             else
-                onTagSelectListener.onTagSelected(listAdapter.getItem(position));
+                onTagSelectListener.onTagSelected(listAdapter.getItem(position).name);
         }
     }
 

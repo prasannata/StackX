@@ -198,11 +198,7 @@ public class UserIntentService extends AbstractIntentService
                     site.userType = linkAccountsMap.get(siteUrl).userType;
                     site.writePermissions = userService.checkForWritePermission(site.apiSiteParameter);
 
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable(StringConstants.PERMISSION,
-                                    userService.checkForWritePermission(site.apiSiteParameter));
-                    bundle.putSerializable(StringConstants.SITE, site);
-                    receiver.send(CHECK_WRITE_PERMISSION, bundle);
+                    notifyReceiver(receiver, site);
 
                     regSitesFirstMap.put(siteUrl, site);
                     linkSitesMap.remove(siteUrl);
@@ -214,6 +210,14 @@ public class UserIntentService extends AbstractIntentService
 
         return new ArrayList<Site>(regSitesFirstMap.values());
 
+    }
+
+    private void notifyReceiver(ResultReceiver receiver, Site site)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(StringConstants.PERMISSION, site.writePermissions);
+        bundle.putSerializable(StringConstants.SITE, site);
+        receiver.send(CHECK_WRITE_PERMISSION, bundle);
     }
 
     private void deauthenticateApp(String accessToken)

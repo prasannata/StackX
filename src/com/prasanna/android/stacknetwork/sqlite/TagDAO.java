@@ -29,6 +29,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsAuditTable;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsTable;
 
@@ -69,17 +70,17 @@ public class TagDAO
         }
     }
 
-    public void insert(String site, HashSet<String> tags)
+    public void insert(String site, HashSet<Tag> tags)
     {
         if (tags != null && !tags.isEmpty())
         {
             Log.d(TAG, "inserting tags into DB for site " + site);
 
-            for (String tag : tags)
+            for (Tag tag : tags)
             {
                 ContentValues values = new ContentValues();
-                values.put(TagsTable.COLUMN_ID, tag.toLowerCase().hashCode());
-                values.put(TagsTable.COLUMN_VALUE, tag);
+                values.put(TagsTable.COLUMN_ID, tag.name.hashCode());
+                values.put(TagsTable.COLUMN_VALUE, tag.name);
                 values.put(TagsTable.COLUMN_SITE, site);
                 database.insert(DatabaseHelper.TABLE_TAGS, null, values);
             }
@@ -99,11 +100,9 @@ public class TagDAO
 
     public long getLastUpdateTime(String site)
     {
-        String[] cols = new String[]
-        { TagsAuditTable.COLUMN_LAST_UPDATE_TIME };
+        String[] cols = new String[] { TagsAuditTable.COLUMN_LAST_UPDATE_TIME };
         String selection = DatabaseHelper.TagsAuditTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs =
-        { site };
+        String[] selectionArgs = { site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS_AUDIT, cols, selection, selectionArgs, null, null,
                         null);
@@ -119,13 +118,11 @@ public class TagDAO
         return cursor.getLong(0);
     }
 
-    public LinkedHashSet<String> getTags(String site)
+    public LinkedHashSet<Tag> getTags(String site)
     {
-        String[] cols = new String[]
-        { TagsTable.COLUMN_VALUE };
+        String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = DatabaseHelper.TagsTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs =
-        { site };
+        String[] selectionArgs = { site };
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS, cols, selection, selectionArgs, null, null, orderBy);
@@ -137,14 +134,16 @@ public class TagDAO
         return getTagSet(cursor);
     }
 
-    private LinkedHashSet<String> getTagSet(Cursor cursor)
+    private LinkedHashSet<Tag> getTagSet(Cursor cursor)
     {
-        LinkedHashSet<String> tags = new LinkedHashSet<String>();
+        LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast())
         {
-            tags.add(cursor.getString(0));
+            Tag tag = new Tag(cursor.getString(0));
+            tag.local = cursor.getInt(1) == 1;
+            tags.add(tag);
             cursor.moveToNext();
         }
 
@@ -159,8 +158,7 @@ public class TagDAO
     public void deleteTagsFromServerForSite(String site)
     {
         String whereClause = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
-        String[] whereArgs =
-        { site, "0" };
+        String[] whereArgs = { site, "0" };
 
         database.delete(DatabaseHelper.TABLE_TAGS, whereClause, whereArgs);
 
@@ -170,8 +168,7 @@ public class TagDAO
     private void deleteAuditEntry(String site)
     {
         String whereClause = TagsTable.COLUMN_SITE + " = ?";
-        String[] whereArgs =
-        { site };
+        String[] whereArgs = { site };
         database.delete(DatabaseHelper.TABLE_TAGS_AUDIT, whereClause, whereArgs);
     }
 

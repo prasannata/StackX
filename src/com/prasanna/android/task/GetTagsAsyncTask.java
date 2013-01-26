@@ -26,20 +26,21 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.prasanna.android.http.ServerException;
+import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
-public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String>>
+public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
 {
     private final String TAG = GetTagsAsyncTask.class.getSimpleName();
 
-    private final AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier;
+    private final AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier;
     private final boolean registeredUser;
     private final TagDAO tagDao;
     private final boolean fromDb;
 
-    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier,
+    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier,
                     TagDAO tagsDbAdapter, boolean registeredUser, boolean fromDb)
     {
         super();
@@ -51,9 +52,9 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
     }
 
     @Override
-    protected LinkedHashSet<String> doInBackground(Void... params)
+    protected LinkedHashSet<Tag> doInBackground(Void... params)
     {
-        LinkedHashSet<String> tags = null;
+        LinkedHashSet<Tag> tags = null;
         try
         {
             if (fromDb)
@@ -79,7 +80,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
     }
 
     @Override
-    protected void onPostExecute(LinkedHashSet<String> result)
+    protected void onPostExecute(LinkedHashSet<Tag> result)
     {
         if (taskCompletionNotifier != null)
             taskCompletionNotifier.notifyOnCompletion(result);
@@ -87,7 +88,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         super.onPostExecute(result);
     }
 
-    private LinkedHashSet<String> getTagsFromDb(String site)
+    private LinkedHashSet<Tag> getTagsFromDb(String site)
     {
         try
         {
@@ -124,7 +125,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
     }
 
-    private void persistTags(LinkedHashSet<String> result)
+    private void persistTags(LinkedHashSet<Tag> result)
     {
         try
         {
