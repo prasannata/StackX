@@ -282,6 +282,8 @@ public class TagListFragment extends ListFragment
             getListView().addFooterView(getProgressBar());
             setListAdapter(listAdapter);
 
+            runGetTagsTask(true);
+            
             activityCreated = true;
         }
     }
@@ -304,8 +306,10 @@ public class TagListFragment extends ListFragment
 
         if (SharedPreferencesUtil.isOn(getActivity(), TAGS_DIRTY, false))
         {
+            tags.clear();
             listAdapter.clear();
             runGetTagsTask(true);
+            SharedPreferencesUtil.setOnOff(getActivity(), TAGS_DIRTY, false);
         }
         else
         {
