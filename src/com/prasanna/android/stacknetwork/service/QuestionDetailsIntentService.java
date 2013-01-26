@@ -134,6 +134,14 @@ public class QuestionDetailsIntentService extends AbstractIntentService
         question.body = questionService.getQuestionBodyForId(question.id);
         sendSerializable(receiver, RESULT_CODE_Q_BODY, StringConstants.BODY, question.body);
 
+        getCommentsAndSend(receiver, question);
+
+        if (question.answerCount > 0)
+            question.answers = getAnswersAndSend(receiver, question.id, 1);
+    }
+
+    private void getCommentsAndSend(ResultReceiver receiver, Question question)
+    {
         StackXPage<Comment> commentsPage = questionService.getComments(StringConstants.QUESTIONS,
                         String.valueOf(question.id), 1);
         if (commentsPage != null)
@@ -141,15 +149,13 @@ public class QuestionDetailsIntentService extends AbstractIntentService
             question.comments = commentsPage.items;
             sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
         }
-
-        if (question.answerCount > 0)
-            question.answers = getAnswersAndSend(receiver, question.id, 1);
     }
 
     private Question getQuestionMetaAndBodyAndSend(ResultReceiver receiver, long questionId)
     {
         Question question = questionService.getQuestionFullDetails(questionId);
         sendSerializable(receiver, RESULT_CODE_Q, StringConstants.QUESTION, question);
+        getCommentsAndSend(receiver, question);
         return question;
     }
 
