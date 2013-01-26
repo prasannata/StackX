@@ -329,7 +329,7 @@ public class TagListFragment extends ListFragment
 
         if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
         {
-            if (listAdapter.getItem(position).equals(StringConstants.FRONT_PAGE))
+            if (listAdapter.getItem(position).name.equals(StringConstants.FRONT_PAGE))
                 onTagSelectListener.onFrontPageSelected();
             else
                 onTagSelectListener.onTagSelected(listAdapter.getItem(position).name);
