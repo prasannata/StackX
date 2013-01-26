@@ -399,10 +399,12 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     public HashMap<String, Account> getAccounts(int page)
     {
         String restEndPoint = "/me/associated";
+        int pageSize = 100;
+        
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.NETWORK_USER_TYPE_FILTER);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
 
         return getAccounts(restEndPoint, queryParams);
     }
@@ -410,9 +412,11 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     public HashMap<String, Account> getAccounts(long userId, int page)
     {
         String restEndPoint = "/users/" + userId + "/associated";
+        int pageSize = 100;
+        
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
 
         return getAccounts(restEndPoint, queryParams);
     }

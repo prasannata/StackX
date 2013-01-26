@@ -29,6 +29,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
@@ -59,7 +60,7 @@ public class WritePermissionDAO
         databaseHelper.close();
     }
 
-    public void insertAll(String site, ArrayList<WritePermission> permissions)
+    public void insertAll(Site site, ArrayList<WritePermission> permissions)
     {
         if (permissions != null)
         {
@@ -80,7 +81,9 @@ public class WritePermissionDAO
                 }
                 values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
                 values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
-                values.put(WritePermissionTable.COLUMN_SITE, site);
+                values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
+                values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
+                
                 database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
             }
         }
@@ -108,14 +111,18 @@ public class WritePermissionDAO
     public ArrayList<String> getSites()
     {
         String[] cols = { WritePermissionTable.COLUMN_SITE };
+        String selection = WritePermissionTable.COLUMN_ADD + " = ? and" + WritePermissionTable.COLUMN_DEL + " = ? and "
+                        + WritePermissionTable.COLUMN_EDIT + "= ?";
+        String[] selectionArgs = { "1", "1", "1" };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, null, null, null, null, null);
+        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, selection, selectionArgs, null,
+                        null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
-        
+
         ArrayList<String> sites = new ArrayList<String>();
         cursor.moveToFirst();
-        while(!cursor.isAfterLast())
+        while (!cursor.isAfterLast())
         {
             sites.add(cursor.getString(0));
             cursor.moveToNext();
@@ -149,7 +156,6 @@ public class WritePermissionDAO
         while (!cursor.isAfterLast())
         {
             permissions.add(getPermission(cursor));
-
             cursor.moveToNext();
         }
 

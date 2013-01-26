@@ -39,6 +39,7 @@ import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
@@ -75,6 +76,18 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
                 textView.setVisibility(View.VISIBLE);
             }
 
+            if (dataSet.get(position).writePermissions != null)
+            {
+                for (WritePermission permission : dataSet.get(position).writePermissions)
+                {
+                    if(permission.canAdd & permission.canDelete & permission.canEdit)
+                    {
+                        View writePermissionView = layoutForSites.findViewById(R.id.writePermissionEnabled);
+                        writePermissionView.setVisibility(View.VISIBLE);
+                        break;
+                    }
+                }
+            }
             setViewAndListenerForDefaultSiteOption(position, layoutForSites);
             setOnClickForSite(position, layoutForSites);
         }

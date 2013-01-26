@@ -164,7 +164,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
             {
                 ArrayList<WritePermission> permissions = (ArrayList<WritePermission>) resultData
                                 .getSerializable(StringConstants.PERMISSION);
-                persistPermissions(resultData.getString(StringConstants.SITE), permissions);
+                persistPermissions((Site) resultData.getSerializable(StringConstants.SITE), permissions);
             }
             else
             {
@@ -179,7 +179,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
     }
 
-    private void persistPermissions(String site, ArrayList<WritePermission> permissions)
+    private void persistPermissions(Site site, ArrayList<WritePermission> permissions)
     {
         WritePermissionDAO writePermissionDAO = new WritePermissionDAO(this);
 

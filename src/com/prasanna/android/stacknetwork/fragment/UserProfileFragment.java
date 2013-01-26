@@ -57,7 +57,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private RelativeLayout profileHomeLayout;
     private LinearLayout userAccountList;
     private ProgressDialog fetchProfileProgress;
-    private int usersAccountCursor = 0;
     private Intent userProfileIntent;
     private User user;
     private boolean me = false;
@@ -73,9 +72,10 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         resultReceiver = new RestQueryResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
+        me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
+
         if (user != null)
         {
-            me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
             if (me)
                 user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
             user.accounts = SharedPreferencesUtil.getMeAccounts(getActivity().getCacheDir());
@@ -87,8 +87,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (profileHomeLayout == null)
         {
-            usersAccountCursor = 0;
-
             fetchProfileProgress = ProgressDialog.show(getActivity(), "", "Fetching profile");
 
             profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
@@ -144,6 +142,19 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             getActivity().stopService(userProfileIntent);
         }
+    }
+
+    private void startUserProfileService()
+    {
+        userProfileIntent = new Intent(getActivity(), UserIntentService.class);
+        userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
+        userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
+        userProfileIntent.putExtra(StringConstants.ME,
+                        getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+        userProfileIntent.putExtra(StringConstants.USER_ID,
+                        getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+        userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        getActivity().startService(userProfileIntent);
     }
 
     private void displayUserDetail()
@@ -215,28 +226,15 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                         + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
-    private void startUserProfileService()
-    {
-        userProfileIntent = new Intent(getActivity(), UserIntentService.class);
-        userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
-        userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
-        userProfileIntent.putExtra(StringConstants.ME,
-                        getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-        userProfileIntent.putExtra(StringConstants.USER_ID,
-                        getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-        userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        getActivity().startService(userProfileIntent);
-    }
-
     private void displayUserAccounts()
     {
         if (user != null && user.accounts != null)
         {
-            for (; usersAccountCursor < user.accounts.size(); usersAccountCursor++)
+            for (int idx = 0; idx < user.accounts.size(); idx++)
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
                                 R.layout.textview_black_textcolor, null);
-                textView.setText(user.accounts.get(usersAccountCursor).siteName);
+                textView.setText(user.accounts.get(idx).siteName);
                 userAccountList.addView(textView);
             }
         }

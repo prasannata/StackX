@@ -65,12 +65,13 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_WAIT_TIME = "waitBetweenWrite";
         public static final String COLUMN_OBJECT_TYPE = "objectType";
         public static final String COLUMN_SITE = "site";
+        public static final String COLUMN_SITE_URL = "site_url";
 
         private static final String CREATE_TABLE = "create table " + TABLE_WRITE_PERMISSION + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
                         + " integer not null, " + COLUMN_EDIT + " integer not null, " + COLUMN_MAX_DAILY_ACTIONS
                         + " integer not null, " + COLUMN_WAIT_TIME + " integer not null, " + COLUMN_OBJECT_TYPE
-                        + " text not null, " + COLUMN_SITE + " text not null);";
+                        + " text not null, " + COLUMN_SITE + " text not null, " + COLUMN_SITE_URL + " text not null);";
     }
 
     public DatabaseHelper(Context context)

@@ -36,4 +36,6 @@ public class Account implements Serializable
     public String siteUrl;
     
     public UserType userType;
+    
+    public Site site;
 }

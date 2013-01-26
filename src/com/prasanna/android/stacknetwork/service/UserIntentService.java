@@ -201,7 +201,7 @@ public class UserIntentService extends AbstractIntentService
                     Bundle bundle = new Bundle();
                     bundle.putSerializable(StringConstants.PERMISSION,
                                     userService.checkForWritePermission(site.apiSiteParameter));
-                    bundle.putSerializable(StringConstants.SITE, site.apiSiteParameter);
+                    bundle.putSerializable(StringConstants.SITE, site);
                     receiver.send(CHECK_WRITE_PERMISSION, bundle);
 
                     regSitesFirstMap.put(siteUrl, site);
