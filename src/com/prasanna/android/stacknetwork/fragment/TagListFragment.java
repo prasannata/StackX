@@ -85,6 +85,7 @@ public class TagListFragment extends ListFragment
 
             if (result != null)
             {
+                tags.clear();
                 tags.add(new Tag(StringConstants.FRONT_PAGE));
                 tags.addAll(result);
                 listAdapter.addAll(tags);
@@ -102,6 +103,8 @@ public class TagListFragment extends ListFragment
         @Override
         protected FilterResults performFiltering(CharSequence constraint)
         {
+            Log.d(TAG, "performFiltering");
+            
             FilterResults result = new FilterResults();
 
             if (constraint != null && constraint.length() > 0)
