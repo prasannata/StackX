@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
@@ -36,6 +37,8 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -80,7 +83,8 @@ public class UserIntentService extends AbstractIntentService
             {
                 case GET_USER_PROFILE:
                     Log.d(TAG, "getUserDetail");
-                    bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, page));
+                    boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
+                    bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, refresh, page));
                     bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userId));
                     receiver.send(0, bundle);
                     break;
@@ -128,9 +132,49 @@ public class UserIntentService extends AbstractIntentService
         }
     }
 
-    private StackXPage<User> getUserDetail(boolean me, long userId, int page)
+    private StackXPage<User> getUserDetail(boolean me, long userId, boolean refresh, int page)
     {
-        return me ? userService.getMe() : userService.getUserById(userId);
+        if (me)
+        {
+            final int MS_IN_HALF_AN_HOUR = 1800000;
+            ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
+            StackXPage<User> userPage = null;
+            try
+            {
+                profileDAO.open();
+                User myProfile = null;
+                if (!refresh)
+                    myProfile = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
+
+                if (myProfile == null || System.currentTimeMillis() - myProfile.lastUpdateTime > MS_IN_HALF_AN_HOUR)
+                {
+                    userPage = userService.getMe();
+                    if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
+                    {
+                        profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
+                        profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
+                    }
+                }
+                else
+                {
+                    userPage = new StackXPage<User>();
+                    userPage.items = new ArrayList<User>();
+                    userPage.items.add(myProfile);
+                }
+            }
+            catch (SQLException e)
+            {
+                Log.d(TAG, e.getMessage());
+            }
+            finally
+            {
+                profileDAO.close();
+            }
+
+            return userPage;
+        }
+        else
+            return userService.getUserById(userId);
     }
 
     private HashMap<String, Account> getUserAccounts(boolean me, long userId)

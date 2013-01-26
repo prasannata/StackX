@@ -30,7 +30,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Tag;
-import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsAuditTable;
+import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsTable;
 
 public class TagDAO
@@ -92,16 +92,16 @@ public class TagDAO
     private void insertAuditEntry(String site)
     {
         ContentValues values = new ContentValues();
-        values.put(TagsAuditTable.COLUMN_SITE, site);
-        values.put(TagsAuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
+        values.put(AuditTable.COLUMN_SITE, site);
+        values.put(AuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
         Log.d(TAG, "Audit entry for tags: " + values.toString());
         database.insert(DatabaseHelper.TABLE_TAGS_AUDIT, null, values);
     }
 
     public long getLastUpdateTime(String site)
     {
-        String[] cols = new String[] { TagsAuditTable.COLUMN_LAST_UPDATE_TIME };
-        String selection = DatabaseHelper.TagsAuditTable.COLUMN_SITE + " = ?";
+        String[] cols = new String[] { AuditTable.COLUMN_LAST_UPDATE_TIME };
+        String selection = DatabaseHelper.AuditTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS_AUDIT, cols, selection, selectionArgs, null, null,

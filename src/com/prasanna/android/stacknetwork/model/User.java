@@ -100,4 +100,6 @@ public class User extends StackXItem implements Serializable
     public long lastAccessTime = 0L;
 
     public ArrayList<Account> accounts;
+
+    public long lastUpdateTime;
 }

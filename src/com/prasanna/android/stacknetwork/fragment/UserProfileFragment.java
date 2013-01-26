@@ -48,8 +48,6 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.task.GetImageAsyncTask;
-import com.prasanna.android.task.GetImageAsyncTaskCompleteNotifierImpl;
 
 public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver
 {
@@ -58,6 +56,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private LinearLayout userAccountList;
     private ProgressDialog fetchProfileProgress;
     private Intent userProfileIntent;
+    private int userAccountListCursor = 0;
     private User user;
     private boolean me = false;
     private RestQueryResultReceiver resultReceiver;
@@ -69,6 +68,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
         super.onCreate(savedInstanceState);
 
+        userAccountListCursor = 0;
         resultReceiver = new RestQueryResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
@@ -153,6 +153,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                         getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
         userProfileIntent.putExtra(StringConstants.USER_ID,
                         getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+        userProfileIntent.putExtra(StringConstants.REFRESH,
+                        getActivity().getIntent().getBooleanExtra(StringConstants.REFRESH, false));
         userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         getActivity().startService(userProfileIntent);
     }
@@ -182,13 +184,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private void updateProfileInfo()
     {
         ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
-        if (userProfileImage.getDrawable() == null)
-        {
-            GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new GetImageAsyncTaskCompleteNotifierImpl(
-                            userProfileImage));
-            fetchImageAsyncTask.execute(user.profileImageLink);
-        }
-
+        userProfileImage.setImageBitmap(user.avatar);
+        
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(user.displayName);
 
@@ -230,11 +227,11 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (user != null && user.accounts != null)
         {
-            for (int idx = 0; idx < user.accounts.size(); idx++)
+            for (;userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
                                 R.layout.textview_black_textcolor, null);
-                textView.setText(user.accounts.get(idx).siteName);
+                textView.setText(user.accounts.get(userAccountListCursor).siteName);
                 userAccountList.addView(textView);
             }
         }
@@ -244,6 +241,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
+        Log.d(TAG, "onReceiveResult");
+        
         if (fetchProfileProgress != null)
             fetchProfileProgress.dismiss();
 

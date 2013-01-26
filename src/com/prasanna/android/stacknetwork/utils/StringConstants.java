@@ -86,6 +86,8 @@ public class StringConstants
 
     public static final String PERMISSION = "permission";
 
+    public static final String REFRESH = "refresh";
+
     public static final class HttpError
     {
         public static final String CODE = "code";

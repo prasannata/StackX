@@ -118,6 +118,7 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     public void refresh()
     {
         finish();
+        getIntent().putExtra(StringConstants.REFRESH, true);
         startActivity(getIntent());
     }
 

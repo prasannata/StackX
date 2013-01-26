@@ -87,6 +87,7 @@ public abstract class AbstractBaseServiceHelper
                 user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
                 user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
                 user.creationDate = userJsonObject.getLong(JsonFields.User.CREATION_DATE);
+                user.avatar = SecureHttpHelper.getInstance().fetchImage(user.profileImageLink);
                 page.items.add(user);
             }
         }
