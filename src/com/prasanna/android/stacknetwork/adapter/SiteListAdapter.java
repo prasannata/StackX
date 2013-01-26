@@ -169,6 +169,7 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
     {
         Intent startQuestionActivityIntent = new Intent(listView.getContext(), QuestionsActivity.class);
         startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         listView.getContext().startActivity(startQuestionActivityIntent);
     }

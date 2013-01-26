@@ -25,10 +25,13 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.prasanna.android.provider.RecentQueriesProvider;
 import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
@@ -37,8 +40,10 @@ import com.prasanna.android.stacknetwork.fragment.TagListFragment;
 import com.prasanna.android.stacknetwork.fragment.TagListFragment.OnTagSelectListener;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
+import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -55,6 +60,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
     private boolean showTagsFragment = false;
     private TagListFragment tagListFragment;
+    private String intentAction;
 
     public static QuestionListFragment getFragment(String fragmentTag)
     {
@@ -103,15 +109,15 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         me = this;
 
         setContentView(R.layout.fragment_container);
-        String action = getIntent().getAction();
+        intentAction = getIntent().getAction();
 
-        if (Intent.ACTION_SEARCH.equals(action))
+        if (Intent.ACTION_SEARCH.equals(intentAction))
             showSearchFragment();
-        else if (StringConstants.SIMILAR.equals(action))
+        else if (StringConstants.SIMILAR.equals(intentAction))
             showSimilarQuestionListFragment();
-        else if (StringConstants.RELATED.equals(action))
+        else if (StringConstants.RELATED.equals(intentAction))
             showRelatedQuestionListFragment();
-        else if (StringConstants.TAG.equals(action))
+        else if (StringConstants.TAG.equals(intentAction))
             showTagQuestionListFragment();
         else
             showFrontPageForSite();
@@ -204,6 +210,56 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     protected boolean shouldSearchViewBeEnabled()
     {
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        boolean ret = super.onCreateOptionsMenu(menu);
+
+        if (menu != null && intentAction != null && StringConstants.TAG.equals(intentAction))
+            menu.findItem(R.id.menu_new_label).setVisible(true);
+
+        return ret;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (intentAction != null && StringConstants.TAG.equals(intentAction))
+        {
+            if (item.getItemId() == R.id.menu_new_label)
+            {
+                insertTagToDb();
+
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void insertTagToDb()
+    {
+        TagDAO tagDAO = new TagDAO(this);
+        String tagLabel = getIntent().getStringExtra(StringConstants.TAG);
+        try
+        {
+            tagDAO.open();
+            tagDAO.insert(OperatingSite.getSite().apiSiteParameter, tagLabel, true);
+
+            Toast.makeText(this, tagLabel + " added to your tags", Toast.LENGTH_LONG).show();
+            
+            SharedPreferencesUtil.setOnOff(this, TagListFragment.TAGS_DIRTY, true);
+        }
+        catch (SQLException e)
+        {
+            Toast.makeText(this, "Failed to add " + tagLabel + " to your tags", Toast.LENGTH_LONG).show();
+        }
+        finally
+        {
+            tagDAO.close();
+        }
     }
 
     @Override

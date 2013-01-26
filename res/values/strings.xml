@@ -76,13 +76,14 @@
     <string name="defaultSite">Default site</string>
     <string name="hide">Hide</string>
     <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid this problem, it is recommended that you login. Continue?</string>
+    <string name="writePermissions">Write Permissions</string>
+    <string name="add">add</string>
 
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>
     <string name="search_hasAnswers">Has Answers</string>
     <string name="search_isAnswered">Is Answered</string>
     <string name="searchForTag">Search for tag</string>
-    <string name="writePermissions">Write Permissions</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>

@@ -23,10 +23,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 import android.app.ListFragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -43,17 +47,22 @@ import android.widget.TextView;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetTagsAsyncTask;
 
 public class TagListFragment extends ListFragment
 {
+    private static final String TAG = TagListFragment.class.getSimpleName();
+
+    public static final String TAGS_DIRTY = "dirty";
+
     private OnTagSelectListener onTagSelectListener;
     private ArrayAdapter<String> listAdapter;
     private LinearLayout parentLayout;
     private ProgressBar progressBar;
-    private boolean tagsFetched = false;
+    private boolean activityCreated = false;
     private EditText filterListInputText;
     private Button clearFilterInputText;
     private CharSequence defaultHint;
@@ -71,7 +80,7 @@ public class TagListFragment extends ListFragment
         public void notifyOnCompletion(LinkedHashSet<String> result)
         {
             getProgressBar().setVisibility(View.GONE);
-            
+
             if (result != null)
             {
                 listAdapter.add(StringConstants.FRONT_PAGE);
@@ -82,7 +91,6 @@ public class TagListFragment extends ListFragment
                 showError();
             }
         }
- 
     }
 
     private ProgressBar getProgressBar()
@@ -169,28 +177,51 @@ public class TagListFragment extends ListFragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        setupFilterEditText();
-        getListView().setTextFilterEnabled(true);
-        getListView().addFooterView(getProgressBar());
-        setListAdapter(listAdapter);
-
-        if (!tagsFetched)
+        if (!activityCreated)
         {
-            getProgressBar().setVisibility(View.VISIBLE);
-            GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
-                            getActivity()), AppUtils.inRegisteredSite(getActivity()));
-            fetchUserAsyncTask.execute();
-            tagsFetched = true;
+            setupFilterEditText();
+            getListView().setTextFilterEnabled(true);
+            getListView().addFooterView(getProgressBar());
+            setListAdapter(listAdapter);
+
+            runGetTagsTask(true);
+            activityCreated = true;
         }
+    }
+
+    private void runGetTagsTask(boolean fromDb)
+    {
+        getProgressBar().setVisibility(View.VISIBLE);
+
+        GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
+                        getActivity()), AppUtils.inRegisteredSite(getActivity()), fromDb);
+        fetchUserAsyncTask.execute();
     }
 
     @Override
     public void onResume()
     {
+        Log.d(TAG, "onResume");
+
         super.onResume();
 
-        if (listAdapter != null)
-            listAdapter.notifyDataSetChanged();
+        if (SharedPreferencesUtil.isOn(getActivity(), TAGS_DIRTY, false))
+        {
+            listAdapter.clear();
+            runGetTagsTask(true);
+        }
+        else
+        {
+            if (listAdapter != null)
+                listAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void onStop()
+    {
+        Log.d(TAG, "onStop");
+
+        super.onStop();
     }
 
     @Override
@@ -216,7 +247,7 @@ public class TagListFragment extends ListFragment
         getListView().removeFooterView(progressBar);
         getListView().addFooterView(errorView);
     }
-    
+
     public static TagListFragment newFragment(OnTagSelectListener onTagSelectListener)
     {
         TagListFragment fragment = new TagListFragment();

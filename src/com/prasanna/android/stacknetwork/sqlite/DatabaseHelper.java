@@ -36,12 +36,13 @@ public class DatabaseHelper extends SQLiteOpenHelper
     public static final class TagsTable
     {
         public static final String COLUMN_ID = "_id";
-        public static final String COLUMN_VALUE = "_value";
+        public static final String COLUMN_VALUE = "value";
         public static final String COLUMN_SITE = "site";
+        public static final String COLUMN_LOCAL_ADD = "local_add";
 
         private static final String CREATE_TABLE = "create table " + TABLE_TAGS + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null, " + COLUMN_SITE
-                        + " text not null);";
+                        + " text not null, " + COLUMN_LOCAL_ADD + " integer DEFAULT 0);";
     }
 
     public static final class TagsAuditTable

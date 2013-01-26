@@ -37,15 +37,17 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
     private final AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier;
     private final boolean registeredUser;
     private final TagDAO tagDao;
+    private final boolean fromDb;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<String>> taskCompletionNotifier,
-                    TagDAO tagsDbAdapter, boolean registeredUser)
+                    TagDAO tagsDbAdapter, boolean registeredUser, boolean fromDb)
     {
         super();
 
         this.taskCompletionNotifier = taskCompletionNotifier;
         this.tagDao = tagsDbAdapter;
         this.registeredUser = registeredUser;
+        this.fromDb = fromDb;
     }
 
     @Override
@@ -54,7 +56,8 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         LinkedHashSet<String> tags = null;
         try
         {
-            tags = getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
+            if (fromDb)
+                tags = getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
 
             if (tags == null || tags.isEmpty())
             {
@@ -90,11 +93,11 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         {
             tagDao.open();
             long lastUpdateTime = tagDao.getLastUpdateTime(site);
-            
+
             if (tagsOlderThanDay(lastUpdateTime))
             {
                 Log.d(TAG, "Tags older than day, deleting...");
-                tagDao.deleteTagsForSite(site);
+                tagDao.deleteTagsFromServerForSite(site);
             }
             else
                 return tagDao.getTags(site);
@@ -117,7 +120,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<String
         long MILLISECONDS_IN_DAY = 86400000L;
 
         Log.d(TAG, "Tags last updated: " + lastUpdateTime);
-        
+
         return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
     }
 

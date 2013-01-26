@@ -9,6 +9,13 @@
         android:title="@string/delete"
         android:visible="false"/>
     <item
+        android:id="@+id/menu_new_label"
+        android:icon="@drawable/collections_new_label"
+        android:orderInCategory="0"
+        android:showAsAction="always|collapseActionView"
+        android:title="@string/add"
+        android:visible="false"/>
+    <item
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/search"
@@ -20,8 +27,8 @@
         android:icon="@drawable/expand"
         android:orderInCategory="1"
         android:showAsAction="never"
-        android:visible="false"
-        android:title="@string/search"/>
+        android:title="@string/search"
+        android:visible="false"/>
     <item
         android:id="@+id/menu_refresh"
         android:icon="@drawable/refresh"
