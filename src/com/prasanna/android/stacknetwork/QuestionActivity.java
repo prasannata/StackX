@@ -177,10 +177,18 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                         // Only check if add comment is available
                         if (ObjectType.COMMENT.equals(writePermission.objectType) && writePermission.canAdd)
                         {
-                            
+
                             MenuItem newCommentMenuItem = menu.findItem(R.id.menu_new_comment);
-                            newCommentMenuItem.setEnabled(true);
                             newCommentMenuItem.setVisible(true);
+                            newCommentMenuItem.getActionView().setOnClickListener(new View.OnClickListener()
+                            {
+
+                                @Override
+                                public void onClick(View v)
+                                {
+                                    Toast.makeText(QuestionActivity.this, "Add comment", Toast.LENGTH_LONG).show();
+                                }
+                            });
                             break;
                         }
                     }
@@ -225,8 +233,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         else
         {
             Question metaDetails = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
-            
-            if(metaDetails != null)
+
+            if (metaDetails != null)
                 question = Question.copyMetaDeta(metaDetails);
 
             if (question != null)
@@ -296,18 +304,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 startServiceForAnswers();
             }
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        if (item.getItemId() == R.id.menu_new_comment)
-        {
-            Toast.makeText(this, "Add comment", Toast.LENGTH_LONG).show();
-            return true;
-        }
-        
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

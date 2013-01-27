@@ -72,6 +72,7 @@
     <string name="hide">Hide</string>
     <string name="writePermissions">Write Permissions</string>
     <string name="add">add</string>
+    <string name="addComment">Add comment</string>
 
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>

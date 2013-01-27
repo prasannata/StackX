@@ -20,7 +20,7 @@
         android:actionLayout="@layout/new_comment"
         android:orderInCategory="0"
         android:showAsAction="always"
-        android:enabled="false"
+        android:title="@string/addComment"
         android:visible="false"/>
     <item
         android:id="@+id/menu_search"
