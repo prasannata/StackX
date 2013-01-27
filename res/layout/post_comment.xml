@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/rounded_border_grey_min_padding" >
+
+    <TextView
+        android:id="@+id/commentContext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="4dp"
+        android:gravity="left"
+        android:textColor="@color/delft"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/textInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/commentContext"
+        android:cursorVisible="true"
+        android:inputType="textMultiLine"
+        android:scrollHorizontally="false"
+        android:textColor="@color/black"
+        android:textCursorDrawable="@null" />
+
+    <TextView
+        android:id="@+id/sendComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/textInput"
+        android:layout_marginTop="4dp"
+        android:drawableRight="@drawable/send_now_dark_32x32"
+        android:gravity="center"
+        android:text="@string/post"
+        android:textColor="@color/delft"
+        android:textSize="15sp" />
+
+</RelativeLayout>

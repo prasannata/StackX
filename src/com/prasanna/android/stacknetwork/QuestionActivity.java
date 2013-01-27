@@ -20,7 +20,9 @@
 package com.prasanna.android.stacknetwork;
 
 import java.io.File;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -42,6 +44,7 @@ import android.widget.Toast;
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment;
+import com.prasanna.android.stacknetwork.fragment.PostCommentFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
@@ -72,8 +75,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
     private boolean serviceRunningForAnswers = false;
-
     private CommentFragment commentFragment;
+    private PostCommentFragment postCommentFragment;
+    private SoftReference<HashMap<String, String>> commentsDraft = new SoftReference<HashMap<String,String>>(new HashMap<String, String>());
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
@@ -173,22 +177,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 {
                     for (WritePermission writePermission : writePermissions)
                     {
-                        Log.d(TAG, "" + writePermission.objectType);
                         // Only check if add comment is available
                         if (ObjectType.COMMENT.equals(writePermission.objectType) && writePermission.canAdd)
                         {
-
-                            MenuItem newCommentMenuItem = menu.findItem(R.id.menu_new_comment);
-                            newCommentMenuItem.setVisible(true);
-                            newCommentMenuItem.getActionView().setOnClickListener(new View.OnClickListener()
-                            {
-
-                                @Override
-                                public void onClick(View v)
-                                {
-                                    Toast.makeText(QuestionActivity.this, "Add comment", Toast.LENGTH_LONG).show();
-                                }
-                            });
+                            setupAddComment(menu);
                             break;
                         }
                     }
@@ -203,6 +195,32 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 writePermissionDAO.close();
             }
         }
+    }
+
+    private void setupAddComment(Menu menu)
+    {
+        MenuItem newCommentMenuItem = menu.findItem(R.id.menu_new_comment);
+        newCommentMenuItem.setVisible(true);
+        newCommentMenuItem.getActionView().setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String fragmentTag = null;
+
+                if (viewPager.getCurrentItem() == 0)
+                {
+                    fragmentTag = question.id + "-comment";
+                    showPostCommentFragment("Comment on answer by " + question.owner.displayName, question.id, fragmentTag);
+                }
+                else
+                {
+                    Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
+                    fragmentTag = answer.id + "-comment";
+                    showPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id, fragmentTag);
+                }
+            }
+        });
     }
 
     private void setupViewPager()
@@ -259,6 +277,25 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             stopService(intent);
     }
 
+    
+    @Override
+    public void onBackPressed()
+    {
+        Log.d(TAG, "onBackPressed");
+        
+        super.onBackPressed();
+        
+        discardPostCommentFragmentIfVisible();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+
+        super.onSaveInstanceState(outState);
+    }
+    
     @Override
     protected void refresh()
     {
@@ -289,10 +326,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         if (commentFragment != null && commentFragment.isVisible())
         {
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.remove(commentFragment);
-            transaction.commit();
+            getFragmentManager().popBackStackImmediate();
+            commentFragment = null;
         }
+
+        discardPostCommentFragmentIfVisible();
 
         if (numAnswersDisplayed < question.answerCount && numAnswersDisplayed - position < 2)
         {
@@ -303,6 +341,20 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 setProgressBarIndeterminateVisibility(true);
                 startServiceForAnswers();
             }
+        }
+    }
+
+    private void discardPostCommentFragmentIfVisible()
+    {
+        if (postCommentFragment != null)
+        {
+            postCommentFragment.hideSoftKeyboard();
+
+            Log.d(TAG, "Adding  " + postCommentFragment.getTag());
+            
+            commentsDraft.get().put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
+            getFragmentManager().popBackStackImmediate();
+            postCommentFragment = null;
         }
     }
 
@@ -569,5 +621,24 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
             viewPager.setCurrentItem(0);
         }
+    }
+
+    private void showPostCommentFragment(String title, long id, String fragmentTag)
+    {
+        postCommentFragment = new PostCommentFragment();
+        postCommentFragment.setPostId(id);
+        postCommentFragment.setTitle(title);
+        
+        Log.d(TAG, "Get  " + fragmentTag);
+        Log.d(TAG, "Value  " + commentsDraft.get().get(fragmentTag));
+        
+        if(commentsDraft.get().get(fragmentTag) != null)
+            postCommentFragment.setDraftText(commentsDraft.get().get(fragmentTag));
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentContainer, postCommentFragment, fragmentTag);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.addToBackStack(fragmentTag);
+        transaction.commit();
     }
 }
