@@ -71,6 +71,20 @@ public class User extends StackXItem implements Serializable
         }
     }
 
+    public static User copyShallowUser(User that)
+    {
+        if (that == null)
+            return null;
+
+        User user = new User();
+        user.id = that.id;
+        user.acceptRate = that.acceptRate;
+        user.displayName = that.displayName;
+        user.reputation = that.reputation;
+        user.link = that.link;
+        return user;
+    }
+
     private static final long serialVersionUID = -5427063287288616795L;
 
     public long accountId = 0L;

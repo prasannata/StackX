@@ -28,12 +28,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class WritePermissionDAO
 {
@@ -42,11 +40,8 @@ public class WritePermissionDAO
     private final DatabaseHelper databaseHelper;
     private SQLiteDatabase database;
 
-    private Context context;
-
     public WritePermissionDAO(Context context)
     {
-        this.context = context;
         databaseHelper = new DatabaseHelper(context);
     }
 
@@ -68,22 +63,19 @@ public class WritePermissionDAO
 
             for (WritePermission permission : permissions)
             {
+                Log.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: " + permission.canEdit
+                                + ", delete: " + permission.canDelete);
                 ContentValues values = new ContentValues();
                 values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
                 values.put(WritePermissionTable.COLUMN_EDIT, permission.canEdit);
                 values.put(WritePermissionTable.COLUMN_DEL, permission.canDelete);
                 if (permission.objectType != null)
-                {
                     values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
-                    SharedPreferencesUtil.setOnOff(context, SettingsFragment.PREFIX_KEY_PREF_WRITE_PERMISSION + site
-                                    + "_" + permission.objectType.getValue(), permission.canAdd & permission.canDelete
-                                    & permission.canEdit);
-                }
                 values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
                 values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
                 values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
                 values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
-                
+
                 database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
             }
         }
@@ -164,14 +156,16 @@ public class WritePermissionDAO
 
     private WritePermission getPermission(Cursor cursor)
     {
-        int colIdx = 0;
         WritePermission permission = new WritePermission();
-        permission.canAdd = cursor.getInt(colIdx++) == 1;
-        permission.canDelete = cursor.getInt(colIdx++) == 1;
-        permission.canEdit = cursor.getInt(colIdx++) == 1;
-        permission.maxDailyActions = cursor.getInt(colIdx++);
-        permission.minSecondsBetweenActions = cursor.getInt(colIdx++);
-        permission.objectType = ObjectType.getEnum(cursor.getString(colIdx++));
+        permission.canAdd = cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_ADD)) == 1;
+        permission.canDelete = cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_DEL)) == 1;
+        permission.canEdit = cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_EDIT)) == 1;
+        permission.maxDailyActions = cursor
+                        .getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS));
+        permission.minSecondsBetweenActions = cursor.getInt(cursor
+                        .getColumnIndex(WritePermissionTable.COLUMN_WAIT_TIME));
+        permission.objectType = ObjectType.getEnum(cursor.getString(cursor
+                        .getColumnIndex(WritePermissionTable.COLUMN_OBJECT_TYPE)));
         return permission;
     }
 }

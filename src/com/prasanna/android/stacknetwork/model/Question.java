@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
@@ -25,6 +25,33 @@ import java.util.ArrayList;
 public class Question extends StackXItem implements Serializable
 {
     private static final long serialVersionUID = -4722553914475051236L;
+
+    public static Question copyMetaDeta(Question that)
+    {
+        if(that == null)
+            return null;
+        
+        Question question = new Question();
+        question.id = that.id;
+        question.title = that.title;
+        question.score = that.score;
+        question.creationDate = that.creationDate;
+        question.body = that.body;
+        question.link = that.link;
+        question.viewCount = that.viewCount;
+        question.answerCount = that.answerCount;
+        question.relativeLink = that.relativeLink;
+        question.answered = that.answered;
+        question.hasAcceptedAnswer = that.hasAcceptedAnswer;
+        if (that.tags != null)
+        {
+            question.tags = new String[that.tags.length];
+            for (int i = 0; i < that.tags.length; i++)
+                question.tags[i] = that.tags[i];
+        }
+        question.owner = User.copyShallowUser(that.owner);
+        return question;
+    }
 
     public int viewCount;
 

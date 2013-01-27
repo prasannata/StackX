@@ -254,7 +254,7 @@ public class QuestionFragment extends Fragment
         if (parentLayout != null)
         {
             if (isAdded())
-                getActivity().getActionBar().setTitle(question.title);
+                getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
 
             displayQuestion();
         }

@@ -106,7 +106,10 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     private void getQuestionDetail(ResultReceiver receiver, Intent intent)
     {
         long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
-        Question question = QuestionsCache.getInstance().get(questionId);
+        Question question = null;
+
+        if (!intent.getBooleanExtra(StringConstants.REFRESH, false))
+            question = QuestionsCache.getInstance().get(questionId);
 
         if (question != null)
         {

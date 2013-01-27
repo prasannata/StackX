@@ -26,6 +26,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -45,11 +46,15 @@ import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
+import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
@@ -146,9 +151,50 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         boolean ret = super.onPrepareOptionsMenu(menu);
 
         if (menu != null)
+        {
             menu.removeItem(R.id.menu_search);
+            enableAddCommentIfPermitted(menu);
+        }
 
         return ret;
+    }
+
+    private void enableAddCommentIfPermitted(Menu menu)
+    {
+        if (AppUtils.inAuthenticatedRealm(this))
+        {
+            WritePermissionDAO writePermissionDAO = new WritePermissionDAO(getApplicationContext());
+            try
+            {
+                writePermissionDAO.open();
+                ArrayList<WritePermission> writePermissions = writePermissionDAO
+                                .getPermissions(OperatingSite.getSite().apiSiteParameter);
+                if (writePermissions != null)
+                {
+                    for (WritePermission writePermission : writePermissions)
+                    {
+                        Log.d(TAG, "" + writePermission.objectType);
+                        // Only check if add comment is available
+                        if (ObjectType.COMMENT.equals(writePermission.objectType) && writePermission.canAdd)
+                        {
+                            
+                            MenuItem newCommentMenuItem = menu.findItem(R.id.menu_new_comment);
+                            newCommentMenuItem.setEnabled(true);
+                            newCommentMenuItem.setVisible(true);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (SQLException e)
+            {
+                Log.e(TAG, e.getMessage());
+            }
+            finally
+            {
+                writePermissionDAO.close();
+            }
+        }
     }
 
     private void setupViewPager()
@@ -178,7 +224,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
         else
         {
-            question = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
+            Question metaDetails = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
+            
+            if(metaDetails != null)
+                question = Question.copyMetaDeta(metaDetails);
 
             if (question != null)
             {
@@ -187,6 +236,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 intent.setAction(StringConstants.QUESTION);
                 intent.putExtra(StringConstants.QUESTION_ID, question.id);
                 intent.putExtra(StringConstants.QUESTION, question);
+                intent.putExtra(StringConstants.REFRESH, getIntent().getBooleanExtra(StringConstants.REFRESH, false));
                 startService(intent);
             }
         }
@@ -206,7 +256,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         Intent intent = getIntent();
         finish();
-        intent.putExtra(StringConstants.CACHED, false);
+        intent.putExtra(StringConstants.REFRESH, true);
         startActivity(intent);
     }
 
@@ -246,6 +296,18 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 startServiceForAnswers();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.menu_new_comment)
+        {
+            Toast.makeText(this, "Add comment", Toast.LENGTH_LONG).show();
+            return true;
+        }
+        
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

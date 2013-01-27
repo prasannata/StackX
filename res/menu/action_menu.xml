@@ -16,6 +16,13 @@
         android:title="@string/add"
         android:visible="false"/>
     <item
+        android:id="@+id/menu_new_comment"
+        android:actionLayout="@layout/new_comment"
+        android:orderInCategory="0"
+        android:showAsAction="always"
+        android:enabled="false"
+        android:visible="false"/>
+    <item
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/search"

@@ -11,7 +11,7 @@
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="logoutMsg">All your saved preferences, archives etc. will be lost. Okay?</string>
-    <string name="usersUri">/users</string>
+    <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid this problem, it is recommended that you login. Continue?</string>
     <string name="skipLogin">Skip login</string>
     <string name="loading">Loading</string>
     <string name="stats">stats</string>
@@ -22,8 +22,7 @@
     <string name="comments">Comments</string>
     <string name="upvotes">Upvotes</string>
     <string name="downvotes">Downvotes</string>
-    <string name="profileViews">Profile views</string>
-    <string name="zero">"0"</string>
+    <string name="zero">0</string>
     <string name="accounts">Accounts</string>
     <string name="lastSeen">Last seen</string>
     <string name="noEmail">Email not found</string>
@@ -43,13 +42,10 @@
     <string name="badge">badge</string>
     <string name="avatar">avatar</string>
     <string name="loadingSites">Loading sites</string>
-    <string name="viewProfile">View profile</string>
     <string name="viewQuestion">View Question</string>
-    <string name="viewUserAnswer">View answer</string>
     <string name="registered">Registered</string>
     <string name="reorder">Reorder</string>
     <string name="done">Done</string>
-    <string name="dragAndDropHint">Long press and drag</string>
     <string name="accepted">Accepted</string>
     <string name="delete">Delete</string>
     <string name="sureQuestion">"Sure ?"</string>
@@ -58,7 +54,6 @@
     <string name="title">Title</string>
     <string name="views">Views</string>
     <string name="skip">Skip</string>
-    <string name="viewMessage">View message</string>
     <string name="notification">Notification</string>
     <string name="about">About</string>
     <string name="vibrate">Vibrate</string>
@@ -75,7 +70,6 @@
     <string name="general">General</string>
     <string name="defaultSite">Default site</string>
     <string name="hide">Hide</string>
-    <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid this problem, it is recommended that you login. Continue?</string>
     <string name="writePermissions">Write Permissions</string>
     <string name="add">add</string>
 
@@ -84,6 +78,9 @@
     <string name="search_hasAnswers">Has Answers</string>
     <string name="search_isAnswered">Is Answered</string>
     <string name="searchForTag">Search for tag</string>
+
+    <!-- Symbols -->
+    <string name="plusSign">+</string>
 
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>
