@@ -20,7 +20,6 @@
 package com.prasanna.android.stacknetwork;
 
 import java.io.File;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -77,8 +76,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private boolean serviceRunningForAnswers = false;
     private CommentFragment commentFragment;
     private PostCommentFragment postCommentFragment;
-    private SoftReference<HashMap<String, String>> commentsDraft = new SoftReference<HashMap<String, String>>(
-                    new HashMap<String, String>());
+    private HashMap<String, String> commentsDraft = new HashMap<String, String>();
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
@@ -353,7 +351,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
             Log.d(TAG, "Adding  " + postCommentFragment.getTag());
 
-            commentsDraft.get().put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
+            commentsDraft.put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
             getFragmentManager().popBackStackImmediate();
             postCommentFragment = null;
         }
@@ -630,8 +628,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         postCommentFragment.setPostId(id);
         postCommentFragment.setTitle(title);
 
-        if (commentsDraft.get().get(fragmentTag) != null)
-            postCommentFragment.setDraftText(commentsDraft.get().get(fragmentTag));
+        if (commentsDraft.get(fragmentTag) != null)
+            postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, postCommentFragment, fragmentTag);
