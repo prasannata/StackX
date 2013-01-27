@@ -77,7 +77,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private boolean serviceRunningForAnswers = false;
     private CommentFragment commentFragment;
     private PostCommentFragment postCommentFragment;
-    private SoftReference<HashMap<String, String>> commentsDraft = new SoftReference<HashMap<String,String>>(new HashMap<String, String>());
+    private SoftReference<HashMap<String, String>> commentsDraft = new SoftReference<HashMap<String, String>>(
+                    new HashMap<String, String>());
 
     public class QuestionViewPageAdapter extends FragmentPagerAdapter
     {
@@ -211,7 +212,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 if (viewPager.getCurrentItem() == 0)
                 {
                     fragmentTag = question.id + "-comment";
-                    showPostCommentFragment("Comment on answer by " + question.owner.displayName, question.id, fragmentTag);
+                    showPostCommentFragment("Comment on question by " + question.owner.displayName, question.id,
+                                    fragmentTag);
                 }
                 else
                 {
@@ -277,14 +279,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             stopService(intent);
     }
 
-    
     @Override
     public void onBackPressed()
     {
         Log.d(TAG, "onBackPressed");
-        
+
         super.onBackPressed();
-        
+
         discardPostCommentFragmentIfVisible();
     }
 
@@ -295,7 +296,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         super.onSaveInstanceState(outState);
     }
-    
+
     @Override
     protected void refresh()
     {
@@ -351,7 +352,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             postCommentFragment.hideSoftKeyboard();
 
             Log.d(TAG, "Adding  " + postCommentFragment.getTag());
-            
+
             commentsDraft.get().put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
             getFragmentManager().popBackStackImmediate();
             postCommentFragment = null;
@@ -628,11 +629,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         postCommentFragment = new PostCommentFragment();
         postCommentFragment.setPostId(id);
         postCommentFragment.setTitle(title);
-        
+
         Log.d(TAG, "Get  " + fragmentTag);
         Log.d(TAG, "Value  " + commentsDraft.get().get(fragmentTag));
-        
-        if(commentsDraft.get().get(fragmentTag) != null)
+
+        if (commentsDraft.get().get(fragmentTag) != null)
             postCommentFragment.setDraftText(commentsDraft.get().get(fragmentTag));
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
