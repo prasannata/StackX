@@ -630,9 +630,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         postCommentFragment.setPostId(id);
         postCommentFragment.setTitle(title);
 
-        Log.d(TAG, "Get  " + fragmentTag);
-        Log.d(TAG, "Value  " + commentsDraft.get().get(fragmentTag));
-
         if (commentsDraft.get().get(fragmentTag) != null)
             postCommentFragment.setDraftText(commentsDraft.get().get(fragmentTag));
 
