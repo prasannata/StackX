@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork.sqlite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -132,7 +133,7 @@ public class WritePermissionDAO
         return sites;
     }
 
-    public ArrayList<WritePermission> getPermissions(String site)
+    public HashMap<ObjectType, WritePermission> getPermissions(String site)
     {
         if (site == null)
             return null;
@@ -151,14 +152,16 @@ public class WritePermissionDAO
         return getPermissions(cursor);
     }
 
-    private ArrayList<WritePermission> getPermissions(Cursor cursor)
+    private HashMap<ObjectType, WritePermission> getPermissions(Cursor cursor)
     {
-        ArrayList<WritePermission> permissions = new ArrayList<WritePermission>();
+        HashMap<ObjectType, WritePermission> permissions = new HashMap<ObjectType, WritePermission>();
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast())
         {
-            permissions.add(getPermission(cursor));
+            WritePermission permission = getPermission(cursor);
+            if (permission.objectType != null)
+                permissions.put(permission.objectType, permission);
             cursor.moveToNext();
         }
 

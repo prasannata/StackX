@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/commentDetails"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_border_grey_min_padding"
-    android:orientation="vertical" >
+    android:background="@drawable/rounded_border_grey_min_padding" >
 
     <TextView
         android:id="@+id/commentScore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="7dp"
         android:gravity="center"
@@ -24,18 +24,62 @@
         android:layout_toRightOf="@id/commentScore"
         android:gravity="left"
         android:textColor="@color/delft"
-        android:textSize="12sp" />
+        android:textSize="15sp" />
+
+    <RelativeLayout
+        android:id="@+id/commentWriteOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/commentTitle"
+        android:layout_marginTop="5dp"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/replyToComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/social_reply_dark_24x24"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/commentEditOptions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/editComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:src="@drawable/content_edit_dark_24x24"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/deleteComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:src="@drawable/content_discard_dark_24x24"
+                android:visibility="gone" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/commentOwner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/commentWriteOptions"
         android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/commentWriteOptions"
         android:layout_below="@id/commentTitle"
         android:layout_marginRight="2dp"
-        android:layout_marginTop="4dp"
-        android:gravity="bottom"
+        android:gravity="center"
         android:textColor="@color/delft"
-        android:textSize="10sp" />
+        android:textSize="12sp" />
 
 </RelativeLayout>

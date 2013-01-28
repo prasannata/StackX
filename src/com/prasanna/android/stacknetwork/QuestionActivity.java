@@ -27,7 +27,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -48,17 +47,16 @@ import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
 import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
@@ -165,35 +163,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private void enableAddCommentIfPermitted(Menu menu)
     {
-        if (AppUtils.inAuthenticatedRealm(this))
+        boolean canAddComment = WritePermissionUtil.canAdd(getApplicationContext(),
+                        OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
+
+        if (AppUtils.inAuthenticatedRealm(this) && canAddComment)
         {
-            WritePermissionDAO writePermissionDAO = new WritePermissionDAO(getApplicationContext());
-            try
-            {
-                writePermissionDAO.open();
-                ArrayList<WritePermission> writePermissions = writePermissionDAO
-                                .getPermissions(OperatingSite.getSite().apiSiteParameter);
-                if (writePermissions != null)
-                {
-                    for (WritePermission writePermission : writePermissions)
-                    {
-                        // Only check if add comment is available
-                        if (ObjectType.COMMENT.equals(writePermission.objectType) && writePermission.canAdd)
-                        {
-                            setupAddComment(menu);
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (SQLException e)
-            {
-                Log.e(TAG, e.getMessage());
-            }
-            finally
-            {
-                writePermissionDAO.close();
-            }
+            setupAddComment(menu);
         }
     }
 

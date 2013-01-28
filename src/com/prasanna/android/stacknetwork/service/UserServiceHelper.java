@@ -257,7 +257,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
-        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
+        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
 
         return getAnswers(restEndPoint, queryParams);
     }
@@ -272,7 +272,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
-        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.QUESTION_DETAIL_FILTER);
+        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
         return getAnswers(restEndPoint, queryParams);
     }
 

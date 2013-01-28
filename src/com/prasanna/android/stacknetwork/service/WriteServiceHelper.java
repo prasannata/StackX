@@ -39,6 +39,7 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
 
 public class WriteServiceHelper extends AbstractBaseServiceHelper
 {
@@ -64,10 +65,8 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, SharedPreferencesUtil
                         .getAccessToken(null)));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER,
-                        StackUri.QueryParamDefaultValues.DEFAULT_FILTER));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID,
-                        StackUri.QueryParamDefaultValues.CLIENT_ID));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER, QueryParamDefaultValues.ITEM_DETAIL_FILTER));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.BODY, body));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
 
