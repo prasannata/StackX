@@ -47,7 +47,7 @@ public class AsyncTaskExecutor
 
     public <P, S, R> void executeAsyncTask(Context context, AsyncTask<P, S, R> task, P... args)
     {
-        if (isOnline(context))
+        if (task != null && isOnline(context))
             task.execute(args);
     }
 }
