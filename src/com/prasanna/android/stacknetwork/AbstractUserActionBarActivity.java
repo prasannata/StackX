@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -57,6 +57,7 @@ import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
 
 public abstract class AbstractUserActionBarActivity extends Activity
@@ -240,20 +241,17 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void loadIcon()
     {
-        if (isOnline())
+        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
         {
-            GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+            @Override
+            public void notifyOnCompletion(Bitmap result)
             {
-                @Override
-                public void notifyOnCompletion(Bitmap result)
-                {
-                    setActionBarHomeIcon(result);
-                    iconCache.add(OperatingSite.getSite().name, result);
-                }
-            });
+                setActionBarHomeIcon(result);
+                iconCache.add(OperatingSite.getSite().name, result);
+            }
+        });
 
-            fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
-        }
+        AsyncTaskExecutor.getInstance().executeAsyncTask(this, fetchImageAsyncTask, OperatingSite.getSite().iconUrl);
     }
 
     private void setActionBarHomeIcon(Bitmap result)

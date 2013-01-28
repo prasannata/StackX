@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -50,6 +50,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetTagsAsyncTask;
 
 public class TagListFragment extends ListFragment
@@ -104,7 +105,7 @@ public class TagListFragment extends ListFragment
         protected FilterResults performFiltering(CharSequence constraint)
         {
             Log.d(TAG, "performFiltering");
-            
+
             FilterResults result = new FilterResults();
 
             if (constraint != null && constraint.length() > 0)
@@ -283,7 +284,7 @@ public class TagListFragment extends ListFragment
             setListAdapter(listAdapter);
 
             runGetTagsTask(true);
-            
+
             activityCreated = true;
         }
     }
@@ -294,7 +295,8 @@ public class TagListFragment extends ListFragment
 
         GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
                         getActivity()), AppUtils.inRegisteredSite(getActivity()), fromDb);
-        fetchUserAsyncTask.execute();
+
+        AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
     }
 
     @Override
@@ -326,7 +328,6 @@ public class TagListFragment extends ListFragment
         super.onStop();
     }
 
-    
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
