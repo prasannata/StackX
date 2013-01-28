@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.service;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.http.HttpEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ import android.util.Log;
 
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Answer;
+import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
@@ -192,6 +194,18 @@ public abstract class AbstractBaseServiceHelper
         return answer;
     }
 
+    protected Comment getSerializedCommentObject(JSONObjectWrapper jsonObject) throws JSONException
+    {
+        Comment comment = new Comment();
+        comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
+        comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
+        comment.body = jsonObject.getString(JsonFields.Comment.BODY);
+        comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
+        comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
+        comment.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Comment.OWNER));
+        return comment;
+    }
+
     protected String[] getTags(JSONObjectWrapper jsonObject) throws JSONException
     {
         String[] tags = null;
@@ -229,10 +243,18 @@ public abstract class AbstractBaseServiceHelper
         return wrapperObject;
     }
 
-    protected JSONObjectWrapper executeHttpRequest(String restEndPoint, Map<String, String> queryParams)
+    protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
     {
-        return SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
-                        restEndPoint, queryParams);
+        return SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
+                        queryParams);
+
+    }
+
+    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> queryParams,
+                    HttpEntity httpEntity)
+    {
+        return SecureHttpHelper.getInstance().executePostForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
+                        queryParams, httpEntity);
 
     }
 

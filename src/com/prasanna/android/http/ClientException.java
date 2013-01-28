@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -19,21 +19,19 @@
 
 package com.prasanna.android.http;
 
-import com.prasanna.android.stacknetwork.model.StackXError;
+import java.io.Serializable;
 
-public class ClientException extends RuntimeException
+public class ClientException extends AbstractHttpException implements Serializable
 {
     private static final long serialVersionUID = -6758967927788004257L;
-    private final StackXError error;
 
-    public ClientException(StackXError error)
+    public ClientException(int statusCode)
     {
-        super(error.name + " - " + error.msg);
-        this.error = error;
+        this(statusCode, null);
     }
 
-    public StackXError getError()
+    public ClientException(int statusCode, String errorResponse)
     {
-        return error;
+        super(statusCode, errorResponse);
     }
 }

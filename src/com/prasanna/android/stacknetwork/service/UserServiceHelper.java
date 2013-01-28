@@ -75,7 +75,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = StringConstants.SITES;
         LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
+        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
                         restEndPoint, AppUtils.getDefaultQueryParams());
         try
         {
@@ -119,7 +119,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
     private StackXPage<Question> getQuestions(String restEndPoint, Map<String, String> queryParams)
     {
-        JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (questionsJsonResponse != null)
         {
@@ -191,7 +191,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
+        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
                         "/me", queryParams);
 
         return getSerializedUserObject(jsonObject);
@@ -206,7 +206,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
         if (userId != -1)
         {
-            JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(
+            JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
                             StackUri.STACKX_API_HOST, "/users/" + userId, queryParams);
 
             page = getSerializedUserObject(jsonObject);
@@ -219,7 +219,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         StackXPage<Answer> page = new StackXPage<Answer>();
 
-        JSONObjectWrapper answersJsonObject = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper answersJsonObject = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (answersJsonObject != null)
         {
@@ -284,7 +284,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, site);
-        JSONObjectWrapper jsonObjectWrapper = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonObjectWrapper != null)
         {
@@ -351,7 +351,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         StackXPage<InboxItem> page = null;
 
-        JSONObjectWrapper jsonOfInboxItems = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper jsonOfInboxItems = executeHttpGetRequest(restEndPoint, queryParams);
         if (jsonOfInboxItems != null)
         {
             JSONArray itemsArray = jsonOfInboxItems.getJSONArray(JsonFields.ITEMS);
@@ -425,7 +425,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     private HashMap<String, Account> getAccounts(String restEndPoint, Map<String, String> queryParams)
     {
         HashMap<String, Account> accounts = null;
-        JSONObjectWrapper accountsJsonObject = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper accountsJsonObject = executeHttpGetRequest(restEndPoint, queryParams);
         if (accountsJsonObject != null)
         {
             JSONArray jsonArray = accountsJsonObject.getJSONArray(JsonFields.ITEMS);
@@ -462,7 +462,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         error.id = -1;
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeForGzipResponse(StackUri.STACKX_API_HOST,
+        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
                         restEndPoint, null);
         boolean success = jsonObject != null && jsonObject.getJSONArray(JsonFields.ITEMS) != null
                         && jsonObject.getJSONArray(JsonFields.ITEMS).length() == 0;
@@ -492,7 +492,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         while (hasMore)
         {
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
-            JSONObjectWrapper jsonObjectWrapper = executeHttpRequest(restEndPoint, queryParams);
+            JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, queryParams);
 
             if (jsonObjectWrapper != null)
             {

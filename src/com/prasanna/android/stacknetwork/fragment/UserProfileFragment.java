@@ -129,10 +129,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        if (user != null)
-        {
-            outState.putSerializable(StringConstants.USER, user);
-        }
         super.onSaveInstanceState(outState);
     }
 

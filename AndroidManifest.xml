@@ -25,6 +25,7 @@
         <service android:name=".service.QuestionsIntentService" />
         <service android:name=".service.QuestionDetailsIntentService" />
         <service android:name=".service.UserIntentService" />
+        <service android:name=".service.WriteIntentService" />
 
         <receiver android:name=".receiver.BatteryLevelReceiver" >
             <intent-filter>

@@ -62,7 +62,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                         String.valueOf(StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.VOTES);
 
-        JSONObjectWrapper answersJson = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper answersJson = executeHttpGetRequest(restEndPoint, queryParams);
         if (answersJson != null)
         {
             try
@@ -143,7 +143,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         String restEndPoint = "questions/" + id;
         String questionBody = null;
         Map<String, String> queryParams = getDefaultQueryParams();
-        JSONObjectWrapper questionJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionJsonResponse != null)
         {
             try
@@ -173,7 +173,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         Map<String, String> queryParams = getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
 
-        JSONObjectWrapper commentsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper commentsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (commentsJsonResponse != null)
         {
@@ -184,23 +184,15 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                 JSONArray jsonArray = commentsJsonResponse.getJSONArray(JsonFields.ITEMS);
                 for (int count = 0; count < jsonArray.length(); count++)
                 {
-                    Comment comment = new Comment();
                     JSONObject jsonObject = jsonArray.getJSONObject(count);
-                    comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
-                    comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
-                    comment.body = jsonObject.getString(JsonFields.Comment.BODY);
-                    comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
-                    comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
-                    comment.owner = getSerializableUserSnippetObject(JSONObjectWrapper.wrap(jsonObject
-                                    .getJSONObject(JsonFields.Comment.OWNER)));
-
+                    
                     if (commentsPage == null)
                     {
                         commentsPage = new StackXPage<Comment>();
                         commentsPage.items = new ArrayList<Comment>();
                     }
 
-                    commentsPage.items.add(comment);
+                    commentsPage.items.add(getSerializedCommentObject(JSONObjectWrapper.wrap(jsonObject)));
                 }
 
             }
@@ -212,6 +204,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return commentsPage;
     }
 
+
     public StackXPage<Question> search(String query, int page)
     {
         String restEndPoint = "search";
@@ -221,7 +214,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         return getQuestionModel(questionsJsonResponse);
     }
@@ -233,7 +226,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.putAll(searchCriteria.getMap());
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         return getQuestionModel(questionsJsonResponse);
     }
@@ -249,7 +242,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         String restEndPoint = "questions/" + id;
         Question question = null;
         Map<String, String> queryParams = getDefaultQueryParams();
-        JSONObjectWrapper questionJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionJsonResponse != null)
         {
             try
@@ -286,7 +279,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionsJsonResponse != null)
         {
             questions = getQuestionModel(questionsJsonResponse);
@@ -307,7 +300,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionsJsonResponse != null)
         {
             questions = getQuestionModel(questionsJsonResponse);
@@ -329,7 +322,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
             queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-            JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+            JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
             if (questionsJsonResponse != null)
             {
@@ -358,7 +351,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
             queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-            JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+            JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
             if (questionsJsonResponse != null)
             {
@@ -384,7 +377,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
             queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-            JSONObjectWrapper questionsJsonResponse = executeHttpRequest(restEndPoint, queryParams);
+            JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
             if (questionsJsonResponse != null)
             {

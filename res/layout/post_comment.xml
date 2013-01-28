@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2013 Prasanna Thirumalai
+    
+    This file is part of StackX.
+
+    StackX is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    StackX is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with StackX.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -11,6 +30,18 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="4dp"
         android:gravity="left"
+        android:textColor="@color/delft"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/charCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/commentContext"
+        android:layout_marginRight="2dp"
+        android:gravity="center"
+        android:text="@string/zero"
         android:textColor="@color/delft"
         android:textSize="12sp" />
 
@@ -32,10 +63,40 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/textInput"
         android:layout_marginTop="4dp"
+        android:clickable="false"
         android:drawableRight="@drawable/send_now_dark_32x32"
         android:gravity="center"
         android:text="@string/post"
-        android:textColor="@color/delft"
+        android:textColor="@color/lightGrey"
         android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/sendStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/sendComment"
+        android:layout_alignLeft="@id/textInput"
+        android:layout_alignTop="@id/sendComment"
+        android:layout_below="@id/textInput"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/sendProgress"
+        style="@android:style/Widget.ProgressBar.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/sendComment"
+        android:layout_alignLeft="@id/textInput"
+        android:layout_alignTop="@id/sendComment"
+        android:layout_below="@id/textInput"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:indeterminateOnly="true"
+        android:textSize="12sp"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -23,4 +23,5 @@ public interface HttpContentTypes
 {
     public static final String APPLICATION_JSON = "application/JSON";
     public static final String TEXT_HTML = "text/html";
+    public static final String APPLICATION_FROM_URL_ENCODED = "application/x-www-form-urlencoded";
 }

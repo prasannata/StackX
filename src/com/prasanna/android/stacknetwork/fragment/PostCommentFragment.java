@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -19,9 +19,16 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,16 +36,21 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.service.WriteIntentService;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class PostCommentFragment extends Fragment
 {
     private static final String TAG = PostCommentFragment.class.getSimpleName();
     private static final String TEXT = "text";
+    private static final int COMMENT_MIN_LEN = 15;
 
     private RelativeLayout parentLayout;
     private EditText editText;
@@ -47,16 +59,108 @@ public class PostCommentFragment extends Fragment
     private String title;
     private long postId;
     private String draftText;
+    private RestQueryResultReceiver resultReceiver;
+    private TextView charCount;
+    private TextView sendStatus;
+    private ProgressBar sendProgressBar;
+
+    private class CommentTextWatcher implements TextWatcher
+    {
+
+        @Override
+        public void afterTextChanged(Editable s)
+        {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after)
+        {
+            charCount.setText(String.valueOf(s.length()));
+
+            if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
+            {
+                sendComment.setTextColor(getResources().getColor(R.color.delft));
+                sendComment.setClickable(true);
+            }
+            else
+            {
+                if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                {
+                    sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
+                    sendComment.setClickable(false);
+                }
+            }
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count)
+        {
+        }
+
+    }
+
+    public void setPostId(long id)
+    {
+        this.postId = id;
+    }
 
     public void setTitle(String title)
     {
         this.title = title;
     }
 
+    public String getCurrentText()
+    {
+        if (editText != null && editText.getText() != null)
+            return editText.getText().toString();
+
+        return null;
+    }
+
+    public void setDraftText(String draftText)
+    {
+        this.draftText = draftText;
+    }
+
+    public void setSendError(String errorResponse)
+    {
+        sendProgressBar.setVisibility(View.GONE);
+
+        if (sendStatus != null)
+        {
+            String failureText = "Failed";
+            try
+            {
+                JSONObject error = new JSONObject(errorResponse);
+                failureText = error.getString(JsonFields.Error.ERROR_NAME);
+            }
+            catch (JSONException e)
+            {
+                Log.w(TAG, "Failed to parse error text");
+            }
+
+            sendStatus.setText(failureText);
+            sendStatus.setTextColor(Color.RED);
+            sendStatus.setVisibility(View.VISIBLE);
+        }
+
+        editText.setFocusableInTouchMode(true);
+        sendComment.setClickable(true);
+    }
+
+    public void setResultReceiver(RestQueryResultReceiver resultReceiver)
+    {
+        this.resultReceiver = resultReceiver;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         parentLayout = (RelativeLayout) inflater.inflate(R.layout.post_comment, null);
+        charCount = (TextView) parentLayout.findViewById(R.id.charCount);
+        sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
+        sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
+
         prepareEditText();
 
         if (savedInstanceState != null && savedInstanceState.getString(TEXT) != null)
@@ -97,9 +201,10 @@ public class PostCommentFragment extends Fragment
             }
         });
 
-        if(draftText != null)
+        if (draftText != null)
             editText.setText(draftText);
-        
+
+        editText.addTextChangedListener(new CommentTextWatcher());
         editText.requestFocus();
     }
 
@@ -124,15 +229,30 @@ public class PostCommentFragment extends Fragment
             {
                 if (editText.getText() != null && editText.getText().toString().length() > 0)
                 {
-                    Toast.makeText(getActivity(), editText.getText().toString() + " for " + postId, Toast.LENGTH_SHORT).show();
+                    if (isAdded())
+                        sendComment();
                 }
             }
         });
     }
 
-    public void setPostId(long id)
+    private void sendComment()
     {
-        this.postId = id;
+        Intent intent = new Intent(getActivity(), WriteIntentService.class);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+        intent.putExtra(StringConstants.POST_ID, postId);
+        intent.putExtra(StringConstants.BODY, editText.getText().toString());
+        updateUIElements();
+        getActivity().startService(intent);
+    }
+
+    private void updateUIElements()
+    {
+        editText.setFocusable(false);
+        sendComment.setClickable(false);
+        sendProgressBar.setVisibility(View.VISIBLE);
+        sendStatus.setVisibility(View.GONE);
     }
 
     public void hideSoftKeyboard()
@@ -142,18 +262,5 @@ public class PostCommentFragment extends Fragment
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         }
-    }
-
-    public String getCurrentText()
-    {
-        if (editText != null && editText.getText() != null)
-            return editText.getText().toString();
-
-        return null;
-    }
-
-    public void setDraftText(String draftText)
-    {
-        this.draftText = draftText;
     }
 }

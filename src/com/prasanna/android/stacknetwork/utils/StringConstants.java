@@ -88,6 +88,8 @@ public class StringConstants
 
     public static final String REFRESH = "refresh";
 
+    public static final String REQUEST_CODE = "request_code";
+
     public static final class HttpError
     {
         public static final String CODE = "code";

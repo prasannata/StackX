@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -55,7 +55,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/posts/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
-        JSONObjectWrapper jsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
         {
@@ -93,7 +93,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/posts/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
-        JSONObjectWrapper jsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
         {
@@ -131,7 +131,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/comments/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
-        JSONObjectWrapper jsonResponse = executeHttpRequest(restEndPoint, queryParams);
+        JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
         {

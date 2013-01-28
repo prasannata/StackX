@@ -53,6 +53,7 @@ import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
+import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
@@ -284,7 +285,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         super.onBackPressed();
 
-        discardPostCommentFragmentIfVisible();
+        discardPostCommentFragmentIfVisible(false);
     }
 
     @Override
@@ -329,7 +330,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment = null;
         }
 
-        discardPostCommentFragmentIfVisible();
+        discardPostCommentFragmentIfVisible(false);
 
         if (numAnswersDisplayed < question.answerCount && numAnswersDisplayed - position < 2)
         {
@@ -343,7 +344,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
     }
 
-    private void discardPostCommentFragmentIfVisible()
+    private void discardPostCommentFragmentIfVisible(boolean finish)
     {
         if (postCommentFragment != null)
         {
@@ -351,7 +352,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
             Log.d(TAG, "Adding  " + postCommentFragment.getTag());
 
-            commentsDraft.put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
+            if (!finish)
+                commentsDraft.put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
+
             getFragmentManager().popBackStackImmediate();
             postCommentFragment = null;
         }
@@ -502,16 +505,44 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 setProgressBarIndeterminateVisibility(false);
                 displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS));
                 break;
+            case WriteIntentService.ACTION_ADD_COMMENT:
+                discardPostCommentFragmentIfVisible(true);
+                addMyComment(resultData);
+                break;
             case QuestionDetailsIntentService.ERROR:
-                setProgressBarIndeterminateVisibility(false);
-                HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
-                Log.d(TAG, e.getErrorResponse());
-                AppUtils.getErrorView(this, e);
+                handleError(resultData);
                 break;
             default:
                 Log.d(TAG, "Unknown result code in receiver: " + resultCode);
                 break;
         }
+    }
+
+    protected void handleError(Bundle resultData)
+    {
+        setProgressBarIndeterminateVisibility(false);
+
+        HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
+        Log.d(TAG, e.getErrorResponse());
+        int requestCode = resultData.getInt(StringConstants.REQUEST_CODE, -1);
+
+        if (requestCode == WriteIntentService.ACTION_ADD_COMMENT)
+        {
+            if (postCommentFragment != null)
+                postCommentFragment.setSendError(e.getErrorResponse());
+            
+        }
+        else
+            AppUtils.getErrorView(this, e);
+    }
+
+    protected void addMyComment(Bundle resultData)
+    {
+        if (question.comments == null)
+            question.comments = new ArrayList<Comment>();
+
+        question.comments.add((Comment) resultData.getSerializable(StringConstants.COMMENT));
+        questionFragment.setComments(question.comments);
     }
 
     private void startServiceForAnswers()
@@ -627,6 +658,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         postCommentFragment = new PostCommentFragment();
         postCommentFragment.setPostId(id);
         postCommentFragment.setTitle(title);
+        postCommentFragment.setResultReceiver(resultReceiver);
 
         if (commentsDraft.get(fragmentTag) != null)
             postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));

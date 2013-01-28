@@ -36,6 +36,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -156,34 +158,16 @@ public final class SecureHttpHelper
         return bitmap;
     }
 
-    public JSONObjectWrapper executeForGzipResponse(String host, String path, Map<String, String> queryParams)
+    public JSONObjectWrapper executePostForGzipResponse(String host, String path, Map<String, String> queryParams, HttpEntity httpEntity)
     {
-        JSONObjectWrapper jsonObject = null;
         try
         {
             DefaultHttpClient client = getClientForGzipResponse();
-            HttpGet request = new HttpGet(buildUri(host, path, queryParams));
+            HttpPost request = new HttpPost(buildUri(host, path, queryParams));
+            request.setHeader(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
             request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
 
-            Log.d(TAG, "HTTP request to: " + request.getURI().toString());
-
-            HttpResponse httpResponse = client.execute(request);
-            HttpEntity entity = httpResponse.getEntity();
-            String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-
-            if (statusCode == HttpStatus.SC_OK)
-            {
-                jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
-            }
-            else
-            {
-                Log.d(TAG, "Http request failed: " + statusCode);
-                Log.d(TAG, "Http request failure message: " + jsonText);
-
-                if (statusCode >= HttpErrorFamily.SERVER_ERROR)
-                    throw new ServerException(statusCode, jsonText);
-            }
+            return executeRequest(client, request);
         }
         catch (ClientProtocolException e)
         {
@@ -216,6 +200,81 @@ public final class SecureHttpHelper
         catch (CertificateException e)
         {
             Log.e(TAG, e.getMessage());
+        }
+
+        return null;
+    }
+
+    public JSONObjectWrapper executeGetForGzipResponse(String host, String path, Map<String, String> queryParams)
+    {
+        try
+        {
+            DefaultHttpClient client = getClientForGzipResponse();
+            HttpGet request = new HttpGet(buildUri(host, path, queryParams));
+            request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+
+            return executeRequest(client, request);
+        }
+        catch (ClientProtocolException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (JSONException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (KeyManagementException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (UnrecoverableKeyException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (KeyStoreException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (CertificateException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return null;
+    }
+
+    private JSONObjectWrapper executeRequest(DefaultHttpClient client, HttpRequestBase request) throws IOException,
+                    ClientProtocolException, JSONException
+    {
+        JSONObjectWrapper jsonObject = null;
+        
+        Log.d(TAG, "HTTP request to: " + request.getURI().toString());
+        HttpResponse httpResponse = client.execute(request);
+        HttpEntity entity = httpResponse.getEntity();
+        String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+
+        if (statusCode == HttpStatus.SC_OK)
+        {
+            jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
+        }
+        else
+        {
+            Log.d(TAG, "Http request failed: " + statusCode);
+            Log.d(TAG, "Http request failure message: " + jsonText);
+
+            if (statusCode >= HttpErrorFamily.SERVER_ERROR)
+                throw new ServerException(statusCode, jsonText);
+            else if (statusCode >= HttpErrorFamily.CLIENT_ERROR)
+                throw new ClientException(statusCode, jsonText);
         }
 
         return jsonObject;
@@ -253,8 +312,7 @@ public final class SecureHttpHelper
     {
         Validate.notNull(host, path);
 
-        Builder uriBuilder = Uri.parse(host).buildUpon();
-        uriBuilder = uriBuilder.appendPath(path);
+        Builder uriBuilder = Uri.parse(host).buildUpon().appendPath(path);
         if (queryParams != null)
         {
             for (Map.Entry<String, String> entrySet : queryParams.entrySet())

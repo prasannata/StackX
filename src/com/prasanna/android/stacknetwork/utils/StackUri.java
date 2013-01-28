@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -41,6 +41,7 @@ public class StackUri
         public static final String SINCE = "since";
         public static final String TAGGED = "tagged";
         public static final String TITLE = "title";
+        public static final String BODY = "body";
     }
 
     public static class QueryParamDefaultValues
@@ -54,8 +55,9 @@ public class StackUri
         public static final String NETWORK_USER_TYPE_FILTER = "!-q2RbCAp";
         public static final String CLIENT_ID = "202";
         public static final String KEY = "Nt8I5NbbbzXXPPVwE0ujRg((";
-        public static final String SCOPE = "read_inbox,no_expiry";
+        public static final String SCOPE = "read_inbox,no_expiry,write_access";
         public static final String REDIRECT_URI = "http://oauth.prasanna.stackx.com";
+        public static final String DEFAULT_FILTER = "default";
     }
 
     public static class Sort
