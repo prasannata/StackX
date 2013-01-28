@@ -42,6 +42,7 @@ import android.widget.Toast;
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
 import com.prasanna.android.stacknetwork.fragment.PostCommentFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -115,7 +116,15 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             if (position == 0)
                 return QuestionActivity.this.questionFragment;
             else
-                return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
+            {
+                String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":" + (position + 1);
+                Fragment fragment = getFragmentManager().findFragmentByTag(currentViewPagerFragmentTag);
+
+                if (fragment == null)
+                    return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
+
+                return fragment;
+            }
         }
     }
 
@@ -186,14 +195,15 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 if (viewPager.getCurrentItem() == 0)
                 {
                     fragmentTag = question.id + "-comment";
-                    showPostCommentFragment("Comment on question by " + question.owner.displayName, question.id,
+                    displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id,
                                     fragmentTag);
                 }
                 else
                 {
                     Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
                     fragmentTag = answer.id + "-comment";
-                    showPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id, fragmentTag);
+                    displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id,
+                                    fragmentTag);
                 }
             }
         });
@@ -258,9 +268,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         Log.d(TAG, "onBackPressed");
 
-        super.onBackPressed();
-
         discardPostCommentFragmentIfVisible(false);
+
+        super.onBackPressed();
     }
 
     @Override
@@ -552,9 +562,17 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         if (commentFragment == null)
         {
-            Log.d(TAG, "Creating comment fragment for question: " + question.id);
+            Log.d(TAG, "Creating comment fragment");
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
+            String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
+                            + viewPager.getCurrentItem();
+
+            OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
+                            .findFragmentByTag(currentViewPagerFragmentTag);
+
+            if (onCommentChangeListener != null)
+                commentFragment.setOnCommentChangeListener(onCommentChangeListener);
         }
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -627,7 +645,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
     }
 
-    private void showPostCommentFragment(String title, long id, String fragmentTag)
+    private void displayPostCommentFragment(String title, long id, String fragmentTag)
     {
         postCommentFragment = new PostCommentFragment();
         postCommentFragment.setPostId(id);

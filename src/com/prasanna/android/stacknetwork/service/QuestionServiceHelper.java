@@ -40,6 +40,7 @@ import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.StackUri.Order;
 
 public class QuestionServiceHelper extends AbstractBaseServiceHelper
 {
@@ -172,6 +173,8 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         String restEndPoint = parent + "/" + parentId + "/comments";
         Map<String, String> queryParams = getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
+        queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.CREATION);
+        queryParams.put(StackUri.QueryParams.ORDER, Order.ASC);
 
         JSONObjectWrapper commentsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
@@ -185,7 +188,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                 for (int count = 0; count < jsonArray.length(); count++)
                 {
                     JSONObject jsonObject = jsonArray.getJSONObject(count);
-                    
+
                     if (commentsPage == null)
                     {
                         commentsPage = new StackXPage<Comment>();
@@ -203,7 +206,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         }
         return commentsPage;
     }
-
 
     public StackXPage<Question> search(String query, int page)
     {

@@ -22,6 +22,8 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.text.Html;
@@ -44,6 +46,7 @@ import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -56,6 +59,25 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private ImageView replyToComment;
     private ImageView editComment;
     private ImageView deleteComment;
+    private OnCommentChangeListener onCommentChangeListener;
+
+    public interface OnCommentChangeListener
+    {
+        void onCommentUpdate(Comment comment);
+
+        void onCommentDelete(Comment comment);
+    }
+
+    public void setOnCommentChangeListener(OnCommentChangeListener onCommentChangeListener)
+    {
+        this.onCommentChangeListener = onCommentChangeListener;
+        Log.d(TAG, "OnCommentChangeListener: " + (onCommentChangeListener != null));
+    }
+
+    public void setComments(ArrayList<Comment> comments)
+    {
+        this.comments = comments;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -64,9 +86,10 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
         if (itemsContainer == null)
         {
+            if (comments == null)
+                comments = new ArrayList<Comment>();
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, container, false);
-            itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment, new ArrayList<Comment>(),
-                            this);
+            itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment, comments, this);
         }
 
         return itemsContainer;
@@ -80,8 +103,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         super.onActivityCreated(savedInstanceState);
 
         getWritePermissions();
-        if (comments != null && !comments.isEmpty())
-            itemListAdapter.addAll(comments);
     }
 
     private void getWritePermissions()
@@ -152,73 +173,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         else
         {
             if (myComment)
-                setupMyCommentOptions(commentLayout);
+                setupMyCommentOptions(comment, commentLayout);
         }
-    }
-
-    private void setupReplyToComment(final Comment comment, RelativeLayout commentLayout)
-    {
-        replyToComment = (ImageView) commentLayout.findViewById(R.id.replyToComment);
-        replyToComment.setVisibility(View.VISIBLE);
-        replyToComment.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v)
-            {
-                Toast.makeText(getActivity(), "Reply to comment by " + comment.owner.displayName, Toast.LENGTH_LONG)
-                                .show();
-            }
-        });
-    }
-
-    private void setupMyCommentOptions(RelativeLayout commentLayout)
-    {
-        Log.d(TAG, "Setting up my comment edit options");
-
-        commentLayout.findViewById(R.id.commentEditOptions).setVisibility(View.VISIBLE);
-
-        if (canEditComment())
-        {
-            Log.d(TAG, "I can edit my comment");
-            setupEditComment(commentLayout);
-        }
-
-        if (canDelComment())
-        {
-            Log.d(TAG, "I can delete my comment");
-            setupDeleteComment(commentLayout);
-        }
-    }
-
-    private void setupDeleteComment(RelativeLayout commentLayout)
-    {
-        deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
-        deleteComment.setVisibility(View.VISIBLE);
-        deleteComment.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v)
-            {
-                Toast.makeText(getActivity(), "Delete my comment", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void setupEditComment(RelativeLayout commentLayout)
-    {
-        editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
-        editComment.setVisibility(View.VISIBLE);
-        editComment.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v)
-            {
-                Toast.makeText(getActivity(), "Edit my comment", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     private boolean isMyComment(Comment comment)
@@ -231,6 +187,85 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         }
 
         return (comment.owner != null && comment.owner.id == myId);
+    }
+
+    private void setupReplyToComment(final Comment comment, RelativeLayout commentLayout)
+    {
+        replyToComment = (ImageView) commentLayout.findViewById(R.id.replyToComment);
+        replyToComment.setVisibility(View.VISIBLE);
+        replyToComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Toast.makeText(getActivity(), "Reply to comment by " + comment.owner.displayName, Toast.LENGTH_LONG)
+                                .show();
+            }
+        });
+    }
+
+    private void setupMyCommentOptions(Comment comment, RelativeLayout commentLayout)
+    {
+        Log.d(TAG, "Setting up my comment edit options");
+
+        commentLayout.findViewById(R.id.commentEditOptions).setVisibility(View.VISIBLE);
+
+        if (canEditComment())
+        {
+            Log.d(TAG, "I can edit my comment");
+            setupEditComment(comment, commentLayout);
+        }
+
+        if (canDelComment())
+        {
+            Log.d(TAG, "I can delete my comment");
+            setupDeleteComment(comment, commentLayout);
+        }
+    }
+
+    private void setupEditComment(Comment comment, RelativeLayout commentLayout)
+    {
+        editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
+        editComment.setVisibility(View.VISIBLE);
+        editComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Toast.makeText(getActivity(), "Edit my comment", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setupDeleteComment(final Comment comment, RelativeLayout commentLayout)
+    {
+        deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
+        deleteComment.setVisibility(View.VISIBLE);
+        deleteComment.setOnClickListener(new View.OnClickListener()
+        {
+            private OnClickListener listener = new OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    if (which == DialogInterface.BUTTON_POSITIVE)
+                    {
+                        if (onCommentChangeListener != null)
+                            onCommentChangeListener.onCommentDelete(comment);
+
+                        itemListAdapter.notifyDataSetChanged();
+                        if (comments.isEmpty())
+                            removeMyself();
+                    }
+                }
+            };
+
+            @Override
+            public void onClick(View v)
+            {
+                DialogBuilder.yesNoDialog(getActivity(), R.string.sureQuestion, listener).show();
+            }
+        });
     }
 
     private boolean canAddComment()
@@ -253,8 +288,13 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         return objectType != null && writePermissions != null && writePermissions.containsKey(objectType);
     }
 
-    public void setComments(ArrayList<Comment> comments)
+    public boolean hasNoComments()
     {
-        this.comments = comments;
+        return comments == null || comments.isEmpty();
+    }
+
+    private void removeMyself()
+    {
+        getFragmentManager().popBackStackImmediate();
     }
 }

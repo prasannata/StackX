@@ -41,13 +41,15 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.PageSelectAdapter;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
 import com.prasanna.android.stacknetwork.model.Answer;
+import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.views.HtmlTextView;
 
-public class AnswerFragment extends Fragment
+public class AnswerFragment extends Fragment implements OnCommentChangeListener
 {
     private static final String TAG = AnswerFragment.class.getSimpleName();
     private FrameLayout parentLayout;
@@ -90,14 +92,16 @@ public class AnswerFragment extends Fragment
         registerForContextMenu(answerCtxMenuImageView);
     }
 
+    @Override
     public void onResume()
     {
         Log.d(TAG, "onResume");
-        
+
         super.onResume();
 
         displayAnswer();
     }
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
@@ -132,12 +136,7 @@ public class AnswerFragment extends Fragment
             textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
             textView.setText(getAutherDisplayText(acceptRate));
 
-            if (answer.comments != null && !answer.comments.isEmpty())
-            {
-                textView = (TextView) parentLayout.findViewById(R.id.answerCommentsCount);
-                textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
-                textView.setVisibility(View.VISIBLE);
-            }
+            displayNumComments();
 
             final ImageView questionMarkImageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
             showQuestionTitleOnClick(questionMarkImageView);
@@ -145,9 +144,24 @@ public class AnswerFragment extends Fragment
             setupContextMenuForAnswer();
 
             answerBodyLayout.removeAllViews();
-            
+
             for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
                 answerBodyLayout.addView(answerView);
+        }
+    }
+
+    private void displayNumComments()
+    {
+        TextView textView = (TextView) parentLayout.findViewById(R.id.answerCommentsCount);
+
+        if (answer.comments != null && !answer.comments.isEmpty())
+        {
+            textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
+            textView.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            textView.setVisibility(View.GONE);
         }
     }
 
@@ -241,5 +255,25 @@ public class AnswerFragment extends Fragment
         pageSelectAdapter.selectQuestionPage();
         layout.setVisibility(View.GONE);
         questionViewAction.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onCommentUpdate(Comment comment)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onCommentDelete(Comment comment)
+    {
+        if (answer.comments != null)
+        {
+            Log.d(TAG, "Removing comment: " + comment.id);
+
+            answer.comments.remove(comment);
+        }
+
+        displayNumComments();
     }
 }

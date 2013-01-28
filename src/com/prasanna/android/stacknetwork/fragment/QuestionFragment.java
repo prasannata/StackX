@@ -40,13 +40,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 
-public class QuestionFragment extends Fragment
+public class QuestionFragment extends Fragment implements OnCommentChangeListener
 {
     private static final String TAG = QuestionFragment.class.getSimpleName();
 
@@ -202,7 +203,7 @@ public class QuestionFragment extends Fragment
                         + AppUtils.formatReputation(question.owner.reputation) + "]";
     }
 
-    private void showNumComments()
+    private void displayNumComments()
     {
         if (question.comments != null && !question.comments.isEmpty())
         {
@@ -244,7 +245,7 @@ public class QuestionFragment extends Fragment
     {
         question.comments = comments;
         if (parentLayout != null)
-            showNumComments();
+            displayNumComments();
     }
 
     public void setAndDisplay(Question question)
@@ -264,5 +265,25 @@ public class QuestionFragment extends Fragment
     {
         backIv.setVisibility(View.VISIBLE);
         backIv.setOnClickListener(clickListener);
+    }
+
+    @Override
+    public void onCommentUpdate(Comment comment)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onCommentDelete(Comment comment)
+    {
+        if (question.comments != null)
+        {
+            Log.d(TAG, "Removing comment: " + comment.id);
+
+            question.comments.remove(comment);
+        }
+
+        displayNumComments();
     }
 }
