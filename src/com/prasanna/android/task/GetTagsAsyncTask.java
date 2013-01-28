@@ -25,7 +25,7 @@ import android.database.SQLException;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.prasanna.android.http.ServerException;
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
@@ -72,7 +72,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
                 persistTags(tags);
             }
         }
-        catch (ServerException e)
+        catch (AbstractHttpException e)
         {
             Log.e(TAG, "Error fetching tags: " + e.getMessage());
         }
@@ -131,6 +131,8 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         {
             tagDao.open();
             tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
+            result.clear();
+            result.addAll(tagDao.getTags(OperatingSite.getSite().apiSiteParameter));
         }
         catch (SQLException e)
         {
