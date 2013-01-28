@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -239,17 +240,20 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void loadIcon()
     {
-        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+        if (isOnline())
         {
-            @Override
-            public void notifyOnCompletion(Bitmap result)
+            GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
             {
-                setActionBarHomeIcon(result);
-                iconCache.add(OperatingSite.getSite().name, result);
-            }
-        });
+                @Override
+                public void notifyOnCompletion(Bitmap result)
+                {
+                    setActionBarHomeIcon(result);
+                    iconCache.add(OperatingSite.getSite().name, result);
+                }
+            });
 
-        fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
+            fetchImageAsyncTask.execute(OperatingSite.getSite().iconUrl);
+        }
     }
 
     private void setActionBarHomeIcon(Bitmap result)
@@ -307,7 +311,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 inboxItem.title = "Python unit testing functions by using mocks";
                 inboxItem.body = "You can use mock library by Michael Foord, which is part Python 3. It makes this kind of mocking ...";
                 unreadInboxItems.add(inboxItem);
-                
+
                 StackXPage<InboxItem> inboxItems = new StackXPage<InboxItem>();
                 inboxItems.items = unreadInboxItems;
                 inboxItems.hasMore = false;
@@ -337,6 +341,12 @@ public abstract class AbstractUserActionBarActivity extends Activity
             searchView.clearFocus();
         }
 
+    }
+
+    protected boolean isOnline()
+    {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     protected boolean onActionBarHomeButtonClick(MenuItem item)
