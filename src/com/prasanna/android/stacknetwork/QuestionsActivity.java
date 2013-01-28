@@ -335,8 +335,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         {
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         }
-        actionBarMenu.findItem(R.id.menu_search).setVisible(forTags);
-        actionBarMenu.findItem(R.id.menu_refresh).setVisible(forTags);
+        actionBarMenu.findItem(R.id.menu_search).setVisible(!forTags);
+        actionBarMenu.findItem(R.id.menu_refresh).setVisible(!forTags);
     }
 
     @Override
