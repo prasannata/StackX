@@ -2,8 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/errorLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical|center_horizontal" >
+    android:layout_height="match_parent"
+    android:layout_gravity="center" >
 
     <ImageView
         android:id="@+id/errorImg"
@@ -12,16 +12,19 @@
         android:layout_alignParentLeft="true"
         android:layout_gravity="center"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/error" />
 
     <TextView
         android:id="@+id/errorMsg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/errorImg"
         android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/errorImg"
         android:layout_marginLeft="25dp"
         android:layout_toRightOf="@id/errorImg"
         android:textColor="@color/black"
-        android:textSize="15sp" />
+        android:textSize=" 20sp" />
 
 </RelativeLayout>

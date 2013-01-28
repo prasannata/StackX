@@ -100,9 +100,18 @@ public class AppUtils
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout errorLayout = (RelativeLayout) inflater.inflate(R.layout.error, null);
-        StackXError error = StackXError.deserialize(e.getErrorResponse());
+        String errorMsg = "Unknown error";
+
+        if (e.getCode() == null)
+        {
+            StackXError error = StackXError.deserialize(e.getErrorResponse());
+            errorMsg = error.name;
+        }
+        else
+            errorMsg = e.getCode().getDescription();
+        
         TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
-        textView.setText(error.name);
+        textView.setText(errorMsg);
         return errorLayout;
     }
 }

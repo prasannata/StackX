@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.prasanna.android.http.ServerException;
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -62,6 +62,7 @@ public class QuestionsIntentService extends AbstractIntentService
 
         try
         {
+            super.onHandleIntent(intent);
 
             switch (action)
             {
@@ -107,7 +108,7 @@ public class QuestionsIntentService extends AbstractIntentService
 
             receiver.send(0, bundle);
         }
-        catch (ServerException e)
+        catch (AbstractHttpException e)
         {
             bundle.putSerializable(StringConstants.EXCEPTION, e);
             receiver.send(ERROR, bundle);

@@ -192,6 +192,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void startIntentService()
     {
+        showProgressBar();
         intent.putExtra(StringConstants.PAGE, ++currentPage);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.putExtra(StringConstants.SORT, sort);
@@ -208,8 +209,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     public void refresh()
     {
         clean();
+        removeErrorViewIfShown();
         created = false;
-        showProgressBar();
         findActionAndStartService();
     }
 
@@ -233,8 +234,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 
-        showProgressBar();
-
         startIntentService();
     }
 
@@ -244,7 +243,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_SIMILAR);
         intent.putExtra(StringConstants.TITLE, getBundle().getString(StringConstants.TITLE));
 
-        showProgressBar();
         startIntentService();
     }
 
@@ -254,7 +252,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
         intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
 
-        showProgressBar();
         startIntentService();
     }
 
@@ -264,7 +261,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
         intent.putExtra(StringConstants.TAG, tag);
 
-        showProgressBar();
         startIntentService();
     }
 
@@ -274,7 +270,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
         intent.putExtra(StringConstants.TAG, tag);
 
-        showProgressBar();
         startIntentService();
     }
 
@@ -291,7 +286,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
         intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
 
-        showProgressBar();
         startIntentService();
     }
 

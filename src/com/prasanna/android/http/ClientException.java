@@ -25,13 +25,78 @@ public class ClientException extends AbstractHttpException implements Serializab
 {
     private static final long serialVersionUID = -6758967927788004257L;
 
+    public enum ClientErrorCode implements Code
+    {
+        NO_NETWORK(1, "No network available");
+
+        private final int statusCode;
+        private final String description;
+
+        ClientErrorCode(int statusCode, String description)
+        {
+            this.statusCode = statusCode;
+            this.description = description;
+        }
+
+        @Override
+        public int getStatusCode()
+        {
+            return statusCode;
+        }
+
+        @Override
+        public String getDescription()
+        {
+            return description;
+        }
+    }
+
+    private ClientErrorCode code;
+
     public ClientException(int statusCode)
     {
         this(statusCode, null);
     }
 
+    public ClientException(ClientErrorCode code)
+    {
+        super();
+        
+        this.code = code;
+    }
+
     public ClientException(int statusCode, String errorResponse)
     {
         super(statusCode, errorResponse);
+    }
+
+    public ClientException(ClientErrorCode code, String errorResponse)
+    {
+        super(errorResponse);
+
+        this.code = code;
+    }
+
+    public ClientErrorCode getCode()
+    {
+        return code;
+    }
+    
+    @Override
+    public String getErrorResponse()
+    {
+        if(code != null)
+            return code.getDescription();
+        else
+            return super.getErrorResponse();
+    }
+
+    @Override
+    public int getStatusCode()
+    {
+        if(code != null)
+            return code.getStatusCode();
+        else
+            return super.getStatusCode();
     }
 }

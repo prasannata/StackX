@@ -54,18 +54,29 @@ public class WriteIntentService extends AbstractIntentService
         final String body = intent.getStringExtra(StringConstants.BODY);
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
-        switch (action)
+        try
         {
-            case ACTION_ADD_COMMENT:
-                sendComment(postId, body, receiver);
-                break;
-            case ACTION_EDIT_COMMENT:
-                break;
-            case ACTION_DEL_COMMENT:
-                break;
-            default:
-                Log.d(TAG, "Unknown action: " + action);
-                break;
+            super.onHandleIntent(intent);
+
+            switch (action)
+            {
+                case ACTION_ADD_COMMENT:
+                    sendComment(postId, body, receiver);
+                    break;
+                case ACTION_EDIT_COMMENT:
+                    break;
+                case ACTION_DEL_COMMENT:
+                    break;
+                default:
+                    Log.d(TAG, "Unknown action: " + action);
+                    break;
+            }
+        }
+        catch (AbstractHttpException e)
+        {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(StringConstants.EXCEPTION, e);
+            receiver.send(ERROR, bundle);
         }
     }
 

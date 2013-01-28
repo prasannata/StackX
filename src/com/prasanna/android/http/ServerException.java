@@ -24,6 +24,7 @@ import java.io.Serializable;
 public class ServerException extends AbstractHttpException implements Serializable
 {
     private static final long serialVersionUID = 653718270475335315L;
+    private Code code;
 
     public ServerException(int statusCode)
     {
@@ -34,4 +35,18 @@ public class ServerException extends AbstractHttpException implements Serializab
     {
         super(statusCode, errorResponse);
     }
+    
+    public ServerException(Code code)
+    {
+        super();
+        
+        this.code = code;
+    }
+
+    @Override
+    public Code getCode()
+    {
+        return code;
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -192,8 +192,19 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     public void refresh()
     {
-        showProgressBar();
+        removeErrorViewIfShown();
+
         startIntentService();
+    }
+
+    protected void removeErrorViewIfShown()
+    {
+        if (getListView().getVisibility() == View.GONE)
+            getListView().setVisibility(View.VISIBLE);
+
+        View errorView = getParentLayout().findViewById(R.id.errorLayout);
+        if (errorView != null)
+            getParentLayout().removeView(errorView);
     }
 
     @SuppressWarnings("unchecked")
@@ -254,7 +265,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         dismissProgressBar();
 
-        getParentLayout().removeAllViews();
+        getListView().setVisibility(View.GONE);
         getParentLayout().addView(AppUtils.getErrorView(getActivity(), e));
     }
 
@@ -267,10 +278,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
             Log.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
 
             if (currentPageObject != null && currentPageObject.hasMore)
-            {
-                showProgressBar();
                 startIntentService();
-            }
         }
     }
 

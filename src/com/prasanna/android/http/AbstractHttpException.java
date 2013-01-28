@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -19,11 +19,10 @@
 
 package com.prasanna.android.http;
 
-
-public class AbstractHttpException extends RuntimeException implements HttpException
+public abstract class AbstractHttpException extends RuntimeException implements HttpException
 {
-    private final String errorResponse;
-    private final int statusCode;
+    private String errorResponse;
+    private int statusCode;
 
     private static final long serialVersionUID = 7575439728639763037L;
 
@@ -35,9 +34,20 @@ public class AbstractHttpException extends RuntimeException implements HttpExcep
     public AbstractHttpException(int statusCode, String errorResponse)
     {
         super(errorResponse);
-        
+
         this.statusCode = statusCode;
         this.errorResponse = errorResponse;
+    }
+
+    public AbstractHttpException(String message)
+    {
+        super(message);
+        this.errorResponse = message;
+    }
+
+    public AbstractHttpException()
+    {
+        super();
     }
 
     public String getErrorResponse()

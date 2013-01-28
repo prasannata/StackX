@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -21,9 +21,12 @@ package com.prasanna.android.stacknetwork.service;
 import java.io.Serializable;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
+import com.prasanna.android.http.ClientException;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -39,6 +42,18 @@ public abstract class AbstractIntentService extends IntentService
         super(name);
     }
 
+    protected boolean helloWorld()
+    {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+    }
+    
+    @Override  
+    protected void onHandleIntent(Intent intent)
+    {
+        if(!helloWorld())
+            throw new ClientException(ClientException.ClientErrorCode.NO_NETWORK);
+    }
     protected void broadcastHttpErrorIntent(StackXError error)
     {
         Log.d(TAG, "broadcastHttpErrorIntent: " + error.msg);

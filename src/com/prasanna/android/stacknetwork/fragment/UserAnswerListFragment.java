@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -76,7 +76,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
                             new ArrayList<Answer>(), this);
 
             itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
-            showProgressBar();
         }
         return itemsContainer;
     }
@@ -135,6 +134,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     protected void startIntentService()
     {
+        showProgressBar();
+        
         intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
         intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
         intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -27,7 +27,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.prasanna.android.http.ServerException;
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -65,9 +65,10 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
         try
         {
+            super.onHandleIntent(intent);
             handleIntent(intent, receiver);
         }
-        catch (ServerException e)
+        catch (AbstractHttpException e)
         {
             Bundle bundle = new Bundle();
             bundle.putSerializable(StringConstants.EXCEPTION, e);

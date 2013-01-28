@@ -23,7 +23,16 @@ import java.io.Serializable;
 
 public interface HttpException extends Serializable
 {
+    public interface Code extends Serializable
+    {
+        int getStatusCode();
+
+        String getDescription();
+    }
+    
     int getStatusCode();
     
     String getErrorResponse();
+    
+    Code getCode();
 }

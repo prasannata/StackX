@@ -19,9 +19,6 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -41,9 +38,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
-import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class PostCommentFragment extends Fragment
@@ -128,17 +125,8 @@ public class PostCommentFragment extends Fragment
         if (sendStatus != null)
         {
             String failureText = "Failed";
-            try
-            {
-                JSONObject error = new JSONObject(errorResponse);
-                failureText = error.getString(JsonFields.Error.ERROR_NAME);
-            }
-            catch (JSONException e)
-            {
-                Log.w(TAG, "Failed to parse error text");
-            }
-
-            sendStatus.setText(failureText);
+            StackXError error = StackXError.deserialize(errorResponse);
+            sendStatus.setText(error != null ? error.name : failureText);
             sendStatus.setTextColor(Color.RED);
             sendStatus.setVisibility(View.VISIBLE);
         }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -70,7 +70,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
                             new ArrayList<Question>(), this);
-            showProgressBar();
         }
 
         return itemsContainer;
@@ -126,6 +125,8 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     {
         Log.d(TAG, "startIntentService");
 
+        showProgressBar();
+        
         intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
         intent.putExtra(StringConstants.ACTION, action);
         intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));

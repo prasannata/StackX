@@ -29,7 +29,7 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-import com.prasanna.android.http.ServerException;
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
@@ -79,6 +79,8 @@ public class UserIntentService extends AbstractIntentService
 
         try
         {
+            super.onHandleIntent(intent);
+            
             switch (action)
             {
                 case GET_USER_PROFILE:
@@ -125,7 +127,7 @@ public class UserIntentService extends AbstractIntentService
             }
 
         }
-        catch (ServerException e)
+        catch (AbstractHttpException e)
         {
             bundle.putSerializable(StringConstants.EXCEPTION, e);
             receiver.send(ERROR, bundle);

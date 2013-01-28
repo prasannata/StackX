@@ -530,7 +530,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         {
             if (postCommentFragment != null)
                 postCommentFragment.setSendError(e.getErrorResponse());
-            
         }
         else
             AppUtils.getErrorView(this, e);
