@@ -29,12 +29,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
-import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.adapter.SiteListAdapter.OnSiteSelectedListener;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
@@ -42,17 +43,21 @@ import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
+import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver
+public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver,
+                OnSiteSelectedListener
 {
     private static final String TAG = StackNetworkListActivity.class.getSimpleName();
+    private final String CHANGE_SITE_HINT = "change_site_hint";
 
     private ProgressDialog progressDialog;
     private Intent intent = null;
     private ArrayList<Site> sites;
     private SiteListAdapter siteListAdapter;
     private RestQueryResultReceiver receiver;
+    private ProgressDialog fetchProfileProgress;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -85,16 +90,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                 updateView(sites);
             }
         }
-    }
-
-    @Override
-    protected void onListItemClick(ListView listView, View v, int position, long id)
-    {
-        Log.d(TAG, "Clicked item " + sites.get(position).name);
-
-        Site site = sites.get(position);
-        OperatingSite.setSite(site);
-        startActivity(new Intent(this, QuestionsActivity.class));
     }
 
     @Override
@@ -136,6 +131,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         if (sites != null && sites.isEmpty() == false)
         {
             siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView());
+            siteListAdapter.setOnSiteSelectedListener(this);
             setListAdapter(siteListAdapter);
         }
     }
@@ -160,21 +156,30 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
         else
         {
-            if (UserIntentService.CHECK_WRITE_PERMISSION == resultCode)
+            switch (resultCode)
             {
-                ArrayList<WritePermission> permissions = (ArrayList<WritePermission>) resultData
-                                .getSerializable(StringConstants.PERMISSION);
-                persistPermissions((Site) resultData.getSerializable(StringConstants.SITE), permissions);
-            }
-            else
-            {
-                sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
+                case UserIntentService.CHECK_WRITE_PERMISSION:
+                    ArrayList<WritePermission> permissions = (ArrayList<WritePermission>) resultData
+                                    .getSerializable(StringConstants.PERMISSION);
+                    persistPermissions((Site) resultData.getSerializable(StringConstants.SITE), permissions);
+                    break;
+                case UserIntentService.GET_USER_PROFILE:
+                    if (fetchProfileProgress != null)
+                        fetchProfileProgress.dismiss();
+                    startQuestionsActivity();
+                    break;
+                case UserIntentService.GET_USER_SITES:
+                    sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
 
-                if (sites != null)
-                {
-                    SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
-                    updateView(sites);
-                }
+                    if (sites != null)
+                    {
+                        SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
+                        updateView(sites);
+                    }
+                    break;
+                default:
+                    Log.d(TAG, "Unknown result code in result receiver");
+                    break;
             }
         }
     }
@@ -198,11 +203,49 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
     }
 
+    private void getMyProfile()
+    {
+        if (AppUtils.inAuthenticatedRealm(this))
+        {
+            fetchProfileProgress = ProgressDialog.show(this, null, "Fetching your profile");
+
+            Intent userProfileIntent = new Intent(this, UserIntentService.class);
+            userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
+            userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
+            userProfileIntent.putExtra(StringConstants.ME, true);
+            userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+            startService(userProfileIntent);
+        }
+    }
+
     private void showError()
     {
         View errorView = getLayoutInflater().inflate(R.layout.error, null);
         TextView errorTextView = (TextView) errorView.findViewById(R.id.errorMsg);
         errorTextView.setText("Failed to fetch sites");
         getListView().addFooterView(errorView);
+    }
+
+    @Override
+    public void onSiteSelected(Site site)
+    {
+        OperatingSite.setSite(site);
+
+        if (SharedPreferencesUtil.isOn(this, CHANGE_SITE_HINT, true))
+        {
+            Toast.makeText(this, "Use options menu to change site any time.", Toast.LENGTH_LONG).show();
+            SharedPreferencesUtil.setOnOff(this, CHANGE_SITE_HINT, false);
+        }
+
+        getMyProfile();
+    }
+
+    private void startQuestionsActivity()
+    {
+        Intent startQuestionActivityIntent = new Intent(this, QuestionsActivity.class);
+        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startQuestionActivityIntent);
     }
 }

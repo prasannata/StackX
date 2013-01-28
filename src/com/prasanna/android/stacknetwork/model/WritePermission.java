@@ -8,8 +8,9 @@ public class WritePermission implements Serializable
 
     public enum ObjectType
     {
-        QUESTION("question"),
-        COMMENT("comment");
+        ANSWER("answer"),
+        COMMENT("comment"),
+        QUESTION("question");
 
         private final String value;
 

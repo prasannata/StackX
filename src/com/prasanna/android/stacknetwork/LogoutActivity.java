@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -34,7 +34,9 @@ import android.widget.LinearLayout;
 
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
+import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -145,6 +147,8 @@ public class LogoutActivity extends Activity
             SharedPreferencesUtil.clear(getApplicationContext());
             SharedPreferencesUtil.setFirstRunComplete(this);
             deleteMyTags();
+            deleteWritePermissions();
+            deleteMyProfile();
             startLoginActivity();
         }
         else if (error != null && error.id > 0)
@@ -157,6 +161,37 @@ public class LogoutActivity extends Activity
             Log.d(TAG, "Logout failed for unknown reason");
             finish();
         }
+    }
+
+    private void deleteMyProfile()
+    {
+        SharedPreferencesUtil.remove(this, StringConstants.USER_ID);
+
+        ProfileDAO profileDao = new ProfileDAO(this);
+        try
+        {
+            profileDao.open();
+            profileDao.deleteAll();
+        }
+        finally
+        {
+            profileDao.close();
+        }
+    }
+
+    private void deleteWritePermissions()
+    {
+        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(this);
+        try
+        {
+            writePermissionDAO.open();
+            writePermissionDAO.deleteAll();
+        }
+        finally
+        {
+            writePermissionDAO.close();
+        }
+
     }
 
     private void deleteMyTags()

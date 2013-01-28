@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -57,26 +57,33 @@ public class WritePermissionDAO
 
     public void insertAll(Site site, ArrayList<WritePermission> permissions)
     {
-        if (permissions != null)
+        if (site != null && permissions != null)
         {
             Log.d(TAG, "Storing permissions");
 
             for (WritePermission permission : permissions)
             {
-                Log.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: " + permission.canEdit
-                                + ", delete: " + permission.canDelete);
-                ContentValues values = new ContentValues();
-                values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
-                values.put(WritePermissionTable.COLUMN_EDIT, permission.canEdit);
-                values.put(WritePermissionTable.COLUMN_DEL, permission.canDelete);
                 if (permission.objectType != null)
-                    values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
-                values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
-                values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
-                values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
-                values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
+                {
+                    Log.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: " + permission.canEdit
+                                    + ", delete: " + permission.canDelete);
+                    ContentValues values = new ContentValues();
+                    values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
+                    values.put(WritePermissionTable.COLUMN_EDIT, permission.canEdit);
+                    values.put(WritePermissionTable.COLUMN_DEL, permission.canDelete);
+                    if (permission.objectType != null)
+                        values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
+                    values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
+                    values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
+                    values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
+                    values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
 
-                database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
+                    database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
+                }
+                else
+                {
+                    Log.w(TAG, "Object type null for permission for site: " + site.apiSiteParameter);
+                }
             }
         }
     }
@@ -88,7 +95,8 @@ public class WritePermissionDAO
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
                         + " = ?";
-        String[] selectionArgs = { site, objectType.getValue() };
+        String[] selectionArgs =
+        { site, objectType.getValue() };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);
@@ -102,10 +110,12 @@ public class WritePermissionDAO
 
     public ArrayList<String> getSites()
     {
-        String[] cols = { WritePermissionTable.COLUMN_SITE };
+        String[] cols =
+        { WritePermissionTable.COLUMN_SITE };
         String selection = WritePermissionTable.COLUMN_ADD + " = ? and" + WritePermissionTable.COLUMN_DEL + " = ? and "
                         + WritePermissionTable.COLUMN_EDIT + "= ?";
-        String[] selectionArgs = { "1", "1", "1" };
+        String[] selectionArgs =
+        { "1", "1", "1" };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, selection, selectionArgs, null,
                         null, null);
@@ -128,7 +138,8 @@ public class WritePermissionDAO
             return null;
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs = { site };
+        String[] selectionArgs =
+        { site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);
@@ -167,5 +178,10 @@ public class WritePermissionDAO
         permission.objectType = ObjectType.getEnum(cursor.getString(cursor
                         .getColumnIndex(WritePermissionTable.COLUMN_OBJECT_TYPE)));
         return permission;
+    }
+
+    public void deleteAll()
+    {
+        database.delete(DatabaseHelper.TABLE_WRITE_PERMISSION, null, null);
     }
 }

@@ -23,7 +23,6 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -35,12 +34,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 @SuppressLint("ViewConstructor")
@@ -49,7 +46,13 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
     public static final String TAG = SiteListAdapter.class.getSimpleName();
 
     private final LayoutInflater layoutInflater;
-    private final String CHANGE_SITE_HINT = "change_site_hint";
+
+    private OnSiteSelectedListener onSiteSelectedListener;
+
+    public interface OnSiteSelectedListener
+    {
+        void onSiteSelected(Site site);
+    }
 
     public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites, ListView listView)
     {
@@ -80,7 +83,7 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
             {
                 for (WritePermission permission : dataSet.get(position).writePermissions)
                 {
-                    if(permission.canAdd & permission.canDelete & permission.canEdit)
+                    if (permission.canAdd & permission.canDelete & permission.canEdit)
                     {
                         View writePermissionView = layoutForSites.findViewById(R.id.writePermissionEnabled);
                         writePermissionView.setVisibility(View.VISIBLE);
@@ -135,21 +138,10 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
         {
             public void onClick(View v)
             {
-                if (reorder == false)
-                {
-                    Log.d(TAG, "Clicking on list item " + position);
+                Log.d(TAG, "Clicking on list item " + position);
 
-                    OperatingSite.setSite(dataSet.get(position));
-
-                    if (SharedPreferencesUtil.isOn(getContext(), CHANGE_SITE_HINT, true))
-                    {
-                        Toast.makeText(getContext(), "Use options menu to change site any time.", Toast.LENGTH_LONG)
-                                        .show();
-                        SharedPreferencesUtil.setOnOff(getContext(), CHANGE_SITE_HINT, false);
-                    }
-
-                    startQuestionsActivity();
-                }
+                if (onSiteSelectedListener != null)
+                    onSiteSelectedListener.onSiteSelected(dataSet.get(position));
             }
         });
     }
@@ -165,12 +157,8 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
         return TAG;
     }
 
-    private void startQuestionsActivity()
+    public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener)
     {
-        Intent startQuestionActivityIntent = new Intent(listView.getContext(), QuestionsActivity.class);
-        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        listView.getContext().startActivity(startQuestionActivityIntent);
+        this.onSiteSelectedListener = onSiteSelectedListener;
     }
 }

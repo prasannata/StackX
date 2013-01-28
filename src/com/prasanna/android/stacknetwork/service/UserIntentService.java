@@ -39,6 +39,7 @@ import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -80,7 +81,7 @@ public class UserIntentService extends AbstractIntentService
         try
         {
             super.onHandleIntent(intent);
-            
+
             switch (action)
             {
                 case GET_USER_PROFILE:
@@ -88,21 +89,21 @@ public class UserIntentService extends AbstractIntentService
                     boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
                     bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, refresh, page));
                     bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userId));
-                    receiver.send(0, bundle);
+                    receiver.send(GET_USER_PROFILE, bundle);
                     break;
                 case GET_USER_QUESTIONS:
                     Log.d(TAG, "getQuestions");
                     bundle.putSerializable(StringConstants.QUESTIONS, getQuestions(me, userId, page));
-                    receiver.send(0, bundle);
+                    receiver.send(GET_USER_QUESTIONS, bundle);
                     break;
                 case GET_USER_ANSWERS:
                     Log.d(TAG, "getAnswers");
                     bundle.putSerializable(StringConstants.ANSWERS, getAnswers(me, userId, page));
-                    receiver.send(0, bundle);
+                    receiver.send(GET_USER_ANSWERS, bundle);
                     break;
                 case GET_USER_INBOX:
                     bundle.putSerializable(StringConstants.INBOX_ITEMS, userService.getInbox(page));
-                    receiver.send(0, bundle);
+                    receiver.send(GET_USER_INBOX, bundle);
                     break;
                 case GET_USER_UNREAD_INBOX:
                     getUnreadInboxItems(intent);
@@ -111,12 +112,12 @@ public class UserIntentService extends AbstractIntentService
                     bundle.putSerializable(
                                     StringConstants.SITES,
                                     getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, false)));
-                    receiver.send(0, bundle);
+                    receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
                     Log.d(TAG, "getQuestions");
                     bundle.putSerializable(StringConstants.QUESTIONS, getFavorites(me, userId, page));
-                    receiver.send(0, bundle);
+                    receiver.send(GET_USER_FAVORITES, bundle);
                     break;
                 case DEAUTH_APP:
                     deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
@@ -138,7 +139,7 @@ public class UserIntentService extends AbstractIntentService
     {
         if (me)
         {
-            final int MS_IN_HALF_AN_HOUR = 1800000;
+
             ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
             StackXPage<User> userPage = null;
             try
@@ -148,13 +149,15 @@ public class UserIntentService extends AbstractIntentService
                 if (!refresh)
                     myProfile = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
 
-                if (myProfile == null || System.currentTimeMillis() - myProfile.lastUpdateTime > MS_IN_HALF_AN_HOUR)
+                if (profileOlderThanThirtyMinutes(myProfile))
                 {
                     userPage = userService.getMe();
                     if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
                     {
                         profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
                         profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
+                        SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID,
+                                        userPage.items.get(0).id);
                     }
                 }
                 else
@@ -177,6 +180,12 @@ public class UserIntentService extends AbstractIntentService
         }
         else
             return userService.getUserById(userId);
+    }
+
+    private boolean profileOlderThanThirtyMinutes(User myProfile)
+    {
+        final int MS_IN_HALF_AN_HOUR = 1800000;
+        return myProfile == null || System.currentTimeMillis() - myProfile.lastUpdateTime > MS_IN_HALF_AN_HOUR;
     }
 
     private HashMap<String, Account> getUserAccounts(boolean me, long userId)

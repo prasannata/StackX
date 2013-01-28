@@ -74,6 +74,24 @@ public class SharedPreferencesUtil
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(name, defaultValue);
     }
 
+    public static void setLong(Context context, String key, long value)
+    {
+        if (context != null && key != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.putLong(key, value);
+            prefEditor.commit();
+        }
+    }
+
+    public static long getLong(Context context, String key, long defaultValue)
+    {
+        if (context != null && key != null)
+            return PreferenceManager.getDefaultSharedPreferences(context).getLong(key, defaultValue);
+
+        return defaultValue;
+    }
+
     public static void setString(Context context, String key, String value)
     {
         if (context != null && key != null)
@@ -90,6 +108,16 @@ public class SharedPreferencesUtil
             return PreferenceManager.getDefaultSharedPreferences(context).getString(key, defaultValue);
 
         return defaultValue;
+    }
+
+    public static void remove(Context context, String key)
+    {
+        if (context != null && key != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.remove(key);
+            prefEditor.commit();
+        }
     }
 
     public static boolean isFirstRun(Context context)
