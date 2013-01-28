@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -148,23 +149,19 @@ public class PostCommentFragment extends Fragment
         sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
         sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
 
-        prepareEditText();
-
-        if (savedInstanceState != null && savedInstanceState.getString(TEXT) != null)
-            editText.setText(savedInstanceState.getString(TEXT));
-
         prepareSendComment();
+        prepareEditText(savedInstanceState);
 
         if (title != null)
         {
             commentContext = (TextView) parentLayout.findViewById(R.id.commentContext);
-            commentContext.setText(title);
+            commentContext.setText(Html.fromHtml(title));
         }
 
         return parentLayout;
     }
 
-    private void prepareEditText()
+    private void prepareEditText(Bundle savedInstanceState)
     {
         editText = (EditText) parentLayout.findViewById(R.id.textInput);
         editText.setOnFocusChangeListener(new OnFocusChangeListener()
@@ -188,10 +185,14 @@ public class PostCommentFragment extends Fragment
             }
         });
 
+        editText.addTextChangedListener(new CommentTextWatcher());
+
         if (draftText != null)
             editText.setText(draftText);
 
-        editText.addTextChangedListener(new CommentTextWatcher());
+        if (savedInstanceState != null && savedInstanceState.getString(TEXT) != null)
+            editText.setText(savedInstanceState.getString(TEXT));
+
         editText.requestFocus();
     }
 
