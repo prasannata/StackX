@@ -444,7 +444,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         Log.d(TAG, "Hiding tag list fragment");
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.hide(tagListFragment);
         ft.commit();
     }
