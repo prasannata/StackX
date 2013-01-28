@@ -75,6 +75,11 @@ public class PostCommentFragment extends Fragment
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after)
         {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count)
+        {
             charCount.setText(String.valueOf(s.length()));
 
             if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
@@ -91,12 +96,6 @@ public class PostCommentFragment extends Fragment
                 }
             }
         }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count)
-        {
-        }
-
     }
 
     public void setPostId(long id)
