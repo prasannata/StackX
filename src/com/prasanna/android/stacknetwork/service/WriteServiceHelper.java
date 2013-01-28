@@ -19,13 +19,21 @@
 
 package com.prasanna.android.stacknetwork.service;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 
 import android.util.Log;
 
+import com.prasanna.android.http.ClientException;
+import com.prasanna.android.http.HttpContentTypes;
+import com.prasanna.android.http.HttpHeaderParams;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -51,19 +59,32 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/posts/" + postId + "/comments/add";
 
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, SharedPreferencesUtil.getAccessToken(null));
-        queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
-        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.DEFAULT_FILTER);
-        queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
-        queryParams.put(StackUri.QueryParams.BODY, body);
-        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 
-        JSONObjectWrapper jsonObject = executeHttpPostequest(restEndPoint, queryParams, null);
-        
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, SharedPreferencesUtil
+                        .getAccessToken(null)));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER,
+                        StackUri.QueryParamDefaultValues.DEFAULT_FILTER));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID,
+                        StackUri.QueryParamDefaultValues.CLIENT_ID));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.BODY, body));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
+
+        Map<String, String> requestHeaders = new HashMap<String, String>();
+
+        requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
+        requestHeaders.put(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+
         try
         {
+            JSONObjectWrapper jsonObject = executeHttpPostequest(restEndPoint, requestHeaders, null,
+                            new UrlEncodedFormEntity(parameters));
             return getSerializedCommentObject(jsonObject);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
         }
         catch (JSONException e)
         {

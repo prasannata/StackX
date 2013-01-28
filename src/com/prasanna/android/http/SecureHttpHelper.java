@@ -158,14 +158,20 @@ public final class SecureHttpHelper
         return bitmap;
     }
 
-    public JSONObjectWrapper executePostForGzipResponse(String host, String path, Map<String, String> queryParams, HttpEntity httpEntity)
+    public JSONObjectWrapper executePostForGzipResponse(String host, String path, Map<String, String> requestHeaders,
+                    Map<String, String> queryParams, HttpEntity httpEntity)
     {
         try
         {
             DefaultHttpClient client = getClientForGzipResponse();
             HttpPost request = new HttpPost(buildUri(host, path, queryParams));
-            request.setHeader(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
-            request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+
+            if (requestHeaders != null)
+            {
+                for (Map.Entry<String, String> entry : requestHeaders.entrySet())
+                    request.setHeader(entry.getKey(), entry.getValue());
+            }
+            request.setEntity(httpEntity);
 
             return executeRequest(client, request);
         }
@@ -255,7 +261,7 @@ public final class SecureHttpHelper
                     ClientProtocolException, JSONException
     {
         JSONObjectWrapper jsonObject = null;
-        
+
         Log.d(TAG, "HTTP request to: " + request.getURI().toString());
         HttpResponse httpResponse = client.execute(request);
         HttpEntity entity = httpResponse.getEntity();

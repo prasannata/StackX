@@ -27,7 +27,8 @@ public class ClientException extends AbstractHttpException implements Serializab
 
     public enum ClientErrorCode implements Code
     {
-        NO_NETWORK(1, "No network available");
+        NO_NETWORK(1, "No network available"),
+        INVALID_ENCODING(2, "Invalid encoding");
 
         private final int statusCode;
         private final String description;

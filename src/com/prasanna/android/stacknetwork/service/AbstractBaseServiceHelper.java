@@ -99,7 +99,8 @@ public abstract class AbstractBaseServiceHelper
 
     protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject)
     {
-        int[] badgeCounts = { 0, 0, 0 };
+        int[] badgeCounts =
+        { 0, 0, 0 };
 
         if (badgeCountJsonObject != null)
         {
@@ -250,11 +251,11 @@ public abstract class AbstractBaseServiceHelper
 
     }
 
-    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> queryParams,
-                    HttpEntity httpEntity)
+    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
+                    Map<String, String> queryParams, HttpEntity httpEntity)
     {
         return SecureHttpHelper.getInstance().executePostForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                        queryParams, httpEntity);
+                        requestHeaders, queryParams, httpEntity);
 
     }
 
