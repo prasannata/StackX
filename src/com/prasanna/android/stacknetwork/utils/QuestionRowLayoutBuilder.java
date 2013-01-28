@@ -115,9 +115,12 @@ public class QuestionRowLayoutBuilder
         textView = (TextView) parentLayout.findViewById(R.id.questionViewsValue);
         textView.append(":" + AppUtils.formatNumber(question.viewCount));
 
-        textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                        + Html.fromHtml(question.owner.displayName));
+        if (question.owner.displayName != null)
+        {
+            textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
+            textView.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
+                            + Html.fromHtml(question.owner.displayName));
+        }
     }
 
     private LayoutInflater getInflater(Context context)

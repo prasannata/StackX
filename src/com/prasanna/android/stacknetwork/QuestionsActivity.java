@@ -249,7 +249,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             tagDAO.insert(OperatingSite.getSite().apiSiteParameter, tagLabel, true);
 
             Toast.makeText(this, tagLabel + " added to your tags", Toast.LENGTH_LONG).show();
-            
+
             SharedPreferencesUtil.setOnOff(this, TagListFragment.TAGS_DIRTY, true);
         }
         catch (SQLException e)
@@ -312,10 +312,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                 addAndHideFragment(tagListFragment, StringConstants.TAGS);
             }
 
-            getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            getActionBar().setTitle(StringConstants.TAGS);
-            actionBarMenu.findItem(R.id.menu_search).setVisible(false);
-            actionBarMenu.findItem(R.id.menu_refresh).setVisible(false);
+            toggleDisplayForTags(true);
 
             showTagFragment();
 
@@ -323,6 +320,40 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         }
 
         return false;
+    }
+
+    private void toggleDisplayForTags(boolean forTags)
+    {
+        getActionBar().setDisplayHomeAsUpEnabled(!forTags);
+        
+        if (forTags)
+        {
+            getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+            getActionBar().setTitle(StringConstants.TAGS);
+        }
+        else
+        {
+            getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        }
+        actionBarMenu.findItem(R.id.menu_search).setVisible(forTags);
+        actionBarMenu.findItem(R.id.menu_refresh).setVisible(forTags);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+
+        if (currentFragment instanceof TagListFragment)
+        {
+            Log.d(TAG, "Tag list fragment is current fragment");
+
+            hideTagFragment();
+            
+            toggleDisplayForTags(false);
+        }
+        else
+            super.onBackPressed();
     }
 
     @Override
@@ -402,7 +433,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "Showing tag list fragment");
 
-        getActionBar().setDisplayHomeAsUpEnabled(false);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.show(tagListFragment);
@@ -414,6 +444,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         Log.d(TAG, "Hiding tag list fragment");
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.hide(tagListFragment);
         ft.commit();
     }

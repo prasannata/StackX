@@ -318,6 +318,7 @@ public class TagListFragment extends ListFragment
         }
     }
 
+    @Override
     public void onStop()
     {
         Log.d(TAG, "onStop");
@@ -325,6 +326,7 @@ public class TagListFragment extends ListFragment
         super.onStop();
     }
 
+    
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
