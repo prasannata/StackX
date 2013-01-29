@@ -170,10 +170,10 @@ public class MarkdownFormatter
      */
     public static ArrayList<View> parse(Context context, String markdownText)
     {
-        ArrayList<View> views = new ArrayList<View>();
-        try
+        if (context != null && markdownText != null)
         {
-            if (markdownText != null)
+            ArrayList<View> views = new ArrayList<View>();
+            try
             {
                 markdownText = clean(markdownText);
 
@@ -272,16 +272,17 @@ public class MarkdownFormatter
 
                 addSimpleTextToView(context, views, buffer, params);
             }
+            catch (XmlPullParserException e)
+            {
+                Log.e(TAG, "Error parsing: " + e);
+            }
+            catch (IOException e)
+            {
+                Log.e(TAG, "Error parsing: " + e);
+            }
+            return views;
         }
-        catch (XmlPullParserException e)
-        {
-            Log.e(TAG, "Error parsing: " + e);
-        }
-        catch (IOException e)
-        {
-            Log.e(TAG, "Error parsing: " + e);
-        }
-        return views;
+        return null;
 
     }
 
