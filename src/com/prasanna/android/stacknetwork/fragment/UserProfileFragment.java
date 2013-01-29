@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Fragment;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -54,7 +54,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private static final String TAG = UserProfileFragment.class.getSimpleName();
     private RelativeLayout profileHomeLayout;
     private LinearLayout userAccountList;
-    private ProgressDialog fetchProfileProgress;
+    private ProgressBar fetchProfileProgress;
     private Intent userProfileIntent;
     private int userAccountListCursor = 0;
     private User user;
@@ -87,9 +87,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (profileHomeLayout == null)
         {
-            fetchProfileProgress = ProgressDialog.show(getActivity(), "", "Fetching profile");
-
             profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
+            fetchProfileProgress = (ProgressBar) profileHomeLayout.findViewById(R.id.progressBar);
+            fetchProfileProgress.setVisibility(View.VISIBLE);
             userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
         }
 
@@ -181,7 +181,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
         userProfileImage.setImageBitmap(user.avatar);
-        
+
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(user.displayName);
 
@@ -223,7 +223,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (user != null && user.accounts != null)
         {
-            for (;userAccountListCursor < user.accounts.size(); userAccountListCursor++)
+            for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
                                 R.layout.textview_black_textcolor, null);
@@ -238,9 +238,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         Log.d(TAG, "onReceiveResult");
-        
+
         if (fetchProfileProgress != null)
-            fetchProfileProgress.dismiss();
+            fetchProfileProgress.setVisibility(View.GONE);
 
         StackXPage<User> userPage = (StackXPage<User>) resultData.getSerializable(StringConstants.USER);
         if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
