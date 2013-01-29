@@ -268,9 +268,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         Log.d(TAG, "onBackPressed");
 
-        discardPostCommentFragmentIfVisible(false);
-
         super.onBackPressed();
+        
+        discardPostCommentFragmentIfVisible(false);
     }
 
     @Override
