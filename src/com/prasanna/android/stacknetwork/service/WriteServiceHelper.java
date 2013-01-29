@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.util.Log;
@@ -36,6 +37,7 @@ import com.prasanna.android.http.HttpContentTypes;
 import com.prasanna.android.http.HttpHeaderParams;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri;
@@ -79,7 +81,9 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         {
             JSONObjectWrapper jsonObject = executeHttpPostequest(restEndPoint, requestHeaders, null,
                             new UrlEncodedFormEntity(parameters));
-            return getSerializedCommentObject(jsonObject);
+            JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
+            if (jsonArray != null && jsonArray.length() == 1)
+                return getSerializedCommentObject(JSONObjectWrapper.wrap(jsonArray.getJSONObject(0)));
         }
         catch (UnsupportedEncodingException e)
         {
@@ -97,5 +101,31 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
     protected String getLogTag()
     {
         return TAG;
+    }
+
+    public void deleteComment(long commentId)
+    {
+        String restEndPoint = "/comments/" + commentId + "/delete";
+
+        List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, SharedPreferencesUtil
+                        .getAccessToken(null)));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
+
+        Map<String, String> requestHeaders = new HashMap<String, String>();
+
+        requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
+
+        try
+        {
+            executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
+        }
     }
 }

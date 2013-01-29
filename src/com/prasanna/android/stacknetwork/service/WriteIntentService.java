@@ -66,6 +66,8 @@ public class WriteIntentService extends AbstractIntentService
                 case ACTION_EDIT_COMMENT:
                     break;
                 case ACTION_DEL_COMMENT:
+                    final Comment comment = (Comment) intent.getSerializableExtra(StringConstants.COMMENT);
+                    deleteComment(comment, receiver);
                     break;
                 default:
                     Log.d(TAG, "Unknown action: " + action);
@@ -80,20 +82,19 @@ public class WriteIntentService extends AbstractIntentService
         }
     }
 
+    private void deleteComment(Comment comment, ResultReceiver receiver)
+    {
+        WriteServiceHelper.getInstance().deleteComment(comment.id);
+        Bundle resultData = new Bundle();
+        resultData.putSerializable(StringConstants.COMMENT, comment);
+        receiver.send(ACTION_DEL_COMMENT, resultData);
+    }
+
     private void sendComment(final long postId, final String body, final ResultReceiver receiver)
     {
         Bundle resultData = new Bundle();
-        try
-        {
-            Comment comment = WriteServiceHelper.getInstance().addComment(postId, body);
-            resultData.putSerializable(StringConstants.COMMENT, comment);
-            receiver.send(ACTION_ADD_COMMENT, resultData);
-        }
-        catch (AbstractHttpException e)
-        {
-            resultData.putInt(StringConstants.REQUEST_CODE, ACTION_ADD_COMMENT);
-            resultData.putSerializable(StringConstants.EXCEPTION, e);
-            receiver.send(ERROR, resultData);
-        }
+        Comment comment = WriteServiceHelper.getInstance().addComment(postId, body);
+        resultData.putSerializable(StringConstants.COMMENT, comment);
+        receiver.send(ACTION_ADD_COMMENT, resultData);
     }
 }

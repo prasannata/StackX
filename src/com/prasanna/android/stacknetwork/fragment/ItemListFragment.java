@@ -54,10 +54,10 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     private static final String TAG = ItemListFragment.class.getSimpleName();
 
     private boolean activityCreated = false;
-    private boolean serviceRunning = false;
     private ProgressBar progressBar;
     private StackXPage<T> currentPageObject;
 
+    protected boolean serviceRunning = false;
     protected RestQueryResultReceiver resultReceiver;
     protected List<StackXPage<T>> pages;
     protected LinearLayout itemsContainer;

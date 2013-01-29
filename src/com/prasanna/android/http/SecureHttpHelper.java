@@ -270,6 +270,7 @@ public final class SecureHttpHelper
 
         if (statusCode == HttpStatus.SC_OK)
         {
+            Log.d(TAG, request + " was successful");
             jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
         }
         else

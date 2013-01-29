@@ -25,6 +25,7 @@ import java.util.HashMap;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.text.Html;
@@ -46,6 +47,7 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
+import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
@@ -308,12 +310,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 {
                     if (which == DialogInterface.BUTTON_POSITIVE)
                     {
-                        if (onCommentChangeListener != null)
-                            onCommentChangeListener.onCommentDelete(comment);
-
-                        itemListAdapter.notifyDataSetChanged();
-                        if (comments.isEmpty())
-                            removeMyself();
+                        startServiceForDelComment(comment);
                     }
                 }
             };
@@ -351,8 +348,37 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         return comments == null || comments.isEmpty();
     }
 
-    private void removeMyself()
+    private void removeSelf()
     {
         getFragmentManager().popBackStackImmediate();
+    }
+
+    private void startServiceForDelComment(final Comment comment)
+    {
+        Intent intent = new Intent(getActivity(), WriteIntentService.class);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        intent.putExtra(StringConstants.COMMENT, comment);
+        intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_DEL_COMMENT);
+        startService(intent);
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData)
+    {
+        serviceRunning = false;
+        if (resultCode == WriteIntentService.ACTION_DEL_COMMENT)
+        {
+            Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
+
+            if (onCommentChangeListener != null)
+            {
+                onCommentChangeListener.onCommentDelete((Comment) resultData.getSerializable(StringConstants.COMMENT));
+
+                itemListAdapter.notifyDataSetChanged();
+                if (comments.isEmpty())
+                    removeSelf();
+
+            }
+        }
     }
 }

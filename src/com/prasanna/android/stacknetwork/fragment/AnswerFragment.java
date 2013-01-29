@@ -19,6 +19,8 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import java.util.Iterator;
+
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
@@ -271,7 +273,16 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
         {
             Log.d(TAG, "Removing comment: " + comment.id);
 
-            answer.comments.remove(comment);
+            Iterator<Comment> iterator = answer.comments.iterator();
+            while (iterator.hasNext())
+            {
+                if (iterator.next().id == comment.id)
+                {
+                    Log.d(TAG, "comment " + comment.id + " removed");
+                    iterator.remove();
+                    break;
+                }
+            }
         }
 
         displayNumComments();

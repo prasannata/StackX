@@ -202,7 +202,7 @@ public abstract class AbstractBaseServiceHelper
         comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
         comment.body = jsonObject.getString(JsonFields.Comment.BODY);
         comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
-        comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
+        comment.score = jsonObject.getInt(JsonFields.Comment.SCORE, 0);
         comment.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Comment.OWNER));
         return comment;
     }
