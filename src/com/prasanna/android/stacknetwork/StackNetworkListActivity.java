@@ -38,12 +38,13 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.service.MyProfileService;
+import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver,
@@ -57,7 +58,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     private ArrayList<Site> sites;
     private SiteListAdapter siteListAdapter;
     private RestQueryResultReceiver receiver;
-    private ProgressDialog fetchProfileProgress;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -163,11 +163,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                                     .getSerializable(StringConstants.PERMISSION);
                     persistPermissions((Site) resultData.getSerializable(StringConstants.SITE), permissions);
                     break;
-                case UserIntentService.GET_USER_PROFILE:
-                    if (fetchProfileProgress != null)
-                        fetchProfileProgress.dismiss();
-                    startQuestionsActivity();
-                    break;
                 case UserIntentService.GET_USER_SITES:
                     sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
 
@@ -182,6 +177,11 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                     break;
             }
         }
+    }
+
+    private void startGetTagsService()
+    {
+        startService(new Intent(this, TagsService.class));
     }
 
     private void persistPermissions(Site site, ArrayList<WritePermission> permissions)
@@ -203,19 +203,10 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
     }
 
-    private void getMyProfile()
+    private void startMyProfileService()
     {
         if (AppUtils.inAuthenticatedRealm(this))
-        {
-            fetchProfileProgress = ProgressDialog.show(this, null, "Fetching your profile");
-
-            Intent userProfileIntent = new Intent(this, UserIntentService.class);
-            userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
-            userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
-            userProfileIntent.putExtra(StringConstants.ME, true);
-            userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
-            startService(userProfileIntent);
-        }
+            startService(new Intent(this, MyProfileService.class));
     }
 
     private void showError()
@@ -237,7 +228,9 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
             SharedPreferencesUtil.setOnOff(this, CHANGE_SITE_HINT, false);
         }
 
-        getMyProfile();
+        startMyProfileService();
+        startGetTagsService();
+        startQuestionsActivity();
     }
 
     private void startQuestionsActivity()

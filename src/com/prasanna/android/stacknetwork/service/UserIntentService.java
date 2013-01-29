@@ -139,7 +139,6 @@ public class UserIntentService extends AbstractIntentService
     {
         if (me)
         {
-
             ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
             StackXPage<User> userPage = null;
             try

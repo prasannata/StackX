@@ -62,7 +62,6 @@ public class TagDAO
             Log.d(TAG, "inserting " + tag + " into DB for site " + site);
 
             ContentValues values = new ContentValues();
-            values.put(TagsTable.COLUMN_ID, tag.toLowerCase().hashCode());
             values.put(TagsTable.COLUMN_VALUE, tag);
             values.put(TagsTable.COLUMN_SITE, site);
             values.put(TagsTable.COLUMN_LOCAL_ADD, isLocalAdd);
@@ -79,7 +78,6 @@ public class TagDAO
             for (Tag tag : tags)
             {
                 ContentValues values = new ContentValues();
-                values.put(TagsTable.COLUMN_ID, tag.name.hashCode());
                 values.put(TagsTable.COLUMN_VALUE, tag.name);
                 values.put(TagsTable.COLUMN_SITE, site);
                 database.insert(DatabaseHelper.TABLE_TAGS, null, values);
@@ -123,6 +121,23 @@ public class TagDAO
         String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = DatabaseHelper.TagsTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
+        String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS, cols, selection, selectionArgs, null, null, orderBy);
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        Log.d(TAG, "Tags retrieved from DB");
+
+        return getTagSet(cursor);
+    }
+
+    public LinkedHashSet<Tag> getTags(String site, boolean includeLocalTags)
+    {
+        String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
+        String selection = DatabaseHelper.TagsTable.COLUMN_SITE + " = ? and "
+                        + DatabaseHelper.TagsTable.COLUMN_LOCAL_ADD + " = ?";
+        String[] selectionArgs = { site, includeLocalTags ? "1" : "0" };
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS, cols, selection, selectionArgs, null, null, orderBy);

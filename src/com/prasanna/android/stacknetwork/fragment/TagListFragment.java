@@ -283,18 +283,18 @@ public class TagListFragment extends ListFragment
             getListView().addFooterView(getProgressBar());
             setListAdapter(listAdapter);
 
-            runGetTagsTask(true);
+            runGetTagsTask();
 
             activityCreated = true;
         }
     }
 
-    private void runGetTagsTask(boolean fromDb)
+    private void runGetTagsTask()
     {
         getProgressBar().setVisibility(View.VISIBLE);
 
         GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
-                        getActivity()), AppUtils.inRegisteredSite(getActivity()), fromDb);
+                        getActivity()), AppUtils.inRegisteredSite(getActivity()));
 
         AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
     }
@@ -310,7 +310,7 @@ public class TagListFragment extends ListFragment
         {
             tags.clear();
             listAdapter.clear();
-            runGetTagsTask(true);
+            runGetTagsTask();
             SharedPreferencesUtil.setOnOff(getActivity(), TAGS_DIRTY, false);
         }
         else

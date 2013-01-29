@@ -83,6 +83,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_SITE = "site";
         public static final String COLUMN_ME = "me";
         public static final String COLUMN_DISPLAY_NAME = "display_name";
+        public static final String COLUMN_GOLD_BADGES = "gold_badges";
+        public static final String COLUMN_SILVER_BADGES = "silver_badges";
+        public static final String COLUMN_BRONZE_BADGES = "bronze_badges";
         public static final String COLUMN_QUESTION_COUNT = "q_count";
         public static final String COLUMN_ANSWER_COUNT = "a_count";
         public static final String COLUMN_UPVOTE_COUNT = "u_count";
@@ -97,13 +100,14 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
         private static final String CREATE_TABLE = "create table " + TABLE_PROFILE + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
-                        + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_QUESTION_COUNT
-                        + " integer not null, " + COLUMN_ANSWER_COUNT + " integer not null, " + COLUMN_UPVOTE_COUNT
-                        + " integer not null, " + COLUMN_DOWNVOTE_COUNT + " integer not null, " + COLUMN_ACCEPT_RATE
-                        + " integer not null, " + COLUMN_REPUTATION + " integer not null, " + COLUMN_VIEWS
-                        + " integer not null, " + COLUMN_REG_DATE + " long not null, " + COLUMN_LAST_ACCESS
-                        + " long not null, " + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE
-                        + " long not null);";
+                        + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
+                        + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
+                        + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT
+                        + " integer not null, " + COLUMN_UPVOTE_COUNT + " integer not null, " + COLUMN_DOWNVOTE_COUNT
+                        + " integer not null, " + COLUMN_ACCEPT_RATE + " integer not null, " + COLUMN_REPUTATION
+                        + " integer not null, " + COLUMN_VIEWS + " integer not null, " + COLUMN_REG_DATE
+                        + " long not null, " + COLUMN_LAST_ACCESS + " long not null, " + COLUMN_PROFILE_IMAGE
+                        + " BLOB, " + COLUMN_LAST_UPDATE + " long not null);";
 
     }
 

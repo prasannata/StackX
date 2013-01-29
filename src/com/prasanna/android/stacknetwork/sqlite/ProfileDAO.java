@@ -66,6 +66,12 @@ public class ProfileDAO
             values.put(ProfileTable.COLUMN_SITE, site);
             values.put(ProfileTable.COLUMN_ME, me);
             values.put(ProfileTable.COLUMN_DISPLAY_NAME, user.displayName);
+            if (user.badgeCounts != null && user.badgeCounts.length == 3)
+            {
+                values.put(ProfileTable.COLUMN_GOLD_BADGES, user.badgeCounts[0]);
+                values.put(ProfileTable.COLUMN_SILVER_BADGES, user.badgeCounts[1]);
+                values.put(ProfileTable.COLUMN_BRONZE_BADGES, user.badgeCounts[2]);
+            }
             values.put(ProfileTable.COLUMN_QUESTION_COUNT, user.questionCount);
             values.put(ProfileTable.COLUMN_ANSWER_COUNT, user.answerCount);
             values.put(ProfileTable.COLUMN_UPVOTE_COUNT, user.upvoteCount);
@@ -82,7 +88,7 @@ public class ProfileDAO
                 user.avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 values.put(ProfileTable.COLUMN_PROFILE_IMAGE, stream.toByteArray());
             }
-            
+
             values.put(ProfileTable.COLUMN_LAST_UPDATE, System.currentTimeMillis());
 
             database.insert(DatabaseHelper.TABLE_PROFILE, null, values);
@@ -124,6 +130,10 @@ public class ProfileDAO
         User user = new User();
         user.id = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_ID));
         user.displayName = cursor.getString(cursor.getColumnIndex(ProfileTable.COLUMN_DISPLAY_NAME));
+        user.badgeCounts = new int[3];
+        user.badgeCounts[0] = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_GOLD_BADGES));
+        user.badgeCounts[1] = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_SILVER_BADGES));
+        user.badgeCounts[2] = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_BRONZE_BADGES));
         user.questionCount = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_QUESTION_COUNT));
         user.answerCount = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_ANSWER_COUNT));
         user.upvoteCount = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_UPVOTE_COUNT));

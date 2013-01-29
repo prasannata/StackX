@@ -27,6 +27,7 @@ import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Tag;
+import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -38,27 +39,28 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
     private final AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier;
     private final boolean registeredUser;
     private final TagDAO tagDao;
-    private final boolean fromDb;
 
     public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier,
-                    TagDAO tagsDbAdapter, boolean registeredUser, boolean fromDb)
+                    TagDAO tagsDbAdapter, boolean registeredUser)
     {
         super();
 
         this.taskCompletionNotifier = taskCompletionNotifier;
         this.tagDao = tagsDbAdapter;
         this.registeredUser = registeredUser;
-        this.fromDb = fromDb;
     }
 
     @Override
     protected LinkedHashSet<Tag> doInBackground(Void... params)
     {
         LinkedHashSet<Tag> tags = null;
+
+        if (TagsService.isRunning())
+            waitForServiceToComplete();
+
         try
         {
-            if (fromDb)
-                tags = getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
+            tags = getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
 
             if (tags == null || tags.isEmpty())
             {
@@ -77,6 +79,27 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
             Log.e(TAG, "Error fetching tags: " + e.getMessage());
         }
         return tags;
+    }
+
+    private void waitForServiceToComplete()
+    {
+        TagsService.registerForCompleteNotification(this);
+
+        Log.d(TAG, "Waiting for service to complete");
+
+        try
+        {
+            synchronized (this)
+            {
+                wait();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+
+        Log.d(TAG, "Service done");
     }
 
     @Override
