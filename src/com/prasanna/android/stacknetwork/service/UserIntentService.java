@@ -109,9 +109,8 @@ public class UserIntentService extends AbstractIntentService
                     getUnreadInboxItems(intent);
                     break;
                 case GET_USER_SITES:
-                    bundle.putSerializable(
-                                    StringConstants.SITES,
-                                    getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, false)));
+                    bundle.putSerializable(StringConstants.SITES,
+                                    getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
                     receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
