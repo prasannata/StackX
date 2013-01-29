@@ -23,8 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/commentScore"
         android:cursorVisible="true"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
+        android:clickable="false"
+        android:enabled="false"
         android:inputType="textMultiLine|textNoSuggestions"
         android:scrollHorizontally="false"
         android:textColor="@color/black"
@@ -56,6 +56,14 @@
             android:orientation="horizontal"
             android:visibility="gone" >
 
+            <ImageView
+                android:id="@+id/finishEditComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:src="@drawable/accept_dark_24x24"
+                android:visibility="gone" />
+            
             <ImageView
                 android:id="@+id/editComment"
                 android:layout_width="wrap_content"

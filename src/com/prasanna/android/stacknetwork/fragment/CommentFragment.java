@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.database.SQLException;
@@ -31,6 +32,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -59,6 +61,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private HashMap<ObjectType, WritePermission> writePermissions;
     private ImageView replyToComment;
     private ImageView editComment;
+    private ImageView finishEditComment;
     private ImageView deleteComment;
     private OnCommentChangeListener onCommentChangeListener;
     private EditText editTextForTitle;
@@ -232,6 +235,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     private void setupEditComment(Comment comment, RelativeLayout commentLayout)
     {
+        setupFinishEditComment(commentLayout);
+
         editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
         editComment.setVisibility(View.VISIBLE);
         editComment.setOnClickListener(new View.OnClickListener()
@@ -239,12 +244,55 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                editTextForTitle.setFocusable(false);
-                editTextForTitle.setFocusableInTouchMode(true);
+                prepareForEditText(true);
+
+                if (editTextForTitle.getText() != null)
+                    editTextForTitle.setSelection(editTextForTitle.getText().length());
+                itemsContainer.clearFocus();
                 editTextForTitle.requestFocus();
-                Toast.makeText(getActivity(), "Edit my comment", Toast.LENGTH_LONG).show();
+                showSoftInput(editTextForTitle);
             }
         });
+    }
+
+    private void setupFinishEditComment(RelativeLayout commentLayout)
+    {
+        finishEditComment = (ImageView) commentLayout.findViewById(R.id.finishEditComment);
+        finishEditComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                hideSoftInput(editTextForTitle);
+                prepareForEditText(false);
+                editTextForTitle.clearFocus();
+                itemsContainer.requestFocus();
+            }
+        });
+    }
+
+    private void showSoftInput(View v)
+    {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void hideSoftInput(View v)
+    {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
+
+    private void prepareForEditText(boolean edit)
+    {
+        editTextForTitle.setEnabled(edit);
+        editTextForTitle.setClickable(edit);
+        editTextForTitle.setFocusable(edit);
+        editTextForTitle.setFocusableInTouchMode(edit);
+
+        editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
+        deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
+        finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
     }
 
     private void setupDeleteComment(final Comment comment, RelativeLayout commentLayout)
