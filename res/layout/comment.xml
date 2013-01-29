@@ -10,20 +10,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="7dp"
+        android:layout_marginTop="5dp"
         android:gravity="center"
         android:textColor="@color/delft"
         android:textSize="13sp" />
 
-    <TextView
+    <EditText
         android:id="@+id/commentTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/commentScore"
-        android:gravity="left"
-        android:textColor="@color/delft"
+        android:cursorVisible="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:scrollHorizontally="false"
+        android:textColor="@color/black"
+        android:textCursorDrawable="@null"
         android:textSize="15sp" />
 
     <RelativeLayout

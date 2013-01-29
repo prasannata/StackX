@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -60,6 +61,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private ImageView editComment;
     private ImageView deleteComment;
     private OnCommentChangeListener onCommentChangeListener;
+    private EditText editTextForTitle;
 
     public interface OnCommentChangeListener
     {
@@ -102,6 +104,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
         super.onActivityCreated(savedInstanceState);
 
+        getListView().setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
+
         getWritePermissions();
     }
 
@@ -143,22 +147,25 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     @Override
     public View getView(final Comment comment, View convertView, ViewGroup parent)
     {
-        RelativeLayout commentLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.comment,
-                        null);
+        RelativeLayout commentLayout = (RelativeLayout) convertView;
 
-        TextView textView = (TextView) commentLayout.findViewById(R.id.commentScore);
-        textView.setText(AppUtils.formatNumber(comment.score));
+        if (commentLayout == null)
+        {
+            commentLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.comment, null);
 
-        textView = (TextView) commentLayout.findViewById(R.id.commentTitle);
-        textView.setText(Html.fromHtml(comment.body));
+            TextView textView = (TextView) commentLayout.findViewById(R.id.commentScore);
+            textView.setText(AppUtils.formatNumber(comment.score));
 
-        textView = (TextView) commentLayout.findViewById(R.id.commentOwner);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(comment.creationDate) + " by "
-                        + Html.fromHtml(comment.owner.displayName));
+            editTextForTitle = (EditText) commentLayout.findViewById(R.id.commentTitle);
+            editTextForTitle.setText(Html.fromHtml(comment.body));
 
-        if (AppUtils.inAuthenticatedRealm(getActivity()))
-            setupCommentWriteOptions(comment, commentLayout);
+            textView = (TextView) commentLayout.findViewById(R.id.commentOwner);
+            textView.setText(DateTimeUtils.getElapsedDurationSince(comment.creationDate) + " by "
+                            + Html.fromHtml(comment.owner.displayName));
 
+            if (AppUtils.inAuthenticatedRealm(getActivity()))
+                setupCommentWriteOptions(comment, commentLayout);
+        }
         return commentLayout;
     }
 
@@ -232,6 +239,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
+                editTextForTitle.setFocusable(false);
+                editTextForTitle.setFocusableInTouchMode(true);
+                editTextForTitle.requestFocus();
                 Toast.makeText(getActivity(), "Edit my comment", Toast.LENGTH_LONG).show();
             }
         });
