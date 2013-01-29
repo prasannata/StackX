@@ -137,7 +137,6 @@ public class TagsService extends AbstractStackxService
             @Override
             public void onHandleMessageFinish(Message message)
             {
-                setRunning(false);
                 TagsService.this.stopSelf(message.arg1);
                 for (Object object : toNotifyObjects)
                 {
@@ -148,6 +147,9 @@ public class TagsService extends AbstractStackxService
                 }
 
                 toNotifyObjects.clear();
+                
+                Log.d(TAG, "Finished executing TagsService");
+                setRunning(false);
             }
         });
     }
