@@ -61,7 +61,7 @@ public class MyProfileService extends AbstractStackxService
                 profileDAO.open();
                 User me = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
 
-                if (System.currentTimeMillis() - me.lastUpdateTime > MS_IN_AN_HOUR)
+                if (me == null || System.currentTimeMillis() - me.lastUpdateTime > MS_IN_AN_HOUR)
                 {
                     Log.d(TAG, "Get my profile");
                     StackXPage<User> userPage = UserServiceHelper.getInstance().getMe();
