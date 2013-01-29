@@ -191,6 +191,8 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             textView = (TextView) parentLayout.findViewById(R.id.questionViews);
             textView.setText(getString(R.string.views) + ":" + AppUtils.formatNumber(question.viewCount));
 
+            displayNumComments();
+
             if (question.body != null)
                 displayBody(question.body);
         }
