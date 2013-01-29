@@ -25,8 +25,6 @@ import java.util.HashMap;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Site;
@@ -34,26 +32,13 @@ import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
 
-public class WritePermissionDAO
+public class WritePermissionDAO extends AbstractBaseDao
 {
     private static final String TAG = WritePermissionDAO.class.getSimpleName();
 
-    private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase database;
-
     public WritePermissionDAO(Context context)
     {
-        databaseHelper = new DatabaseHelper(context);
-    }
-
-    public void open() throws SQLException
-    {
-        database = databaseHelper.getWritableDatabase();
-    }
-
-    public void close()
-    {
-        databaseHelper.close();
+        super(context);
     }
 
     public void insertAll(Site site, ArrayList<WritePermission> permissions)

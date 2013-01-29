@@ -38,6 +38,8 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
+import com.prasanna.android.stacknetwork.sqlite.UserAccountsDao;
+import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
@@ -182,13 +184,56 @@ public class UserIntentService extends AbstractIntentService
 
     private boolean profileOlderThanThirtyMinutes(User myProfile)
     {
-        final int MS_IN_HALF_AN_HOUR = 1800000;
-        return myProfile == null || System.currentTimeMillis() - myProfile.lastUpdateTime > MS_IN_HALF_AN_HOUR;
+        return myProfile == null
+                        || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
     }
 
     private HashMap<String, Account> getUserAccounts(boolean me, long userId)
     {
-        return me ? userService.getAccounts(1) : userService.getAccounts(userId, 1);
+        if (me)
+            return getMyAccounts();
+
+        return userService.getAccounts(userId, 1);
+    }
+
+    private HashMap<String, Account> getMyAccounts()
+    {
+        Log.d(TAG, "getMyAccounts");
+        
+        UserAccountsDao userAccountsDao = new UserAccountsDao(getApplicationContext());
+        try
+        {
+            long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
+                            -1);
+            if (currentAccountId != -1)
+            {
+                userAccountsDao.open();
+                long lastUpdateTime = userAccountsDao.getLastUpdateTime();
+
+                if (System.currentTimeMillis() - lastUpdateTime > IntegerConstants.MS_IN_A_DAY)
+                {
+                    ArrayList<Account> accounts = userAccountsDao.getAccounts(currentAccountId);
+                    HashMap<String, Account> accountsMap = new HashMap<String, Account>();
+                    if (accounts != null)
+                    {
+                        for (Account account : accounts)
+                            accountsMap.put(account.siteUrl, account);
+                    }
+
+                    return accountsMap;
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            userAccountsDao.close();
+        }
+
+        return userService.getAccounts(1);
     }
 
     private StackXPage<Question> getQuestions(boolean me, long userId, int page)
@@ -241,6 +286,17 @@ public class UserIntentService extends AbstractIntentService
 
         if (linkAccountsMap != null && linkSitesMap != null)
         {
+            long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
+                            -1);
+            if (currentAccountId == -1 && !linkAccountsMap.isEmpty())
+            {
+                currentAccountId = linkAccountsMap.values().iterator().next().id;
+
+                Log.d(TAG, "Setting account id in shared preferences: " + currentAccountId);
+                SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, currentAccountId);
+                persistMyAccounts(linkAccountsMap);
+            }
+
             for (String siteUrl : linkAccountsMap.keySet())
             {
                 if (linkSitesMap.containsKey(siteUrl))
@@ -263,6 +319,24 @@ public class UserIntentService extends AbstractIntentService
 
         return new ArrayList<Site>(regSitesFirstMap.values());
 
+    }
+
+    private void persistMyAccounts(HashMap<String, Account> linkAccountsMap)
+    {
+        UserAccountsDao userAccountsDao = new UserAccountsDao(getApplicationContext());
+        try
+        {
+            userAccountsDao.open();
+            userAccountsDao.insert(new ArrayList<Account>(linkAccountsMap.values()));
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            userAccountsDao.close();
+        }
     }
 
     private void notifyReceiver(ResultReceiver receiver, Site site)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -27,6 +27,9 @@ public class StringConstants
 
     public static final String ACCESS_TOKEN = "access_token";
     public static final String AUTHENTICATED = "authenticated";
+
+    public static final String ACCOUNTS = "accounts";
+    public static final String ACCOUNT_ID = "account_id";
 
     public static final String SITES = "sites";
     public static final String SITE = "site";
@@ -60,7 +63,6 @@ public class StringConstants
     public static final String STATUS_CODE = "statusCode";
     public static final String ERROR = "error";
     public static final String ME = "me";
-    public static final String ACCOUNTS = "accounts";
     public static final String ACTION = "action";
     public static final String RELATED = "related";
     public static final String IS_FIRST_RUN = "is_first_run";

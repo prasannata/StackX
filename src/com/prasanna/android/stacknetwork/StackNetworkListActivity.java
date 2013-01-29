@@ -121,7 +121,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     {
         intent = new Intent(this, UserIntentService.class);
         intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
-        intent.putExtra(StringConstants.AUTHENTICATED, AppUtils.inAuthenticatedRealm(getApplicationContext()));
+        intent.putExtra(StringConstants.ME, AppUtils.inAuthenticatedRealm(getApplicationContext()));
         intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
         startService(intent);
     }

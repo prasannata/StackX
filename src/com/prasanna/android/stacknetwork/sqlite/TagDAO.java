@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -25,34 +25,20 @@ import java.util.LinkedHashSet;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.TagsTable;
 
-public class TagDAO
+public class TagDAO extends AbstractBaseDao
 {
     private static final String TAG = TagDAO.class.getSimpleName();
-
-    private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase database;
+    public static final String AUDIT_ENTRY_TYPE = "tag";
 
     public TagDAO(Context context)
     {
-        databaseHelper = new DatabaseHelper(context);
-    }
-
-    public void open() throws SQLException
-    {
-        database = databaseHelper.getWritableDatabase();
-    }
-
-    public void close()
-    {
-        databaseHelper.close();
+        super(context);
     }
 
     public void insert(String site, String tag, boolean isLocalAdd)
@@ -91,9 +77,10 @@ public class TagDAO
     {
         ContentValues values = new ContentValues();
         values.put(AuditTable.COLUMN_SITE, site);
+        values.put(AuditTable.COLUMN_TYPE, AUDIT_ENTRY_TYPE);
         values.put(AuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
         Log.d(TAG, "Audit entry for tags: " + values.toString());
-        database.insert(DatabaseHelper.TABLE_TAGS_AUDIT, null, values);
+        database.insert(DatabaseHelper.TABLE_AUDIT, null, values);
     }
 
     public long getLastUpdateTime(String site)
@@ -102,7 +89,7 @@ public class TagDAO
         String selection = DatabaseHelper.AuditTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS_AUDIT, cols, selection, selectionArgs, null, null,
+        Cursor cursor = database.query(DatabaseHelper.TABLE_AUDIT, cols, selection, selectionArgs, null, null,
                         null);
 
         if (cursor == null || cursor.getCount() == 0)
@@ -156,8 +143,8 @@ public class TagDAO
         cursor.moveToFirst();
         while (!cursor.isAfterLast())
         {
-            Tag tag = new Tag(cursor.getString(0));
-            tag.local = cursor.getInt(1) == 1;
+            Tag tag = new Tag(cursor.getString(cursor.getColumnIndex(TagsTable.COLUMN_VALUE)));
+            tag.local = cursor.getInt(cursor.getColumnIndex(TagsTable.COLUMN_LOCAL_ADD)) == 1;
             tags.add(tag);
             cursor.moveToNext();
         }
@@ -184,7 +171,7 @@ public class TagDAO
     {
         String whereClause = TagsTable.COLUMN_SITE + " = ?";
         String[] whereArgs = { site };
-        database.delete(DatabaseHelper.TABLE_TAGS_AUDIT, whereClause, whereArgs);
+        database.delete(DatabaseHelper.TABLE_AUDIT, whereClause, whereArgs);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -24,8 +24,6 @@ import java.io.ByteArrayOutputStream;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -33,26 +31,13 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.ProfileTable;
 
-public class ProfileDAO
+public class ProfileDAO extends AbstractBaseDao
 {
     private static final String TAG = ProfileDAO.class.getSimpleName();
 
-    private final DatabaseHelper databaseHelper;
-    private SQLiteDatabase database;
-
     public ProfileDAO(Context context)
     {
-        databaseHelper = new DatabaseHelper(context);
-    }
-
-    public void open() throws SQLException
-    {
-        database = databaseHelper.getWritableDatabase();
-    }
-
-    public void close()
-    {
-        databaseHelper.close();
+        super(context);
     }
 
     public void insert(String site, User user, boolean me)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -68,6 +68,21 @@ public class User extends StackXItem implements Serializable
                 }
             }
             return userType;
+        }
+
+        public static UserType getEnum(String userType)
+        {
+            if (userType == null)
+                return null;
+
+            try
+            {
+                return valueOf(userType.toUpperCase());
+            }
+            catch (IllegalArgumentException e)
+            {
+                return null;
+            }
         }
     }
 

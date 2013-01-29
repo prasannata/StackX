@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -26,10 +26,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String TABLE_TAGS = "TAGS";
-    public static final String TABLE_TAGS_AUDIT = "TAGS_AUDIT";
+    public static final String TABLE_AUDIT = "AUDIT";
     public static final String TABLE_USER_PROFILE = "USER_PROFILE";
     public static final String TABLE_WRITE_PERMISSION = "WRITE_PERMISSION";
     public static final String TABLE_PROFILE = "PROFILE";
+    public static final String TABLE_USER_ACCOUNTS = "USER_ACCOUNTS";
 
     private static final String DATABASE_NAME = "stackx.db";
     private static final int DATABASE_VERSION = 1;
@@ -53,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_SITE = "site";
         public static final String COLUMN_LAST_UPDATE_TIME = "last_update_time";
 
-        private static final String CREATE_TABLE = "create table " + TABLE_TAGS_AUDIT + "(" + COLUMN_ID
+        private static final String CREATE_TABLE = "create table " + TABLE_AUDIT + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_TYPE + " text, " + COLUMN_SITE
                         + " text not null, " + COLUMN_LAST_UPDATE_TIME + " long not null);";
     }
@@ -111,6 +112,21 @@ public class DatabaseHelper extends SQLiteOpenHelper
 
     }
 
+    public static final class UserAccountsTable
+    {
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_ACCOUNT_ID = "account_id";
+        public static final String COLUMN_SITE_NAME = "site_name";
+        public static final String COLUMN_SITE_URL = "site_url";
+        public static final String COLUMN_USER_TYPE = "user_type";
+
+        private static final String CREATE_TABLE = "create table " + TABLE_USER_ACCOUNTS + "(" + COLUMN_ID
+                        + " integer primary key autoincrement, " + COLUMN_USER_ID + " integer not null, "
+                        + COLUMN_ACCOUNT_ID + " integer not null, " + COLUMN_SITE_NAME + " text not null, "
+                        + COLUMN_SITE_URL + " text not null, " + COLUMN_USER_TYPE + " text);";
+    }
+
     public DatabaseHelper(Context context)
     {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -123,6 +139,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         db.execSQL(AuditTable.CREATE_TABLE);
         db.execSQL(WritePermissionTable.CREATE_TABLE);
         db.execSQL(ProfileTable.CREATE_TABLE);
+        db.execSQL(UserAccountsTable.CREATE_TABLE);
     }
 
     @Override
