@@ -84,6 +84,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         setProgressBarIndeterminateVisibility(true);
 
         intent = new Intent(this, PostIntentService.class);
+        intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
         if (item.itemType.equals(ItemType.NEW_ANSWER))
         {
             intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
@@ -256,6 +257,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
                 displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
                 displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, item.questionId);
+                displayQuestionIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
                 startActivity(displayQuestionIntent);
             }
         });

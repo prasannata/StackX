@@ -50,14 +50,15 @@ public class PostIntentService extends IntentService
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
         int action = intent.getIntExtra(StringConstants.ACTION, 0);
         long postId = intent.getLongExtra(StringConstants.POST_ID, 0);
+        final String site = intent.getStringExtra(StringConstants.SITE);
 
         switch (action)
         {
             case GET_POST:
-                getPost(postId, receiver);
+                getPost(postId, site, receiver);
                 break;
             case GET_POST_COMMENT:
-                getComment(intent, receiver);
+                getComment(intent, site, receiver);
                 break;
             default:
                 Log.d(TAG, "Unknown action:" + action);
@@ -65,20 +66,20 @@ public class PostIntentService extends IntentService
         }
     }
 
-    private void getComment(Intent intent, final ResultReceiver receiver)
+    private void getComment(Intent intent, String site, final ResultReceiver receiver)
     {
         long commentId = intent.getLongExtra(StringConstants.COMMENT_ID, 0);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(StringConstants.COMMENT, PostServiceHelper.getInstance().getComment(commentId));
+        bundle.putSerializable(StringConstants.COMMENT, PostServiceHelper.getInstance().getComment(commentId, site));
         receiver.send(GET_POST_COMMENT, bundle);
     }
 
-    private void getPost(long postId, ResultReceiver receiver)
+    private void getPost(long postId, String site, ResultReceiver receiver)
     {
         if (postId > 0)
         {
             Bundle bundle = new Bundle();
-            bundle.putSerializable(StringConstants.POST, PostServiceHelper.getInstance().getPost(postId));
+            bundle.putSerializable(StringConstants.POST, PostServiceHelper.getInstance().getPost(postId, site));
             receiver.send(GET_POST, bundle);
         }
     }

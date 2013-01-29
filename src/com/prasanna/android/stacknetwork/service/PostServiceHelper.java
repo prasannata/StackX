@@ -30,6 +30,8 @@ import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Post;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.StackUri;
 
 public class PostServiceHelper extends AbstractBaseServiceHelper
 {
@@ -51,10 +53,12 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
         return TAG;
     }
 
-    public Post getPost(long id)
+    public Post getPost(long id, String site)
     {
         String restEndPoint = "/posts/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
@@ -89,10 +93,13 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public Post getPostComment(long id)
+    public Post getPostComment(long id, String site)
     {
         String restEndPoint = "/posts/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
+
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
@@ -127,10 +134,12 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public Comment getComment(long id)
+    public Comment getComment(long id, String site)
     {
         String restEndPoint = "/comments/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)

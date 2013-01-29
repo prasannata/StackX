@@ -232,6 +232,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
             intent.setAction(StringConstants.QUESTION_ID);
             intent.putExtra(StringConstants.QUESTION_ID, questionId);
+            intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
             startService(intent);
         }
         else
@@ -248,6 +249,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 intent.setAction(StringConstants.QUESTION);
                 intent.putExtra(StringConstants.QUESTION_ID, question.id);
                 intent.putExtra(StringConstants.QUESTION, question);
+                intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
                 intent.putExtra(StringConstants.REFRESH, getIntent().getBooleanExtra(StringConstants.REFRESH, false));
                 startService(intent);
             }
@@ -269,7 +271,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         Log.d(TAG, "onBackPressed");
 
         super.onBackPressed();
-        
+
         discardPostCommentFragmentIfVisible(false);
     }
 
@@ -536,6 +538,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         intent = new Intent(this, QuestionDetailsIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.setAction(StringConstants.ANSWERS);
+        intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
         intent.putExtra(StringConstants.QUESTION_ID, question.id);
         intent.putExtra(StringConstants.PAGE, getNextPageNumber());
         startService(intent);

@@ -53,11 +53,14 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return questionService;
     }
 
-    public ArrayList<Answer> getAnswersForQuestion(long id, int page)
+    public ArrayList<Answer> getAnswersForQuestion(long id, String site, int page)
     {
         ArrayList<Answer> answers = new ArrayList<Answer>();
         String restEndPoint = "questions/" + id + "/answers";
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
+
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE,
                         String.valueOf(StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE));
@@ -92,6 +95,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             }
         }
         return answers;
+    }
+
+    public ArrayList<Answer> getAnswersForQuestion(long id, int page)
+    {
+        return getAnswersForQuestion(id, null, page);
     }
 
     private void getCommentsForAnswers(ArrayList<Answer> answers)
@@ -139,11 +147,14 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         }
     }
 
-    public String getQuestionBodyForId(long id)
+    public String getQuestionBodyForId(long id, String site)
     {
         String restEndPoint = "questions/" + id;
         String questionBody = null;
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
+
         JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionJsonResponse != null)
         {
@@ -166,12 +177,19 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return questionBody;
     }
 
-    public StackXPage<Comment> getComments(String parent, String parentId, int page)
+    public String getQuestionBodyForId(long id)
+    {
+        return getQuestionBodyForId(id, null);
+    }
+
+    public StackXPage<Comment> getComments(String parent, String site, String parentId, int page)
     {
         StackXPage<Comment> commentsPage = null;
 
         String restEndPoint = parent + "/" + parentId + "/comments";
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.CREATION);
         queryParams.put(StackUri.QueryParams.ORDER, Order.ASC);
@@ -207,6 +225,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return commentsPage;
     }
 
+    public StackXPage<Comment> getComments(String parent, String parentId, int page)
+    {
+        return getComments(parent, null, parentId, page);
+    }
+
     public StackXPage<Question> search(String query, int page)
     {
         String restEndPoint = "search";
@@ -239,11 +262,13 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return TAG;
     }
 
-    public Question getQuestionFullDetails(long id)
+    public Question getQuestionFullDetails(long id, String site)
     {
         String restEndPoint = "questions/" + id;
         Question question = null;
         Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
         JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionJsonResponse != null)
         {
@@ -265,6 +290,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         }
 
         return question;
+    }
+
+    public Question getQuestionFullDetails(long id)
+    {
+        return getQuestionFullDetails(id, null);
     }
 
     public StackXPage<Question> getAllQuestions(String sort, int page)

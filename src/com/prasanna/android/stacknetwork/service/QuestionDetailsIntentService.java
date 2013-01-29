@@ -86,9 +86,10 @@ public class QuestionDetailsIntentService extends AbstractIntentService
             {
                 long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0L);
                 int page = intent.getIntExtra(StringConstants.PAGE, 0);
+                final String site = intent.getStringExtra(StringConstants.SITE);
 
                 if (questionId > 0 && page > 0)
-                    getAnswersForQuestion(receiver, questionId, page);
+                    getAnswersForQuestion(receiver, site, questionId, page);
             }
             else
             {
@@ -97,9 +98,9 @@ public class QuestionDetailsIntentService extends AbstractIntentService
         }
     }
 
-    private void getAnswersForQuestion(final ResultReceiver receiver, long questionId, int page)
+    private void getAnswersForQuestion(final ResultReceiver receiver, String site, long questionId, int page)
     {
-        ArrayList<Answer> answers = getAnswersAndSend(receiver, questionId, page);
+        ArrayList<Answer> answers = getAnswersAndSend(receiver, site, questionId, page);
 
         QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
     }
@@ -107,6 +108,8 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     private void getQuestionDetail(ResultReceiver receiver, Intent intent)
     {
         long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
+        final String site = intent.getStringExtra(StringConstants.SITE);
+
         Question question = null;
 
         if (!intent.getBooleanExtra(StringConstants.REFRESH, false))
@@ -122,31 +125,32 @@ public class QuestionDetailsIntentService extends AbstractIntentService
             if (StringConstants.QUESTION.equals(intent.getAction()))
             {
                 question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
-                getQuestionAndAnswers(receiver, question);
+                getQuestionAndAnswers(site, receiver, question);
             }
             else
             {
-                question = getQuestionMetaAndBodyAndSend(receiver, questionId);
+                Log.d(TAG, "Get question for " + questionId + " in " + site);
+                question = getQuestionMetaAndBodyAndSend(site, receiver, questionId);
             }
 
             QuestionsCache.getInstance().add(question.id, question);
         }
     }
 
-    private void getQuestionAndAnswers(ResultReceiver receiver, Question question)
+    private void getQuestionAndAnswers(String site, ResultReceiver receiver, Question question)
     {
         question.body = questionService.getQuestionBodyForId(question.id);
         sendSerializable(receiver, RESULT_CODE_Q_BODY, StringConstants.BODY, question.body);
 
-        getCommentsAndSend(receiver, question);
+        getCommentsAndSend(site, receiver, question);
 
         if (question.answerCount > 0)
-            question.answers = getAnswersAndSend(receiver, question.id, 1);
+            question.answers = getAnswersAndSend(receiver, site, question.id, 1);
     }
 
-    private void getCommentsAndSend(ResultReceiver receiver, Question question)
+    private void getCommentsAndSend(String site, ResultReceiver receiver, Question question)
     {
-        StackXPage<Comment> commentsPage = questionService.getComments(StringConstants.QUESTIONS,
+        StackXPage<Comment> commentsPage = questionService.getComments(StringConstants.QUESTIONS, site,
                         String.valueOf(question.id), 1);
         if (commentsPage != null)
         {
@@ -155,17 +159,17 @@ public class QuestionDetailsIntentService extends AbstractIntentService
         }
     }
 
-    private Question getQuestionMetaAndBodyAndSend(ResultReceiver receiver, long questionId)
+    private Question getQuestionMetaAndBodyAndSend(String site, ResultReceiver receiver, long questionId)
     {
-        Question question = questionService.getQuestionFullDetails(questionId);
+        Question question = questionService.getQuestionFullDetails(questionId, site);
         sendSerializable(receiver, RESULT_CODE_Q, StringConstants.QUESTION, question);
-        getCommentsAndSend(receiver, question);
+        getCommentsAndSend(site, receiver, question);
         return question;
     }
 
-    private ArrayList<Answer> getAnswersAndSend(final ResultReceiver receiver, long questionId, int page)
+    private ArrayList<Answer> getAnswersAndSend(final ResultReceiver receiver, String site, long questionId, int page)
     {
-        ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, page);
+        ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, site, page);
         sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, answers);
         return answers;
     }
