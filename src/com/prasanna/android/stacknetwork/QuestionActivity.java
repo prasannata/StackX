@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2012 Prasanna Thirumalai
+ Copyright (C) 2013 Prasanna Thirumalai
 
  This file is part of StackX.
 
@@ -165,7 +165,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             questionFragment.setComments(question.comments);
         }
 
-        if (!serviceRunningForAnswers)
+        if (question != null && !serviceRunningForAnswers)
             displayAnswers(question.answers);
     }
 
