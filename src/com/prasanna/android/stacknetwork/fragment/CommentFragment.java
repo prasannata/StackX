@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -67,6 +68,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private ImageView deleteComment;
     private OnCommentChangeListener onCommentChangeListener;
     private EditText editTextForTitle;
+    private ProgressDialog progressDialog;
 
     public interface OnCommentChangeListener
     {
@@ -355,6 +357,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     private void startServiceForDelComment(final Comment comment)
     {
+        progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
+        progressDialog.show();
+
         Intent intent = new Intent(getActivity(), WriteIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.putExtra(StringConstants.COMMENT, comment);
@@ -369,6 +374,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         if (resultCode == WriteIntentService.ACTION_DEL_COMMENT)
         {
             Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
+            progressDialog.dismiss();
 
             if (onCommentChangeListener != null)
             {
