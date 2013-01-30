@@ -29,6 +29,7 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
+import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -52,8 +53,6 @@ public class MyProfileService extends AbstractStackxService
         @Override
         public void handleMessage(Message msg)
         {
-            final int MS_IN_AN_HOUR = 3600000;
-
             ProfileDAO profileDAO = new ProfileDAO(context);
 
             try
@@ -61,7 +60,7 @@ public class MyProfileService extends AbstractStackxService
                 profileDAO.open();
                 User me = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
 
-                if (me == null || System.currentTimeMillis() - me.lastUpdateTime > MS_IN_AN_HOUR)
+                if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR)
                 {
                     Log.d(TAG, "Get my profile");
                     StackXPage<User> userPage = UserServiceHelper.getInstance().getMe();

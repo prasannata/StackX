@@ -80,10 +80,30 @@ public class ProfileDAO extends AbstractBaseDao
         }
     }
 
+    public void updateMyAvatar(String site, Bitmap avatar)
+    {
+        if (site != null && avatar != null)
+        {
+            User me = getMe(site);
+
+            String whereClause = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
+            String[] whereArgs =
+            { "1", site };
+
+            ContentValues values = new ContentValues();
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            me.avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            values.put(ProfileTable.COLUMN_PROFILE_IMAGE, stream.toByteArray());
+
+            database.update(ProfileTable.COLUMN_LAST_UPDATE, values, whereClause, whereArgs);
+        }
+    }
+
     public User getMe(String site)
     {
         String selection = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs = { "1", site };
+        String[] selectionArgs =
+        { "1", site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_PROFILE, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -97,7 +117,8 @@ public class ProfileDAO extends AbstractBaseDao
     public User getProfile(long userId, String site)
     {
         String selection = ProfileTable.COLUMN_ID + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs = { String.valueOf(userId), site };
+        String[] selectionArgs =
+        { String.valueOf(userId), site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_PROFILE, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -143,7 +164,8 @@ public class ProfileDAO extends AbstractBaseDao
     public void deleteMe(String site)
     {
         String whereClause = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
-        String[] whereArgs = { "1", site };
+        String[] whereArgs =
+        { "1", site };
 
         database.delete(DatabaseHelper.TABLE_PROFILE, whereClause, whereArgs);
     }
@@ -151,7 +173,8 @@ public class ProfileDAO extends AbstractBaseDao
     public void deleteUser(long userId, String site)
     {
         String whereClause = ProfileTable.COLUMN_ID + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
-        String[] whereArgs = { String.valueOf(userId), site };
+        String[] whereArgs =
+        { String.valueOf(userId), site };
 
         database.delete(DatabaseHelper.TABLE_PROFILE, whereClause, whereArgs);
     }

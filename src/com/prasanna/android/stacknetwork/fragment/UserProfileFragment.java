@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -25,6 +25,8 @@ import java.util.HashMap;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.SQLException;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -43,10 +45,14 @@ import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.GetImageAsyncTask;
 
 public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver
 {
@@ -179,14 +185,60 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
             textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
             textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
+
+            getAndDisplayUserAvatar();
+        }
+    }
+
+    private void getAndDisplayUserAvatar()
+    {
+        if (user.avatar == null)
+        {
+            AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
+            {
+                @Override
+                public void notifyOnCompletion(Bitmap result)
+                {
+                    ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
+                    userProfileImage.setImageBitmap(result);
+
+                    if (me)
+                    {
+                        persistMyAvatar(result);
+                    }
+                }
+
+                private void persistMyAvatar(Bitmap result)
+                {
+                    ProfileDAO profileDAO = new ProfileDAO(getActivity());
+                    try
+                    {
+                        profileDAO.open();
+                        profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, result);
+                    }
+                    catch (SQLException e)
+                    {
+                        Log.d(TAG, e.getMessage());
+                    }
+                    finally
+                    {
+                        profileDAO.close();
+                    }
+                }
+            };
+
+            GetImageAsyncTask imageAsyncTask = new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl);
+            imageAsyncTask.execute(user.profileImageLink);
+        }
+        else
+        {
+            ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
+            userProfileImage.setImageBitmap(user.avatar);
         }
     }
 
     private void updateProfileInfo()
     {
-        ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
-        userProfileImage.setImageBitmap(user.avatar);
-
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(user.displayName);
 

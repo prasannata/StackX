@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -66,7 +66,7 @@ public abstract class AbstractBaseServiceHelper
         {
             JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
             JSONObjectWrapper userJsonObject = JSONObjectWrapper
-                            .wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
+                    .wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
 
             page.items = new ArrayList<User>();
 
@@ -89,7 +89,6 @@ public abstract class AbstractBaseServiceHelper
                 user.lastAccessTime = userJsonObject.getLong(JsonFields.User.LAST_ACCESS_DATE);
                 user.acceptRate = userJsonObject.getInt(JsonFields.User.ACCEPT_RATE);
                 user.creationDate = userJsonObject.getLong(JsonFields.User.CREATION_DATE);
-                user.avatar = SecureHttpHelper.getInstance().fetchImage(user.profileImageLink);
                 page.items.add(user);
             }
         }
@@ -247,15 +246,17 @@ public abstract class AbstractBaseServiceHelper
     protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
     {
         return SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                        queryParams);
+                queryParams);
 
     }
 
-    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
-                    Map<String, String> queryParams, HttpEntity httpEntity)
+    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint,
+            Map<String, String> requestHeaders,
+            Map<String, String> queryParams,
+            HttpEntity httpEntity)
     {
         return SecureHttpHelper.getInstance().executePostForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                        requestHeaders, queryParams, httpEntity);
+                requestHeaders, queryParams, httpEntity);
 
     }
 
