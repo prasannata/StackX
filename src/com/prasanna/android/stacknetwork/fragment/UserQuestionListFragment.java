@@ -123,7 +123,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void startIntentService()
     {
-        Log.d(TAG, "startIntentService");
+        Log.d(TAG, "startIntentService for action " + action);
 
         showProgressBar();
         

@@ -78,19 +78,22 @@ public class PostCommentFragment extends Fragment
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count)
         {
-            charCount.setText(String.valueOf(s.length()));
+            if (!PostCommentFragment.this.isRemoving() || !PostCommentFragment.this.isDetached())
+            {
+                charCount.setText(String.valueOf(s.length()));
 
-            if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
-            {
-                sendComment.setTextColor(getResources().getColor(R.color.delft));
-                sendComment.setClickable(true);
-            }
-            else
-            {
-                if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
                 {
-                    sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
-                    sendComment.setClickable(false);
+                    sendComment.setTextColor(getResources().getColor(R.color.delft));
+                    sendComment.setClickable(true);
+                }
+                else
+                {
+                    if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                    {
+                        sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
+                        sendComment.setClickable(false);
+                    }
                 }
             }
         }
