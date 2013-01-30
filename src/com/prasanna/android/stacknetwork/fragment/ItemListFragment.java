@@ -129,7 +129,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
             itemListAdapter.notifyDataSetChanged();
         else
         {
-            if (items != null && !items.isEmpty())
+            if (itemListAdapter != null &&items != null && !items.isEmpty())
                 itemListAdapter.addAll(items);
         }
     }
