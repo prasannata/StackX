@@ -28,6 +28,7 @@ import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Post;
+import com.prasanna.android.stacknetwork.model.Post.PostType;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
@@ -76,6 +77,9 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
                         post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
                         post.body = jsonObject.getString(JsonFields.Post.BODY);
                         post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
+                        String postType = jsonObject.getString(JsonFields.Post.POST_TYPE);
+                        if (postType != null)
+                            post.postType = PostType.getEnum(postType);
                         post.score = jsonObject.getInt(JsonFields.Post.SCORE);
                         post.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
                         return post;

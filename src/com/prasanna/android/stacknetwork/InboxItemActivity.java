@@ -222,6 +222,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         setupOnClickForViewQuestion();
 
         textView = (TextView) findViewById(R.id.responseItemScore);
+        textView.setVisibility(View.VISIBLE);
         textView.setText(String.valueOf(stackXItem.score));
 
         setuOnClickForContextMenu();
