@@ -74,6 +74,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
     private boolean serviceRunningForAnswers = false;
+    private boolean serviceRunningForQuestion = false;
     private CommentFragment commentFragment;
     private PostCommentFragment postCommentFragment;
     private HashMap<String, String> commentsDraft = new HashMap<String, String>();
@@ -148,6 +149,24 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         setupViewPager();
 
         prepareIntentAndStartService();
+    }
+
+    @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+
+        super.onResume();
+
+        if (question != null && !serviceRunningForQuestion)
+        {
+            displayQuestion();
+            questionFragment.displayBody(question.body);
+            questionFragment.setComments(question.comments);
+        }
+
+        if (!serviceRunningForAnswers)
+            displayAnswers(question.answers);
     }
 
     @Override
@@ -233,6 +252,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             intent.setAction(StringConstants.QUESTION_ID);
             intent.putExtra(StringConstants.QUESTION_ID, questionId);
             intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
+            serviceRunningForQuestion = true;
             startService(intent);
         }
         else
@@ -251,6 +271,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 intent.putExtra(StringConstants.QUESTION, question);
                 intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
                 intent.putExtra(StringConstants.REFRESH, getIntent().getBooleanExtra(StringConstants.REFRESH, false));
+                serviceRunningForQuestion = true;
                 startService(intent);
             }
         }
@@ -477,11 +498,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 if (question.answerCount == 0)
                     setProgressBarIndeterminateVisibility(false);
                 displayQuestion();
+                serviceRunningForQuestion = false;
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
                 questionFragment.displayBody(resultData.getString(StringConstants.BODY));
                 if (question.answerCount == 0)
                     setProgressBarIndeterminateVisibility(false);
+                serviceRunningForQuestion = false;
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
                 question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);

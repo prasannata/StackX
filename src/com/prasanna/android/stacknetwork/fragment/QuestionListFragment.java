@@ -120,21 +120,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onResume()
-    {
-        Log.d(TAG, "onResume");
-        
-        super.onResume();
-
-        if (itemListAdapter != null)
-        {
-            Log.d(TAG, "Num items in adapter: " + itemListAdapter.getCount());
-            
-            itemListAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
     public void onStop()
     {
         Log.d(getLogTag(), "onStop");
