@@ -56,9 +56,4 @@ public class QuestionsCache extends LruCache<Long, Question>
             }
         }
     }
-
-    public Question remove(long questionId)
-    {
-        return remove(questionId);
-    }
 }

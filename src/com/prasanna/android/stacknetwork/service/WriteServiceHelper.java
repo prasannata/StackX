@@ -58,10 +58,22 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         return INSTANCE;
     }
 
+    @Override
+    protected String getLogTag()
+    {
+        return TAG;
+    }
+
     public Comment addComment(long postId, String body)
     {
         String restEndPoint = "/posts/" + postId + "/comments/add";
 
+        return writeComment(body, restEndPoint);
+
+    }
+
+    private Comment writeComment(String body, String restEndPoint)
+    {
         List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
 
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, SharedPreferencesUtil
@@ -93,14 +105,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         {
             Log.e(TAG, e.getMessage());
         }
-
         return null;
-    }
-
-    @Override
-    protected String getLogTag()
-    {
-        return TAG;
     }
 
     public void deleteComment(long commentId)
@@ -127,5 +132,12 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         {
             throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
         }
+    }
+
+    public Comment editComment(long commentId, String editedText)
+    {
+        String restEndPoint = "/comments/" + commentId + "/edit";
+
+        return writeComment(editedText, restEndPoint);
     }
 }

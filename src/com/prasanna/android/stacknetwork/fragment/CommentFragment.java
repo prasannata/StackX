@@ -75,7 +75,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     {
         void onCommentUpdate(Comment comment);
 
-        void onCommentDelete(Comment comment);
+        void onCommentDelete(long commentId);
     }
 
     public void setOnCommentChangeListener(OnCommentChangeListener onCommentChangeListener)
@@ -228,19 +228,19 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         if (canEditComment())
         {
             Log.d(TAG, "I can edit my comment");
-            setupEditComment(comment, commentLayout);
+            setupEditComment(comment.id, commentLayout);
         }
 
         if (canDelComment())
         {
             Log.d(TAG, "I can delete my comment");
-            setupDeleteComment(comment, commentLayout);
+            setupDeleteComment(comment.id, commentLayout);
         }
     }
 
-    private void setupEditComment(Comment comment, RelativeLayout commentLayout)
+    private void setupEditComment(long commentId, RelativeLayout commentLayout)
     {
-        setupFinishEditComment(commentLayout);
+        setupFinishEditComment(commentId, commentLayout);
         setupCancelEditComment(commentLayout);
 
         editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
@@ -261,7 +261,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         });
     }
 
-    private void setupFinishEditComment(RelativeLayout commentLayout)
+    private void setupFinishEditComment(final long commentId, RelativeLayout commentLayout)
     {
         finishEditComment = (ImageView) commentLayout.findViewById(R.id.finishEditComment);
         finishEditComment.setOnClickListener(new View.OnClickListener()
@@ -269,10 +269,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                hideSoftInput(editTextForTitle);
-                prepareForEditText(false);
-                editTextForTitle.clearFocus();
-                itemsContainer.requestFocus();
+                startServiceForEditComment(commentId, editTextForTitle.getText().toString());
+                markCommentEnd(v);
             }
         });
     }
@@ -285,10 +283,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                hideSoftInput(editTextForTitle);
-                prepareForEditText(false);
-                editTextForTitle.clearFocus();
-                itemsContainer.requestFocus();
+                markCommentEnd(v);
             }
         });
     }
@@ -318,7 +313,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
     }
 
-    private void setupDeleteComment(final Comment comment, RelativeLayout commentLayout)
+    private void setupDeleteComment(final long commentId, RelativeLayout commentLayout)
     {
         deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
         deleteComment.setVisibility(View.VISIBLE);
@@ -331,7 +326,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 {
                     if (which == DialogInterface.BUTTON_POSITIVE)
                     {
-                        startServiceForDelComment(comment);
+                        startServiceForDelComment(commentId);
                     }
                 }
             };
@@ -374,14 +369,27 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         getFragmentManager().popBackStackImmediate();
     }
 
-    private void startServiceForDelComment(final Comment comment)
+    private void startServiceForEditComment(long commentId, final String editedText)
     {
         progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
         progressDialog.show();
 
         Intent intent = new Intent(getActivity(), WriteIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        intent.putExtra(StringConstants.COMMENT, comment);
+        intent.putExtra(StringConstants.COMMENT_ID, commentId);
+        intent.putExtra(StringConstants.BODY, editedText);
+        intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_EDIT_COMMENT);
+        startService(intent);
+    }
+
+    private void startServiceForDelComment(long commentId)
+    {
+        progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
+        progressDialog.show();
+
+        Intent intent = new Intent(getActivity(), WriteIntentService.class);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        intent.putExtra(StringConstants.COMMENT_ID, commentId);
         intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_DEL_COMMENT);
         startService(intent);
     }
@@ -390,20 +398,48 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         serviceRunning = false;
-        if (resultCode == WriteIntentService.ACTION_DEL_COMMENT)
+        switch (resultCode)
         {
-            Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
-            progressDialog.dismiss();
+            case WriteIntentService.ACTION_EDIT_COMMENT:
+                Log.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
+                progressDialog.dismiss();
+                onEditCommentComplete(resultData);
+                break;
 
-            if (onCommentChangeListener != null)
-            {
-                onCommentChangeListener.onCommentDelete((Comment) resultData.getSerializable(StringConstants.COMMENT));
-
-                itemListAdapter.notifyDataSetChanged();
-                if (comments.isEmpty())
-                    removeSelf();
-
-            }
+            case WriteIntentService.ACTION_DEL_COMMENT:
+                Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
+                progressDialog.dismiss();
+                onDelCommentComplete(resultData);
+                break;
         }
+    }
+
+    private void onEditCommentComplete(Bundle resultData)
+    {
+        if (onCommentChangeListener != null)
+        {
+            onCommentChangeListener.onCommentUpdate((Comment)resultData.getSerializable(StringConstants.COMMENT));
+        }
+    }
+
+    private void onDelCommentComplete(Bundle resultData)
+    {
+        if (onCommentChangeListener != null)
+        {
+            onCommentChangeListener.onCommentDelete(resultData.getLong(StringConstants.COMMENT_ID));
+
+            itemListAdapter.notifyDataSetChanged();
+            if (comments.isEmpty())
+                removeSelf();
+
+        }
+    }
+
+    private void markCommentEnd(View v)
+    {
+        hideSoftInput(v);
+        prepareForEditText(false);
+        editTextForTitle.clearFocus();
+        itemsContainer.requestFocus();
     }
 }

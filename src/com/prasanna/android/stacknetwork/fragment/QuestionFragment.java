@@ -213,7 +213,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         {
             TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
             textView.setText(getString(R.string.comments) + ":" + String.valueOf(question.comments.size()));
-            textView.setVisibility(View.VISIBLE);
+            textView.setVisibility(question.comments.isEmpty() ? View.GONE : View.VISIBLE);
 
             enableCommentsInContextMenu();
         }
@@ -274,13 +274,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onCommentUpdate(Comment comment)
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onCommentDelete(Comment comment)
-    {
         if (question.comments != null)
         {
             Log.d(TAG, "Removing comment: " + comment.id);
@@ -290,7 +283,29 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             {
                 if (iterator.next().id == comment.id)
                 {
-                    Log.d(TAG, "comment " + comment.id + " removed");
+                    Log.d(TAG, "comment " + comment.id + " edited");
+                    removeQuestionFromCache();
+                    break;
+                }
+            }
+
+            updateCacheIfNeeded();
+        }
+    }
+
+    @Override
+    public void onCommentDelete(long commentId)
+    {
+        if (question.comments != null)
+        {
+            Log.d(TAG, "Removing comment: " + commentId);
+
+            Iterator<Comment> iterator = question.comments.iterator();
+            while (iterator.hasNext())
+            {
+                if (iterator.next().id == commentId)
+                {
+                    Log.d(TAG, "comment " + commentId + " removed");
                     iterator.remove();
                     break;
                 }
@@ -300,6 +315,12 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         }
 
         displayNumComments();
+    }
+
+    private void removeQuestionFromCache()
+    {
+        if (QuestionsCache.getInstance().containsKey(question.id))
+            QuestionsCache.getInstance().remove(question.id);
     }
 
     private void updateCacheIfNeeded()
