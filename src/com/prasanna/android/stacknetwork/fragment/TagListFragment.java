@@ -166,7 +166,7 @@ public class TagListFragment extends ListFragment
             if (convertView == null)
             {
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
-                                Context.LAYOUT_INFLATER_SERVICE);
+                        Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.tag_list_item, null);
             }
 
@@ -175,7 +175,7 @@ public class TagListFragment extends ListFragment
 
             if (adapter.getItem(position).local)
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                                R.drawable.make_available_offline, 0);
+                        R.drawable.make_available_offline, 0);
             else
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
@@ -265,7 +265,7 @@ public class TagListFragment extends ListFragment
                 filterListInputText.setHint(defaultHint);
                 getListView().requestFocus();
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-                                Context.INPUT_METHOD_SERVICE);
+                        Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         });
@@ -294,7 +294,7 @@ public class TagListFragment extends ListFragment
         getProgressBar().setVisibility(View.VISIBLE);
 
         GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
-                        getActivity()), AppUtils.inRegisteredSite(getActivity()));
+                getActivity()), AppUtils.inRegisteredSite(getActivity()));
 
         AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
     }
@@ -331,6 +331,8 @@ public class TagListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
+        Log.d(TAG, "Position clicked : " + position + ", total = " + listAdapter.getCount());
+
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
@@ -357,5 +359,10 @@ public class TagListFragment extends ListFragment
         TagListFragment fragment = new TagListFragment();
         fragment.onTagSelectListener = onTagSelectListener;
         return fragment;
+    }
+
+    public void setOnTagSelectListener(OnTagSelectListener onTagSelectListener)
+    {
+        this.onTagSelectListener = onTagSelectListener;
     }
 }

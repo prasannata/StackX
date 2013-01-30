@@ -75,12 +75,12 @@ public class QuestionListFragment extends AbstractQuestionListFragment
             Log.d(TAG, "Creating new fragment: " + fragmentTag);
 
             newFragment = new QuestionListFragment();
-            newFragment.fragmentTag = fragmentTag;
-            newFragment.sort = sort;
-            newFragment.action = action;
-            newFragment.tag = tag;
-            newFragment.setRetainInstance(true);
         }
+
+        newFragment.fragmentTag = fragmentTag;
+        newFragment.sort = sort;
+        newFragment.action = action;
+        newFragment.tag = tag;
 
         return newFragment;
     }
@@ -94,8 +94,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                            new ArrayList<Question>(), this);
+                    new ArrayList<Question>(), this);
         }
+
+        if (savedInstanceState != null)
+            action = savedInstanceState.getInt(StringConstants.ACTION);
 
         return itemsContainer;
     }
@@ -110,13 +113,23 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (tag != null)
         {
             if ((action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG || action == QuestionsIntentService.GET_FAQ_FOR_TAG)
-                            && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
+                    && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             getActivity().getActionBar().setTitle(tag);
         }
 
         findActionAndStartService();
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+
+        outState.putInt(StringConstants.ACTION, action);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override

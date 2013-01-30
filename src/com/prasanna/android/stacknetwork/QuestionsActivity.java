@@ -48,19 +48,22 @@ import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements
-                OnContextItemSelectedListener<Question>, OnTagSelectListener
+        OnContextItemSelectedListener<Question>, OnTagSelectListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
     private static final String TAB_TITLE_ACTIVE = "Active";
     private static final String TAB_TITLE_NEW = "New";
     private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
     private static final String TAB_TITLE_FAQ = "FAQ";
+    private static final String SAVED = "saved";
 
     private static QuestionsActivity me;
 
     private boolean showTagsFragment = false;
     private TagListFragment tagListFragment;
     private String intentAction;
+    private String tag;
+    private int action;
 
     public static QuestionListFragment getFragment(String fragmentTag)
     {
@@ -84,9 +87,15 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             Fragment existingFragment = getFragmentManager().findFragmentByTag(fragment.fragmentTag);
 
             if (existingFragment == null)
+            {
+                Log.d(TAG, "adding fragment: " + fragment.fragmentTag);
                 ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
+            }
             else
+            {
+                Log.d(TAG, "Attaching fragment: " + fragment.fragmentTag);
                 ft.attach(existingFragment);
+            }
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
@@ -111,16 +120,40 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         setContentView(R.layout.fragment_container);
         intentAction = getIntent().getAction();
 
-        if (Intent.ACTION_SEARCH.equals(intentAction))
-            showSearchFragment();
-        else if (StringConstants.SIMILAR.equals(intentAction))
-            showSimilarQuestionListFragment();
-        else if (StringConstants.RELATED.equals(intentAction))
-            showRelatedQuestionListFragment();
-        else if (StringConstants.TAG.equals(intentAction))
-            showTagQuestionListFragment();
+        if (savedInstanceState == null || !savedInstanceState.getBoolean(SAVED))
+        {
+            if (Intent.ACTION_SEARCH.equals(intentAction))
+                showSearchFragment();
+            else if (StringConstants.SIMILAR.equals(intentAction))
+                showSimilarQuestionListFragment();
+            else if (StringConstants.RELATED.equals(intentAction))
+                showRelatedQuestionListFragment();
+            else if (StringConstants.TAG.equals(intentAction))
+                showTagQuestionListFragment();
+            else
+                showFrontPageForSite();
+        }
         else
-            showFrontPageForSite();
+        {
+            if (StringConstants.TAG.equals(intentAction))
+                showTagQuestionListFragment();
+            else
+            {
+                action = savedInstanceState.getInt(StringConstants.ACTION);
+
+                if (action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG)
+                    showLastTagQuestionListFragment(savedInstanceState);
+                else
+                    showFrontPageForSite();
+            }
+        }
+    }
+
+    private void showFrontPageForSite()
+    {
+        showTagsFragment = true;
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
     }
 
     private void showSearchFragment()
@@ -131,13 +164,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         replaceFragment(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null), null, false);
     }
 
-    private void showFrontPageForSite()
-    {
-        showTagsFragment = true;
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
-    }
-
     private void showSimilarQuestionListFragment()
     {
         String title = getIntent().getStringExtra(StringConstants.TITLE);
@@ -145,7 +171,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         getActionBar().setTitle(getString(R.string.similar) + " to " + title);
 
         QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null,
-                        null);
+                null);
         newFragment.getBundle().putString(StringConstants.TITLE, title);
         replaceFragment(newFragment, StringConstants.SIMILAR + "-" + title.hashCode(), false);
     }
@@ -154,7 +180,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
         QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
-                        null);
+                null);
         newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
         replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, false);
     }
@@ -162,16 +188,23 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void showTagQuestionListFragment()
     {
         String tag = getIntent().getStringExtra(StringConstants.TAG);
-
-        QuestionListFragment newFragment = QuestionListFragment.newFragment(
-                        QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, null);
-        newFragment.getBundle().putString(StringConstants.TAG, tag);
+        Log.d(TAG, "Restoring question list fragment for tag" + tag);
         setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
+    }
+
+    private void showLastTagQuestionListFragment(Bundle savedInstanceState)
+    {
+        showTagsFragment = true;
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        setupActionBarTabs(action, savedInstanceState.getString(StringConstants.TAG), false);
     }
 
     private void setupActionBarTabs(int action, String tag, boolean frontPage)
     {
         getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        this.action = action;
+        this.tag = tag;
 
         createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
         createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
@@ -180,7 +213,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         if (!frontPage)
         {
             createTab(TAB_TITLE_FAQ,
-                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
+                    QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
         }
     }
 
@@ -194,7 +227,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void saveSearchQuery(String query)
     {
         SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
-                        RecentQueriesProvider.MODE);
+                RecentQueriesProvider.MODE);
         suggestions.saveRecentQuery(query, null);
     }
 
@@ -202,7 +235,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     public void refresh()
     {
         QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
-                        R.id.fragmentContainer);
+                R.id.fragmentContainer);
         questionsFragment.refresh();
     }
 
@@ -210,6 +243,18 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     protected boolean shouldSearchViewBeEnabled()
     {
         return true;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+
+        outState.putBoolean(SAVED, true);
+        outState.putInt(StringConstants.ACTION, action);
+        outState.putString(StringConstants.TAG, tag);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -311,6 +356,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
                 tagListFragment = TagListFragment.newFragment(this);
                 addAndHideFragment(tagListFragment, StringConstants.TAGS);
             }
+            else
+                tagListFragment.setOnTagSelectListener(this);
 
             toggleDisplayForTags(true);
 
@@ -325,7 +372,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void toggleDisplayForTags(boolean forTags)
     {
         getActionBar().setDisplayHomeAsUpEnabled(!forTags);
-        
+
         if (forTags)
         {
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
@@ -349,7 +396,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
             Log.d(TAG, "Tag list fragment is current fragment");
 
             hideTagFragment();
-            
+
             toggleDisplayForTags(false);
         }
         else
@@ -361,7 +408,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "Front page selected");
 
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
+        hideTagFragment();
+        setupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
     }
 
     @Override
@@ -369,7 +417,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, tag + " selected");
 
-        hideTagFragmentAndSetupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
+        hideTagFragment();
+        setupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
     private void startSimirarQuestionsActivity(String title)
@@ -419,13 +468,12 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         ft.commit();
     }
 
-    private void hideTagFragmentAndSetupTabsForTag(int action, String tag, boolean frontPage)
+    private void setupTabsForTag(int action, String tag, boolean frontPage)
     {
         getActionBar().removeAllTabs();
         actionBarMenu.findItem(R.id.menu_search).setVisible(true);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        hideTagFragment();
         setupActionBarTabs(action, tag, frontPage);
     }
 

@@ -183,31 +183,24 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     {
         if (question != null)
         {
-            Log.d(TAG, "displaying question");
-
             if (!ctxMenuSetup && menu != null)
             {
                 setupTagsInContextMenu();
                 setupUserProfileInContextMenu();
             }
 
-            Log.d(TAG, "Score: " + question.score);
-
             TextView textView = (TextView) parentLayout.findViewById(R.id.score);
             textView.setText(AppUtils.formatNumber(question.score));
 
-            Log.d(TAG, "answerCount: " + question.answerCount);
             textView = (TextView) parentLayout.findViewById(R.id.answerCount);
             textView.setText(AppUtils.formatNumber(question.answerCount));
 
             if (question.hasAcceptedAnswer)
                 textView.setBackgroundColor(getResources().getColor(R.color.lichen));
 
-            Log.d(TAG, "title: " + question.title);
             textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
             textView.setText(Html.fromHtml(question.title));
 
-            Log.d(TAG, "owner: " + question.owner);
             String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ") : "";
             textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
             textView.setText(getTimeAndOwnerDisplay(acceptRate));
