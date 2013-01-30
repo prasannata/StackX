@@ -45,7 +45,6 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackX
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -60,6 +59,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private User user;
     private boolean me = false;
     private RestQueryResultReceiver resultReceiver;
+    private long userId;
+    private boolean forceRefresh;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -72,13 +73,17 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         resultReceiver = new RestQueryResultReceiver(new Handler());
         resultReceiver.setReceiver(this);
 
-        me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
-
-        if (user != null)
+        if (savedInstanceState != null)
         {
-            if (me)
-                user = SharedPreferencesUtil.getMe(getActivity().getCacheDir());
-            user.accounts = SharedPreferencesUtil.getMeAccounts(getActivity().getCacheDir());
+            me = savedInstanceState.getBoolean(StringConstants.ME);
+            userId = savedInstanceState.getLong(StringConstants.USER_ID);
+            forceRefresh = false;
+        }
+        else
+        {
+            me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
+            userId = getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L);
+            forceRefresh = getActivity().getIntent().getBooleanExtra(StringConstants.REFRESH, false);
         }
     }
 
@@ -130,6 +135,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
+        outState.putBoolean(StringConstants.ME, me);
+        outState.putLong(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         super.onSaveInstanceState(outState);
     }
 
@@ -146,12 +153,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         userProfileIntent = new Intent(getActivity(), UserIntentService.class);
         userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
         userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
-        userProfileIntent.putExtra(StringConstants.ME,
-                        getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-        userProfileIntent.putExtra(StringConstants.USER_ID,
-                        getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-        userProfileIntent.putExtra(StringConstants.REFRESH,
-                        getActivity().getIntent().getBooleanExtra(StringConstants.REFRESH, false));
+        userProfileIntent.putExtra(StringConstants.ME, me);
+        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+        userProfileIntent.putExtra(StringConstants.REFRESH, forceRefresh);
         userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         getActivity().startService(userProfileIntent);
     }
@@ -188,7 +192,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
         textView.setText(getString(R.string.registered) + " "
-                        + DateTimeUtils.getElapsedDurationSince(user.creationDate));
+                + DateTimeUtils.getElapsedDurationSince(user.creationDate));
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
         textView.setText(AppUtils.formatReputation(user.reputation));
@@ -217,7 +221,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
         textView.setText(getString(R.string.lastSeen) + " "
-                        + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+                + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
     private void displayUserAccounts()
@@ -227,7 +231,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                                R.layout.textview_black_textcolor, null);
+                        R.layout.textview_black_textcolor, null);
                 textView.setText(user.accounts.get(userAccountListCursor).siteName);
                 userAccountList.addView(textView);
             }
@@ -251,7 +255,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         }
 
         HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
-                        .getSerializable(StringConstants.USER_ACCOUNTS);
+                .getSerializable(StringConstants.USER_ACCOUNTS);
         if (accounts != null)
         {
             if (user.accounts == null)
