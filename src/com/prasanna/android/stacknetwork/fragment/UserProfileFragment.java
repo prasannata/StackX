@@ -98,9 +98,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onResume()
     {
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
 
         if (user == null)
             startUserProfileService();
