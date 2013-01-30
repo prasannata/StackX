@@ -64,8 +64,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private HashMap<ObjectType, WritePermission> writePermissions;
     private ImageView replyToComment;
     private ImageView editComment;
-    private ImageView finishEditComment;
     private ImageView deleteComment;
+    private ImageView finishEditComment;
+    private ImageView cancelEditComment;
     private OnCommentChangeListener onCommentChangeListener;
     private EditText editTextForTitle;
     private ProgressDialog progressDialog;
@@ -240,6 +241,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private void setupEditComment(Comment comment, RelativeLayout commentLayout)
     {
         setupFinishEditComment(commentLayout);
+        setupCancelEditComment(commentLayout);
 
         editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
         editComment.setVisibility(View.VISIBLE);
@@ -275,6 +277,22 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         });
     }
 
+    private void setupCancelEditComment(RelativeLayout commentLayout)
+    {
+        cancelEditComment = (ImageView) commentLayout.findViewById(R.id.cancelEditComment);
+        cancelEditComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                hideSoftInput(editTextForTitle);
+                prepareForEditText(false);
+                editTextForTitle.clearFocus();
+                itemsContainer.requestFocus();
+            }
+        });
+    }
+
     private void showSoftInput(View v)
     {
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -297,6 +315,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
         deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
         finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
+        cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
     }
 
     private void setupDeleteComment(final Comment comment, RelativeLayout commentLayout)
