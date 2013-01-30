@@ -76,7 +76,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
     private boolean serviceRunningForAnswers = false;
-    private boolean serviceRunningForQuestion = false;
     private CommentFragment commentFragment;
     private PostCommentFragment postCommentFragment;
     private HashMap<String, String> commentsDraft = new HashMap<String, String>();
@@ -155,30 +154,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             Log.d(TAG, "Restoring saved question from bundle");
 
             question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
-            displayQuestion();
-            displayQuestionComments();
-            displayAnswers(question.answers);
         }
         else
             prepareIntentAndStartService();
-    }
-
-    @Override
-    public void onResume()
-    {
-        Log.d(TAG, "onResume");
-
-        super.onResume();
-
-        if (question != null && !serviceRunningForQuestion)
-        {
-            displayQuestion();
-            questionFragment.displayBody(question.body);
-            questionFragment.setComments(question.comments);
-        }
-
-        if (question != null && !serviceRunningForAnswers)
-            displayAnswers(question.answers);
     }
 
     @Override
@@ -246,6 +224,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(questionViewPageAdapter);
 
+        Log.d(TAG, "current number of pages " + questionViewPageAdapter.getCount());
         titlePageIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
         titlePageIndicator.setViewPager(viewPager);
         titlePageIndicator.setOnPageChangeListener(this);
@@ -264,7 +243,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             intent.setAction(StringConstants.QUESTION_ID);
             intent.putExtra(StringConstants.QUESTION_ID, questionId);
             intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
-            serviceRunningForQuestion = true;
             startService(intent);
         }
         else
@@ -283,7 +261,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 intent.putExtra(StringConstants.QUESTION, question);
                 intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
                 intent.putExtra(StringConstants.REFRESH, getIntent().getBooleanExtra(StringConstants.REFRESH, false));
-                serviceRunningForQuestion = true;
                 startService(intent);
             }
         }
@@ -510,16 +487,16 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 setProgressBarIndeterminateVisibility(false);
             case QuestionDetailsIntentService.RESULT_CODE_Q:
                 question = (Question) resultData.getSerializable(StringConstants.QUESTION);
-                if (question.answerCount == 0)
-                    setProgressBarIndeterminateVisibility(false);
                 displayQuestion();
-                serviceRunningForQuestion = false;
+                if (question.answerCount > 0 && (question.answers == null || question.answers.isEmpty()))
+                    startServiceForAnswers();
+                else
+                    setProgressBarIndeterminateVisibility(false);
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
                 questionFragment.displayBody(resultData.getString(StringConstants.BODY));
                 if (question.answerCount == 0)
                     setProgressBarIndeterminateVisibility(false);
-                serviceRunningForQuestion = false;
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
                 question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);
@@ -528,7 +505,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             case QuestionDetailsIntentService.RESULT_CODE_ANSWERS:
                 serviceRunningForAnswers = false;
                 setProgressBarIndeterminateVisibility(false);
-                displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS));
+                displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS), true);
                 break;
             case WriteIntentService.ACTION_ADD_COMMENT:
                 discardPostCommentFragmentIfVisible(true);
@@ -592,9 +569,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         questionFragment.setAndDisplay(question);
 
-        if (question.answerCount > 0 && (question.answers == null || question.answers.isEmpty()))
-            startServiceForAnswers();
-
         titlePageIndicator.notifyDataSetChanged();
         questionViewPageAdapter.notifyDataSetChanged();
     }
@@ -625,14 +599,14 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         transaction.commit();
     }
 
-    private void displayAnswers(ArrayList<Answer> answers)
+    private void displayAnswers(ArrayList<Answer> answers, boolean add)
     {
         if (answers != null && !answers.isEmpty())
         {
             if (question.answers == null)
                 question.answers = new ArrayList<Answer>();
 
-            if (!StringConstants.QUESTION_ID.equals(getIntent().getAction()))
+            if (add && !StringConstants.QUESTION_ID.equals(getIntent().getAction()))
                 question.answers.addAll(answers);
 
             titlePageIndicator.notifyDataSetChanged();

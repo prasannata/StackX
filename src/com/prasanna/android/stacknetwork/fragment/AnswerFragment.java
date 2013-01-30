@@ -50,6 +50,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.HtmlTextView;
 
 public class AnswerFragment extends Fragment implements OnCommentChangeListener
@@ -82,6 +83,9 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
             answerCtxMenuImageView = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
         }
 
+        if (savedInstanceState != null)
+            answer = (Answer) savedInstanceState.getSerializable(StringConstants.ANSWER);
+
         return parentLayout;
     }
 
@@ -103,6 +107,17 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
         super.onResume();
 
         displayAnswer();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+
+        if (answer != null)
+            outState.putSerializable(StringConstants.ANSWER, answer);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -241,9 +256,9 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     private String getAutherDisplayText(String acceptRate)
     {
         Spanned authorName = answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
-                        : new SpannableString("");
+                : new SpannableString("");
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
-                        + AppUtils.formatReputation(answer.owner.reputation) + "]";
+                + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
     private void enableCommentsInContextMenu(ContextMenu menu)

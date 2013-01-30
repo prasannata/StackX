@@ -48,6 +48,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionFragment extends Fragment implements OnCommentChangeListener
 {
@@ -77,6 +78,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
         if (parentLayout == null)
             createView(inflater);
+
+        if (savedInstanceState != null)
+            question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
 
         return parentLayout;
     }
@@ -138,6 +142,17 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         displayQuestion();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+
+        if (question != null)
+            outState.putSerializable(StringConstants.QUESTION, question);
+
+        super.onSaveInstanceState(outState);
+    }
+
     private void setupUserProfileInContextMenu()
     {
         if (question != null && question.owner != null)
@@ -168,24 +183,31 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     {
         if (question != null)
         {
+            Log.d(TAG, "displaying question");
+
             if (!ctxMenuSetup && menu != null)
             {
                 setupTagsInContextMenu();
                 setupUserProfileInContextMenu();
             }
 
+            Log.d(TAG, "Score: " + question.score);
+
             TextView textView = (TextView) parentLayout.findViewById(R.id.score);
             textView.setText(AppUtils.formatNumber(question.score));
 
+            Log.d(TAG, "answerCount: " + question.answerCount);
             textView = (TextView) parentLayout.findViewById(R.id.answerCount);
             textView.setText(AppUtils.formatNumber(question.answerCount));
 
             if (question.hasAcceptedAnswer)
                 textView.setBackgroundColor(getResources().getColor(R.color.lichen));
 
+            Log.d(TAG, "title: " + question.title);
             textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
             textView.setText(Html.fromHtml(question.title));
 
+            Log.d(TAG, "owner: " + question.owner);
             String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ") : "";
             textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
             textView.setText(getTimeAndOwnerDisplay(acceptRate));
@@ -203,8 +225,8 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     private String getTimeAndOwnerDisplay(String acceptRate)
     {
         return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
-                        + AppUtils.formatReputation(question.owner.reputation) + "]";
+                + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
+                + AppUtils.formatReputation(question.owner.reputation) + "]";
     }
 
     private void displayNumComments()
@@ -233,9 +255,11 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     {
         if (text != null && parentLayout != null)
         {
+            question.body = text;
+
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
             questionBodyLayout.removeAllViews();
-            for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), text))
+            for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), question.body))
                 questionBodyLayout.addView(questionBodyTextView);
         }
     }

@@ -38,6 +38,7 @@ public class StringConstants
     public static final String QUESTION_ID = "question_id";
     public static final String QUESTIONS = "questions";
 
+    public static final String ANSWER = "answer";
     public static final String ANSWERS = "answers";
     public static final String ANSWER_COUNT = "answer_count";
 
