@@ -62,7 +62,7 @@ import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
-                StackXRestQueryResultReceiver, PageSelectAdapter
+        StackXRestQueryResultReceiver, PageSelectAdapter
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
@@ -103,7 +103,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             {
                 if (question.answers.get(position - 1).accepted)
                     return QuestionActivity.this.getString(R.string.accepted) + " "
-                                    + QuestionActivity.this.getString(R.string.answer);
+                            + QuestionActivity.this.getString(R.string.answer);
                 else
                     return QuestionActivity.this.getString(R.string.answer) + " " + position;
             }
@@ -147,7 +147,17 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         setupViewPager();
 
-        prepareIntentAndStartService();
+        if (savedInstanceState != null && savedInstanceState.getSerializable(StringConstants.QUESTION) != null)
+        {
+            Log.d(TAG, "Restoring saved question from bundle");
+
+            question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
+            displayQuestion();
+            displayQuestionComments();
+            displayAnswers(question.answers);
+        }
+        else
+            prepareIntentAndStartService();
     }
 
     @Override
@@ -173,7 +183,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private void enableAddCommentIfPermitted(Menu menu)
     {
         boolean canAddComment = WritePermissionUtil.canAdd(getApplicationContext(),
-                        OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
+                OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
 
         if (AppUtils.inAuthenticatedRealm(this) && canAddComment)
         {
@@ -196,14 +206,14 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 {
                     fragmentTag = question.id + "-comment";
                     displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id,
-                                    fragmentTag);
+                            fragmentTag);
                 }
                 else
                 {
                     Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
                     fragmentTag = answer.id + "-comment";
                     displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id,
-                                    fragmentTag);
+                            fragmentTag);
                 }
             }
         });
@@ -279,6 +289,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     public void onSaveInstanceState(Bundle outState)
     {
         Log.d(TAG, "onSaveInstanceState");
+
+        if (question != null)
+            outState.putSerializable(StringConstants.QUESTION, question);
 
         super.onSaveInstanceState(outState);
     }
@@ -569,10 +582,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
             String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
-                            + viewPager.getCurrentItem();
+                    + viewPager.getCurrentItem();
 
             OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
-                            .findFragmentByTag(currentViewPagerFragmentTag);
+                    .findFragmentByTag(currentViewPagerFragmentTag);
 
             if (onCommentChangeListener != null)
                 commentFragment.setOnCommentChangeListener(onCommentChangeListener);
