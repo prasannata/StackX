@@ -27,9 +27,11 @@ public abstract class AbstractBaseDao
 {
     private final DatabaseHelper databaseHelper;
     protected SQLiteDatabase database;
+    protected Context context;
 
     public AbstractBaseDao(Context context)
     {
+        this.context = context;
         databaseHelper = new DatabaseHelper(context);
     }
 

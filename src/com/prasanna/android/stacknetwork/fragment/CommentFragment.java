@@ -288,31 +288,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         });
     }
 
-    private void showSoftInput(View v)
-    {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-    }
-
-    private void hideSoftInput(View v)
-    {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-    }
-
-    private void prepareForEditText(boolean edit)
-    {
-        editTextForTitle.setEnabled(edit);
-        editTextForTitle.setClickable(edit);
-        editTextForTitle.setFocusable(edit);
-        editTextForTitle.setFocusableInTouchMode(edit);
-
-        editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
-        deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
-        finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
-        cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
-    }
-
     private void setupDeleteComment(final long commentId, RelativeLayout commentLayout)
     {
         deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
@@ -337,6 +312,31 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 DialogBuilder.yesNoDialog(getActivity(), R.string.sureQuestion, listener).show();
             }
         });
+    }
+
+    private void showSoftInput(View v)
+    {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void hideSoftInput(View v)
+    {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
+
+    private void prepareForEditText(boolean edit)
+    {
+        editTextForTitle.setEnabled(edit);
+        editTextForTitle.setClickable(edit);
+        editTextForTitle.setFocusable(edit);
+        editTextForTitle.setFocusableInTouchMode(edit);
+
+        editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
+        deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
+        finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
+        cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
     }
 
     private boolean canAddComment()
@@ -371,15 +371,26 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     private void startServiceForEditComment(long commentId, final String editedText)
     {
-        progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
-        progressDialog.show();
+        if (AppUtils.allowedToWrite(getActivity()))
+        {
+            progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
+            progressDialog.show();
 
-        Intent intent = new Intent(getActivity(), WriteIntentService.class);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        intent.putExtra(StringConstants.COMMENT_ID, commentId);
-        intent.putExtra(StringConstants.BODY, editedText);
-        intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_EDIT_COMMENT);
-        startService(intent);
+            Intent intent = new Intent(getActivity(), WriteIntentService.class);
+            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+            intent.putExtra(StringConstants.COMMENT_ID, commentId);
+            intent.putExtra(StringConstants.BODY, editedText);
+            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_EDIT_COMMENT);
+            startService(intent);
+        }
+        else
+        {
+            long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
+                            WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
+            Toast.makeText(getActivity(), "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
+                            Toast.LENGTH_LONG).show();
+        }
+
     }
 
     private void startServiceForDelComment(long commentId)
@@ -418,7 +429,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     {
         if (onCommentChangeListener != null)
         {
-            onCommentChangeListener.onCommentUpdate((Comment)resultData.getSerializable(StringConstants.COMMENT));
+            onCommentChangeListener.onCommentUpdate((Comment) resultData.getSerializable(StringConstants.COMMENT));
         }
     }
 

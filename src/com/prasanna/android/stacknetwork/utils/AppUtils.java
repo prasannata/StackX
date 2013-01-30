@@ -35,6 +35,7 @@ import android.widget.TextView;
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.StackXError;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 
 public class AppUtils
 {
@@ -96,6 +97,18 @@ public class AppUtils
         return new SoftReference<Bitmap>(bitmap);
     }
 
+    public static boolean allowedToWrite(Context context)
+    {
+        if(context == null)
+            return false;
+        
+        long lastCommentWrite = SharedPreferencesUtil
+                        .getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
+        long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(context,
+                        WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
+        return ((System.currentTimeMillis() - lastCommentWrite) / 1000 > minSecondsBetweenWrite);
+    }
+
     public static ViewGroup getErrorView(Context context, HttpException e)
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -109,7 +122,7 @@ public class AppUtils
         }
         else
             errorMsg = e.getCode().getDescription();
-        
+
         TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
         textView.setText(errorMsg);
         return errorLayout;

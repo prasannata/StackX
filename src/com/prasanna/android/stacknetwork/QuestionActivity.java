@@ -48,6 +48,7 @@ import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
@@ -56,6 +57,7 @@ import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
 import com.prasanna.android.task.WriteObjectAsyncTask;
@@ -547,6 +549,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     protected void addMyComment(Bundle resultData)
     {
+        SharedPreferencesUtil.setLong(this, WritePermission.PREF_LAST_COMMENT_WRITE, System.currentTimeMillis());
+        
         if (question.comments == null)
             question.comments = new ArrayList<Comment>();
 

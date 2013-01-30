@@ -46,9 +46,6 @@ public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        if (convertView == null)
-            return listItemView.getView(getItem(position), convertView, parent);
-        
-        return convertView;
+        return listItemView.getView(getItem(position), convertView, parent);
     }
 }
