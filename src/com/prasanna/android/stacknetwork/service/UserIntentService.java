@@ -112,7 +112,7 @@ public class UserIntentService extends AbstractIntentService
                     break;
                 case GET_USER_SITES:
                     bundle.putSerializable(StringConstants.SITES,
-                                    getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
+                            getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
                     receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
@@ -157,7 +157,7 @@ public class UserIntentService extends AbstractIntentService
                         profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
                         profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
                         SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID,
-                                        userPage.items.get(0).id);
+                                userPage.items.get(0).id);
                     }
                 }
                 else
@@ -185,7 +185,7 @@ public class UserIntentService extends AbstractIntentService
     private boolean profileOlderThanThirtyMinutes(User myProfile)
     {
         return myProfile == null
-                        || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
+                || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
     }
 
     private HashMap<String, Account> getUserAccounts(boolean me, long userId)
@@ -199,18 +199,18 @@ public class UserIntentService extends AbstractIntentService
     private HashMap<String, Account> getMyAccounts()
     {
         Log.d(TAG, "getMyAccounts");
-        
+
         UserAccountsDao userAccountsDao = new UserAccountsDao(getApplicationContext());
         try
         {
             long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
-                            -1);
+                    -1);
             if (currentAccountId != -1)
             {
                 userAccountsDao.open();
                 long lastUpdateTime = userAccountsDao.getLastUpdateTime();
 
-                if (System.currentTimeMillis() - lastUpdateTime > IntegerConstants.MS_IN_A_DAY)
+                if (System.currentTimeMillis() - lastUpdateTime <= IntegerConstants.MS_IN_A_DAY)
                 {
                     ArrayList<Account> accounts = userAccountsDao.getAccounts(currentAccountId);
                     HashMap<String, Account> accountsMap = new HashMap<String, Account>();
@@ -233,7 +233,9 @@ public class UserIntentService extends AbstractIntentService
             userAccountsDao.close();
         }
 
-        return userService.getAccounts(1);
+        HashMap<String, Account> accounts = userService.getAccounts(1);
+        persistMyAccounts(accounts);
+        return accounts;
     }
 
     private StackXPage<Question> getQuestions(boolean me, long userId, int page)
@@ -287,7 +289,7 @@ public class UserIntentService extends AbstractIntentService
         if (linkAccountsMap != null && linkSitesMap != null)
         {
             long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
-                            -1);
+                    -1);
             if (currentAccountId == -1 && !linkAccountsMap.isEmpty())
             {
                 currentAccountId = linkAccountsMap.values().iterator().next().id;

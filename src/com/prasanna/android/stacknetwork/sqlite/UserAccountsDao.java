@@ -33,7 +33,7 @@ import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.UserAccountsTable
 
 public class UserAccountsDao extends AbstractBaseDao
 {
-    private static final String TAG = TagDAO.class.getSimpleName();
+    private static final String TAG = UserAccountsDao.class.getSimpleName();
     public static final String AUDIT_ENTRY_TYPE = UserAccountsDao.class.getSimpleName();
 
     public UserAccountsDao(Context context)
