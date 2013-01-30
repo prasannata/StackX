@@ -51,6 +51,7 @@ public class WriteIntentService extends AbstractIntentService
     {
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final long postId = intent.getLongExtra(StringConstants.POST_ID, -1);
+        final long commentId = intent.getLongExtra(StringConstants.COMMENT_ID, -1);
         final String body = intent.getStringExtra(StringConstants.BODY);
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
@@ -64,10 +65,10 @@ public class WriteIntentService extends AbstractIntentService
                     sendComment(postId, body, receiver);
                     break;
                 case ACTION_EDIT_COMMENT:
+                    editComment(commentId, body, receiver);
                     break;
                 case ACTION_DEL_COMMENT:
-                    final Comment comment = (Comment) intent.getSerializableExtra(StringConstants.COMMENT);
-                    deleteComment(comment, receiver);
+                    deleteComment(commentId, receiver);
                     break;
                 default:
                     Log.d(TAG, "Unknown action: " + action);
@@ -82,19 +83,27 @@ public class WriteIntentService extends AbstractIntentService
         }
     }
 
-    private void deleteComment(Comment comment, ResultReceiver receiver)
-    {
-        WriteServiceHelper.getInstance().deleteComment(comment.id);
-        Bundle resultData = new Bundle();
-        resultData.putSerializable(StringConstants.COMMENT, comment);
-        receiver.send(ACTION_DEL_COMMENT, resultData);
-    }
-
     private void sendComment(final long postId, final String body, final ResultReceiver receiver)
     {
         Bundle resultData = new Bundle();
         Comment comment = WriteServiceHelper.getInstance().addComment(postId, body);
         resultData.putSerializable(StringConstants.COMMENT, comment);
         receiver.send(ACTION_ADD_COMMENT, resultData);
+    }
+    
+    private void editComment(long commentId, String editedText, ResultReceiver receiver)
+    {
+        Bundle resultData = new Bundle();
+        Comment comment = WriteServiceHelper.getInstance().editComment(commentId, editedText);
+        resultData.putSerializable(StringConstants.COMMENT, comment);
+        receiver.send(ACTION_EDIT_COMMENT, resultData);
+    }
+    
+    private void deleteComment(long commentId, ResultReceiver receiver)
+    {
+        WriteServiceHelper.getInstance().deleteComment(commentId);
+        Bundle resultData = new Bundle();
+        resultData.putSerializable(StringConstants.COMMENT_ID, commentId);
+        receiver.send(ACTION_DEL_COMMENT, resultData);
     }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2012 Prasanna Thirumalai
+ Copyright (C) 2013 Prasanna Thirumalai
 
  This file is part of StackX.
 
@@ -48,6 +48,7 @@ import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
@@ -56,6 +57,7 @@ import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
 import com.prasanna.android.task.WriteObjectAsyncTask;
@@ -74,6 +76,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
     private boolean serviceRunningForAnswers = false;
+    private boolean serviceRunningForQuestion = false;
     private CommentFragment commentFragment;
     private PostCommentFragment postCommentFragment;
     private HashMap<String, String> commentsDraft = new HashMap<String, String>();
@@ -161,6 +164,24 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     }
 
     @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+
+        super.onResume();
+
+        if (question != null && !serviceRunningForQuestion)
+        {
+            displayQuestion();
+            questionFragment.displayBody(question.body);
+            questionFragment.setComments(question.comments);
+        }
+
+        if (question != null && !serviceRunningForAnswers)
+            displayAnswers(question.answers);
+    }
+
+    @Override
     protected boolean shouldSearchViewBeEnabled()
     {
         return false;
@@ -243,6 +264,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             intent.setAction(StringConstants.QUESTION_ID);
             intent.putExtra(StringConstants.QUESTION_ID, questionId);
             intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
+            serviceRunningForQuestion = true;
             startService(intent);
         }
         else
@@ -261,6 +283,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 intent.putExtra(StringConstants.QUESTION, question);
                 intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
                 intent.putExtra(StringConstants.REFRESH, getIntent().getBooleanExtra(StringConstants.REFRESH, false));
+                serviceRunningForQuestion = true;
                 startService(intent);
             }
         }
@@ -490,11 +513,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 if (question.answerCount == 0)
                     setProgressBarIndeterminateVisibility(false);
                 displayQuestion();
+                serviceRunningForQuestion = false;
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
                 questionFragment.displayBody(resultData.getString(StringConstants.BODY));
                 if (question.answerCount == 0)
                     setProgressBarIndeterminateVisibility(false);
+                serviceRunningForQuestion = false;
                 break;
             case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
                 question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);
@@ -537,6 +562,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     protected void addMyComment(Bundle resultData)
     {
+        SharedPreferencesUtil.setLong(this, WritePermission.PREF_LAST_COMMENT_WRITE, System.currentTimeMillis());
+
         if (question.comments == null)
             question.comments = new ArrayList<Comment>();
 

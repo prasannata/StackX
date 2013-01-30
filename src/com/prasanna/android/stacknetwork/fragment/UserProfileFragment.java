@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -54,7 +54,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private static final String TAG = UserProfileFragment.class.getSimpleName();
     private RelativeLayout profileHomeLayout;
     private LinearLayout userAccountList;
-    private ProgressBar fetchProfileProgress;
+    private ProgressDialog progressDialog;
     private Intent userProfileIntent;
     private int userAccountListCursor = 0;
     private User user;
@@ -88,8 +88,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         if (profileHomeLayout == null)
         {
             profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
-            fetchProfileProgress = (ProgressBar) profileHomeLayout.findViewById(R.id.progressBar);
-            fetchProfileProgress.setVisibility(View.VISIBLE);
+            progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
+            progressDialog.show();
+
             userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
         }
 
@@ -97,9 +98,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onResume()
     {
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
 
         if (user == null)
             startUserProfileService();
@@ -239,8 +240,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         Log.d(TAG, "onReceiveResult");
 
-        if (fetchProfileProgress != null)
-            fetchProfileProgress.setVisibility(View.GONE);
+        if (progressDialog != null)
+            progressDialog.dismiss();
 
         StackXPage<User> userPage = (StackXPage<User>) resultData.getSerializable(StringConstants.USER);
         if (userPage != null && userPage.items != null && !userPage.items.isEmpty())

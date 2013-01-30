@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -30,56 +30,67 @@ import com.prasanna.android.cache.LRU;
 public class LruCache<K, T>
 {
     private static final String TAG = LruCache.class.getSimpleName();
-    
+
     private final int size;
     private final LRU<K, Reference<T>> lru;
 
     public LruCache(int size)
     {
-	this.size = size;
-	lru = new LRU<K, Reference<T>>(size);
+        this.size = size;
+        lru = new LRU<K, Reference<T>>(size);
     }
 
     public void add(K key, T value)
     {
-	if (key != null && value != null)
-	{
-	    Log.d(TAG, "Adding " + key);
-	    lru.put(key, new SoftReference<T>(value));
-	}
+        if (key != null && value != null)
+        {
+            Log.d(TAG, "Adding " + key);
+            lru.put(key, new SoftReference<T>(value));
+        }
     }
 
     public void addWeak(K key, T value)
     {
-	if (key != null && value != null)
-	{
-	    Log.d(TAG, "Adding " + key);
-	    lru.put(key, new WeakReference<T>(value));
-	}
+        if (key != null && value != null)
+        {
+            Log.d(TAG, "Adding " + key);
+            lru.put(key, new WeakReference<T>(value));
+        }
     }
 
     public T get(K key)
     {
-	T value = null;
+        T value = null;
 
-	if (key != null && lru.containsKey(key))
-	{
-	    Log.d(TAG, "Get " + key);
-	    value = lru.get(key).get();
-	    if (value == null)
-		lru.remove(key);
-	}
+        if (key != null && lru.containsKey(key))
+        {
+            Log.d(TAG, "Get " + key);
+            value = lru.get(key).get();
+            if (value == null)
+                lru.remove(key);
+        }
 
-	return value;
+        return value;
     }
 
     public boolean containsKey(K key)
     {
-	return lru.containsKey(key);
+        return lru.containsKey(key);
     }
-    
+
+    public T remove(K key)
+    {
+        if (key != null)
+        {
+            Reference<T> ref = lru.remove(key);
+            return ref.get();
+        }
+        
+        return null;
+    }
+
     public int getSize()
     {
-	return size;
+        return size;
     }
 }

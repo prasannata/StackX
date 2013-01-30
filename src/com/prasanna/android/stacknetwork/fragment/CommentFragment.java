@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -63,16 +64,18 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private HashMap<ObjectType, WritePermission> writePermissions;
     private ImageView replyToComment;
     private ImageView editComment;
-    private ImageView finishEditComment;
     private ImageView deleteComment;
+    private ImageView finishEditComment;
+    private ImageView cancelEditComment;
     private OnCommentChangeListener onCommentChangeListener;
     private EditText editTextForTitle;
+    private ProgressDialog progressDialog;
 
     public interface OnCommentChangeListener
     {
         void onCommentUpdate(Comment comment);
 
-        void onCommentDelete(Comment comment);
+        void onCommentDelete(long commentId);
     }
 
     public void setOnCommentChangeListener(OnCommentChangeListener onCommentChangeListener)
@@ -225,19 +228,20 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         if (canEditComment())
         {
             Log.d(TAG, "I can edit my comment");
-            setupEditComment(comment, commentLayout);
+            setupEditComment(comment.id, commentLayout);
         }
 
         if (canDelComment())
         {
             Log.d(TAG, "I can delete my comment");
-            setupDeleteComment(comment, commentLayout);
+            setupDeleteComment(comment.id, commentLayout);
         }
     }
 
-    private void setupEditComment(Comment comment, RelativeLayout commentLayout)
+    private void setupEditComment(long commentId, RelativeLayout commentLayout)
     {
-        setupFinishEditComment(commentLayout);
+        setupFinishEditComment(commentId, commentLayout);
+        setupCancelEditComment(commentLayout);
 
         editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
         editComment.setVisibility(View.VISIBLE);
@@ -257,7 +261,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         });
     }
 
-    private void setupFinishEditComment(RelativeLayout commentLayout)
+    private void setupFinishEditComment(final long commentId, RelativeLayout commentLayout)
     {
         finishEditComment = (ImageView) commentLayout.findViewById(R.id.finishEditComment);
         finishEditComment.setOnClickListener(new View.OnClickListener()
@@ -265,10 +269,47 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                hideSoftInput(editTextForTitle);
-                prepareForEditText(false);
-                editTextForTitle.clearFocus();
-                itemsContainer.requestFocus();
+                startServiceForEditComment(commentId, editTextForTitle.getText().toString());
+                markCommentEnd(v);
+            }
+        });
+    }
+
+    private void setupCancelEditComment(RelativeLayout commentLayout)
+    {
+        cancelEditComment = (ImageView) commentLayout.findViewById(R.id.cancelEditComment);
+        cancelEditComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                markCommentEnd(v);
+            }
+        });
+    }
+
+    private void setupDeleteComment(final long commentId, RelativeLayout commentLayout)
+    {
+        deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
+        deleteComment.setVisibility(View.VISIBLE);
+        deleteComment.setOnClickListener(new View.OnClickListener()
+        {
+            private OnClickListener listener = new OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    if (which == DialogInterface.BUTTON_POSITIVE)
+                    {
+                        startServiceForDelComment(commentId);
+                    }
+                }
+            };
+
+            @Override
+            public void onClick(View v)
+            {
+                DialogBuilder.yesNoDialog(getActivity(), R.string.sureQuestion, listener).show();
             }
         });
     }
@@ -295,32 +336,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
         deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
         finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
-    }
-
-    private void setupDeleteComment(final Comment comment, RelativeLayout commentLayout)
-    {
-        deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
-        deleteComment.setVisibility(View.VISIBLE);
-        deleteComment.setOnClickListener(new View.OnClickListener()
-        {
-            private OnClickListener listener = new OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    if (which == DialogInterface.BUTTON_POSITIVE)
-                    {
-                        startServiceForDelComment(comment);
-                    }
-                }
-            };
-
-            @Override
-            public void onClick(View v)
-            {
-                DialogBuilder.yesNoDialog(getActivity(), R.string.sureQuestion, listener).show();
-            }
-        });
+        cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
     }
 
     private boolean canAddComment()
@@ -353,11 +369,38 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         getFragmentManager().popBackStackImmediate();
     }
 
-    private void startServiceForDelComment(final Comment comment)
+    private void startServiceForEditComment(long commentId, final String editedText)
     {
+        if (AppUtils.allowedToWrite(getActivity()))
+        {
+            progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
+            progressDialog.show();
+
+            Intent intent = new Intent(getActivity(), WriteIntentService.class);
+            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+            intent.putExtra(StringConstants.COMMENT_ID, commentId);
+            intent.putExtra(StringConstants.BODY, editedText);
+            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_EDIT_COMMENT);
+            startService(intent);
+        }
+        else
+        {
+            long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
+                            WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
+            Toast.makeText(getActivity(), "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
+                            Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private void startServiceForDelComment(long commentId)
+    {
+        progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
+        progressDialog.show();
+
         Intent intent = new Intent(getActivity(), WriteIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        intent.putExtra(StringConstants.COMMENT, comment);
+        intent.putExtra(StringConstants.COMMENT_ID, commentId);
         intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_DEL_COMMENT);
         startService(intent);
     }
@@ -366,19 +409,48 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         serviceRunning = false;
-        if (resultCode == WriteIntentService.ACTION_DEL_COMMENT)
+        switch (resultCode)
         {
-            Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
+            case WriteIntentService.ACTION_EDIT_COMMENT:
+                Log.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
+                progressDialog.dismiss();
+                onEditCommentComplete(resultData);
+                break;
 
-            if (onCommentChangeListener != null)
-            {
-                onCommentChangeListener.onCommentDelete((Comment) resultData.getSerializable(StringConstants.COMMENT));
-
-                itemListAdapter.notifyDataSetChanged();
-                if (comments.isEmpty())
-                    removeSelf();
-
-            }
+            case WriteIntentService.ACTION_DEL_COMMENT:
+                Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
+                progressDialog.dismiss();
+                onDelCommentComplete(resultData);
+                break;
         }
+    }
+
+    private void onEditCommentComplete(Bundle resultData)
+    {
+        if (onCommentChangeListener != null)
+        {
+            onCommentChangeListener.onCommentUpdate((Comment) resultData.getSerializable(StringConstants.COMMENT));
+        }
+    }
+
+    private void onDelCommentComplete(Bundle resultData)
+    {
+        if (onCommentChangeListener != null)
+        {
+            onCommentChangeListener.onCommentDelete(resultData.getLong(StringConstants.COMMENT_ID));
+
+            itemListAdapter.notifyDataSetChanged();
+            if (comments.isEmpty())
+                removeSelf();
+
+        }
+    }
+
+    private void markCommentEnd(View v)
+    {
+        hideSoftInput(v);
+        prepareForEditText(false);
+        editTextForTitle.clearFocus();
+        itemsContainer.requestFocus();
     }
 }

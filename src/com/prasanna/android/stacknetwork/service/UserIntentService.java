@@ -38,7 +38,7 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
-import com.prasanna.android.stacknetwork.sqlite.UserAccountsDao;
+import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -200,7 +200,7 @@ public class UserIntentService extends AbstractIntentService
     {
         Log.d(TAG, "getMyAccounts");
 
-        UserAccountsDao userAccountsDao = new UserAccountsDao(getApplicationContext());
+        UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
         try
         {
             long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
@@ -325,7 +325,7 @@ public class UserIntentService extends AbstractIntentService
 
     private void persistMyAccounts(HashMap<String, Account> linkAccountsMap)
     {
-        UserAccountsDao userAccountsDao = new UserAccountsDao(getApplicationContext());
+        UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
         try
         {
             userAccountsDao.open();

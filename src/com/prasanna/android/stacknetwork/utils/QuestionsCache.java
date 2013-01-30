@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -31,29 +31,29 @@ public class QuestionsCache extends LruCache<Long, Question>
 
     private QuestionsCache()
     {
-	super(CACHE_SIZE);
+        super(CACHE_SIZE);
     }
 
     public static QuestionsCache getInstance()
     {
-	return INSTANCE;
+        return INSTANCE;
     }
 
     public void updateAnswersForQuestion(Long questionId, ArrayList<Answer> answers)
     {
-	if (answers != null && containsKey(questionId))
-	{
-	    Question question = get(questionId);
-	    if (question != null)
-	    {
-		if (question.answers == null)
-		{
-		    question.answers = new ArrayList<Answer>();
-		}
+        if (answers != null && containsKey(questionId))
+        {
+            Question question = get(questionId);
+            if (question != null)
+            {
+                if (question.answers == null)
+                {
+                    question.answers = new ArrayList<Answer>();
+                }
 
-		question.answers.addAll(answers);
-		add(questionId, question);
-	    }
-	}
+                question.answers.addAll(answers);
+                add(questionId, question);
+            }
+        }
     }
 }

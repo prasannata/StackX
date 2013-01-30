@@ -44,7 +44,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     private Intent intent;
     private int page = 0;
     private int action;
-    private boolean activityCreated = false;
+    private boolean initialServiceRan = false;
 
     public static UserQuestionListFragment newFragment(int action)
     {
@@ -76,16 +76,16 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
+    public void onResume()
     {
-        Log.d(getLogTag(), "onActivityCreated");
+        Log.d(getLogTag(), "onResume");
 
-        super.onActivityCreated(savedInstanceState);
+        super.onResume();
 
-        if (!activityCreated)
+        if (!initialServiceRan)
         {
             startIntentService();
-            activityCreated = true;
+            initialServiceRan = true;
         }
     }
 
@@ -123,7 +123,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void startIntentService()
     {
-        Log.d(TAG, "startIntentService");
+        Log.d(TAG, "startIntentService for action " + action);
 
         showProgressBar();
         

@@ -6,6 +6,9 @@ public class WritePermission implements Serializable
 {
     private static final long serialVersionUID = -1311818798901923216L;
 
+    public static final String PREF_LAST_COMMENT_WRITE = "pref_last_comment_write";
+    public static final String PREF_MIN_SECONDS_BETWEEN_WRITE = "pref_min_seconds_between_write";
+    
     public enum ObjectType
     {
         ANSWER("answer"),

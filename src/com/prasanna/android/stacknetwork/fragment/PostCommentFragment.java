@@ -37,11 +37,15 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.StackXError;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class PostCommentFragment extends Fragment
@@ -78,19 +82,22 @@ public class PostCommentFragment extends Fragment
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count)
         {
-            charCount.setText(String.valueOf(s.length()));
+            if (!PostCommentFragment.this.isRemoving() || !PostCommentFragment.this.isDetached())
+            {
+                charCount.setText(String.valueOf(s.length()));
 
-            if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
-            {
-                sendComment.setTextColor(getResources().getColor(R.color.delft));
-                sendComment.setClickable(true);
-            }
-            else
-            {
-                if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
                 {
-                    sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
-                    sendComment.setClickable(false);
+                    sendComment.setTextColor(getResources().getColor(R.color.delft));
+                    sendComment.setClickable(true);
+                }
+                else
+                {
+                    if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                    {
+                        sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
+                        sendComment.setClickable(false);
+                    }
                 }
             }
         }
@@ -226,13 +233,24 @@ public class PostCommentFragment extends Fragment
 
     private void sendComment()
     {
-        Intent intent = new Intent(getActivity(), WriteIntentService.class);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-        intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
-        intent.putExtra(StringConstants.POST_ID, postId);
-        intent.putExtra(StringConstants.BODY, editText.getText().toString());
-        updateUIElements();
-        getActivity().startService(intent);
+        if (AppUtils.allowedToWrite(getActivity()))
+        {
+            Intent intent = new Intent(getActivity(), WriteIntentService.class);
+            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+            intent.putExtra(StringConstants.POST_ID, postId);
+            intent.putExtra(StringConstants.BODY, editText.getText().toString());
+            updateUIElements();
+            getActivity().startService(intent);
+        }
+        else
+        {
+            long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
+                            WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
+            Toast.makeText(getActivity(), "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
+                            Toast.LENGTH_LONG).show();
+        }
+
     }
 
     private void updateUIElements()

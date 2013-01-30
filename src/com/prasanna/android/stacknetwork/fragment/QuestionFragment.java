@@ -47,6 +47,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 
 public class QuestionFragment extends Fragment implements OnCommentChangeListener
 {
@@ -208,11 +209,11 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
     private void displayNumComments()
     {
-        if (question.comments != null && !question.comments.isEmpty())
+        if (question.comments != null)
         {
             TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
             textView.setText(getString(R.string.comments) + ":" + String.valueOf(question.comments.size()));
-            textView.setVisibility(View.VISIBLE);
+            textView.setVisibility(question.comments.isEmpty() ? View.GONE : View.VISIBLE);
 
             enableCommentsInContextMenu();
         }
@@ -273,13 +274,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onCommentUpdate(Comment comment)
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onCommentDelete(Comment comment)
-    {
         if (question.comments != null)
         {
             Log.d(TAG, "Removing comment: " + comment.id);
@@ -289,13 +283,53 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             {
                 if (iterator.next().id == comment.id)
                 {
-                    Log.d(TAG, "comment " + comment.id + " removed");
+                    Log.d(TAG, "comment " + comment.id + " edited");
+                    removeQuestionFromCache();
+                    break;
+                }
+            }
+
+            updateCacheIfNeeded();
+        }
+    }
+
+    @Override
+    public void onCommentDelete(long commentId)
+    {
+        if (question.comments != null)
+        {
+            Log.d(TAG, "Removing comment: " + commentId);
+
+            Iterator<Comment> iterator = question.comments.iterator();
+            while (iterator.hasNext())
+            {
+                if (iterator.next().id == commentId)
+                {
+                    Log.d(TAG, "comment " + commentId + " removed");
                     iterator.remove();
                     break;
                 }
             }
+
+            updateCacheIfNeeded();
         }
 
         displayNumComments();
+    }
+
+    private void removeQuestionFromCache()
+    {
+        if (QuestionsCache.getInstance().containsKey(question.id))
+            QuestionsCache.getInstance().remove(question.id);
+    }
+
+    private void updateCacheIfNeeded()
+    {
+        if (QuestionsCache.getInstance().containsKey(question.id))
+        {
+            Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
+            cachedQuestion.comments = question.comments;
+            QuestionsCache.getInstance().add(question.id, cachedQuestion);
+        }
     }
 }

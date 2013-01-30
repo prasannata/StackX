@@ -31,6 +31,7 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
+import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class WritePermissionDAO extends AbstractBaseDao
 {
@@ -57,12 +58,17 @@ public class WritePermissionDAO extends AbstractBaseDao
                     values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
                     values.put(WritePermissionTable.COLUMN_EDIT, permission.canEdit);
                     values.put(WritePermissionTable.COLUMN_DEL, permission.canDelete);
-                    if (permission.objectType != null)
-                        values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
                     values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
                     values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
                     values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
                     values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
+                    if (permission.objectType != null)
+                    {
+                        values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
+                        if (ObjectType.COMMENT.equals(permission.objectType))
+                            SharedPreferencesUtil.setLong(context, WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE,
+                                            permission.minSecondsBetweenActions);
+                    }
 
                     database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
                 }
@@ -81,8 +87,7 @@ public class WritePermissionDAO extends AbstractBaseDao
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
                         + " = ?";
-        String[] selectionArgs =
-        { site, objectType.getValue() };
+        String[] selectionArgs = { site, objectType.getValue() };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);
@@ -96,12 +101,10 @@ public class WritePermissionDAO extends AbstractBaseDao
 
     public ArrayList<String> getSites()
     {
-        String[] cols =
-        { WritePermissionTable.COLUMN_SITE };
+        String[] cols = { WritePermissionTable.COLUMN_SITE };
         String selection = WritePermissionTable.COLUMN_ADD + " = ? and" + WritePermissionTable.COLUMN_DEL + " = ? and "
                         + WritePermissionTable.COLUMN_EDIT + "= ?";
-        String[] selectionArgs =
-        { "1", "1", "1" };
+        String[] selectionArgs = { "1", "1", "1" };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, selection, selectionArgs, null,
                         null, null);
@@ -124,8 +127,7 @@ public class WritePermissionDAO extends AbstractBaseDao
             return null;
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs =
-        { site };
+        String[] selectionArgs = { site };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
                         null, null);

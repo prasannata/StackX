@@ -49,6 +49,7 @@ import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.views.HtmlTextView;
 
 public class AnswerFragment extends Fragment implements OnCommentChangeListener
@@ -262,13 +263,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onCommentUpdate(Comment comment)
     {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void onCommentDelete(Comment comment)
-    {
         if (answer.comments != null)
         {
             Log.d(TAG, "Removing comment: " + comment.id);
@@ -279,12 +273,38 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
                 if (iterator.next().id == comment.id)
                 {
                     Log.d(TAG, "comment " + comment.id + " removed");
-                    iterator.remove();
+                    removeQuestionFromCache();
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onCommentDelete(long commentId)
+    {
+        if (answer.comments != null)
+        {
+            Log.d(TAG, "Removing comment: " + commentId);
+
+            Iterator<Comment> iterator = answer.comments.iterator();
+            while (iterator.hasNext())
+            {
+                if (iterator.next().id == commentId)
+                {
+                    Log.d(TAG, "comment " + commentId + " removed");
+                    removeQuestionFromCache();
                     break;
                 }
             }
         }
 
         displayNumComments();
+    }
+
+    private void removeQuestionFromCache()
+    {
+        if (QuestionsCache.getInstance().containsKey(answer.questionId))
+            QuestionsCache.getInstance().remove(answer.questionId);
     }
 }

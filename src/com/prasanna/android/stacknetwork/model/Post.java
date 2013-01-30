@@ -25,7 +25,6 @@ public class Post extends StackXItem implements Serializable
 {
     private static final long serialVersionUID = 9203303671049335445L;
 
-    
     public enum PostType
     {
         QUESTION("question"),
@@ -39,7 +38,7 @@ public class Post extends StackXItem implements Serializable
 
         }
 
-        public static PostType getValue(String string)
+        public static PostType getEnum(String string)
         {
             PostType postType = null;
 
@@ -64,5 +63,5 @@ public class Post extends StackXItem implements Serializable
         }
     }
 
-    PostType postType;
+    public PostType postType;
 }

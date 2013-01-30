@@ -31,12 +31,12 @@ import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.UserAccountsTable;
 
-public class UserAccountsDao extends AbstractBaseDao
+public class UserAccountsDAO extends AbstractBaseDao
 {
-    private static final String TAG = UserAccountsDao.class.getSimpleName();
-    public static final String AUDIT_ENTRY_TYPE = UserAccountsDao.class.getSimpleName();
+    private static final String TAG = UserAccountsDAO.class.getSimpleName();
+    public static final String AUDIT_ENTRY_TYPE = UserAccountsDAO.class.getSimpleName();
 
-    public UserAccountsDao(Context context)
+    public UserAccountsDAO(Context context)
     {
         super(context);
     }

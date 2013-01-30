@@ -22,8 +22,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/commentScore"
-        android:cursorVisible="true"
         android:clickable="false"
+        android:cursorVisible="true"
         android:enabled="false"
         android:inputType="textMultiLine|textNoSuggestions"
         android:scrollHorizontally="false"
@@ -60,15 +60,23 @@
                 android:id="@+id/finishEditComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:padding="5dp"
                 android:src="@drawable/accept_dark_24x24"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/cancelEditComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:src="@drawable/navigation_cancel"
                 android:visibility="gone" />
             
             <ImageView
                 android:id="@+id/editComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:padding="5dp"
                 android:src="@drawable/content_edit_dark_24x24"
                 android:visibility="gone" />
 
@@ -76,7 +84,7 @@
                 android:id="@+id/deleteComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:padding="5dp"
                 android:src="@drawable/content_discard_dark_24x24"
                 android:visibility="gone" />
         </LinearLayout>
