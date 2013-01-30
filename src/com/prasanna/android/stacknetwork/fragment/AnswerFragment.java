@@ -49,6 +49,7 @@ import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.views.HtmlTextView;
 
 public class AnswerFragment extends Fragment implements OnCommentChangeListener
@@ -280,11 +281,18 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
                 {
                     Log.d(TAG, "comment " + comment.id + " removed");
                     iterator.remove();
+                    removeQuestionFromCache();
                     break;
                 }
             }
         }
 
         displayNumComments();
+    }
+
+    private void removeQuestionFromCache()
+    {
+        if (QuestionsCache.getInstance().containsKey(answer.questionId))
+            QuestionsCache.getInstance().remove(answer.questionId);
     }
 }

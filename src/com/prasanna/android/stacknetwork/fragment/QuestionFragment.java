@@ -47,6 +47,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 
 public class QuestionFragment extends Fragment implements OnCommentChangeListener
 {
@@ -208,7 +209,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
     private void displayNumComments()
     {
-        if (question.comments != null && !question.comments.isEmpty())
+        if (question.comments != null)
         {
             TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
             textView.setText(getString(R.string.comments) + ":" + String.valueOf(question.comments.size()));
@@ -294,8 +295,20 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
                     break;
                 }
             }
+
+            updateCacheIfNeeded();
         }
 
         displayNumComments();
+    }
+
+    private void updateCacheIfNeeded()
+    {
+        if (QuestionsCache.getInstance().containsKey(question.id))
+        {
+            Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
+            cachedQuestion.comments = question.comments;
+            QuestionsCache.getInstance().add(question.id, cachedQuestion);
+        }
     }
 }
