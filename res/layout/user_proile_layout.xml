@@ -21,12 +21,20 @@
             android:layout_weight="0.4"
             android:orientation="vertical" >
 
+            <include
+                android:id="@+id/getAvatarProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                layout="@layout/progress_bar" />
+
             <ImageView
                 android:id="@+id/profileUserImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:contentDescription="@string/avatar" />
+                android:contentDescription="@string/avatar"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/profileUserReputation"

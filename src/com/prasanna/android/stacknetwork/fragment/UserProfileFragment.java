@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -193,48 +194,50 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private void getAndDisplayUserAvatar()
     {
         if (user.avatar == null)
-        {
-            AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
-            {
-                @Override
-                public void notifyOnCompletion(Bitmap result)
-                {
-                    ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
-                    userProfileImage.setImageBitmap(result);
-
-                    if (me)
-                    {
-                        persistMyAvatar(result);
-                    }
-                }
-
-                private void persistMyAvatar(Bitmap result)
-                {
-                    ProfileDAO profileDAO = new ProfileDAO(getActivity());
-                    try
-                    {
-                        profileDAO.open();
-                        profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, result);
-                    }
-                    catch (SQLException e)
-                    {
-                        Log.d(TAG, e.getMessage());
-                    }
-                    finally
-                    {
-                        profileDAO.close();
-                    }
-                }
-            };
-
-            GetImageAsyncTask imageAsyncTask = new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl);
-            imageAsyncTask.execute(user.profileImageLink);
-        }
+            runAsyncTaskToGetAvatar();
         else
+            displayAvatar(user.avatar);
+    }
+
+    private void runAsyncTaskToGetAvatar()
+    {
+        final ProgressBar getAvatarProgressBar = (ProgressBar) profileHomeLayout
+                .findViewById(R.id.getAvatarProgressBar);
+        getAvatarProgressBar.setVisibility(View.VISIBLE);
+
+        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
         {
-            ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
-            userProfileImage.setImageBitmap(user.avatar);
-        }
+            @Override
+            public void notifyOnCompletion(Bitmap result)
+            {
+                displayAvatar(result);
+                getAvatarProgressBar.setVisibility(View.GONE);
+
+                if (me)
+                    persistMyAvatar(result);
+            }
+
+            private void persistMyAvatar(Bitmap result)
+            {
+                ProfileDAO profileDAO = new ProfileDAO(getActivity());
+                try
+                {
+                    profileDAO.open();
+                    profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, result);
+                }
+                catch (SQLException e)
+                {
+                    Log.d(TAG, e.getMessage());
+                }
+                finally
+                {
+                    profileDAO.close();
+                }
+            }
+        };
+
+        GetImageAsyncTask imageAsyncTask = new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl);
+        imageAsyncTask.execute(user.profileImageLink);
     }
 
     private void updateProfileInfo()
@@ -316,5 +319,12 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             user.accounts.addAll(accounts.values());
             displayUserAccounts();
         }
+    }
+
+    private void displayAvatar(Bitmap result)
+    {
+        ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
+        userProfileImage.setVisibility(View.VISIBLE);
+        userProfileImage.setImageBitmap(result);
     }
 }
