@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -34,18 +34,21 @@ public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
 
     public interface ListItemView<T>
     {
-	View getView(T item, View convertView, ViewGroup parent);
+        View getView(T item, View convertView, ViewGroup parent);
     }
 
     public ItemListAdapter(Context context, int textViewResourceId, ArrayList<T> items, ListItemView<T> listItemView)
     {
-	super(context, textViewResourceId, items);
-	this.listItemView = listItemView;
+        super(context, textViewResourceId, items);
+        this.listItemView = listItemView;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-	return listItemView.getView(getItem(position), convertView, parent);
+        if (convertView == null)
+            return listItemView.getView(getItem(position), convertView, parent);
+        
+        return convertView;
     }
 }
