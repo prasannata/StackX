@@ -232,29 +232,46 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     }
 
     @Override
-    public void refresh()
-    {
-        QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
-                R.id.fragmentContainer);
-        questionsFragment.refresh();
-    }
-
-    @Override
-    protected boolean shouldSearchViewBeEnabled()
-    {
-        return true;
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState)
     {
         Log.d(TAG, "onSaveInstanceState");
+
+        removeTagListFragmentIfBeingShown();
 
         outState.putBoolean(SAVED, true);
         outState.putInt(StringConstants.ACTION, action);
         outState.putString(StringConstants.TAG, tag);
 
         super.onSaveInstanceState(outState);
+    }
+
+    private void removeTagListFragmentIfBeingShown()
+    {
+        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+
+        if (currentFragment instanceof TagListFragment)
+        {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.remove(currentFragment);
+            ft.commit();
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+
+        if (currentFragment instanceof TagListFragment)
+        {
+            Log.d(TAG, "Tag list fragment is current fragment");
+
+            hideTagFragment();
+
+            toggleDisplayForTags(false);
+        }
+        else
+            super.onBackPressed();
     }
 
     @Override
@@ -343,6 +360,20 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     }
 
     @Override
+    public void refresh()
+    {
+        QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
+                R.id.fragmentContainer);
+        questionsFragment.refresh();
+    }
+
+    @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return true;
+    }
+
+    @Override
     protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
     {
         Log.d(TAG, "Home button clicked");
@@ -384,23 +415,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         }
         actionBarMenu.findItem(R.id.menu_search).setVisible(!forTags);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(!forTags);
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
-
-        if (currentFragment instanceof TagListFragment)
-        {
-            Log.d(TAG, "Tag list fragment is current fragment");
-
-            hideTagFragment();
-
-            toggleDisplayForTags(false);
-        }
-        else
-            super.onBackPressed();
     }
 
     @Override
