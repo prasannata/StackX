@@ -56,6 +56,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
     private static final String TAB_TITLE_FAQ = "FAQ";
     private static final String SAVED = "saved";
+    private static final String LAST_SELECTED_TAB = "last_selected_tab";
 
     private static QuestionsActivity me;
 
@@ -118,35 +119,45 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         me = this;
 
         setContentView(R.layout.fragment_container);
-        intentAction = getIntent().getAction();
 
-        if (savedInstanceState == null || !savedInstanceState.getBoolean(SAVED))
+        if (savedInstanceState == null)
         {
-            if (Intent.ACTION_SEARCH.equals(intentAction))
-                showSearchFragment();
-            else if (StringConstants.SIMILAR.equals(intentAction))
-                showSimilarQuestionListFragment();
-            else if (StringConstants.RELATED.equals(intentAction))
-                showRelatedQuestionListFragment();
-            else if (StringConstants.TAG.equals(intentAction))
-                showTagQuestionListFragment();
-            else
-                showFrontPageForSite();
+            showFragmentForIntentAction();
         }
         else
         {
-            if (StringConstants.TAG.equals(intentAction))
-                showTagQuestionListFragment();
-            else
-            {
-                action = savedInstanceState.getInt(StringConstants.ACTION);
+            action = savedInstanceState.getInt(StringConstants.ACTION, 0);
 
+            if (action != 0)
+            {
                 if (action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG)
                     showLastTagQuestionListFragment(savedInstanceState);
                 else
                     showFrontPageForSite();
+
+                int lastSelectedTab = savedInstanceState.getInt(LAST_SELECTED_TAB, 0);
+                if (lastSelectedTab > 0)
+                    getActionBar().setSelectedNavigationItem(lastSelectedTab);
             }
+            else
+                showFragmentForIntentAction();
         }
+    }
+
+    private void showFragmentForIntentAction()
+    {
+        intentAction = getIntent().getAction();
+
+        if (Intent.ACTION_SEARCH.equals(intentAction))
+            showSearchFragment();
+        else if (StringConstants.SIMILAR.equals(intentAction))
+            showSimilarQuestionListFragment();
+        else if (StringConstants.RELATED.equals(intentAction))
+            showRelatedQuestionListFragment();
+        else if (StringConstants.TAG.equals(intentAction))
+            showTagQuestionListFragment();
+        else
+            showFrontPageForSite();
     }
 
     private void showFrontPageForSite()
@@ -237,6 +248,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         Log.d(TAG, "onSaveInstanceState");
 
         removeTagListFragmentIfBeingShown();
+
+        if (getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
+            outState.putInt(LAST_SELECTED_TAB, getActionBar().getSelectedNavigationIndex());
 
         outState.putBoolean(SAVED, true);
         outState.putInt(StringConstants.ACTION, action);

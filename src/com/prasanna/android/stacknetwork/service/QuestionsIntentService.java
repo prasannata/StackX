@@ -32,13 +32,13 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class QuestionsIntentService extends AbstractIntentService
 {
     private static final String TAG = QuestionsIntentService.class.getSimpleName();
-    public static final int GET_FRONT_PAGE = 1;
-    public static final int GET_FAQ_FOR_TAG = 2;
-    public static final int GET_RELATED = 3;
-    public static final int GET_QUESTIONS_FOR_TAG = 4;
-    public static final int GET_SIMILAR = 5;
-    public static final int SEARCH = 6;
-    public static final int SEARCH_ADVANCED = 7;
+    public static final int GET_FRONT_PAGE = 0x501;
+    public static final int GET_FAQ_FOR_TAG = 0x502;
+    public static final int GET_RELATED = 0x503;
+    public static final int GET_QUESTIONS_FOR_TAG = 0x504;
+    public static final int GET_SIMILAR = 0x505;
+    public static final int SEARCH = 0x506;
+    public static final int SEARCH_ADVANCED = 0x507;
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
@@ -84,7 +84,7 @@ public class QuestionsIntentService extends AbstractIntentService
                     String seachTagged = intent.getStringExtra(StringConstants.TAG);
                     Log.d(TAG, "Get questions for " + seachTagged);
                     bundle.putSerializable(StringConstants.QUESTIONS,
-                                    questionService.getQuestionsForTag(seachTagged, sort, page));
+                            questionService.getQuestionsForTag(seachTagged, sort, page));
                     break;
                 case GET_SIMILAR:
                     String title = intent.getStringExtra(StringConstants.TITLE);
@@ -98,7 +98,7 @@ public class QuestionsIntentService extends AbstractIntentService
                     break;
                 case SEARCH_ADVANCED:
                     SearchCriteria criteria = (SearchCriteria) intent
-                                    .getSerializableExtra(StringConstants.SEARCH_CRITERIA);
+                            .getSerializableExtra(StringConstants.SEARCH_CRITERIA);
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.searchAdvanced(criteria));
                     break;
 
