@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/criteriaTable"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white" >
@@ -12,23 +13,12 @@
         android:orientation="horizontal"
         android:weightSum="1" >
 
-        <TextView
-            android:id="@+id/titleLabel"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_margin="5dp"
-            android:layout_weight="0.3"
-            android:gravity="left"
-            android:text="@string/search_query"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
         <EditText
             android:id="@+id/searchQuery"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:layout_weight="0.7"
+            android:layout_weight="1"
             android:background="@drawable/rounded_border_grey_min_padding"
             android:cursorVisible="true"
             android:inputType="text"
@@ -110,11 +100,31 @@
         android:weightSum="1" >
 
         <TextView
+            android:id="@+id/hasAnswersLabel"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_weight="0.35"
+            android:gravity="left|center"
+            android:text="@string/search_answers"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/searcOnlyWithAnswers"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_weight="0.15"
+            android:button="@drawable/checkbox"
+            android:gravity="left|center" />
+
+        <TextView
             android:id="@+id/answeredLabel"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:layout_weight="0.3"
+            android:layout_weight="0.35"
             android:gravity="left|center"
             android:text="@string/search_answered"
             android:textColor="@color/black"
@@ -125,7 +135,7 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:layout_weight="0.7"
+            android:layout_weight="0.15"
             android:button="@drawable/checkbox"
             android:gravity="left|center" />
     </TableRow>
@@ -170,6 +180,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
+            android:clickable="true"
             android:src="@drawable/navigation_accept_dark_48x48" />
 
         <ImageView

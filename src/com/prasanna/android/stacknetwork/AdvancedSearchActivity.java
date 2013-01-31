@@ -27,12 +27,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
@@ -51,6 +53,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
     private ImageView runCriteria;
     private ImageView clearCriteria;
     private CheckBox answered;
+    private TableLayout criteriaLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -61,6 +64,8 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
 
         setContentView(R.layout.search_criteria_builder);
 
+        criteriaLayout = (TableLayout) findViewById(R.id.criteriaTable);
+
         searchQuery = (EditText) findViewById(R.id.searchQuery);
         selectedTag = (AutoCompleteTextView) findViewById(R.id.searchSelectedTag);
         selectedTag.setAdapter(getTagArrayAdapter());
@@ -69,6 +74,10 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
 
         noLikeTag = (AutoCompleteTextView) findViewById(R.id.searchNoLikeTag);
         noLikeTag.setAdapter(getTagArrayAdapter());
+
+        sortSpinner = (Spinner) findViewById(R.id.searchSortSpinner);
+        sortOptionArray = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.searchSortArray)));
+        sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item, sortOptionArray));
 
         runCriteria = (ImageView) findViewById(R.id.runCriteria);
         runCriteria.setOnClickListener(new View.OnClickListener()
@@ -87,10 +96,14 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
                 if (answered.isChecked())
                     searchCriteria.mustBeAnswered();
                 searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem())).build();
+
+                criteriaLayout.startAnimation(AnimationUtils.loadAnimation(AdvancedSearchActivity.this,
+                                android.R.anim.slide_out_right));
+                criteriaLayout.setVisibility(View.GONE);
             }
         });
 
-        clearCriteria = (ImageView) findViewById(R.id.runCriteria);
+        clearCriteria = (ImageView) findViewById(R.id.clearCriteria);
         clearCriteria.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -102,9 +115,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
                 sortSpinner.setSelection(0);
             }
         });
-        sortSpinner = (Spinner) findViewById(R.id.searchSortSpinner);
-        sortOptionArray = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.searchSortArray)));
-        sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item, sortOptionArray));
     }
 
     private ArrayAdapter<String> getTagArrayAdapter()

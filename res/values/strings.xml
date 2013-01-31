@@ -86,6 +86,7 @@
     <string name="search_query">Query</string>
     <string name="search_tagged">Tagged</string>
     <string name="search_notTagged">!Tagged</string>
+    <string name="search_answers">Answers</string>
     <string name="search_answered">Answered</string>
     <string name="search_sort">Sort</string>
     

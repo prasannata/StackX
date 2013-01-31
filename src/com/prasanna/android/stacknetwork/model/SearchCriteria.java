@@ -66,7 +66,7 @@ public class SearchCriteria implements Serializable
 
             try
             {
-                return valueOf(value);
+                return valueOf(value.toUpperCase());
             }
             catch (IllegalArgumentException e)
             {
