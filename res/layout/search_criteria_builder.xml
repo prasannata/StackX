@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:orientation="horizontal"
-        android:weightSum="1" >
+        android:orientation="horizontal" >
 
         <EditText
             android:id="@+id/searchQuery"
