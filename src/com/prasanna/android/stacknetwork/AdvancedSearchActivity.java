@@ -19,41 +19,27 @@
 
 package com.prasanna.android.stacknetwork;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import android.database.SQLException;
+import android.app.FragmentTransaction;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TableLayout;
+import android.view.MenuItem;
 
+import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
+import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
+import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
+import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSearchListener;
+import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
-import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
-import com.prasanna.android.stacknetwork.sqlite.TagDAO;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.stacknetwork.utils.Validate;
 
-public class AdvancedSearchActivity extends AbstractUserActionBarActivity
+public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements
+                OnContextItemSelectedListener<Question>, OnRunSearchListener
 {
     private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
-    private Spinner sortSpinner;
-    private ArrayList<String> sortOptionArray;
-    private EditText searchQuery;
-    private AutoCompleteTextView selectedTag;
-    private AutoCompleteTextView noLikeTag;
-    private ImageView runCriteria;
-    private ImageView clearCriteria;
-    private CheckBox answered;
-    private TableLayout criteriaLayout;
+    private boolean viewInitialized = false;
+    private QuestionListFragment questionListFragment;
+    private SearchCriteriaFragment searchCriteriaFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -62,83 +48,30 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.search_criteria_builder);
-
-        criteriaLayout = (TableLayout) findViewById(R.id.criteriaTable);
-
-        searchQuery = (EditText) findViewById(R.id.searchQuery);
-        selectedTag = (AutoCompleteTextView) findViewById(R.id.searchSelectedTag);
-        selectedTag.setAdapter(getTagArrayAdapter());
-
-        answered = (CheckBox) findViewById(R.id.searchAnswered);
-
-        noLikeTag = (AutoCompleteTextView) findViewById(R.id.searchNoLikeTag);
-        noLikeTag.setAdapter(getTagArrayAdapter());
-
-        sortSpinner = (Spinner) findViewById(R.id.searchSortSpinner);
-        sortOptionArray = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.searchSortArray)));
-        sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item, sortOptionArray));
-
-        runCriteria = (ImageView) findViewById(R.id.runCriteria);
-        runCriteria.setOnClickListener(new View.OnClickListener()
+        if (!viewInitialized)
         {
-            @Override
-            public void onClick(View v)
-            {
-                SearchCriteria searchCriteria = SearchCriteria.newCriteria();
-
-                if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
-                    searchCriteria.addTagInclude(searchQuery.getText().toString());
-                if (selectedTag.getText() != null && !Validate.isEmptyString(selectedTag.getText().toString()))
-                    searchCriteria.addTagInclude(selectedTag.getText().toString());
-                if (noLikeTag.getText() != null && !Validate.isEmptyString(noLikeTag.getText().toString()))
-                    searchCriteria.addTagExclude(noLikeTag.getText().toString());
-                if (answered.isChecked())
-                    searchCriteria.mustBeAnswered();
-                searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem())).build();
-
-                criteriaLayout.startAnimation(AnimationUtils.loadAnimation(AdvancedSearchActivity.this,
-                                android.R.anim.slide_out_right));
-                criteriaLayout.setVisibility(View.GONE);
-            }
-        });
-
-        clearCriteria = (ImageView) findViewById(R.id.clearCriteria);
-        clearCriteria.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                searchQuery.setText("");
-                selectedTag.setText("");
-                noLikeTag.setText("");
-                sortSpinner.setSelection(0);
-            }
-        });
-    }
-
-    private ArrayAdapter<String> getTagArrayAdapter()
-    {
-        TagDAO tagDAO = new TagDAO(this);
-        ArrayList<String> tags = null;
-        try
-        {
-            tagDAO.open();
-            tags = tagDAO.getTagStringList(OperatingSite.getSite().apiSiteParameter);
-        }
-        catch (SQLException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-        finally
-        {
-            tagDAO.close();
+            Log.d(TAG, "initializing view");
+            setContentView(R.layout.advanced_search);
+            searchCriteriaFragment = (SearchCriteriaFragment) getFragmentManager().findFragmentById(
+                            R.id.searchCriteriaFragment);
+            questionListFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
+                            R.id.questionListFragment);
+            viewInitialized = true;
         }
 
-        if (tags == null)
-            tags = new ArrayList<String>();
-
-        return new ArrayAdapter<String>(this, R.layout.spinner_item, tags);
+        /*
+         * Can this be better done by handling
+         * onConfigurationChanged(newConfig)?
+         */
+        if (questionListFragment != null)
+        {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+                ft.hide(questionListFragment);
+            else
+                ft.show(questionListFragment);
+            ft.commit();
+        }
     }
 
     @Override
@@ -153,13 +86,44 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        // TODO Auto-generated method stub
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     protected void refresh()
     {
+        throw new UnsupportedOperationException("Refresh not supported for " + TAG);
     }
 
     @Override
     protected boolean shouldSearchViewBeEnabled()
     {
         return false;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item, Question stackXItem)
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void onRunSearch(SearchCriteria searchCriteria)
+    {
+        if (searchCriteria != null)
+            showSearchResults();
+    }
+
+    private void showSearchResults()
+    {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.hide(searchCriteriaFragment);
+        ft.show(questionListFragment);
+        ft.addToBackStack(null);
+        ft.commit();
     }
 }

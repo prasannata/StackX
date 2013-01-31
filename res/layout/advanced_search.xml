@@ -2,7 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
-    
+    android:orientation="horizontal" >
+
+    <fragment
+        android:id="@+id/searchCriteriaFragment"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        class="com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment" />
+
+    <fragment
+        android:id="@+id/questionListFragment"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        class="com.prasanna.android.stacknetwork.fragment.QuestionListFragment" />
 
 </LinearLayout>
