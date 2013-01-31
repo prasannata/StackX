@@ -273,6 +273,9 @@ public abstract class AbstractUserActionBarActivity extends Activity
             case R.id.menu_search_filter:
                 showSearchFilterOptions(item);
                 return true;
+            case R.id.menu_advanced_search:
+                startActivity(new Intent(this, AdvancedSearchActivity.class));
+                return true;
             case R.id.menu_my_profile:
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
                 userProfileIntent.putExtra(StringConstants.ME, true);

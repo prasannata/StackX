@@ -1,173 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white" >
 
-    <RelativeLayout
+    <TableRow
         android:id="@+id/query"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:weightSum="1" >
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:id="@+id/titleLabel"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
             android:layout_margin="5dp"
-            android:gravity="center"
+            android:layout_weight="0.3"
+            android:gravity="left"
             android:text="@string/search_query"
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
 
         <EditText
-            android:id="@+id/queryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:id="@+id/searchQuery"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/rounded_border_grey_min_padding"
             android:cursorVisible="true"
             android:inputType="text"
             android:textColor="@color/black"
             android:textCursorDrawable="@null"
-            android:textSize="15sp" />
-    </RelativeLayout>
+            android:textSize="20sp" />
+    </TableRow>
 
-    <RelativeLayout
+    <TableRow
         android:id="@+id/tagged"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/query"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:weightSum="1" >
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:id="@+id/taggedLabel"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
             android:layout_margin="5dp"
-            android:gravity="center"
+            android:layout_weight="0.3"
+            android:gravity="left"
             android:text="@string/search_tagged"
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
 
         <AutoCompleteTextView
-            android:id="@+id/selectedTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:id="@+id/searchSelectedTag"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/rounded_border_grey_min_padding"
             android:cursorVisible="true"
             android:inputType="text"
             android:textColor="@color/black"
             android:textCursorDrawable="@null"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
+    </TableRow>
 
-        <LinearLayout
-            android:id="@+id/selectedTags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone" >
-        </LinearLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
+    <TableRow
         android:id="@+id/notTagged"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/tagged"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:orientation="horizontal" >
+        android:weightSum="1" >
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:id="@+id/notTaggedLabel"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:gravity="center"
+            android:layout_weight="0.3"
+            android:gravity="left"
             android:text="@string/search_notTagged"
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
 
         <AutoCompleteTextView
-            android:id="@+id/noLikeTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:id="@+id/searchNoLikeTag"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/rounded_border_grey_min_padding"
             android:cursorVisible="true"
             android:inputType="textMultiLine"
             android:textColor="@color/black"
             android:textCursorDrawable="@null"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
+    </TableRow>
 
-        <LinearLayout
-            android:id="@+id/noLikeTags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:visibility="gone" >
-        </LinearLayout>
-    </RelativeLayout>
-
-    <RelativeLayout
+    <TableRow
         android:id="@+id/answered"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/notTagged"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:orientation="horizontal" >
+        android:weightSum="1" >
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:id="@+id/answeredLabel"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:gravity="center"
+            android:layout_weight="0.3"
+            android:gravity="left|center"
             android:text="@string/search_answered"
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
 
         <CheckBox
-            android:id="@+id/answeredCB"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:id="@+id/searchAnswered"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_weight="0.7"
             android:button="@drawable/checkbox"
-            android:gravity="center"
-            android:padding="8dp" />
-    </RelativeLayout>
+            android:gravity="left|center" />
+    </TableRow>
 
-    <RelativeLayout
+    <TableRow
         android:id="@+id/sort"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/answered"
         android:background="@drawable/rounded_border_grey_min_padding"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:weightSum="1" >
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:id="@+id/sortLabel"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
             android:layout_margin="5dp"
-            android:gravity="center"
+            android:layout_weight="0.3"
+            android:gravity="left|center"
             android:text="@string/search_sort"
             android:textColor="@color/black"
-            android:textSize="15sp" />
+            android:textSize="20sp" />
 
         <Spinner
+            android:id="@+id/searchSortSpinner"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_weight="0.7"
+            android:drawSelectorOnTop="true"
+            android:spinnerMode="dropdown" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/runCriteria"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:drawSelectorOnTop="true"
-            android:entries="@array/searchSort"
-            android:spinnerMode="dropdown" />
-    </RelativeLayout>
+            android:layout_margin="10dp"
+            android:src="@drawable/navigation_accept_dark_48x48" />
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/clearCriteria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:src="@drawable/content_undo_dark_48x48" />
+    </TableRow>
+
+</TableLayout>

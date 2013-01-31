@@ -19,6 +19,8 @@
 
 package com.prasanna.android.stacknetwork.sqlite;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
@@ -103,7 +105,48 @@ public class TagDAO extends AbstractBaseDao
         return cursor.getLong(0);
     }
 
-    public LinkedHashSet<Tag> getTags(String site)
+    public LinkedHashSet<Tag> getTagSet(String site)
+    {
+        Cursor cursor = getCursor(site);
+        
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        Log.d(TAG, "Tags retrieved from DB");
+
+        LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
+        getTagCollection(cursor, tags);
+        return tags;
+    }
+
+    public ArrayList<String> getTagStringList(String site)
+    {
+        Cursor cursor = getCursor(site);
+        
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        Log.d(TAG, "Tags retrieved from DB");
+
+        ArrayList<String> tags = new ArrayList<String>();
+        getTagStringCollection(cursor, tags);
+        return tags;
+    }
+
+    private void getTagStringCollection(Cursor cursor, ArrayList<String> tags)
+    {
+        cursor.moveToFirst();
+        
+        while (!cursor.isAfterLast())
+        {
+            Tag tag = new Tag(cursor.getString(cursor.getColumnIndex(TagsTable.COLUMN_VALUE)));
+            tag.local = cursor.getInt(cursor.getColumnIndex(TagsTable.COLUMN_LOCAL_ADD)) == 1;
+            tags.add(tag.name);
+            cursor.moveToNext();
+        }
+    }
+
+    private Cursor getCursor(String site)
     {
         String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = DatabaseHelper.TagsTable.COLUMN_SITE + " = ?";
@@ -111,12 +154,7 @@ public class TagDAO extends AbstractBaseDao
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_TAGS, cols, selection, selectionArgs, null, null, orderBy);
-        if (cursor == null || cursor.getCount() == 0)
-            return null;
-
-        Log.d(TAG, "Tags retrieved from DB");
-
-        return getTagSet(cursor);
+        return cursor;
     }
 
     public LinkedHashSet<Tag> getTags(String site, boolean includeLocalTags)
@@ -133,23 +171,22 @@ public class TagDAO extends AbstractBaseDao
 
         Log.d(TAG, "Tags retrieved from DB");
 
-        return getTagSet(cursor);
+        LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
+        getTagCollection(cursor, tags);
+        return tags;
     }
 
-    private LinkedHashSet<Tag> getTagSet(Cursor cursor)
+    private void getTagCollection(Cursor cursor, Collection<Tag> destination)
     {
-        LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
-
         cursor.moveToFirst();
+        
         while (!cursor.isAfterLast())
         {
             Tag tag = new Tag(cursor.getString(cursor.getColumnIndex(TagsTable.COLUMN_VALUE)));
             tag.local = cursor.getInt(cursor.getColumnIndex(TagsTable.COLUMN_LOCAL_ADD)) == 1;
-            tags.add(tag);
+            destination.add(tag);
             cursor.moveToNext();
         }
-
-        return tags;
     }
 
     public void deleteAll()

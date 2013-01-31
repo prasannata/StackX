@@ -82,16 +82,17 @@
     <string name="searchForTag">Search for tag</string>
 
     <!-- Search query options -->
+    <string name="advanced_search">Advanced Search</string>
     <string name="search_query">Query</string>
     <string name="search_tagged">Tagged</string>
-    <string name="search_notTagged">Not Tagged</string>
+    <string name="search_notTagged">!Tagged</string>
     <string name="search_answered">Answered</string>
     <string name="search_sort">Sort</string>
     
     <!-- Symbols -->
     <string name="plusSign">+</string>
 
-    <string-array name="searchSort">
+    <string-array name="searchSortArray">
         <item>activity</item>
         <item>creation</item>
         <item>votes</item>

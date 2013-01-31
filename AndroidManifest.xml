@@ -97,6 +97,9 @@
                 android:resource="@xml/question_searchable" />
         </activity>
         <activity
+            android:name=".AdvancedSearchActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".UserInboxActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name" >

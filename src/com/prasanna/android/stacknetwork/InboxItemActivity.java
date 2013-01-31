@@ -118,8 +118,9 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     public boolean onCreateOptionsMenu(Menu menu)
     {
         boolean ret = super.onCreateOptionsMenu(menu);
-
-        menu.removeItem(R.id.menu_refresh);
+        
+        if (menu != null)
+            menu.removeItem(R.id.menu_refresh);
 
         return ret & true;
     }

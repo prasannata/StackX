@@ -43,39 +43,44 @@
         android:showAsAction="ifRoom"
         android:title="@string/refresh"/>
     <item
+        android:id="@+id/menu_advanced_search"
+        android:orderInCategory="2"
+        android:showAsAction="never"
+        android:title="@string/advanced_search"/>
+    <item
         android:id="@+id/menu_my_profile"
         android:icon="@drawable/person"
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:showAsAction="never"
         android:title="@string/profile"/>
     <item
         android:id="@+id/menu_my_inbox"
         android:icon="@drawable/email"
-        android:orderInCategory="3"
+        android:orderInCategory="4"
         android:showAsAction="never"
         android:title="@string/inbox"/>
     <item
         android:id="@+id/menu_option_archive"
         android:icon="@drawable/save_light"
-        android:orderInCategory="4"
+        android:orderInCategory="5"
         android:showAsAction="never"
         android:title="@string/archive"/>
     <item
         android:id="@+id/menu_option_change_site"
         android:icon="@drawable/labels"
-        android:orderInCategory="5"
+        android:orderInCategory="6"
         android:showAsAction="never"
         android:title="@string/changeSite"/>
     <item
         android:id="@+id/menu_option_settings"
         android:icon="@drawable/settings_white"
-        android:orderInCategory="6"
+        android:orderInCategory="7"
         android:showAsAction="never"
         android:title="@string/settings"/>
     <item
         android:id="@+id/menu_option_test_gen_notify"
         android:icon="@drawable/new_msg_notify"
-        android:orderInCategory="9"
+        android:orderInCategory="8"
         android:showAsAction="never"
         android:title="Notify Test"/>
 

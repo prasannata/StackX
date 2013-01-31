@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -124,7 +124,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
                 tagDao.deleteTagsFromServerForSite(site);
             }
             else
-                return tagDao.getTags(site);
+                return tagDao.getTagSet(site);
 
         }
         catch (SQLException e)
@@ -155,7 +155,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
             tagDao.open();
             tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
             result.clear();
-            result.addAll(tagDao.getTags(OperatingSite.getSite().apiSiteParameter));
+            result.addAll(tagDao.getTagSet(OperatingSite.getSite().apiSiteParameter));
         }
         catch (SQLException e)
         {
