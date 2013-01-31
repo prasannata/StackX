@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white" >
+
+    <RelativeLayout
+        android:id="@+id/query"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/search_query"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/queryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"
+            android:cursorVisible="true"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@null"
+            android:textSize="15sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/tagged"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/query"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/search_tagged"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <AutoCompleteTextView
+            android:id="@+id/selectedTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"
+            android:cursorVisible="true"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@null"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/selectedTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/notTagged"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tagged"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/search_notTagged"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <AutoCompleteTextView
+            android:id="@+id/noLikeTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"
+            android:cursorVisible="true"
+            android:inputType="textMultiLine"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@null"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:id="@+id/noLikeTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/answered"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/notTagged"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/search_answered"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <CheckBox
+            android:id="@+id/answeredCB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:button="@drawable/checkbox"
+            android:gravity="center"
+            android:padding="8dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/sort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/answered"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/search_sort"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:drawSelectorOnTop="true"
+            android:entries="@array/searchSort"
+            android:spinnerMode="dropdown" />
+    </RelativeLayout>
+
+</RelativeLayout>
