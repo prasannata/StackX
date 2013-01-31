@@ -247,7 +247,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         Log.d(TAG, "onSaveInstanceState");
 
-        removeTagListFragmentIfBeingShown();
+        removeTagListFragment();
 
         if (getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
             outState.putInt(LAST_SELECTED_TAB, getActionBar().getSelectedNavigationIndex());
@@ -259,15 +259,14 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         super.onSaveInstanceState(outState);
     }
 
-    private void removeTagListFragmentIfBeingShown()
+    private void removeTagListFragment()
     {
-        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
-
-        if (currentFragment instanceof TagListFragment)
+        if (tagListFragment != null)
         {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.remove(currentFragment);
+            ft.remove(tagListFragment);
             ft.commit();
+            tagListFragment = null;
         }
     }
 

@@ -202,6 +202,8 @@ public class TagListFragment extends ListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreateView");
+
         if (parentLayout == null)
         {
             parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view_with_search, null);
@@ -274,6 +276,8 @@ public class TagListFragment extends ListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
+        Log.d(TAG, "onActivityCreated");
+
         super.onActivityCreated(savedInstanceState);
 
         if (!activityCreated)
@@ -291,6 +295,8 @@ public class TagListFragment extends ListFragment
 
     private void runGetTagsTask()
     {
+        Log.d(TAG, "Running get tags task");
+
         getProgressBar().setVisibility(View.VISIBLE);
 
         GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
@@ -317,15 +323,9 @@ public class TagListFragment extends ListFragment
         {
             if (listAdapter != null)
                 listAdapter.notifyDataSetChanged();
+            else
+                runGetTagsTask();
         }
-    }
-
-    @Override
-    public void onStop()
-    {
-        Log.d(TAG, "onStop");
-
-        super.onStop();
     }
 
     @Override
