@@ -59,36 +59,26 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     private SiteListAdapter siteListAdapter;
     private RestQueryResultReceiver receiver;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.sitelist);
 
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
 
-        Object lastSavedInstance = null;
-        if (savedInstanceState != null)
-            lastSavedInstance = (ArrayList<Site>) savedInstanceState.getSerializable(StringConstants.SITES);
-
-        if (lastSavedInstance == null && SharedPreferencesUtil.hasSiteListCache(getCacheDir()) == false)
+        if (SharedPreferencesUtil.hasSiteListCache(getCacheDir()))
         {
-            registerReceiverAndStartService();
+            sites = SharedPreferencesUtil.getSiteListFromCache(getCacheDir());
+            updateView();
         }
         else
         {
-            if (lastSavedInstance != null)
-            {
-                sites = (ArrayList<Site>) lastSavedInstance;
-                updateView(sites);
-            }
-            else
-            {
-                sites = SharedPreferencesUtil.getSiteListFromCache(getCacheDir());
-                updateView(sites);
-            }
+            registerReceiverAndStartService();            
         }
     }
 
@@ -126,21 +116,14 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         startService(intent);
     }
 
-    private void updateView(ArrayList<Site> sites)
+    private void updateView()
     {
-        if (sites != null && sites.isEmpty() == false)
+        if (sites != null && !sites.isEmpty())
         {
-            siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites, getListView());
+            siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites);
             siteListAdapter.setOnSiteSelectedListener(this);
             setListAdapter(siteListAdapter);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        outState.putSerializable(StringConstants.SITES, sites);
-        super.onSaveInstanceState(outState);
     }
 
     @SuppressWarnings("unchecked")
@@ -169,7 +152,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                     if (sites != null)
                     {
                         SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
-                        updateView(sites);
+                        updateView();
                     }
                     break;
                 default:

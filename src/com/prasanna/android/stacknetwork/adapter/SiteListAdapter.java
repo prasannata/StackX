@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -21,16 +21,13 @@ package com.prasanna.android.stacknetwork.adapter;
 
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,12 +37,9 @@ import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
-@SuppressLint("ViewConstructor")
-public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
+public class SiteListAdapter extends ArrayAdapter<Site>
 {
     public static final String TAG = SiteListAdapter.class.getSimpleName();
-
-    private final LayoutInflater layoutInflater;
 
     private OnSiteSelectedListener onSiteSelectedListener;
 
@@ -54,56 +48,53 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
         void onSiteSelected(Site site);
     }
 
-    public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites, ListView listView)
+    public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites)
     {
-        super(context, textViewResourceId, sites, listView);
-
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        super(context, textViewResourceId, sites);
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
     {
-        RelativeLayout layoutForSites = (RelativeLayout) convertView;
-        if (layoutForSites == null && dataSet != null && position >= 0 && position < dataSet.size())
+        if (convertView == null)
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
+
+        TextView textView = (TextView) convertView.findViewById(R.id.siteName);
+        textView.setText(getItem(position).name);
+
+        if (getItem(position).userType.equals(UserType.REGISTERED))
         {
-            layoutForSites = (RelativeLayout) layoutInflater.inflate(R.layout.sitelist_row, null);
-            TextView textView = (TextView) layoutForSites.findViewById(R.id.siteName);
-            textView.setGravity(Gravity.LEFT);
-            textView.setId(dataSet.get(position).name.hashCode());
-            textView.setText(dataSet.get(position).name);
-
-            if (dataSet.get(position).userType.equals(UserType.REGISTERED))
-            {
-                textView = (TextView) layoutForSites.findViewById(R.id.siteUserTypeRegistered);
-                textView.setVisibility(View.VISIBLE);
-            }
-
-            if (dataSet.get(position).writePermissions != null)
-            {
-                for (WritePermission permission : dataSet.get(position).writePermissions)
-                {
-                    if (permission.canAdd & permission.canDelete & permission.canEdit)
-                    {
-                        View writePermissionView = layoutForSites.findViewById(R.id.writePermissionEnabled);
-                        writePermissionView.setVisibility(View.VISIBLE);
-                        break;
-                    }
-                }
-            }
-            setViewAndListenerForDefaultSiteOption(position, layoutForSites);
-            setOnClickForSite(position, layoutForSites);
+            textView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
+            textView.setVisibility(View.VISIBLE);
         }
 
-        return layoutForSites;
+        if (getItem(position).writePermissions != null)
+        {
+            for (WritePermission permission : getItem(position).writePermissions)
+            {
+                if (permission.canAdd & permission.canDelete & permission.canEdit)
+                {
+                    View writePermissionView = convertView.findViewById(R.id.writePermissionEnabled);
+                    writePermissionView.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+        }
+
+        setViewAndListenerForDefaultSiteOption(position, convertView);
+        setOnClickForSite(position, convertView);
+        return convertView;
     }
 
-    private void setViewAndListenerForDefaultSiteOption(final int position, RelativeLayout layoutForSites)
+    private void setViewAndListenerForDefaultSiteOption(final int position, View layoutForSites)
     {
         String currentDefaultSite = SharedPreferencesUtil.getDefaultSiteName(getContext());
         final ImageView iv = (ImageView) layoutForSites.findViewById(R.id.isDefaultSite);
         if (isDefaultSite(currentDefaultSite, position))
             iv.setImageResource(R.drawable.circle_delft);
+        else
+            iv.setImageResource(R.drawable.circle_white);
+
         iv.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -118,10 +109,10 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
                 else
                 {
                     iv.setImageResource(R.drawable.circle_delft);
-                    SharedPreferencesUtil.setDefaultSite(getContext(), dataSet.get(position));
+                    SharedPreferencesUtil.setDefaultSite(getContext(), getItem(position));
                     notifyDataSetChanged();
-                    Toast.makeText(getContext(), dataSet.get(position).name + " set as default site.",
-                                    Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), getItem(position).name + " set as default site.", Toast.LENGTH_LONG)
+                                    .show();
                 }
             }
         });
@@ -129,10 +120,10 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
 
     private boolean isDefaultSite(String currentDefaultSite, final int position)
     {
-        return currentDefaultSite != null && currentDefaultSite.equals(dataSet.get(position).name);
+        return currentDefaultSite != null && currentDefaultSite.equals(getItem(position).name);
     }
 
-    private void setOnClickForSite(final int position, RelativeLayout layoutForSites)
+    private void setOnClickForSite(final int position, View layoutForSites)
     {
         layoutForSites.setOnClickListener(new View.OnClickListener()
         {
@@ -141,20 +132,9 @@ public class SiteListAdapter extends AbstractDraggableArrayListAdpater<Site>
                 Log.d(TAG, "Clicking on list item " + position);
 
                 if (onSiteSelectedListener != null)
-                    onSiteSelectedListener.onSiteSelected(dataSet.get(position));
+                    onSiteSelectedListener.onSiteSelected(getItem(position));
             }
         });
-    }
-
-    public List<Site> getSites()
-    {
-        return dataSet;
-    }
-
-    @Override
-    public String getTag()
-    {
-        return TAG;
     }
 
     public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener)
