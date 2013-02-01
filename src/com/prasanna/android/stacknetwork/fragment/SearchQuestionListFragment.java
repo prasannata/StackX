@@ -1,6 +1,7 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
@@ -48,6 +49,13 @@ public class SearchQuestionListFragment extends QuestionListFragment
             showProgressBar();
             startService(intent);
         }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden)
+    {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            getActivity().getActionBar().setDisplayHomeAsUpEnabled(!hidden);
     }
 
     @Override

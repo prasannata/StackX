@@ -147,10 +147,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-        {
             ft.hide(searchCriteriaFragment);
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
         ft.show(questionListFragment);
         ft.commit();
