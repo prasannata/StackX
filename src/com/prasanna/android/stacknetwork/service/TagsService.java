@@ -19,10 +19,7 @@
 
 package com.prasanna.android.stacknetwork.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 import android.content.Context;
 import android.database.SQLException;
@@ -40,7 +37,6 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 public class TagsService extends AbstractStackxService
 {
     private static final String TAG = TagsService.class.getSimpleName();
-    private static List<Object> toNotifyObjects = Collections.synchronizedList(new ArrayList<Object>());
 
     private final static class ServiceHandler extends Handler
     {
@@ -138,15 +134,8 @@ public class TagsService extends AbstractStackxService
             public void onHandleMessageFinish(Message message)
             {
                 TagsService.this.stopSelf(message.arg1);
-                for (Object object : toNotifyObjects)
-                {
-                    synchronized (object)
-                    {
-                        object.notify();
-                    }
-                }
-
-                toNotifyObjects.clear();
+                
+                notifyWaitingObjectsOnComplete();
                 
                 Log.d(TAG, "Finished executing TagsService");
                 setRunning(false);
