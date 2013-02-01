@@ -19,7 +19,6 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -38,9 +37,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
+import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.UserProfileActivity;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -48,24 +50,8 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 {
     private static final String TAG = AbstractQuestionListFragment.class.getSimpleName();
 
-    private OnContextItemSelectedListener<Question> onContextItemSelectedListener;
     private final Bundle bundle = new Bundle();
     private int position;
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void onAttach(Activity activity)
-    {
-        Log.d(TAG, "onAttach");
-
-        super.onAttach(activity);
-
-        if (!(activity instanceof OnContextItemSelectedListener))
-            throw new IllegalArgumentException(activity.getLocalClassName()
-                            + " must implement OnContextItemSelectedListener");
-
-        onContextItemSelectedListener = (OnContextItemSelectedListener<Question>) activity;
-    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
@@ -81,7 +67,37 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     {
         Log.d(TAG, "onContextItemSelected");
 
-        return onContextItemSelectedListener.onContextItemSelected(item, itemListAdapter.getItem(position));
+        Question question = itemListAdapter.getItem(position);
+        if (item.getGroupId() == R.id.qContextMenuGroup)
+        {
+            Log.d(TAG, "Context item selected: " + item.getTitle());
+            switch (item.getItemId())
+            {
+                case R.id.q_ctx_menu_user_profile:
+                    showUserProfile(question.owner.id);
+                    break;
+                case R.id.q_ctx_similar:
+                    startSimirarQuestionsActivity(question.title);
+                    return true;
+                case R.id.q_ctx_related:
+                    startRelatedQuestionsActivity(question.id);
+                    return true;
+                case R.id.q_ctx_menu_email:
+                    emailQuestion(question.title, question.link);
+                    return true;
+                default:
+                    Log.d(TAG, "Unknown item in context menu: " + item.getTitle());
+                    return false;
+            }
+        }
+        else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
+        {
+            Log.d(TAG, "Tag selected: " + item.getTitle());
+            startTagQuestionsActivity((String) item.getTitle());
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -149,5 +165,42 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     public Bundle getBundle()
     {
         return bundle;
+    }
+
+    private void startSimirarQuestionsActivity(String title)
+    {
+        Intent questionsIntent = new Intent(getActivity(), QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.SIMILAR);
+        questionsIntent.putExtra(StringConstants.TITLE, title);
+        startActivity(questionsIntent);
+    }
+
+    private void startRelatedQuestionsActivity(long questionId)
+    {
+        Intent questionsIntent = new Intent(getActivity(), QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.RELATED);
+        questionsIntent.putExtra(StringConstants.QUESTION_ID, questionId);
+        startActivity(questionsIntent);
+    }
+
+    private void startTagQuestionsActivity(String tag)
+    {
+        Intent questionsIntent = new Intent(getActivity(), QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.TAG);
+        questionsIntent.putExtra(StringConstants.TAG, tag);
+        startActivity(questionsIntent);
+    }
+
+    private void showUserProfile(long userId)
+    {
+        Intent userProfileIntent = new Intent(getActivity(), UserProfileActivity.class);
+        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+        startActivity(userProfileIntent);
+    }
+
+    private void emailQuestion(String subject, String body)
+    {
+        Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
+        startActivity(Intent.createChooser(emailIntent, ""));
     }
 }

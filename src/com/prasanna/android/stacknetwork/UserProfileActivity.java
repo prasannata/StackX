@@ -21,25 +21,19 @@ package com.prasanna.android.stacknetwork;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Intent;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 
-import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
-import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class UserProfileActivity extends AbstractUserActionBarActivity implements
-                OnContextItemSelectedListener<StackXItem>
+public class UserProfileActivity extends AbstractUserActionBarActivity
 {
     private static final String TAG = UserProfileActivity.class.getSimpleName();
     private static final String[] PAGES =
@@ -90,6 +84,8 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
+        Log.d(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.viewpager_title_indicator);
@@ -127,60 +123,4 @@ public class UserProfileActivity extends AbstractUserActionBarActivity implement
     {
         return false;
     }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item, StackXItem stackXItem)
-    {
-        if (item.getGroupId() == R.id.qContextMenuGroup)
-        {
-
-            Log.d(TAG, "Context item selected: " + item.getTitle());
-
-            switch (item.getItemId())
-            {
-                case R.id.q_ctx_related:
-                    startRelatedQuestionsActivity(stackXItem);
-                    return true;
-                case R.id.q_ctx_similar:
-                    startSimilarQuestionsActivity(stackXItem);
-                    return true;
-                case R.id.q_ctx_menu_email:
-                    Intent emailIntent = IntentUtils.createEmailIntent(stackXItem.title, stackXItem.link);
-                    startActivity(Intent.createChooser(emailIntent, ""));
-                    return true;
-                default:
-                    return false;
-            }
-        }
-        else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
-        {
-            Log.d(TAG, "Tag selected: " + item.getTitle());
-
-            Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-            questionsIntent.setAction(StringConstants.TAG);
-            questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
-            startActivity(questionsIntent);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private void startRelatedQuestionsActivity(StackXItem stackXItem)
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.RELATED);
-        questionsIntent.putExtra(StringConstants.QUESTION_ID, stackXItem.id);
-        startActivity(questionsIntent);
-    }
-
-    private void startSimilarQuestionsActivity(StackXItem stackXItem)
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.SIMILAR);
-        questionsIntent.putExtra(StringConstants.TITLE, stackXItem.title);
-        startActivity(questionsIntent);
-    }
-
 }

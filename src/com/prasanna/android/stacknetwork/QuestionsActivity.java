@@ -34,21 +34,17 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.prasanna.android.provider.RecentQueriesProvider;
-import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
 import com.prasanna.android.stacknetwork.fragment.TagListFragment;
 import com.prasanna.android.stacknetwork.fragment.TagListFragment.OnTagSelectListener;
-import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class QuestionsActivity extends AbstractUserActionBarActivity implements
-        OnContextItemSelectedListener<Question>, OnTagSelectListener
+public class QuestionsActivity extends AbstractUserActionBarActivity implements OnTagSelectListener
 {
     private static final String TAG = QuestionsActivity.class.getSimpleName();
     private static final String TAB_TITLE_ACTIVE = "Active";
@@ -182,7 +178,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         getActionBar().setTitle(getString(R.string.similar) + " to " + title);
 
         QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null,
-                null);
+                        null);
         newFragment.getBundle().putString(StringConstants.TITLE, title);
         replaceFragment(newFragment, StringConstants.SIMILAR + "-" + title.hashCode(), false);
     }
@@ -191,7 +187,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     {
         long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
         QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
-                null);
+                        null);
         newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
         replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, false);
     }
@@ -224,7 +220,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
         if (!frontPage)
         {
             createTab(TAB_TITLE_FAQ,
-                    QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
+                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
         }
     }
 
@@ -238,7 +234,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     private void saveSearchQuery(String query)
     {
         SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
-                RecentQueriesProvider.MODE);
+                        RecentQueriesProvider.MODE);
         suggestions.saveRecentQuery(query, null);
     }
 
@@ -338,45 +334,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item, Question question)
-    {
-        if (item.getGroupId() == R.id.qContextMenuGroup)
-        {
-            Log.d(TAG, "Context item selected: " + item.getTitle());
-            switch (item.getItemId())
-            {
-                case R.id.q_ctx_menu_user_profile:
-                    showUserProfile(question.owner.id);
-                    break;
-                case R.id.q_ctx_similar:
-                    startSimirarQuestionsActivity(question.title);
-                    return true;
-                case R.id.q_ctx_related:
-                    startRelatedQuestionsActivity(question.id);
-                    return true;
-                case R.id.q_ctx_menu_email:
-                    emailQuestion(question.title, question.link);
-                    return true;
-                default:
-                    Log.d(TAG, "Unknown item in context menu: " + item.getTitle());
-                    return false;
-            }
-        }
-        else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
-        {
-            Log.d(TAG, "Tag selected: " + item.getTitle());
-            startTagQuestionsActivity((String) item.getTitle());
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
     public void refresh()
     {
         QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
-                R.id.fragmentContainer);
+                        R.id.fragmentContainer);
         questionsFragment.refresh();
     }
 
@@ -446,43 +407,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements
 
         hideTagFragment();
         setupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
-    }
-
-    private void startSimirarQuestionsActivity(String title)
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.SIMILAR);
-        questionsIntent.putExtra(StringConstants.TITLE, title);
-        startActivity(questionsIntent);
-    }
-
-    private void startRelatedQuestionsActivity(long questionId)
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.RELATED);
-        questionsIntent.putExtra(StringConstants.QUESTION_ID, questionId);
-        startActivity(questionsIntent);
-    }
-
-    private void startTagQuestionsActivity(String tag)
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.TAG);
-        questionsIntent.putExtra(StringConstants.TAG, tag);
-        startActivity(questionsIntent);
-    }
-
-    private void showUserProfile(long userId)
-    {
-        Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
-        startActivity(userProfileIntent);
-    }
-
-    private void emailQuestion(String subject, String body)
-    {
-        Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
-        startActivity(Intent.createChooser(emailIntent, ""));
     }
 
     private void addAndHideFragment(TagListFragment fragment, String fragmentTag)

@@ -24,17 +24,13 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 
-import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSearchListener;
 import com.prasanna.android.stacknetwork.fragment.SearchQuestionListFragment;
-import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 
-public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements
-                OnContextItemSelectedListener<Question>, OnRunSearchListener
+public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener
 {
     private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
     private boolean viewInitialized = false;
@@ -112,13 +108,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     protected boolean shouldSearchViewBeEnabled()
     {
-        return false;
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item, Question stackXItem)
-    {
-        // TODO Auto-generated method stub
         return false;
     }
 

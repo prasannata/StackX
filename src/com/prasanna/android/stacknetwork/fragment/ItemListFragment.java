@@ -70,11 +70,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     protected abstract String getLogTag();
 
-    public interface OnContextItemSelectedListener<T>
-    {
-        boolean onContextItemSelected(MenuItem item, T stackXItem);
-    }
-
     protected boolean isServiceRunning()
     {
         return serviceRunning;
