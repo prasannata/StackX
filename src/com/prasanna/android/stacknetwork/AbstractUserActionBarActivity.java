@@ -109,7 +109,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     public void refreshOperationSite()
     {
         if (OperatingSite.getSite() == null)
-            OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(getApplicationContext()));
+            OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(this));
     }
 
     @Override
