@@ -84,7 +84,7 @@ public class QuestionsIntentService extends AbstractIntentService
                     String seachTagged = intent.getStringExtra(StringConstants.TAG);
                     Log.d(TAG, "Get questions for " + seachTagged);
                     bundle.putSerializable(StringConstants.QUESTIONS,
-                            questionService.getQuestionsForTag(seachTagged, sort, page));
+                                    questionService.getQuestionsForTag(seachTagged, sort, page));
                     break;
                 case GET_SIMILAR:
                     String title = intent.getStringExtra(StringConstants.TITLE);
@@ -98,7 +98,7 @@ public class QuestionsIntentService extends AbstractIntentService
                     break;
                 case SEARCH_ADVANCED:
                     SearchCriteria criteria = (SearchCriteria) intent
-                            .getSerializableExtra(StringConstants.SEARCH_CRITERIA);
+                                    .getSerializableExtra(StringConstants.SEARCH_CRITERIA);
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.searchAdvanced(criteria));
                     break;
 

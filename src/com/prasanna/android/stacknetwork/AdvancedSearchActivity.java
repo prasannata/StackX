@@ -27,9 +27,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.prasanna.android.stacknetwork.fragment.ItemListFragment.OnContextItemSelectedListener;
-import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSearchListener;
+import com.prasanna.android.stacknetwork.fragment.SearchQuestionListFragment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 
@@ -38,7 +38,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
 {
     private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
     private boolean viewInitialized = false;
-    private QuestionListFragment questionListFragment;
+    private SearchQuestionListFragment questionListFragment;
     private SearchCriteriaFragment searchCriteriaFragment;
 
     @Override
@@ -54,22 +54,32 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
             setContentView(R.layout.advanced_search);
             searchCriteriaFragment = (SearchCriteriaFragment) getFragmentManager().findFragmentById(
                             R.id.searchCriteriaFragment);
-            questionListFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
+            questionListFragment = (SearchQuestionListFragment) getFragmentManager().findFragmentById(
                             R.id.questionListFragment);
             viewInitialized = true;
         }
 
-        /*
-         * Can this be better done by handling
-         * onConfigurationChanged(newConfig)?
-         */
+        showOrHideQuestionListFragment(getResources().getConfiguration());
+    }
+
+    private void showOrHideQuestionListFragment(Configuration configuration)
+    {
         if (questionListFragment != null)
         {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-                ft.hide(questionListFragment);
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+            {
+                if (!questionListFragment.hasResults())
+                    ft.hide(questionListFragment);
+                else
+                    ft.hide(searchCriteriaFragment);
+            }
             else
-                ft.show(questionListFragment);
+            {
+                ft.show(searchCriteriaFragment);
+                if (questionListFragment.hasResults())
+                    ft.show(questionListFragment);
+            }
             ft.commit();
         }
     }
@@ -88,8 +98,9 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
-        // TODO Auto-generated method stub
         super.onConfigurationChanged(newConfig);
+
+        showOrHideQuestionListFragment(newConfig);
     }
 
     @Override
@@ -114,16 +125,19 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     public void onRunSearch(SearchCriteria searchCriteria)
     {
-        if (searchCriteria != null)
-            showSearchResults();
+        showSearchResults(searchCriteria, false);
     }
 
-    private void showSearchResults()
+    private void showSearchResults(SearchCriteria searchCriteria, boolean addToBackStack)
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.hide(searchCriteriaFragment);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            ft.hide(searchCriteriaFragment);
         ft.show(questionListFragment);
         ft.addToBackStack(null);
         ft.commit();
+
+        questionListFragment.search(searchCriteria);
     }
 }

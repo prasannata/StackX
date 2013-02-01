@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.prasanna.android.stacknetwork.utils.Validate;
@@ -34,6 +35,7 @@ public class SearchCriteria implements Serializable
     public static final String Q = "q";
     public static final String TITLE = "title";
     public static final String TAGGED = "tagged";
+    public static final String NOT_TAGGED = "nottagged";
     public static final String ANSWERS = "answers";
     public static final String ACCEPTED = "accepted";
     public static final String PAGE = "page";
@@ -102,7 +104,13 @@ public class SearchCriteria implements Serializable
     private SearchCriteria(String query)
     {
         criteria = new HashMap<String, String>();
+        setQuery(query);
+    }
+
+    public SearchCriteria setQuery(String query)
+    {
         criteria.put(Q, query);
+        return this;
     }
 
     public SearchCriteria setMinAnswers(int minAns)
@@ -129,7 +137,7 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria addTagInclude(String tag)
+    public SearchCriteria includeTag(String tag)
     {
         if (includeTags == null)
             includeTags = new ArrayList<String>();
@@ -140,7 +148,7 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria addTagExclude(String tag)
+    public SearchCriteria excludeTag(String tag)
     {
         if (excludeTags == null)
             includeTags = new ArrayList<String>();
@@ -159,7 +167,28 @@ public class SearchCriteria implements Serializable
         if (!criteria.containsKey(PAGESIZE))
             setPageSize(DEFAULT_SIZE);
 
+        if (includeTags != null && !includeTags.isEmpty())
+            addCriteria(TAGGED, getAsDelimitedString(includeTags, ";"));
+
+        if (excludeTags != null && !excludeTags.isEmpty())
+            addCriteria(NOT_TAGGED, getAsDelimitedString(excludeTags, ";"));
+
         return this;
+    }
+
+    private String getAsDelimitedString(ArrayList<String> tags, String delim)
+    {
+        Iterator<String> iterator = tags.iterator();
+        StringBuilder sb = new StringBuilder();
+
+        while (iterator.hasNext())
+        {
+            sb.append(iterator.next());
+            if (iterator.hasNext())
+                sb.append(delim);
+        }
+
+        return sb.toString();
     }
 
     public SearchCriteria nextPage()

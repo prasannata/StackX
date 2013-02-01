@@ -35,8 +35,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
@@ -56,8 +56,9 @@ public class SearchCriteriaFragment extends Fragment
     private ImageView runCriteria;
     private ImageView clearCriteria;
     private CheckBox answered;
-    private TableLayout criteriaLayout;
+    private ScrollView criteriaLayout;
     private OnRunSearchListener onRunSearchListener;
+    private CheckBox hasAnswers;
 
     public interface OnRunSearchListener
     {
@@ -84,12 +85,13 @@ public class SearchCriteriaFragment extends Fragment
 
         super.onCreate(savedInstanceState);
 
-        criteriaLayout = (TableLayout) inflater.inflate(R.layout.search_criteria_builder, null);
+        criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
 
         searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
         selectedTag = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.searchSelectedTag);
         selectedTag.setAdapter(getTagArrayAdapter());
 
+        hasAnswers = (CheckBox) criteriaLayout.findViewById(R.id.searchOnlyWithAnswers);
         answered = (CheckBox) criteriaLayout.findViewById(R.id.searchAnswered);
 
         noLikeTag = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.searchNoLikeTag);
@@ -119,11 +121,17 @@ public class SearchCriteriaFragment extends Fragment
                 SearchCriteria searchCriteria = SearchCriteria.newCriteria();
 
                 if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
-                    searchCriteria.addTagInclude(searchQuery.getText().toString());
+                    searchCriteria.setQuery(searchQuery.getText().toString().trim());
                 if (selectedTag.getText() != null && !Validate.isEmptyString(selectedTag.getText().toString()))
-                    searchCriteria.addTagInclude(selectedTag.getText().toString());
+                    searchCriteria.includeTag(selectedTag.getText().toString().trim());
                 if (noLikeTag.getText() != null && !Validate.isEmptyString(noLikeTag.getText().toString()))
-                    searchCriteria.addTagExclude(noLikeTag.getText().toString());
+                    searchCriteria.excludeTag(noLikeTag.getText().toString().trim());
+
+                Log.d(TAG, "Answered: " + answered.isChecked());
+
+                if (hasAnswers.isChecked())
+                    searchCriteria.setMinAnswers(1);
+
                 if (answered.isChecked())
                     searchCriteria.mustBeAnswered();
                 searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem())).build();
@@ -140,8 +148,18 @@ public class SearchCriteriaFragment extends Fragment
                 selectedTag.setText("");
                 noLikeTag.setText("");
                 sortSpinner.setSelection(0);
+                answered.setChecked(false);
+                hasAnswers.setChecked(false);
             }
         });
+    }
+
+    @Override
+    public void onPause()
+    {
+        Log.d(TAG, "onPause");
+
+        super.onPause();
     }
 
     private ArrayAdapter<String> getTagArrayAdapter()
@@ -167,4 +185,5 @@ public class SearchCriteriaFragment extends Fragment
 
         return new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, tags);
     }
+
 }
