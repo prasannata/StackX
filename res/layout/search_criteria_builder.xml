@@ -115,7 +115,7 @@
                 android:textSize="20sp" />
 
             <CheckBox
-                android:id="@+id/searcOnlyWithAnswers"
+                android:id="@+id/searchOnlyWithAnswers"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_margin="5dp"

@@ -24,6 +24,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSearchListener;
@@ -68,10 +69,14 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 if (!questionListFragment.hasResults())
                     ft.hide(questionListFragment);
                 else
+                {
+                    getActionBar().setDisplayHomeAsUpEnabled(true);
                     ft.hide(searchCriteriaFragment);
+                }
             }
             else
             {
+                getActionBar().setDisplayHomeAsUpEnabled(false);
                 ft.show(searchCriteriaFragment);
                 if (questionListFragment.hasResults())
                     ft.show(questionListFragment);
@@ -117,14 +122,37 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         showSearchResults(searchCriteria, false);
     }
 
+    @Override
+    protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
+    {
+        Log.d(TAG, "Home button clicked");
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
+                        && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible())
+        {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.show(searchCriteriaFragment);
+            ft.hide(questionListFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+
+            return true;
+        }
+
+        return super.onActionBarHomeButtonClick(menuItem);
+    }
+
     private void showSearchResults(SearchCriteria searchCriteria, boolean addToBackStack)
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
             ft.hide(searchCriteriaFragment);
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         ft.show(questionListFragment);
-        ft.addToBackStack(null);
         ft.commit();
 
         questionListFragment.search(searchCriteria);
