@@ -54,7 +54,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private static final String SAVED = "saved";
     private static final String LAST_SELECTED_TAB = "last_selected_tab";
 
-    private static QuestionsActivity me;
+    private static QuestionsActivity self;
 
     private boolean showTagsFragment = false;
     private TagListFragment tagListFragment;
@@ -64,8 +64,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     public static QuestionListFragment getFragment(String fragmentTag)
     {
-        if (me != null)
-            return (QuestionListFragment) me.getFragmentManager().findFragmentByTag(fragmentTag);
+        if (self != null)
+            return (QuestionListFragment) self.getFragmentManager().findFragmentByTag(fragmentTag);
         else
             return null;
     }
@@ -112,7 +112,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
         super.onCreate(savedInstanceState);
 
-        me = this;
+        self = this;
 
         setContentView(R.layout.fragment_container);
 
