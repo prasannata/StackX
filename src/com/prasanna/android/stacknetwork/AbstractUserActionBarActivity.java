@@ -110,6 +110,12 @@ public abstract class AbstractUserActionBarActivity extends Activity
     {
         if (OperatingSite.getSite() == null)
             OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(this));
+
+        if (OperatingSite.getSite() == null)
+        {
+            startSiteListActivity();
+            finish();
+        }
     }
 
     @Override
@@ -291,10 +297,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 startActivity(userInboxIntent);
                 return true;
             case R.id.menu_option_change_site:
-                Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
-                siteListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                siteListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(siteListIntent);
+                startSiteListActivity();
                 return true;
             case R.id.menu_option_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
@@ -322,6 +325,14 @@ public abstract class AbstractUserActionBarActivity extends Activity
         }
 
         return false;
+    }
+
+    private void startSiteListActivity()
+    {
+        Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
+        siteListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        siteListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(siteListIntent);
     }
 
     private void showSearchFilterOptions(MenuItem item)
