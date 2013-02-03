@@ -207,17 +207,14 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         this.action = action;
         this.tag = tag;
 
-        if (getActionBar().getTabCount() == 0)
-        {
-            createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
-            createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
-            createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES));
+        createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
+        createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
+        createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES));
 
-            if (!frontPage)
-            {
-                createTab(TAB_TITLE_FAQ,
-                                QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
-            }
+        if (!frontPage)
+        {
+            createTab(TAB_TITLE_FAQ,
+                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
         }
     }
 
@@ -269,8 +266,23 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         Log.d(TAG, "onResume");
 
         super.onResume();
-
-        showFragmentForIntentAction();
+        
+        if (getActionBar().getTabCount() == 0)
+        {
+            showFragmentForIntentAction();
+        }
+        else
+        {
+            Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+            if (fragment != null && fragment.isAdded() && !fragment.isVisible())
+            {
+                Log.d(TAG, "Showing last attached fragment");
+                
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.show(fragment);
+                ft.commit();
+            }
+        }
     }
 
     @Override
