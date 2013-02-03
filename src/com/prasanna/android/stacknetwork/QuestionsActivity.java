@@ -116,11 +116,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
         setContentView(R.layout.fragment_container);
 
-        if (savedInstanceState == null)
-        {
-            showFragmentForIntentAction();
-        }
-        else
+        if (savedInstanceState != null)
         {
             action = savedInstanceState.getInt(StringConstants.ACTION, 0);
 
@@ -135,8 +131,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
                 if (lastSelectedTab > 0)
                     getActionBar().setSelectedNavigationItem(lastSelectedTab);
             }
-            else
-                showFragmentForIntentAction();
         }
     }
 
@@ -213,14 +207,17 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         this.action = action;
         this.tag = tag;
 
-        createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
-        createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
-        createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES));
-
-        if (!frontPage)
+        if (getActionBar().getTabCount() == 0)
         {
-            createTab(TAB_TITLE_FAQ,
-                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
+            createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
+            createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
+            createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES));
+
+            if (!frontPage)
+            {
+                createTab(TAB_TITLE_FAQ,
+                                QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
+            }
         }
     }
 
@@ -267,9 +264,27 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
+    public void onResume()
+    {
+        Log.d(TAG, "onResume");
+
+        super.onResume();
+
+        showFragmentForIntentAction();
+    }
+
+    @Override
     public void onBackPressed()
     {
+        if (!hideTagFragmentIfShown())
+            super.onBackPressed();
+    }
+
+    private boolean hideTagFragmentIfShown()
+    {
         Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+
+        Log.d(TAG, "current fragment is null " + (currentFragment == null));
 
         if (currentFragment instanceof TagListFragment)
         {
@@ -278,9 +293,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             hideTagFragment();
 
             toggleDisplayForTags(false);
+
+            return true;
         }
-        else
-            super.onBackPressed();
+
+        return false;
     }
 
     @Override
