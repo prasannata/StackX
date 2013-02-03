@@ -264,9 +264,6 @@ public class PostCommentFragment extends Fragment
     public void hideSoftKeyboard()
     {
         if (isVisible() && editText != null)
-        {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        }
+            AppUtils.hideSoftInput(getActivity(), editText);
     }
 }

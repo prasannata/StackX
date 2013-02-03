@@ -33,7 +33,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -266,9 +265,7 @@ public class TagListFragment extends ListFragment
                 filterListInputText.setText("");
                 filterListInputText.setHint(defaultHint);
                 getListView().requestFocus();
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                AppUtils.hideSoftInput(getActivity(), v);
             }
         });
     }
@@ -333,9 +330,8 @@ public class TagListFragment extends ListFragment
     {
         Log.d(TAG, "Position clicked : " + position + ", total = " + listAdapter.getCount());
 
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-
+        AppUtils.hideSoftInput(getActivity(), v);
+        
         if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
         {
             if (listAdapter.getItem(position).name.equals(StringConstants.FRONT_PAGE))

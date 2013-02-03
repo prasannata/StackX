@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -34,7 +33,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -256,7 +254,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                     editTextForTitle.setSelection(editTextForTitle.getText().length());
                 itemsContainer.clearFocus();
                 editTextForTitle.requestFocus();
-                showSoftInput(editTextForTitle);
+                AppUtils.showSoftInput(getActivity(), editTextForTitle);
             }
         });
     }
@@ -312,18 +310,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 DialogBuilder.yesNoDialog(getActivity(), R.string.sureQuestion, listener).show();
             }
         });
-    }
-
-    private void showSoftInput(View v)
-    {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-    }
-
-    private void hideSoftInput(View v)
-    {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
     private void prepareForEditText(boolean edit)
@@ -448,7 +434,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     private void markCommentEnd(View v)
     {
-        hideSoftInput(v);
+        AppUtils.hideSoftInput(getActivity(), v);
         prepareForEditText(false);
         editTextForTitle.clearFocus();
         itemsContainer.requestFocus();
