@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -33,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
@@ -103,9 +102,10 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public View getView(Question item, View convertView, ViewGroup parent)
     {
-        LinearLayout layout = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(),
-                        getActivity(), item);
-        ImageView imageView = (ImageView) layout.findViewById(R.id.itemContextMenu);
+        if (convertView == null)
+            convertView = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(),
+                            getActivity(), item);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.itemContextMenu);
         imageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -114,7 +114,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
                 getActivity().openContextMenu(v);
             }
         });
-        return layout;
+        return convertView;
     }
 
     @Override
