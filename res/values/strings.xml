@@ -75,23 +75,24 @@
     <string name="addComment">Add comment</string>
     <string name="post">Post</string>
 
+    <string name="plusTab">+ Tab</string>
+    
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>
     <string name="search_hasAnswers">Has Answers</string>
-    <string name="search_isAnswered">Is Answered</string>
+    <string name="search_answered">Answered</string>
     <string name="searchForTag">Search for tag</string>
-
-    <!-- Search query options -->
     <string name="advanced_search">Advanced Search</string>
     <string name="search_query">Query</string>
-    <string name="search_tagged">Tagged</string>
-    <string name="search_notTagged">!Tagged</string>
-    <string name="search_answers">Answers</string>
-    <string name="search_answered">Answered</string>
-    <string name="search_sort">Sort</string>
-    
+
     <!-- Symbols -->
     <string name="plusSign">+</string>
+    <string name="minusSign">-</string>
+
+    <!-- Alphabets -->
+    <string name="aCaps">A</string>
+    <string name="i">i</string>
+    <string name="x">x</string>
 
     <string-array name="searchSortArray">
         <item>activity</item>

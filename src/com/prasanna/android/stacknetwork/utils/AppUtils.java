@@ -28,7 +28,9 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -99,11 +101,10 @@ public class AppUtils
 
     public static boolean allowedToWrite(Context context)
     {
-        if(context == null)
+        if (context == null)
             return false;
-        
-        long lastCommentWrite = SharedPreferencesUtil
-                        .getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
+
+        long lastCommentWrite = SharedPreferencesUtil.getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
         long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(context,
                         WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
         return ((System.currentTimeMillis() - lastCommentWrite) / 1000 > minSecondsBetweenWrite);
@@ -126,5 +127,27 @@ public class AppUtils
         TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
         textView.setText(errorMsg);
         return errorLayout;
+    }
+
+    public static void showSoftInput(Context context, View v)
+    {
+        toggleSoftInput(context, v, false);
+    }
+
+    public static void hideSoftInput(Context context, View v)
+    {
+        toggleSoftInput(context, v, true);
+    }
+
+    private static void toggleSoftInput(Context context, View v, boolean hide)
+    {
+        if (context != null && v != null)
+        {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (hide)
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+            else
+                imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+        }
     }
 }

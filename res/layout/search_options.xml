@@ -52,7 +52,7 @@
         android:layout_toRightOf="@id/searchOnlyAnsweredCB"
         android:gravity="center"
         android:paddingRight="5dp"
-        android:text="@string/search_isAnswered"
+        android:text="@string/search_answered"
         android:textColor="@color/black"
         android:textSize="15sp" />
 

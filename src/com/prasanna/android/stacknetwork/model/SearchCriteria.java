@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -148,14 +149,38 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
+    public SearchCriteria includeTags(Collection<String> tags)
+    {
+        if (tags != null)
+        {
+            if (includeTags == null)
+                includeTags = new ArrayList<String>();
+
+            includeTags.addAll(tags);
+        }
+        return this;
+    }
+
     public SearchCriteria excludeTag(String tag)
     {
         if (excludeTags == null)
-            includeTags = new ArrayList<String>();
+            excludeTags = new ArrayList<String>();
 
         if (!Validate.isEmptyString(tag))
             excludeTags.add(tag);
 
+        return this;
+    }
+
+    public SearchCriteria excludeTags(Collection<String> tags)
+    {
+        if (tags != null)
+        {
+            if (excludeTags == null)
+                excludeTags = new ArrayList<String>();
+
+            excludeTags.addAll(tags);
+        }
         return this;
     }
 
