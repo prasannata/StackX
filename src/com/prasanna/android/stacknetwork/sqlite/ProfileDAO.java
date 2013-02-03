@@ -84,15 +84,13 @@ public class ProfileDAO extends AbstractBaseDao
     {
         if (site != null && avatar != null)
         {
-            User me = getMe(site);
-
             String whereClause = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
             String[] whereArgs =
             { "1", site };
 
             ContentValues values = new ContentValues();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            me.avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
             values.put(ProfileTable.COLUMN_PROFILE_IMAGE, stream.toByteArray());
 
             database.update(ProfileTable.COLUMN_LAST_UPDATE, values, whereClause, whereArgs);
