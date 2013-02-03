@@ -2,12 +2,17 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class SearchQuestionListFragment extends QuestionListFragment
 {
@@ -38,6 +43,33 @@ public class SearchQuestionListFragment extends QuestionListFragment
         }
         else
             intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria.nextPage());
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu)
+    {
+        Log.d(TAG, "onPrepareOptionsMenu");
+        menu.findItem(R.id.menu_save).setVisible(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_save:
+                Toast.makeText(getActivity(), "Search criteria saved", Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        
+        return false;
     }
 
     @Override

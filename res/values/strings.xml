@@ -74,9 +74,9 @@
     <string name="add">add</string>
     <string name="addComment">Add comment</string>
     <string name="post">Post</string>
-
+    <string name="save">Save</string>
     <string name="plusTab">+ Tab</string>
-    
+
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>
     <string name="search_hasAnswers">Has Answers</string>

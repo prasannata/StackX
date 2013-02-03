@@ -85,17 +85,19 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         }
     }
 
+    
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    public boolean onPrepareOptionsMenu(Menu menu)
     {
-        boolean ret = super.onCreateOptionsMenu(menu);
-
-        if (menu != null)
-            menu.removeItem(R.id.menu_refresh);
-
+        Log.d(TAG, "onPrepareOptionsMenu");
+        
+        boolean ret = super.onPrepareOptionsMenu(menu);
+        
+        menu.removeItem(R.id.menu_refresh);
+        
         return ret & true;
     }
-
+    
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
