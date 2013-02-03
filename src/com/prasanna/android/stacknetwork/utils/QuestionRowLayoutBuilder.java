@@ -66,7 +66,7 @@ public class QuestionRowLayoutBuilder
             for (int i = 0; i < question.tags.length; i++)
             {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(3, 0, 3, 0);
                 TextView tagTextView = ((TextView) getInflater(context).inflate(R.layout.tags_layout, null));
                 tagTextView.setText(question.tags[i]);
