@@ -69,8 +69,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private AutoCompleteTextView tagEditText;
     private ImageView runSearch;
     private ImageView clearCriteria;
-    private TextView addUnknownTagToIncluded;
-    private TextView addUnknownTagToExcluded;
+    private ToggleButton addUnknownTagToIncluded;
+    private ToggleButton addUnknownTagToExcluded;
 
     private ScrollView criteriaLayout;
     private OnRunSearchListener onRunSearchListener;
@@ -131,16 +131,26 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         private void prepareToggleIncludeTag(final TagViewHolder tagViewHolder, final String tag)
         {
+            if (includedTags.contains(tag))
+                tagViewHolder.toggleIncludeTag.setTextColor(getResources().getColor(R.color.delft));
+            else
+                tagViewHolder.toggleIncludeTag.setTextColor(getResources().getColor(R.color.lightGrey));
+
             tagViewHolder.toggleIncludeTag.setOnCheckedChangeListener(new OnCheckedChangeListener()
             {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
                 {
                     Log.d(TAG, "toggleIncludeTag checked " + isChecked);
+                    
+                    if (isChecked)
+                        tagViewHolder.toggleIncludeTag.setTextColor(getResources().getColor(R.color.delft));
+                    else
+                        tagViewHolder.toggleIncludeTag.setTextColor(getResources().getColor(R.color.lightGrey));
 
-                    tagViewHolder.toggleIncludeTag.setChecked(isChecked);
                     if (isChecked && tagViewHolder.toggleExcludeTag.isChecked())
                         tagViewHolder.toggleExcludeTag.setChecked(false);
+
                     updateIncludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
                 }
             });
@@ -148,6 +158,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         private void prepareToggleExcludeTag(final TagViewHolder tagViewHolder, final String tag)
         {
+            if (excludedTags.contains(tag))
+                tagViewHolder.toggleExcludeTag.setTextColor(getResources().getColor(R.color.delft));
+            else
+                tagViewHolder.toggleExcludeTag.setTextColor(getResources().getColor(R.color.lightGrey));
+
             tagViewHolder.toggleExcludeTag.setOnCheckedChangeListener(new OnCheckedChangeListener()
             {
                 @Override
@@ -155,9 +170,14 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 {
                     Log.d(TAG, "toggleExcludeTag checked " + isChecked);
 
-                    tagViewHolder.toggleExcludeTag.setChecked(isChecked);
+                    if (isChecked)
+                        tagViewHolder.toggleExcludeTag.setTextColor(getResources().getColor(R.color.delft));
+                    else
+                        tagViewHolder.toggleExcludeTag.setTextColor(getResources().getColor(R.color.lightGrey));
+
                     if (isChecked && tagViewHolder.toggleIncludeTag.isChecked())
                         tagViewHolder.toggleIncludeTag.setChecked(false);
+
                     updateExcludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
                 }
             });
@@ -264,11 +284,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private void prepareAddUnknownTagToIncluded()
     {
-        addUnknownTagToIncluded = (TextView) criteriaLayout.findViewById(R.id.includeUnknownTag);
-        addUnknownTagToIncluded.setOnClickListener(new View.OnClickListener()
+        addUnknownTagToIncluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleIncludeUnknownTag);
+        addUnknownTagToIncluded.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
-            public void onClick(View v)
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
                 String unknownTag = tagEditText.getText().toString();
                 TextView textView = getTextViewForAddedTag(unknownTag);
@@ -279,11 +299,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private void prepareAddUnknownTagToExcluded()
     {
-        addUnknownTagToExcluded = (TextView) criteriaLayout.findViewById(R.id.excludeUnknownTag);
-        addUnknownTagToExcluded.setOnClickListener(new View.OnClickListener()
+        addUnknownTagToExcluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleExcludeUnknownTag);
+        addUnknownTagToExcluded.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
-            public void onClick(View v)
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
                 String unknownTag = tagEditText.getText().toString();
                 TextView textView = getTextViewForAddedTag(unknownTag);

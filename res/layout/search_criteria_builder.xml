@@ -54,27 +54,19 @@
                 android:src="@drawable/search_white_32x32" />
         </RelativeLayout>
 
-        <TableRow
-            android:id="@+id/query"
+        <EditText
+            android:id="@+id/searchQuery"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_margin="3dp"
-            android:orientation="horizontal" >
-
-            <EditText
-                android:id="@+id/searchQuery"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_border_grey_min_padding"
-                android:cursorVisible="true"
-                android:hint="@string/search_query"
-                android:inputType="text"
-                android:textColor="@color/black"
-                android:textCursorDrawable="@null"
-                android:textSize="15sp" />
-        </TableRow>
+            android:layout_weight="1"
+            android:background="@drawable/rounded_border_grey_min_padding"
+            android:cursorVisible="true"
+            android:hint="@string/search_query"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textCursorDrawable="@null"
+            android:textSize="15sp" />
 
         <RadioGroup
             android:id="@+id/includeAnswers"
@@ -104,28 +96,19 @@
                 android:textSize="12sp" />
         </RadioGroup>
 
-        <TableRow
+        <LinearLayout
             android:id="@+id/tagged"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
             android:orientation="horizontal" >
 
-            <ImageView
-                android:id="@+id/taggedLabel"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:layout_margin="1dp"
-                android:layout_weight="0.08"
-                android:gravity="left"
-                android:src="@drawable/labels_dark_32x32" />
-
             <AutoCompleteTextView
                 android:id="@+id/tagEditText"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_margin="3dp"
-                android:layout_weight="0.72"
+                android:layout_weight="0.8"
                 android:background="@drawable/rounded_border_grey_min_padding"
                 android:cursorVisible="true"
                 android:hint="@string/tags"
@@ -134,32 +117,32 @@
                 android:textCursorDrawable="@null"
                 android:textSize="15sp" />
 
-            <TextView
-                android:id="@+id/includeUnknownTag"
+            <ToggleButton
+                android:id="@+id/toggleIncludeUnknownTag"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
-                android:layout_margin="3dp"
+                android:layout_gravity="center"
+                android:layout_margin="1dp"
                 android:layout_weight="0.1"
                 android:background="@drawable/rounded_border_grey_min_padding"
-                android:gravity="center"
-                android:text="@string/plusSign"
-                android:textColor="@color/black"
-                android:drawableBottom="@drawable/line_grey"
-                android:visibility="gone" />
+                android:textColor="@color/lightGrey"
+                android:textOff="@string/plusSign"
+                android:textOn="@string/plusSign"
+                android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/excludeUnknownTag"
+            <ToggleButton
+                android:id="@+id/toggleExcludeUnknownTag"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
-                android:layout_margin="3dp"
+                android:layout_gravity="center"
+                android:layout_margin="1dp"
                 android:layout_weight="0.1"
                 android:background="@drawable/rounded_border_grey_min_padding"
-                android:gravity="center"
-                android:text="@string/minusSign"
-                android:textColor="@color/black"
-                android:drawableBottom="@drawable/line_grey"
-                android:visibility="gone" />
-        </TableRow>
+                android:textColor="@color/lightGrey"
+                android:textOff="@string/minusSign"
+                android:textOn="@string/minusSign"
+                android:visibility="visible" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/selectedTags"

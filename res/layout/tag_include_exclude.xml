@@ -21,8 +21,10 @@
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
+        android:layout_margin="3dp"
         android:layout_weight="0.1"
-        android:textColor="@color/delft"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:textColor="@color/lightGrey"
         android:textOff="@string/plusSign"
         android:textOn="@string/plusSign" />
 
@@ -31,8 +33,10 @@
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
+        android:layout_margin="3dp"
         android:layout_weight="0.1"
-        android:textColor="@color/delft"
+        android:background="@drawable/rounded_border_grey_min_padding"
+        android:textColor="@color/lightGrey"
         android:textOff="@string/minusSign"
         android:textOn="@string/minusSign" />
 
