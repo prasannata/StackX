@@ -273,11 +273,22 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         }
         else
         {
-            if (getIntent().getAction() == null || StringConstants.TAG.equals(getIntent().getAction()))
+            Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+            if (fragment != null)
             {
-                getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-                getActionBar().setDisplayHomeAsUpEnabled(true);
-                getActionBar().setSelectedNavigationItem(0);
+                Log.d(TAG, "Showing last attached fragment");
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.show(fragment);
+                ft.commit();
+            }
+            else
+            {
+                if (getIntent().getAction() == null || StringConstants.TAG.equals(getIntent().getAction()))
+                {
+                    getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                    getActionBar().setDisplayHomeAsUpEnabled(true);
+                    getActionBar().setSelectedNavigationItem(0);
+                }
             }
         }
     }
