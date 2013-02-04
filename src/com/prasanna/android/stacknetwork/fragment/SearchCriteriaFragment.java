@@ -142,11 +142,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
                 {
                     Log.d(TAG, "toggleIncludeTag checked " + isChecked);
-                    
+
                     if (isChecked)
-                        tagViewHolder.toggleIncludeTag.setTextColor(getResources().getColor(R.color.delft));
+                        buttonView.setTextColor(getResources().getColor(R.color.delft));
                     else
-                        tagViewHolder.toggleIncludeTag.setTextColor(getResources().getColor(R.color.lightGrey));
+                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
                     if (isChecked && tagViewHolder.toggleExcludeTag.isChecked())
                         tagViewHolder.toggleExcludeTag.setChecked(false);
@@ -171,9 +171,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     Log.d(TAG, "toggleExcludeTag checked " + isChecked);
 
                     if (isChecked)
-                        tagViewHolder.toggleExcludeTag.setTextColor(getResources().getColor(R.color.delft));
+                        buttonView.setTextColor(getResources().getColor(R.color.delft));
                     else
-                        tagViewHolder.toggleExcludeTag.setTextColor(getResources().getColor(R.color.lightGrey));
+                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
                     if (isChecked && tagViewHolder.toggleIncludeTag.isChecked())
                         tagViewHolder.toggleIncludeTag.setChecked(false);
@@ -184,10 +184,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         }
     }
 
-    private void addTag(boolean include, String tag, TextView tagTextView)
+    private void addTag(TextView tagTextView)
     {
-        tagTextView.setText(tag);
-
         LinearLayout currentRow = getTagRow(tagTextView);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -324,16 +322,17 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 if (excludedTags.contains(tag))
                     excludedTags.remove(tag);
                 else
-                    addTag(true, tag, textView);
+                    addTag(textView);
             }
             else
                 Toast.makeText(getActivity(), tag + " already added", Toast.LENGTH_SHORT).show();
         }
         else
         {
-            if (includedTags.contains(tag))
+            includedTags.remove(tag);
+            
+            if (!excludedTags.contains(tag))
             {
-                includedTags.remove(tag);
                 LinearLayout parent = (LinearLayout) textView.getParent();
                 parent.removeView(textView);
             }
@@ -352,16 +351,17 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 if (includedTags.contains(tag))
                     includedTags.remove(tag);
                 else
-                    addTag(true, tag, textView);
+                    addTag(textView);
             }
             else
                 Toast.makeText(getActivity(), tag + " already added", Toast.LENGTH_SHORT).show();
         }
         else
         {
-            if (excludedTags.contains(tag))
+            excludedTags.remove(tag);
+            
+            if (!includedTags.contains(tag))
             {
-                excludedTags.remove(tag);
                 LinearLayout parent = (LinearLayout) textView.getParent();
                 parent.removeView(textView);
             }
