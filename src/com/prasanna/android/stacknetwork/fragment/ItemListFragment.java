@@ -117,6 +117,8 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onResume()
     {
+        Log.d(TAG, "onResume");
+        
         super.onResume();
 
         if (itemListAdapter != null && itemListAdapter.getCount() > 0)

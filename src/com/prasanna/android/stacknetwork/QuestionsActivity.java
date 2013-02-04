@@ -266,21 +266,18 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         Log.d(TAG, "onResume");
 
         super.onResume();
-        
+
         if (getActionBar().getTabCount() == 0)
         {
             showFragmentForIntentAction();
         }
         else
         {
-            Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
-            if (fragment != null && fragment.isAdded() && !fragment.isVisible())
+            if (getIntent().getAction() == null || StringConstants.TAG.equals(getIntent().getAction()))
             {
-                Log.d(TAG, "Showing last attached fragment");
-                
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.show(fragment);
-                ft.commit();
+                getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+                getActionBar().setSelectedNavigationItem(0);
             }
         }
     }
