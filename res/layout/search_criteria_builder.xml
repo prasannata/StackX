@@ -128,7 +128,7 @@
                 android:textColor="@color/lightGrey"
                 android:textOff="@string/plusSign"
                 android:textOn="@string/plusSign"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <ToggleButton
                 android:id="@+id/toggleExcludeUnknownTag"
@@ -141,7 +141,7 @@
                 android:textColor="@color/lightGrey"
                 android:textOff="@string/minusSign"
                 android:textOn="@string/minusSign"
-                android:visibility="visible" />
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout

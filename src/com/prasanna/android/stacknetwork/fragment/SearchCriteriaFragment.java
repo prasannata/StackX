@@ -126,6 +126,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             prepareToggleIncludeTag(tagViewHolder, tag);
             prepareToggleExcludeTag(tagViewHolder, tag);
 
+            convertView.setTag(tagViewHolder);
+            
             return convertView;
         }
 
@@ -148,10 +150,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     else
                         buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
-                    if (isChecked && tagViewHolder.toggleExcludeTag.isChecked())
-                        tagViewHolder.toggleExcludeTag.setChecked(false);
-
                     updateIncludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
+                    
+                    if (isChecked)
+                        tagViewHolder.toggleExcludeTag.setChecked(false);
                 }
             });
         }
@@ -175,17 +177,22 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     else
                         buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
-                    if (isChecked && tagViewHolder.toggleIncludeTag.isChecked())
-                        tagViewHolder.toggleIncludeTag.setChecked(false);
-
                     updateExcludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
+                    
+                    if (isChecked)
+                    {
+                        Log.d(TAG, "toggleIncludeTag  set checked false");
+                        tagViewHolder.toggleIncludeTag.setChecked(false);
+                    }
                 }
             });
         }
     }
 
-    private void addTag(TextView tagTextView)
+    private void addTag(TextView tagTextView, String tag)
     {
+        tagTextView.setText(tag);
+        
         LinearLayout currentRow = getTagRow(tagTextView);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -318,11 +325,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 includedTags.add(tag);
 
+                Log.d(TAG, tag + " added to included");
                 textView.setBackgroundColor(getResources().getColor(R.color.lichen));
                 if (excludedTags.contains(tag))
                     excludedTags.remove(tag);
                 else
-                    addTag(textView);
+                    addTag(textView, tag);
             }
             else
                 Toast.makeText(getActivity(), tag + " already added", Toast.LENGTH_SHORT).show();
@@ -347,11 +355,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 excludedTags.add(tag);
 
+                Log.d(TAG, tag + " added to excluded");
                 textView.setBackgroundColor(getResources().getColor(R.color.pulp));
                 if (includedTags.contains(tag))
                     includedTags.remove(tag);
                 else
-                    addTag(textView);
+                    addTag(textView, tag);
             }
             else
                 Toast.makeText(getActivity(), tag + " already added", Toast.LENGTH_SHORT).show();
