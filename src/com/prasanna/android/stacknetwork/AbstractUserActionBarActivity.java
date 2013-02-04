@@ -88,6 +88,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void initializeActionBar()
     {
+        getActionBar().setHomeButtonEnabled(false);
+
         if (getActionBar().getTitle() == null)
             getActionBar().setTitle(OperatingSite.getSite().name);
 
@@ -139,6 +141,9 @@ public abstract class AbstractUserActionBarActivity extends Activity
             setupActionBarForAnyUser(menu);
 
         this.actionBarMenu = menu;
+
+        getActionBar().setHomeButtonEnabled(true);
+
         return true;
     }
 
