@@ -139,7 +139,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     Log.d(TAG, "toggleIncludeTag checked " + isChecked);
 
                     tagViewHolder.toggleIncludeTag.setChecked(isChecked);
-                    if (tagViewHolder.toggleExcludeTag.isChecked())
+                    if (isChecked && tagViewHolder.toggleExcludeTag.isChecked())
                         tagViewHolder.toggleExcludeTag.setChecked(false);
                     updateIncludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
                 }
@@ -156,7 +156,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     Log.d(TAG, "toggleExcludeTag checked " + isChecked);
 
                     tagViewHolder.toggleExcludeTag.setChecked(isChecked);
-                    if (tagViewHolder.toggleIncludeTag.isChecked())
+                    if (isChecked && tagViewHolder.toggleIncludeTag.isChecked())
                         tagViewHolder.toggleIncludeTag.setChecked(false);
                     updateExcludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
                 }
