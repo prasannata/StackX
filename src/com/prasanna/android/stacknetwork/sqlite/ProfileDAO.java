@@ -66,6 +66,7 @@ public class ProfileDAO extends AbstractBaseDao
             values.put(ProfileTable.COLUMN_ACCEPT_RATE, user.acceptRate);
             values.put(ProfileTable.COLUMN_REG_DATE, user.creationDate);
             values.put(ProfileTable.COLUMN_LAST_ACCESS, user.lastAccessTime);
+            values.put(ProfileTable.COLUMN_PROFILE_IMAGE_LINK, user.profileImageLink);
 
             if (user.avatar != null)
             {

@@ -43,8 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_LOCAL_ADD = "local_add";
 
         private static final String CREATE_TABLE = "create table " + TABLE_TAGS + "(" + COLUMN_ID
-                + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null, " + COLUMN_SITE
-                + " text not null, " + COLUMN_LOCAL_ADD + " integer DEFAULT 0);";
+                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null, " + COLUMN_SITE
+                        + " text not null, " + COLUMN_LOCAL_ADD + " integer DEFAULT 0);";
     }
 
     public static final class AuditTable
@@ -55,8 +55,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_LAST_UPDATE_TIME = "last_update_time";
 
         private static final String CREATE_TABLE = "create table " + TABLE_AUDIT + "(" + COLUMN_ID
-                + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE + " text, "
-                + COLUMN_LAST_UPDATE_TIME + " long not null);";
+                        + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE
+                        + " text, " + COLUMN_LAST_UPDATE_TIME + " long not null);";
     }
 
     public static final class WritePermissionTable
@@ -72,10 +72,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_SITE_URL = "site_url";
 
         private static final String CREATE_TABLE = "create table " + TABLE_WRITE_PERMISSION + "(" + COLUMN_ID
-                + " integer primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
-                + " integer not null, " + COLUMN_EDIT + " integer not null, " + COLUMN_MAX_DAILY_ACTIONS
-                + " integer not null, " + COLUMN_WAIT_TIME + " integer not null, " + COLUMN_OBJECT_TYPE
-                + " text not null, " + COLUMN_SITE + " text not null, " + COLUMN_SITE_URL + " text not null);";
+                        + " integer primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
+                        + " integer not null, " + COLUMN_EDIT + " integer not null, " + COLUMN_MAX_DAILY_ACTIONS
+                        + " integer not null, " + COLUMN_WAIT_TIME + " integer not null, " + COLUMN_OBJECT_TYPE
+                        + " text not null, " + COLUMN_SITE + " text not null, " + COLUMN_SITE_URL + " text not null);";
     }
 
     public static final class ProfileTable
@@ -96,19 +96,20 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_VIEWS = "views";
         public static final String COLUMN_REG_DATE = "reg_date";
         public static final String COLUMN_LAST_ACCESS = "last_access";
+        public static final String COLUMN_PROFILE_IMAGE_LINK = "profile_image_link";
         public static final String COLUMN_PROFILE_IMAGE = "profile_image";
         public static final String COLUMN_LAST_UPDATE = "last_update";
 
         private static final String CREATE_TABLE = "create table " + TABLE_PROFILE + "(" + COLUMN_ID
-                + " integer primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
-                + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
-                + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
-                + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT
-                + " integer not null, " + COLUMN_UPVOTE_COUNT + " integer not null, " + COLUMN_DOWNVOTE_COUNT
-                + " integer not null, " + COLUMN_ACCEPT_RATE + " integer not null, " + COLUMN_REPUTATION
-                + " integer not null, " + COLUMN_VIEWS + " integer not null, " + COLUMN_REG_DATE + " long not null, "
-                + COLUMN_LAST_ACCESS + " long not null, " + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE
-                + " long not null);";
+                        + " integer primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
+                        + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
+                        + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
+                        + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT
+                        + " integer not null, " + COLUMN_UPVOTE_COUNT + " integer not null, " + COLUMN_DOWNVOTE_COUNT
+                        + " integer not null, " + COLUMN_ACCEPT_RATE + " integer not null, " + COLUMN_REPUTATION
+                        + " integer not null, " + COLUMN_VIEWS + " integer not null, " + COLUMN_REG_DATE
+                        + " long not null, " + COLUMN_LAST_ACCESS + " long not null, " + COLUMN_PROFILE_IMAGE_LINK
+                        + " text, " + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE + " long not null);";
 
     }
 
@@ -122,9 +123,9 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_USER_TYPE = "user_type";
 
         private static final String CREATE_TABLE = "create table " + TABLE_USER_ACCOUNTS + "(" + COLUMN_ID
-                + " integer primary key autoincrement, " + COLUMN_USER_ID + " integer not null, " + COLUMN_ACCOUNT_ID
-                + " integer not null, " + COLUMN_SITE_NAME + " text not null, " + COLUMN_SITE_URL + " text not null, "
-                + COLUMN_USER_TYPE + " text);";
+                        + " integer primary key autoincrement, " + COLUMN_USER_ID + " integer not null, "
+                        + COLUMN_ACCOUNT_ID + " integer not null, " + COLUMN_SITE_NAME + " text not null, "
+                        + COLUMN_SITE_URL + " text not null, " + COLUMN_USER_TYPE + " text);";
     }
 
     public DatabaseHelper(Context context)
