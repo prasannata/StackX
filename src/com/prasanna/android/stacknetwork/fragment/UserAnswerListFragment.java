@@ -206,50 +206,48 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         LinearLayout answerRow = (LinearLayout) convertView;
 
         if (convertView == null)
-        {
             answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
 
-            if (answer.accepted)
-                answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
+        if (answer.accepted)
+            answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
 
-            TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
-            RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
-            layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
-            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            textView.setLayoutParams(layoutParams);
-            textView.setText(Html.fromHtml(answer.title));
+        TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
+        RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
+        layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
+        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        textView.setLayoutParams(layoutParams);
+        textView.setText(Html.fromHtml(answer.title));
 
-            textView = (TextView) answerRow.findViewById(R.id.answerScore);
-            textView.setText("Answer Score: " + answer.score);
+        textView = (TextView) answerRow.findViewById(R.id.answerScore);
+        textView.setText("Answer Score: " + answer.score);
 
-            textView = (TextView) answerRow.findViewById(R.id.answerTime);
-            textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
+        textView = (TextView) answerRow.findViewById(R.id.answerTime);
+        textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
 
-            textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
+        textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
 
-            if (answer.body != null)
+        if (answer.body != null)
+        {
+            String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
+
+            if (answerBody.length() > ANSWER_PREVIEW_LEN)
             {
-                String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
-
-                if (answerBody.length() > ANSWER_PREVIEW_LEN)
-                {
-                    answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
-                    textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
-                }
-                else
-                    textView.setText(Html.fromHtml(answerBody));
+                answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
+                textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
             }
-
-            ImageView imageView = (ImageView) answerRow.findViewById(R.id.itemContextMenu);
-            imageView.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    getActivity().openContextMenu(v);
-                }
-            });
+            else
+                textView.setText(Html.fromHtml(answerBody));
         }
+
+        ImageView imageView = (ImageView) answerRow.findViewById(R.id.itemContextMenu);
+        imageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                getActivity().openContextMenu(v);
+            }
+        });
         return answerRow;
     }
 
