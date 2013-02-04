@@ -67,7 +67,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private ArrayList<String> sortOptionArray;
     private EditText searchQuery;
     private AutoCompleteTextView tagEditText;
-    private AutoCompleteTextView noLikeTag;
     private ImageView runSearch;
     private ImageView clearCriteria;
     private TextView addUnknownTagToIncluded;
@@ -419,7 +418,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 searchQuery.setText("");
                 tagEditText.setText("");
-                noLikeTag.setText("");
                 sortSpinner.setSelection(0);
                 includeAnswers.clearCheck();
                 selectedTags.removeAllViews();
