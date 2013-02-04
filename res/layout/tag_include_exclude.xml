@@ -9,7 +9,7 @@
         android:id="@+id/tag"
         android:layout_width="0dp"
         android:layout_height="40dp"
-        android:layout_weight="0.6"
+        android:layout_weight="0.8"
         android:background="@color/white"
         android:gravity="left|center"
         android:padding="5dp"
@@ -21,7 +21,7 @@
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:layout_weight="0.2"
+        android:layout_weight="0.1"
         android:textColor="@color/delft"
         android:textOff="@string/plusSign"
         android:textOn="@string/plusSign" />
@@ -31,7 +31,7 @@
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:layout_weight="0.2"
+        android:layout_weight="0.1"
         android:textColor="@color/delft"
         android:textOff="@string/minusSign"
         android:textOn="@string/minusSign" />
