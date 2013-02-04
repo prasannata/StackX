@@ -251,7 +251,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
         tagEditText.addTextChangedListener(this);
         tagEditText.setAdapter(getTagArrayAdapter());
-        
+
         includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
 
         sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
@@ -292,7 +292,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             }
         });
     }
-
 
     private void updateIncludedTags(TextView textView, String tag, boolean add)
     {
@@ -355,12 +354,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         TextView textView = (TextView) criteriaLayout.findViewWithTag(UNKNOWN_TAG_TV_PREFIX_TAG + unknownTag);
         if (textView == null)
         {
-            textView = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.tags_layout, null);
+            textView = getTextViewForTag();
             textView.setTag(UNKNOWN_TAG_TV_PREFIX_TAG + unknownTag);
         }
         return textView;
     }
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -486,7 +485,20 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private TextView getTextViewForTag()
     {
-        return (TextView) LayoutInflater.from(getActivity()).inflate(
-                        R.layout.tags_layout, null);
+        final TextView textView = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.tags_layout, null);
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (textView.getText() != null)
+                {
+                    tagEditText.setText(textView.getText());
+                    tagEditText.setSelection(textView.getText().length());
+                }
+            }
+        });
+
+        return textView;
     }
 }
