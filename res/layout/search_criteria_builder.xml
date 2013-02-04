@@ -144,6 +144,7 @@
                 android:gravity="center"
                 android:text="@string/plusSign"
                 android:textColor="@color/black"
+                android:drawableBottom="@drawable/line_grey"
                 android:visibility="gone" />
 
             <TextView
@@ -156,6 +157,7 @@
                 android:gravity="center"
                 android:text="@string/minusSign"
                 android:textColor="@color/black"
+                android:drawableBottom="@drawable/line_grey"
                 android:visibility="gone" />
         </TableRow>
 
