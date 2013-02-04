@@ -28,6 +28,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.database.SQLException;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +46,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.prasanna.android.stacknetwork.R;
@@ -54,10 +57,11 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.Validate;
 
-public class SearchCriteriaFragment extends Fragment
+public class SearchCriteriaFragment extends Fragment implements TextWatcher
 {
     private static final String TAG = SearchCriteriaFragment.class.getSimpleName();
-    private static final String SELECTED_TAGS_LL_PREFIX_ID = "selectedTags:ll:";
+    private static final String SELECTED_TAGS_LL_PREFIX_TAG = "selectedTags:ll:";
+    private static final String UNKNOWN_TAG_TV_PREFIX_TAG = "unknownTag:tv:";
 
     private Spinner sortSpinner;
     private ArrayList<String> sortOptionArray;
@@ -66,6 +70,9 @@ public class SearchCriteriaFragment extends Fragment
     private AutoCompleteTextView noLikeTag;
     private ImageView runSearch;
     private ImageView clearCriteria;
+    private TextView addUnknownTagToIncluded;
+    private TextView addUnknownTagToExcluded;
+
     private ScrollView criteriaLayout;
     private OnRunSearchListener onRunSearchListener;
     private RadioGroup includeAnswers;
@@ -103,8 +110,7 @@ public class SearchCriteriaFragment extends Fragment
             {
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.tag_include_exclude, null);
                 tagViewHolder = new TagViewHolder();
-                tagViewHolder.selectedTagTextView = (TextView) LayoutInflater.from(getActivity()).inflate(
-                                R.layout.tags_layout, null);
+                tagViewHolder.selectedTagTextView = getTextViewForTag();
                 tagViewHolder.tagTextView = (TextView) convertView.findViewById(R.id.tag);
                 tagViewHolder.toggleIncludeTag = (ToggleButton) convertView.findViewById(R.id.toggleIncludeTag);
                 tagViewHolder.toggleExcludeTag = (ToggleButton) convertView.findViewById(R.id.toggleExcludeTag);
@@ -134,22 +140,9 @@ public class SearchCriteriaFragment extends Fragment
                     Log.d(TAG, "toggleIncludeTag checked " + isChecked);
 
                     tagViewHolder.toggleIncludeTag.setChecked(isChecked);
-
-                    if (isChecked)
-                    {
-                        if (tagViewHolder.toggleExcludeTag.isChecked())
-                            tagViewHolder.toggleExcludeTag.setChecked(false);
-
-                        includedTags.add(tag);
-                        tagViewHolder.selectedTagTextView.setBackgroundColor(getResources().getColor(R.color.lichen));
-                        addTag(true, tag, tagViewHolder.selectedTagTextView);
-                    }
-                    else
-                    {
-                        includedTags.remove(tag);
-                        LinearLayout parent = (LinearLayout) tagViewHolder.selectedTagTextView.getParent();
-                        parent.removeView(tagViewHolder.selectedTagTextView);
-                    }
+                    if (tagViewHolder.toggleExcludeTag.isChecked())
+                        tagViewHolder.toggleExcludeTag.setChecked(false);
+                    updateIncludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
                 }
             });
         }
@@ -164,22 +157,9 @@ public class SearchCriteriaFragment extends Fragment
                     Log.d(TAG, "toggleExcludeTag checked " + isChecked);
 
                     tagViewHolder.toggleExcludeTag.setChecked(isChecked);
-
-                    if (isChecked)
-                    {
-                        if (tagViewHolder.toggleIncludeTag.isChecked())
-                            tagViewHolder.toggleIncludeTag.setChecked(false);
-
-                        excludedTags.add(tag);
-
-                        addTag(false, tag, tagViewHolder.selectedTagTextView);
-                    }
-                    else
-                    {
-                        excludedTags.remove(tag);
-                        LinearLayout parent = (LinearLayout) tagViewHolder.selectedTagTextView.getParent();
-                        parent.removeView(tagViewHolder.selectedTagTextView);
-                    }
+                    if (tagViewHolder.toggleIncludeTag.isChecked())
+                        tagViewHolder.toggleIncludeTag.setChecked(false);
+                    updateExcludedTags(tagViewHolder.selectedTagTextView, tag, isChecked);
                 }
             });
         }
@@ -190,18 +170,6 @@ public class SearchCriteriaFragment extends Fragment
         tagTextView.setText(tag);
 
         LinearLayout currentRow = getTagRow(tagTextView);
-
-        if (include)
-        {
-            includedTags.add(tag);
-            tagTextView.setBackgroundColor(getResources().getColor(R.color.lichen));
-        }
-        else
-        {
-            excludedTags.add(tag);
-            tagTextView.setBackgroundColor(getResources().getColor(R.color.pulp));
-        }
-
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(3, 0, 3, 0);
@@ -215,7 +183,7 @@ public class SearchCriteriaFragment extends Fragment
 
         int maxWidth = getResources().getDisplayMetrics().widthPixels - 25;
 
-        LinearLayout currentRow = (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_ID
+        LinearLayout currentRow = (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
                         + currentNumRowsOfSelectedTags);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -252,7 +220,7 @@ public class SearchCriteriaFragment extends Fragment
                         LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.topMargin = topMargin;
         rowLayout.setLayoutParams(layoutParams);
-        rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_ID + currentNumRowsOfSelectedTags);
+        rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_TAG + currentNumRowsOfSelectedTags);
         return rowLayout;
     }
 
@@ -281,16 +249,118 @@ public class SearchCriteriaFragment extends Fragment
         searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
         selectedTags = (LinearLayout) criteriaLayout.findViewById(R.id.selectedTags);
         tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
+        tagEditText.addTextChangedListener(this);
         tagEditText.setAdapter(getTagArrayAdapter());
-
+        
         includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
 
         sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
         clearCriteria = (ImageView) criteriaLayout.findViewById(R.id.clearCriteria);
 
+        prepareAddUnknownTagToIncluded();
+        prepareAddUnknownTagToExcluded();
+
         return criteriaLayout;
     }
 
+    private void prepareAddUnknownTagToIncluded()
+    {
+        addUnknownTagToIncluded = (TextView) criteriaLayout.findViewById(R.id.includeUnknownTag);
+        addUnknownTagToIncluded.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String unknownTag = tagEditText.getText().toString();
+                TextView textView = getTextViewForAddedTag(unknownTag);
+                updateIncludedTags(textView, unknownTag, true);
+            }
+        });
+    }
+
+    private void prepareAddUnknownTagToExcluded()
+    {
+        addUnknownTagToExcluded = (TextView) criteriaLayout.findViewById(R.id.excludeUnknownTag);
+        addUnknownTagToExcluded.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                String unknownTag = tagEditText.getText().toString();
+                TextView textView = getTextViewForAddedTag(unknownTag);
+                updateExcludedTags(textView, unknownTag, true);
+            }
+        });
+    }
+
+
+    private void updateIncludedTags(TextView textView, String tag, boolean add)
+    {
+        if (add)
+        {
+            if (!includedTags.contains(tag))
+            {
+                includedTags.add(tag);
+
+                textView.setBackgroundColor(getResources().getColor(R.color.lichen));
+                if (excludedTags.contains(tag))
+                    excludedTags.remove(tag);
+                else
+                    addTag(true, tag, textView);
+            }
+            else
+                Toast.makeText(getActivity(), tag + " already added", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            if (includedTags.contains(tag))
+            {
+                includedTags.remove(tag);
+                LinearLayout parent = (LinearLayout) textView.getParent();
+                parent.removeView(textView);
+            }
+        }
+    }
+
+    private void updateExcludedTags(TextView textView, String tag, boolean add)
+    {
+        if (add)
+        {
+            if (!excludedTags.contains(tag))
+            {
+                excludedTags.add(tag);
+
+                textView.setBackgroundColor(getResources().getColor(R.color.pulp));
+                if (includedTags.contains(tag))
+                    includedTags.remove(tag);
+                else
+                    addTag(true, tag, textView);
+            }
+            else
+                Toast.makeText(getActivity(), tag + " already added", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            if (excludedTags.contains(tag))
+            {
+                excludedTags.remove(tag);
+                LinearLayout parent = (LinearLayout) textView.getParent();
+                parent.removeView(textView);
+            }
+        }
+    }
+
+    private TextView getTextViewForAddedTag(String unknownTag)
+    {
+        TextView textView = (TextView) criteriaLayout.findViewWithTag(UNKNOWN_TAG_TV_PREFIX_TAG + unknownTag);
+        if (textView == null)
+        {
+            textView = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.tags_layout, null);
+            textView.setTag(UNKNOWN_TAG_TV_PREFIX_TAG + unknownTag);
+        }
+        return textView;
+    }
+    
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -331,7 +401,7 @@ public class SearchCriteriaFragment extends Fragment
                     default:
                         break;
                 }
-                
+
                 searchCriteria.includeTags(includedTags).excludeTags(excludedTags);
 
                 searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
@@ -353,6 +423,7 @@ public class SearchCriteriaFragment extends Fragment
                 noLikeTag.setText("");
                 sortSpinner.setSelection(0);
                 includeAnswers.clearCheck();
+                selectedTags.removeAllViews();
             }
         });
     }
@@ -379,5 +450,43 @@ public class SearchCriteriaFragment extends Fragment
             tags = new ArrayList<String>();
 
         return new TagListAdapter(getActivity(), R.layout.tag_include_exclude, R.id.tag, tags);
+    }
+
+    @Override
+    public void afterTextChanged(Editable s)
+    {
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after)
+    {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count)
+    {
+        if (s.length() > 2 && !tagEditText.isPerformingCompletion())
+        {
+            if (addUnknownTagToIncluded.getVisibility() == View.GONE)
+                addUnknownTagToIncluded.setVisibility(View.VISIBLE);
+
+            if (addUnknownTagToExcluded.getVisibility() == View.GONE)
+                addUnknownTagToExcluded.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            if (addUnknownTagToIncluded.getVisibility() == View.VISIBLE)
+                addUnknownTagToIncluded.setVisibility(View.GONE);
+
+            if (addUnknownTagToExcluded.getVisibility() == View.VISIBLE)
+                addUnknownTagToExcluded.setVisibility(View.GONE);
+
+        }
+    }
+
+    private TextView getTextViewForTag()
+    {
+        return (TextView) LayoutInflater.from(getActivity()).inflate(
+                        R.layout.tags_layout, null);
     }
 }
