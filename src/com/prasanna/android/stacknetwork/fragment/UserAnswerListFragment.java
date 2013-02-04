@@ -135,7 +135,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     protected void startIntentService()
     {
         showProgressBar();
-        
+
         intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
         intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
         intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
@@ -203,49 +203,53 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public View getView(final Answer answer, View convertView, ViewGroup parent)
     {
-        LinearLayout answerRow = (LinearLayout) getActivity().getLayoutInflater()
-                        .inflate(R.layout.answer_snippet, null);
+        LinearLayout answerRow = (LinearLayout) convertView;
 
-        if (answer.accepted)
-            answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
-
-        TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
-        RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
-        layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        textView.setLayoutParams(layoutParams);
-        textView.setText(Html.fromHtml(answer.title));
-
-        textView = (TextView) answerRow.findViewById(R.id.answerScore);
-        textView.setText("Answer Score: " + answer.score);
-
-        textView = (TextView) answerRow.findViewById(R.id.answerTime);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
-
-        textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
-
-        if (answer.body != null)
+        if (convertView == null)
         {
-            String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
+            answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
 
-            if (answerBody.length() > ANSWER_PREVIEW_LEN)
+            if (answer.accepted)
+                answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
+
+            TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
+            RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
+            layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            textView.setLayoutParams(layoutParams);
+            textView.setText(Html.fromHtml(answer.title));
+
+            textView = (TextView) answerRow.findViewById(R.id.answerScore);
+            textView.setText("Answer Score: " + answer.score);
+
+            textView = (TextView) answerRow.findViewById(R.id.answerTime);
+            textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
+
+            textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
+
+            if (answer.body != null)
             {
-                answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
-                textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
+                String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
+
+                if (answerBody.length() > ANSWER_PREVIEW_LEN)
+                {
+                    answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
+                    textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
+                }
+                else
+                    textView.setText(Html.fromHtml(answerBody));
             }
-            else
-                textView.setText(Html.fromHtml(answerBody));
+
+            ImageView imageView = (ImageView) answerRow.findViewById(R.id.itemContextMenu);
+            imageView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    getActivity().openContextMenu(v);
+                }
+            });
         }
-
-        ImageView imageView = (ImageView) answerRow.findViewById(R.id.itemContextMenu);
-        imageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                getActivity().openContextMenu(v);
-            }
-        });
         return answerRow;
     }
 
