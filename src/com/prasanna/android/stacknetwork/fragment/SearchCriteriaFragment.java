@@ -421,6 +421,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 sortSpinner.setSelection(0);
                 includeAnswers.clearCheck();
                 selectedTags.removeAllViews();
+                AppUtils.hideSoftInput(getActivity(), v);
             }
         });
     }
