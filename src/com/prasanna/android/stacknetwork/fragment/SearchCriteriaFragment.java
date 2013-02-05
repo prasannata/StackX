@@ -273,9 +273,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 String unknownTag = tagEditText.getText().toString();
 
                 if (isChecked)
+                {
+                    buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
                     buttonView.setTextColor(getResources().getColor(R.color.delft));
+                }
                 else
+                {
+                    buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
+                }
 
                 if (unknownTag != null && unknownTag.length() > 0)
                     updateSelectedTags(unknownTag, true, isChecked);
@@ -296,9 +302,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 String unknownTag = tagEditText.getText().toString();
 
                 if (isChecked)
+                {
+                    buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
                     buttonView.setTextColor(getResources().getColor(R.color.delft));
+                }
                 else
+                {
+                    buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
+                }
 
                 if (unknownTag != null && unknownTag.length() > 0)
                     updateSelectedTags(unknownTag, false, isChecked);
