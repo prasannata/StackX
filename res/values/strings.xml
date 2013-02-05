@@ -97,8 +97,8 @@
     <string-array name="searchSortArray">
         <item>activity</item>
         <item>creation</item>
-        <item>votes</item>
         <item>relevance</item>
+        <item>votes</item>
     </string-array>
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>
