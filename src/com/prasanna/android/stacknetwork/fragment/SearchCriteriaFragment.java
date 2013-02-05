@@ -40,6 +40,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Filter;
+import android.widget.Filter.FilterListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -163,7 +164,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 tagViewHolder.toggleExcludeTag = (ToggleButton) convertView.findViewById(R.id.toggleExcludeTag);
 
                 convertView.setTag(tagViewHolder);
-                
+
                 prepareToggleIncludeTag(tagViewHolder, tag);
                 prepareToggleExcludeTag(tagViewHolder, tag);
             }
@@ -189,7 +190,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
                     updateIncludedTags(tag, isChecked);
-                    
+
                     if (isChecked && tagViewHolder.toggleExcludeTag.isChecked())
                         tagViewHolder.toggleExcludeTag.setChecked(false);
                 }
@@ -217,7 +218,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
                     updateExcludedTags(tag, isChecked);
-                    
+
                     if (isChecked && tagViewHolder.toggleIncludeTag.isChecked())
                         tagViewHolder.toggleIncludeTag.setChecked(false);
 
@@ -362,8 +363,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 else
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
-                updateIncludedTags(unknownTag, isChecked);
-                
+                if (unknownTag != null && unknownTag.length() > 0)
+                    updateIncludedTags(unknownTag, isChecked);
+
                 if (isChecked && addUnknownTagToExcluded.isChecked())
                     addUnknownTagToExcluded.setChecked(false);
             }
@@ -385,8 +387,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 else
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
-                updateExcludedTags(unknownTag, isChecked);
-                
+                if (unknownTag != null && unknownTag.length() > 0)
+                    updateExcludedTags(unknownTag, isChecked);
 
                 if (isChecked && addUnknownTagToIncluded.isChecked())
                     addUnknownTagToIncluded.setChecked(false);
@@ -550,9 +552,26 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     }
 
     @Override
-    public void afterTextChanged(Editable s)
+    public void afterTextChanged(final Editable s)
     {
-        tagArrayAdapter.getFilter().filter(s);
+        if (s == null || s.length() == 0)
+        {
+            addUnknownTagToIncluded.setVisibility(View.GONE);
+            addUnknownTagToIncluded.setChecked(false);
+            addUnknownTagToExcluded.setVisibility(View.GONE);
+            addUnknownTagToExcluded.setChecked(false);
+        }
+        else
+        {
+            tagArrayAdapter.getFilter().filter(s, new FilterListener()
+            {
+                @Override
+                public void onFilterComplete(int count)
+                {
+                    afterTextChangedHandler(s, count);
+                }
+            });
+        }
     }
 
     @Override
@@ -563,23 +582,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
-        if (s.length() > 2 && !tagEditText.isPerformingCompletion())
-        {
-            if (addUnknownTagToIncluded.getVisibility() == View.GONE)
-                addUnknownTagToIncluded.setVisibility(View.VISIBLE);
 
-            if (addUnknownTagToExcluded.getVisibility() == View.GONE)
-                addUnknownTagToExcluded.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            if (addUnknownTagToIncluded.getVisibility() == View.VISIBLE)
-                addUnknownTagToIncluded.setVisibility(View.GONE);
-
-            if (addUnknownTagToExcluded.getVisibility() == View.VISIBLE)
-                addUnknownTagToExcluded.setVisibility(View.GONE);
-
-        }
     }
 
     private TextView getTextViewForTag()
@@ -599,5 +602,38 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         });
 
         return textView;
+    }
+
+    private void afterTextChangedHandler(final Editable s, int count)
+    {
+        if (count == 0)
+        {
+            if (addUnknownTagToIncluded.getVisibility() == View.GONE)
+                addUnknownTagToIncluded.setVisibility(View.VISIBLE);
+            
+            if (addUnknownTagToExcluded.getVisibility() == View.GONE)
+                addUnknownTagToExcluded.setVisibility(View.VISIBLE);
+
+            if (includedTags.contains(s.toString()))
+                addUnknownTagToIncluded.setChecked(true);
+            else
+                addUnknownTagToIncluded.setChecked(false);
+            
+            if (excludedTags.contains(s.toString()))
+                addUnknownTagToExcluded.setChecked(true);
+            else
+                addUnknownTagToExcluded.setChecked(false);
+        }
+        else
+        {
+            if (addUnknownTagToIncluded.getVisibility() == View.VISIBLE)
+                addUnknownTagToIncluded.setVisibility(View.GONE);
+
+            if (addUnknownTagToExcluded.getVisibility() == View.VISIBLE)
+                addUnknownTagToExcluded.setVisibility(View.GONE);
+            
+            addUnknownTagToIncluded.setChecked(false);
+            addUnknownTagToExcluded.setChecked(false);
+        }
     }
 }
