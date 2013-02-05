@@ -127,8 +127,7 @@
                 android:background="@drawable/rounded_border_grey_min_padding"
                 android:textColor="@color/lightGrey"
                 android:textOff="@string/plusSign"
-                android:textOn="@string/plusSign"
-                android:visibility="gone" />
+                android:textOn="@string/plusSign" />
 
             <ToggleButton
                 android:id="@+id/toggleExcludeUnknownTag"
@@ -140,8 +139,7 @@
                 android:background="@drawable/rounded_border_grey_min_padding"
                 android:textColor="@color/lightGrey"
                 android:textOff="@string/minusSign"
-                android:textOn="@string/minusSign"
-                android:visibility="gone" />
+                android:textOn="@string/minusSign" />
         </LinearLayout>
 
         <LinearLayout

@@ -1,43 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="horizontal" >
 
     <TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tag"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_weight="0.8"
         android:background="@color/white"
         android:gravity="left|center"
         android:padding="5dp"
         android:textColor="@color/black"
         android:textSize="15sp" />
 
-    <ToggleButton
-        android:id="@+id/toggleIncludeTag"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:layout_margin="3dp"
-        android:layout_weight="0.1"
-        android:background="@drawable/rounded_border_grey_min_padding"
-        android:textColor="@color/lightGrey"
-        android:textOff="@string/plusSign"
-        android:textOn="@string/plusSign" />
 
-    <ToggleButton
-        android:id="@+id/toggleExcludeTag"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_gravity="center"
-        android:layout_margin="3dp"
-        android:layout_weight="0.1"
-        android:background="@drawable/rounded_border_grey_min_padding"
-        android:textColor="@color/lightGrey"
-        android:textOff="@string/minusSign"
-        android:textOn="@string/minusSign" />
-
-</LinearLayout>

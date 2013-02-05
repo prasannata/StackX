@@ -134,102 +134,13 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     }
 
-    static class TagViewHolder
-    {
-        TextView tagTextView;
-        ToggleButton toggleIncludeTag;
-        ToggleButton toggleExcludeTag;
-    }
-
     public class TagListAdapter extends ArrayAdapter<String>
     {
         private Filter filter;
 
-        public TagListAdapter(Context context, int resource, int textViewResourceId, ArrayList<String> tags)
+        public TagListAdapter(Context context, int textViewResourceId, ArrayList<String> tags)
         {
-            super(context, resource, textViewResourceId, tags);
-        }
-
-        @Override
-        public View getView(final int position, View convertView, ViewGroup parent)
-        {
-            final String tag = getItem(position);
-            final TagViewHolder tagViewHolder;
-            if (convertView == null)
-            {
-                convertView = LayoutInflater.from(getActivity()).inflate(R.layout.tag_include_exclude, null);
-                tagViewHolder = new TagViewHolder();
-                tagViewHolder.tagTextView = (TextView) convertView.findViewById(R.id.tag);
-                tagViewHolder.toggleIncludeTag = (ToggleButton) convertView.findViewById(R.id.toggleIncludeTag);
-                tagViewHolder.toggleExcludeTag = (ToggleButton) convertView.findViewById(R.id.toggleExcludeTag);
-
-                convertView.setTag(tagViewHolder);
-
-                prepareToggleIncludeTag(tagViewHolder, tag);
-                prepareToggleExcludeTag(tagViewHolder, tag);
-            }
-            else
-                tagViewHolder = (TagViewHolder) convertView.getTag();
-
-            tagViewHolder.tagTextView.setText(tag);
-            return convertView;
-        }
-
-        private void prepareToggleIncludeTag(final TagViewHolder tagViewHolder, final String tag)
-        {
-            tagViewHolder.toggleIncludeTag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-            {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-                {
-                    Log.d(TAG, tag + " include checked " + isChecked);
-
-                    if (isChecked)
-                        buttonView.setTextColor(getResources().getColor(R.color.delft));
-                    else
-                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
-
-                    updateIncludedTags(tag, isChecked);
-
-                    if (isChecked && tagViewHolder.toggleExcludeTag.isChecked())
-                        tagViewHolder.toggleExcludeTag.setChecked(false);
-                }
-            });
-
-            if (includedTags.contains(tag) && !tagViewHolder.toggleIncludeTag.isChecked())
-            {
-                Log.d(TAG, "Set checked onContains");
-                tagViewHolder.toggleIncludeTag.setChecked(true);
-            }
-        }
-
-        private void prepareToggleExcludeTag(final TagViewHolder tagViewHolder, final String tag)
-        {
-            tagViewHolder.toggleExcludeTag.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-            {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-                {
-                    Log.d(TAG, tag + " exclude checked " + isChecked);
-
-                    if (isChecked)
-                        buttonView.setTextColor(getResources().getColor(R.color.delft));
-                    else
-                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
-
-                    updateExcludedTags(tag, isChecked);
-
-                    if (isChecked && tagViewHolder.toggleIncludeTag.isChecked())
-                        tagViewHolder.toggleIncludeTag.setChecked(false);
-
-                }
-            });
-
-            if (excludedTags.contains(tag) && !tagViewHolder.toggleExcludeTag.isChecked())
-            {
-                Log.d(TAG, "Set checked x onContains");
-                tagViewHolder.toggleExcludeTag.setChecked(true);
-            }
+            super(context, textViewResourceId, tags);
         }
 
         @Override
@@ -242,9 +153,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         }
     }
 
-    private void addTag(TextView tagTextView, String tag)
+    private void addTagView(TextView tagTextView, int bgColor, String tag)
     {
         tagTextView.setText(tag);
+        tagTextView.setBackgroundColor(bgColor);
 
         LinearLayout currentRow = getTagRow(tagTextView);
 
@@ -342,6 +254,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
         clearCriteria = (ImageView) criteriaLayout.findViewById(R.id.clearCriteria);
 
+        addUnknownTagToIncluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleIncludeUnknownTag);
+        addUnknownTagToExcluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleExcludeUnknownTag);
+        
         prepareAddUnknownTagToIncluded();
         prepareAddUnknownTagToExcluded();
 
@@ -350,7 +265,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private void prepareAddUnknownTagToIncluded()
     {
-        addUnknownTagToIncluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleIncludeUnknownTag);
         addUnknownTagToIncluded.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
@@ -364,7 +278,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
                 if (unknownTag != null && unknownTag.length() > 0)
-                    updateIncludedTags(unknownTag, isChecked);
+                    updateSelectedTags(unknownTag, true, isChecked);
 
                 if (isChecked && addUnknownTagToExcluded.isChecked())
                     addUnknownTagToExcluded.setChecked(false);
@@ -374,7 +288,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private void prepareAddUnknownTagToExcluded()
     {
-        addUnknownTagToExcluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleExcludeUnknownTag);
         addUnknownTagToExcluded.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
@@ -388,7 +301,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
                 if (unknownTag != null && unknownTag.length() > 0)
-                    updateExcludedTags(unknownTag, isChecked);
+                    updateSelectedTags(unknownTag, false, isChecked);
 
                 if (isChecked && addUnknownTagToIncluded.isChecked())
                     addUnknownTagToIncluded.setChecked(false);
@@ -396,58 +309,54 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         });
     }
 
-    private void updateIncludedTags(String tag, boolean add)
+    private void updateSelectedTags(String tag, boolean include, boolean add)
     {
         TextView textView = getTextViewForSelectedTag(tag);
 
         if (add)
         {
-            if (!includedTags.contains(tag))
+            if (include)
             {
-                includedTags.add(tag);
-
-                Log.d(TAG, tag + " added to included");
-                textView.setBackgroundColor(getResources().getColor(R.color.lichen));
-                addTag(textView, tag);
+                if (!includedTags.contains(tag))
+                {
+                    includedTags.add(tag);
+                    Log.d(TAG, tag + " added to included");
+                    addTagView(textView, getResources().getColor(R.color.lichen), tag);
+                }
+            }
+            else
+            {
+                if (!excludedTags.contains(tag))
+                {
+                    excludedTags.add(tag);
+                    Log.d(TAG, tag + " added to excluded");
+                    addTagView(textView, getResources().getColor(R.color.pulp), tag);
+                }
             }
         }
         else
         {
-            Log.d(TAG, tag + " removed from included");
-
-            includedTags.remove(tag);
-
-            LinearLayout parent = (LinearLayout) textView.getParent();
-            if (parent != null && !excludedTags.contains(tag))
-                parent.removeView(textView);
+            if (include)
+            {
+                includedTags.remove(tag);
+                Log.d(TAG, tag + " removed from included");
+                removeTagView(tag, include, textView);
+            }
+            else
+            {
+                excludedTags.remove(tag);
+                Log.d(TAG, tag + " removed from excluded");
+                removeTagView(tag, include, textView);
+            }
         }
     }
 
-    private void updateExcludedTags(String tag, boolean add)
+    private void removeTagView(String tag, boolean include, TextView textView)
     {
-        TextView textView = getTextViewForSelectedTag(tag);
-
-        if (add)
-        {
-            if (!excludedTags.contains(tag))
-            {
-                excludedTags.add(tag);
-
-                Log.d(TAG, tag + " added to excluded");
-                textView.setBackgroundColor(getResources().getColor(R.color.pulp));
-                addTag(textView, tag);
-            }
-        }
-        else
-        {
-            Log.d(TAG, tag + " removed from excluded");
-
-            excludedTags.remove(tag);
-
-            LinearLayout parent = (LinearLayout) textView.getParent();
-            if (parent != null && !includedTags.contains(tag))
-                parent.removeView(textView);
-        }
+        LinearLayout parent = (LinearLayout) textView.getParent();
+        boolean addedToOther = include ? excludedTags.contains(tag) : includedTags.contains(tag);
+        if (parent != null && !addedToOther)
+            parent.removeView(textView);
     }
 
     private TextView getTextViewForSelectedTag(String tag)
@@ -548,7 +457,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             tagDAO.close();
         }
 
-        return new TagListAdapter(getActivity(), R.layout.tag_include_exclude, R.id.tag, new ArrayList<String>());
+        return new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
     }
 
     @Override
@@ -556,9 +465,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     {
         if (s == null || s.length() == 0)
         {
-            addUnknownTagToIncluded.setVisibility(View.GONE);
             addUnknownTagToIncluded.setChecked(false);
-            addUnknownTagToExcluded.setVisibility(View.GONE);
             addUnknownTagToExcluded.setChecked(false);
         }
         else
@@ -568,7 +475,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 @Override
                 public void onFilterComplete(int count)
                 {
-                    afterTextChangedHandler(s, count);
+                    onFilterCompleteHandler(s, count);
                 }
             });
         }
@@ -604,36 +511,16 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         return textView;
     }
 
-    private void afterTextChangedHandler(final Editable s, int count)
+    private void onFilterCompleteHandler(final Editable s, int count)
     {
-        if (count == 0)
-        {
-            if (addUnknownTagToIncluded.getVisibility() == View.GONE)
-                addUnknownTagToIncluded.setVisibility(View.VISIBLE);
-            
-            if (addUnknownTagToExcluded.getVisibility() == View.GONE)
-                addUnknownTagToExcluded.setVisibility(View.VISIBLE);
-
-            if (includedTags.contains(s.toString()))
-                addUnknownTagToIncluded.setChecked(true);
-            else
-                addUnknownTagToIncluded.setChecked(false);
-            
-            if (excludedTags.contains(s.toString()))
-                addUnknownTagToExcluded.setChecked(true);
-            else
-                addUnknownTagToExcluded.setChecked(false);
-        }
+        if (includedTags.contains(s.toString()))
+            addUnknownTagToIncluded.setChecked(true);
         else
-        {
-            if (addUnknownTagToIncluded.getVisibility() == View.VISIBLE)
-                addUnknownTagToIncluded.setVisibility(View.GONE);
-
-            if (addUnknownTagToExcluded.getVisibility() == View.VISIBLE)
-                addUnknownTagToExcluded.setVisibility(View.GONE);
-            
             addUnknownTagToIncluded.setChecked(false);
+
+        if (excludedTags.contains(s.toString()))
+            addUnknownTagToExcluded.setChecked(true);
+        else
             addUnknownTagToExcluded.setChecked(false);
-        }
     }
 }
