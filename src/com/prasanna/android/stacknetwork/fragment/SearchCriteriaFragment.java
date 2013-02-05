@@ -72,7 +72,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private ImageView clearCriteria;
     private ToggleButton addUnknownTagToIncluded;
     private ToggleButton addUnknownTagToExcluded;
-
     private ScrollView criteriaLayout;
     private OnRunSearchListener onRunSearchListener;
     private RadioGroup includeAnswers;
@@ -151,72 +150,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
             return filter;
         }
-    }
-
-    private void addTagView(TextView tagTextView, int bgColor, String tag)
-    {
-        tagTextView.setText(tag);
-        tagTextView.setBackgroundColor(bgColor);
-
-        LinearLayout currentRow = getTagRow(tagTextView);
-
-        TextView findViewWithTag = (TextView) currentRow.findViewWithTag(tagTextView.getTag());
-
-        if (findViewWithTag == null)
-        {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(3, 0, 3, 0);
-            currentRow.addView(tagTextView, params);
-        }
-    }
-
-    private LinearLayout getTagRow(TextView tagTextView)
-    {
-        if (selectedTags.getVisibility() == View.GONE)
-            selectedTags.setVisibility(View.VISIBLE);
-
-        int maxWidth = getResources().getDisplayMetrics().widthPixels - 25;
-
-        LinearLayout currentRow = (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
-                        + currentNumRowsOfSelectedTags);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0, 2, 0, 2);
-
-        if (currentRow == null)
-        {
-            currentRow = createNewRowForTags(getActivity(), 3);
-            selectedTags.addView(currentRow, layoutParams);
-        }
-        else
-        {
-            tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            currentRow.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-            if ((tagTextView.getMeasuredWidth() + currentRow.getMeasuredWidth()) > maxWidth)
-            {
-                currentNumRowsOfSelectedTags++;
-                currentRow = createNewRowForTags(getActivity(), 3);
-                selectedTags.addView(currentRow, layoutParams);
-            }
-        }
-
-        return currentRow;
-    }
-
-    private LinearLayout createNewRowForTags(final Context context, int topMargin)
-    {
-        Log.d(TAG, "Creating new tag row");
-
-        LinearLayout rowLayout = new LinearLayout(context);
-        rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.topMargin = topMargin;
-        rowLayout.setLayoutParams(layoutParams);
-        rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_TAG + currentNumRowsOfSelectedTags);
-        return rowLayout;
     }
 
     @Override
@@ -363,6 +296,72 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         }
     }
 
+    private void addTagView(TextView tagTextView, int bgColor, String tag)
+    {
+        tagTextView.setText(tag);
+        tagTextView.setBackgroundColor(bgColor);
+
+        LinearLayout currentRow = getTagRow(tagTextView);
+
+        TextView findViewWithTag = (TextView) currentRow.findViewWithTag(tagTextView.getTag());
+
+        if (findViewWithTag == null)
+        {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
+            params.setMargins(3, 0, 3, 0);
+            currentRow.addView(tagTextView, params);
+        }
+    }
+
+    private LinearLayout getTagRow(TextView tagTextView)
+    {
+        if (selectedTags.getVisibility() == View.GONE)
+            selectedTags.setVisibility(View.VISIBLE);
+
+        int maxWidth = getResources().getDisplayMetrics().widthPixels - 25;
+
+        LinearLayout currentRow = (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
+                        + currentNumRowsOfSelectedTags);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, 2, 0, 2);
+
+        if (currentRow == null)
+        {
+            currentRow = createNewRowForTags(getActivity(), 3);
+            selectedTags.addView(currentRow, layoutParams);
+        }
+        else
+        {
+            tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            currentRow.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+            if ((tagTextView.getMeasuredWidth() + currentRow.getMeasuredWidth()) > maxWidth)
+            {
+                currentNumRowsOfSelectedTags++;
+                currentRow = createNewRowForTags(getActivity(), 3);
+                selectedTags.addView(currentRow, layoutParams);
+            }
+        }
+
+        return currentRow;
+    }
+
+    private LinearLayout createNewRowForTags(final Context context, int topMargin)
+    {
+        Log.d(TAG, "Creating new tag row");
+
+        LinearLayout rowLayout = new LinearLayout(context);
+        rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.topMargin = topMargin;
+        rowLayout.setLayoutParams(layoutParams);
+        rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_TAG + currentNumRowsOfSelectedTags);
+        return rowLayout;
+    }
+    
     private void removeTagView(String tag, boolean include, TextView textView)
     {
         LinearLayout parent = (LinearLayout) textView.getParent();
