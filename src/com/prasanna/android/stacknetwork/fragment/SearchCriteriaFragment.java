@@ -39,6 +39,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -78,15 +79,65 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private int currentNumRowsOfSelectedTags = 0;
     private HashSet<String> includedTags = new HashSet<String>();;
     private HashSet<String> excludedTags = new HashSet<String>();;
+    private Object tagFilterLock = new Object();
+    private ArrayList<String> tags;
+    private TagListAdapter tagArrayAdapter;
 
     public interface OnRunSearchListener
     {
         void onRunSearch(SearchCriteria searchCriteria);
     }
 
+    public class TagFilter extends Filter
+    {
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            FilterResults result = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0)
+            {
+                synchronized (tagFilterLock)
+                {
+                    ArrayList<String> filteredTags = new ArrayList<String>();
+
+                    for (String tag : tags)
+                    {
+                        if (tag.startsWith((String) constraint) && !filteredTags.contains(tag))
+                            filteredTags.add(tag);
+                    }
+
+                    result.count = filteredTags.size();
+                    result.values = filteredTags;
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void publishResults(CharSequence constraint, FilterResults results)
+        {
+            ArrayList<String> filteredTags = (ArrayList<String>) results.values;
+
+            tagArrayAdapter.notifyDataSetInvalidated();
+            tagArrayAdapter.clear();
+
+            if (filteredTags != null)
+            {
+                Log.d(TAG, "Filtered tags size: " + filteredTags.size());
+                tagArrayAdapter.addAll(filteredTags);
+            }
+
+            tagArrayAdapter.notifyDataSetChanged();
+        }
+
+    }
+
     static class TagViewHolder
     {
-        String tag;
         TextView tagTextView;
         ToggleButton toggleIncludeTag;
         ToggleButton toggleExcludeTag;
@@ -94,6 +145,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     public class TagListAdapter extends ArrayAdapter<String>
     {
+        private Filter filter;
 
         public TagListAdapter(Context context, int resource, int textViewResourceId, ArrayList<String> tags)
         {
@@ -110,18 +162,17 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.tag_include_exclude, null);
                 tagViewHolder = new TagViewHolder();
                 tagViewHolder.tagTextView = (TextView) convertView.findViewById(R.id.tag);
-                tagViewHolder.tagTextView.setText(tag);
                 tagViewHolder.toggleIncludeTag = (ToggleButton) convertView.findViewById(R.id.toggleIncludeTag);
                 tagViewHolder.toggleExcludeTag = (ToggleButton) convertView.findViewById(R.id.toggleExcludeTag);
-                tagViewHolder.tag = getItem(position);
-
-                prepareToggleIncludeTag(tagViewHolder, tag);
-                prepareToggleExcludeTag(tagViewHolder, tag);
 
                 convertView.setTag(tagViewHolder);
             }
             else
                 tagViewHolder = (TagViewHolder) convertView.getTag();
+
+            tagViewHolder.tagTextView.setText(tag);
+            prepareToggleIncludeTag(tagViewHolder, tag);
+            prepareToggleExcludeTag(tagViewHolder, tag);
 
             return convertView;
         }
@@ -180,6 +231,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
             if (excludedTags.contains(tag) && !tagViewHolder.toggleExcludeTag.isChecked())
                 tagViewHolder.toggleExcludeTag.setChecked(true);
+        }
+
+        @Override
+        public Filter getFilter()
+        {
+            if (filter == null)
+                filter = new TagFilter();
+
+            return filter;
         }
     }
 
@@ -267,7 +327,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreateView");
 
         super.onCreate(savedInstanceState);
 
@@ -277,7 +337,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         selectedTags = (LinearLayout) criteriaLayout.findViewById(R.id.selectedTags);
         tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
         tagEditText.addTextChangedListener(this);
-        tagEditText.setAdapter(getTagArrayAdapter());
+        tagEditText.setThreshold(1);
+        tagArrayAdapter = getTagArrayAdapter();
+        tagEditText.setAdapter(tagArrayAdapter);
 
         includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
 
@@ -364,7 +426,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             includedTags.remove(tag);
 
             LinearLayout parent = (LinearLayout) textView.getParent();
-            parent.removeView(textView);
+            if (parent != null)
+                parent.removeView(textView);
         }
     }
 
@@ -390,7 +453,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             excludedTags.remove(tag);
 
             LinearLayout parent = (LinearLayout) textView.getParent();
-            parent.removeView(textView);
+            if (parent != null)
+                parent.removeView(textView);
         }
     }
 
@@ -478,7 +542,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private TagListAdapter getTagArrayAdapter()
     {
         TagDAO tagDAO = new TagDAO(getActivity());
-        ArrayList<String> tags = null;
         try
         {
             tagDAO.open();
@@ -493,15 +556,13 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             tagDAO.close();
         }
 
-        if (tags == null)
-            tags = new ArrayList<String>();
-
-        return new TagListAdapter(getActivity(), R.layout.tag_include_exclude, R.id.tag, tags);
+        return new TagListAdapter(getActivity(), R.layout.tag_include_exclude, R.id.tag, new ArrayList<String>());
     }
 
     @Override
     public void afterTextChanged(Editable s)
     {
+        tagArrayAdapter.getFilter().filter(s);
     }
 
     @Override
