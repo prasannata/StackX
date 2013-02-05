@@ -102,9 +102,8 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public View getView(Question item, View convertView, ViewGroup parent)
     {
-        if (convertView == null)
-            convertView = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(),
-                            getActivity(), item);
+        convertView = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(), getActivity(),
+                        item);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.itemContextMenu);
         imageView.setOnClickListener(new View.OnClickListener()
         {

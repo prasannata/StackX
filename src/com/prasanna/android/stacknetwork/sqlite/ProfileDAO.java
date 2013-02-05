@@ -94,7 +94,7 @@ public class ProfileDAO extends AbstractBaseDao
             avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
             values.put(ProfileTable.COLUMN_PROFILE_IMAGE, stream.toByteArray());
 
-            database.update(ProfileTable.COLUMN_LAST_UPDATE, values, whereClause, whereArgs);
+            database.update(DatabaseHelper.TABLE_PROFILE, values, whereClause, whereArgs);
         }
     }
 
