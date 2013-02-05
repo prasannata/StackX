@@ -523,4 +523,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         else
             addUnknownTagToExcluded.setChecked(false);
     }
+
+    public void hideSoftInput()
+    {
+        AppUtils.hideSoftInput(getActivity(), getActivity().getWindow().getCurrentFocus());
+    }
 }

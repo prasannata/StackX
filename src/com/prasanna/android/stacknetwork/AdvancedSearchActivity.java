@@ -72,6 +72,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 {
                     getActionBar().setDisplayHomeAsUpEnabled(true);
                     ft.hide(searchCriteriaFragment);
+                    searchCriteriaFragment.hideSoftInput();
                 }
             }
             else
@@ -85,19 +86,18 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         }
     }
 
-    
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
         Log.d(TAG, "onPrepareOptionsMenu");
-        
+
         boolean ret = super.onPrepareOptionsMenu(menu);
-        
+
         menu.removeItem(R.id.menu_refresh);
-        
+
         return ret & true;
     }
-    
+
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
@@ -148,10 +148,12 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-            ft.hide(searchCriteriaFragment);
-
         ft.show(questionListFragment);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            ft.hide(searchCriteriaFragment);
+            ft.addToBackStack(null);
+        }
         ft.commit();
 
         questionListFragment.search(searchCriteria);
