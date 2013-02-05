@@ -120,9 +120,6 @@
             android:name=".QuestionActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".ArchiveDisplayActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize" />
         <activity

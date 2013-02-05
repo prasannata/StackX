@@ -19,6 +19,9 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import java.util.ArrayList;
+
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -33,7 +36,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.QuestionsActivity;
@@ -41,8 +47,9 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.UserProfileActivity;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
-import com.prasanna.android.stacknetwork.utils.QuestionRowLayoutBuilder;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
@@ -51,6 +58,17 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
     private final Bundle bundle = new Bundle();
     private int position;
+
+    static class QuestionViewHolder
+    {
+        LinearLayout tagsLayout;
+        TextView title;
+        TextView score;
+        TextView answerCount;
+        TextView views;
+        TextView owner;
+        ArrayList<TextView> tagViews;
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
@@ -102,8 +120,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public View getView(Question item, View convertView, ViewGroup parent)
     {
-        convertView = QuestionRowLayoutBuilder.getInstance().build(getActivity().getLayoutInflater(), getActivity(),
-                        item);
+        convertView = build(convertView, getActivity(), item);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.itemContextMenu);
         imageView.setOnClickListener(new View.OnClickListener()
         {
@@ -159,6 +176,106 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     public String getReceiverExtraName()
     {
         return StringConstants.QUESTIONS;
+    }
+
+    public View build(View convertView, final Context context, final Question question)
+    {
+        LinearLayout questionRowLayout = (LinearLayout) convertView;
+        QuestionViewHolder holder;
+
+        if (questionRowLayout == null)
+        {
+            holder = new QuestionViewHolder();
+
+            questionRowLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(
+                            R.layout.question_snippet_layout, null);
+            holder.tagsLayout = (LinearLayout) questionRowLayout.findViewById(R.id.questionSnippetTags);
+
+            holder.score = (TextView) questionRowLayout.findViewById(R.id.score);
+            holder.answerCount = (TextView) questionRowLayout.findViewById(R.id.answerCount);
+            holder.title = (TextView) questionRowLayout.findViewById(R.id.itemTitle);
+            holder.views = (TextView) questionRowLayout.findViewById(R.id.questionViewsValue);
+            holder.owner = (TextView) questionRowLayout.findViewById(R.id.questionOwner);
+            questionRowLayout.setTag(holder);
+        }
+        else
+            holder = (QuestionViewHolder) questionRowLayout.getTag();
+
+        setupViewForQuestionMetadata(holder, question);
+        setupViewForTags(holder, question);
+
+        questionRowLayout.setId((int) question.id);
+        return questionRowLayout;
+    }
+
+    private void setupViewForQuestionMetadata(QuestionViewHolder holder, Question question)
+    {
+        holder.score.setText(AppUtils.formatNumber(question.score));
+        holder.answerCount.setText(AppUtils.formatNumber(question.answerCount));
+
+        if (question.hasAcceptedAnswer)
+            holder.answerCount.setBackgroundColor(getResources().getColor(R.color.lichen));
+        else
+            holder.answerCount.setBackgroundColor(getResources().getColor(R.color.white));
+
+        holder.title.setText(Html.fromHtml(question.title));
+        holder.views.setText("Views:" + AppUtils.formatNumber(question.viewCount));
+
+        if (question.owner.displayName != null)
+        {
+            holder.owner.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
+                            + Html.fromHtml(question.owner.displayName));
+        }
+    }
+
+    private void setupViewForTags(QuestionViewHolder holder, final Question question)
+    {
+        LinearLayout tagsParentLayout = (LinearLayout) holder.tagsLayout;
+
+        if (tagsParentLayout.getChildCount() > 0)
+            tagsParentLayout.removeAllViews();
+        
+        int maxWidth = getResources().getDisplayMetrics().widthPixels - 20;
+
+        LinearLayout rowLayout = createNewRowForTags(0);
+
+        if (question.tags != null && question.tags.length > 0)
+        {
+            for (int i = 0; i < question.tags.length; i++)
+            {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(3, 0, 3, 0);
+                TextView tagTextView = ((TextView) getActivity().getLayoutInflater()
+                                .inflate(R.layout.tags_layout, null));
+                tagTextView.setText(question.tags[i]);
+
+                tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                rowLayout.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+                if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > maxWidth)
+                {
+                    tagsParentLayout.addView(rowLayout);
+                    rowLayout = createNewRowForTags(3);
+                }
+
+                rowLayout.addView(tagTextView, params);
+            }
+
+            tagsParentLayout.addView(rowLayout);
+        }
+
+    }
+
+    private LinearLayout createNewRowForTags(int topMargin)
+    {
+        LinearLayout rowLayout = new LinearLayout(getActivity());
+        rowLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.topMargin = topMargin;
+        rowLayout.setLayoutParams(layoutParams);
+        return rowLayout;
     }
 
     public Bundle getBundle()

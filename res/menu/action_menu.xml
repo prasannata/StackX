@@ -67,21 +67,15 @@
         android:showAsAction="never"
         android:title="@string/inbox"/>
     <item
-        android:id="@+id/menu_option_archive"
-        android:icon="@drawable/save_light"
-        android:orderInCategory="5"
-        android:showAsAction="never"
-        android:title="@string/archive"/>
-    <item
         android:id="@+id/menu_option_change_site"
         android:icon="@drawable/labels"
-        android:orderInCategory="6"
+        android:orderInCategory="5"
         android:showAsAction="never"
         android:title="@string/changeSite"/>
     <item
         android:id="@+id/menu_option_settings"
         android:icon="@drawable/settings_white"
-        android:orderInCategory="7"
+        android:orderInCategory="6"
         android:showAsAction="never"
         android:title="@string/settings"/>
     <item

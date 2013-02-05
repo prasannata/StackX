@@ -292,10 +292,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 userProfileIntent.putExtra(StringConstants.ME, true);
                 startActivity(userProfileIntent);
                 return true;
-            case R.id.menu_option_archive:
-                Intent archiveIntent = new Intent(this, ArchiveDisplayActivity.class);
-                startActivity(archiveIntent);
-                return true;
             case R.id.menu_my_inbox:
                 Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
                 userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());

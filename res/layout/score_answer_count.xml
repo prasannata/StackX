@@ -34,7 +34,7 @@
 
     <TextView
         android:id="@+id/answerCount"
-        android:layout_width="0dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/score"
         android:layout_alignRight="@id/score"
