@@ -40,10 +40,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
@@ -60,13 +62,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private static final String TAG = CommentFragment.class.getSimpleName();
     private ArrayList<Comment> comments;
     private HashMap<ObjectType, WritePermission> writePermissions;
-    private ImageView replyToComment;
-    private ImageView editComment;
-    private ImageView deleteComment;
-    private ImageView finishEditComment;
-    private ImageView cancelEditComment;
     private OnCommentChangeListener onCommentChangeListener;
-    private EditText editTextForTitle;
     private ProgressDialog progressDialog;
 
     public interface OnCommentChangeListener
@@ -150,43 +146,71 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         return TAG;
     }
 
+    static class CommentViewHolder
+    {
+        TextView score;
+        EditText title;
+        TextView owner;
+        ImageView editComment;
+        ImageView replyToComment;
+        ImageView finishEditComment;
+        ImageView cancelEditComment;
+        ImageView deleteComment;
+        LinearLayout commentEditOptions;
+        RelativeLayout commentWriteOptions;
+    }
+
     @Override
     public View getView(final Comment comment, View convertView, ViewGroup parent)
     {
         RelativeLayout commentLayout = (RelativeLayout) convertView;
-
+        CommentViewHolder holder;
         if (commentLayout == null)
         {
             commentLayout = (RelativeLayout) getActivity().getLayoutInflater().inflate(R.layout.comment, null);
-
-            TextView textView = (TextView) commentLayout.findViewById(R.id.commentScore);
-            textView.setText(AppUtils.formatNumber(comment.score));
-
-            editTextForTitle = (EditText) commentLayout.findViewById(R.id.commentTitle);
-            editTextForTitle.setText(Html.fromHtml(comment.body));
-
-            textView = (TextView) commentLayout.findViewById(R.id.commentOwner);
-            textView.setText(DateTimeUtils.getElapsedDurationSince(comment.creationDate) + " by "
-                            + Html.fromHtml(comment.owner.displayName));
+            holder = new CommentViewHolder();
+            holder.score = (TextView) commentLayout.findViewById(R.id.commentScore);
+            holder.title = (EditText) commentLayout.findViewById(R.id.commentTitle);
+            holder.owner = (TextView) commentLayout.findViewById(R.id.commentOwner);
+            holder.editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
+            holder.replyToComment = (ImageView) commentLayout.findViewById(R.id.replyToComment);
+            holder.finishEditComment = (ImageView) commentLayout.findViewById(R.id.finishEditComment);
+            holder.cancelEditComment = (ImageView) commentLayout.findViewById(R.id.cancelEditComment);
+            holder.deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
+            holder.commentWriteOptions = (RelativeLayout) commentLayout.findViewById(R.id.commentWriteOptions);
+            holder.commentEditOptions = (LinearLayout) commentLayout.findViewById(R.id.commentEditOptions);
 
             if (AppUtils.inAuthenticatedRealm(getActivity()))
-                setupCommentWriteOptions(comment, commentLayout);
+                setupCommentWriteOptions(comment, holder);
+
+            commentLayout.setTag(holder);
         }
+        else
+            holder = (CommentViewHolder) commentLayout.getTag();
+
+        Log.d(TAG, "Comment body: " + comment.body);
+
+        holder.score.setText(AppUtils.formatNumber(comment.score));
+        holder.title.setText("");
+        holder.title.append(Html.fromHtml(comment.body));
+        holder.owner.setText(DateTimeUtils.getElapsedDurationSince(comment.creationDate) + " by "
+                        + Html.fromHtml(comment.owner.displayName));
+
         return commentLayout;
     }
 
-    private void setupCommentWriteOptions(final Comment comment, RelativeLayout commentLayout)
+    private void setupCommentWriteOptions(final Comment comment, CommentViewHolder holder)
     {
         boolean myComment = isMyComment(comment);
 
-        commentLayout.findViewById(R.id.commentWriteOptions).setVisibility(View.VISIBLE);
+        holder.commentWriteOptions.setVisibility(View.VISIBLE);
 
         if (canAddComment() && !myComment)
-            setupReplyToComment(comment, commentLayout);
+            setupReplyToComment(comment, holder);
         else
         {
             if (myComment)
-                setupMyCommentOptions(comment, commentLayout);
+                setupMyCommentOptions(comment, holder);
         }
     }
 
@@ -202,11 +226,10 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         return (comment.owner != null && comment.owner.id == myId);
     }
 
-    private void setupReplyToComment(final Comment comment, RelativeLayout commentLayout)
+    private void setupReplyToComment(final Comment comment, CommentViewHolder holder)
     {
-        replyToComment = (ImageView) commentLayout.findViewById(R.id.replyToComment);
-        replyToComment.setVisibility(View.VISIBLE);
-        replyToComment.setOnClickListener(new View.OnClickListener()
+        holder.replyToComment.setVisibility(View.VISIBLE);
+        holder.replyToComment.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -217,80 +240,78 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         });
     }
 
-    private void setupMyCommentOptions(Comment comment, RelativeLayout commentLayout)
+    private void setupMyCommentOptions(Comment comment, CommentViewHolder holder)
     {
         Log.d(TAG, "Setting up my comment edit options");
 
-        commentLayout.findViewById(R.id.commentEditOptions).setVisibility(View.VISIBLE);
+        holder.commentEditOptions.setVisibility(View.VISIBLE);
 
         if (canEditComment())
         {
             Log.d(TAG, "I can edit my comment");
-            setupEditComment(comment.id, commentLayout);
+            setupEditComment(comment.id, holder);
         }
 
         if (canDelComment())
         {
             Log.d(TAG, "I can delete my comment");
-            setupDeleteComment(comment.id, commentLayout);
+            setupDeleteComment(comment.id, holder);
         }
     }
 
-    private void setupEditComment(long commentId, RelativeLayout commentLayout)
+    private void setupEditComment(long commentId, final CommentViewHolder holder)
     {
-        setupFinishEditComment(commentId, commentLayout);
-        setupCancelEditComment(commentLayout);
+        setupFinishEditComment(commentId, holder);
+        setupCancelEditComment(holder);
 
-        editComment = (ImageView) commentLayout.findViewById(R.id.editComment);
-        editComment.setVisibility(View.VISIBLE);
-        editComment.setOnClickListener(new View.OnClickListener()
+        holder.editComment.setVisibility(View.VISIBLE);
+        holder.editComment.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                prepareForEditText(true);
+                prepareForEditText(holder, true);
 
-                if (editTextForTitle.getText() != null)
-                    editTextForTitle.setSelection(editTextForTitle.getText().length());
                 itemsContainer.clearFocus();
-                editTextForTitle.requestFocus();
-                AppUtils.showSoftInput(getActivity(), editTextForTitle);
+                holder.title.requestFocus();
+
+                AppUtils.showSoftInput(getActivity(), holder.title);
+
+                if (holder.title.getText() != null)
+                    holder.title.setSelection(holder.title.getText().length());
             }
         });
     }
 
-    private void setupFinishEditComment(final long commentId, RelativeLayout commentLayout)
+    private void setupFinishEditComment(final long commentId, final CommentViewHolder holder)
     {
-        finishEditComment = (ImageView) commentLayout.findViewById(R.id.finishEditComment);
-        finishEditComment.setOnClickListener(new View.OnClickListener()
+        holder.finishEditComment.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                startServiceForEditComment(commentId, editTextForTitle.getText().toString());
-                markCommentEnd(v);
+                startServiceForEditComment(commentId, holder.title.getText().toString());
+                markCommentEnd(v, holder);
             }
         });
     }
 
-    private void setupCancelEditComment(RelativeLayout commentLayout)
+    private void setupCancelEditComment(final CommentViewHolder holder)
     {
-        cancelEditComment = (ImageView) commentLayout.findViewById(R.id.cancelEditComment);
-        cancelEditComment.setOnClickListener(new View.OnClickListener()
+        holder.cancelEditComment.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                markCommentEnd(v);
+                markCommentEnd(v, holder);
             }
         });
     }
 
-    private void setupDeleteComment(final long commentId, RelativeLayout commentLayout)
+    private void setupDeleteComment(final long commentId, CommentViewHolder holder)
     {
-        deleteComment = (ImageView) commentLayout.findViewById(R.id.deleteComment);
-        deleteComment.setVisibility(View.VISIBLE);
-        deleteComment.setOnClickListener(new View.OnClickListener()
+        holder.deleteComment.setVisibility(View.VISIBLE);
+        holder.deleteComment.setOnClickListener(new View.OnClickListener()
         {
             private OnClickListener listener = new OnClickListener()
             {
@@ -312,17 +333,17 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         });
     }
 
-    private void prepareForEditText(boolean edit)
+    private void prepareForEditText(CommentViewHolder holder, boolean edit)
     {
-        editTextForTitle.setEnabled(edit);
-        editTextForTitle.setClickable(edit);
-        editTextForTitle.setFocusable(edit);
-        editTextForTitle.setFocusableInTouchMode(edit);
+        holder.title.setEnabled(edit);
+        holder.title.setClickable(edit);
+        holder.title.setFocusable(edit);
+        holder.title.setFocusableInTouchMode(edit);
 
-        editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
-        deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
-        finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
-        cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
+        holder.editComment.setVisibility(edit ? View.GONE : View.VISIBLE);
+        holder.deleteComment.setVisibility(edit ? View.GONE : View.VISIBLE);
+        holder.finishEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
+        holder.cancelEditComment.setVisibility(edit ? View.VISIBLE : View.GONE);
     }
 
     private boolean canAddComment()
@@ -395,27 +416,55 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         serviceRunning = false;
+        progressDialog.dismiss();
+
         switch (resultCode)
         {
             case WriteIntentService.ACTION_EDIT_COMMENT:
                 Log.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
-                progressDialog.dismiss();
                 onEditCommentComplete(resultData);
                 break;
 
             case WriteIntentService.ACTION_DEL_COMMENT:
                 Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
-                progressDialog.dismiss();
                 onDelCommentComplete(resultData);
                 break;
+            case WriteIntentService.ERROR:
+                displayErrorToast(resultData);
+                break;
         }
+    }
+
+    private void displayErrorToast(Bundle resultData)
+    {
+        AbstractHttpException e = (AbstractHttpException) resultData.getSerializable(StringConstants.EXCEPTION);
+        String errorMsg = "Request failed for unknown reason";
+        if (e != null)
+        {
+            StackXError stackXError = StackXError.deserialize(e.getMessage());
+            if (stackXError != null && stackXError.msg != null)
+                errorMsg = stackXError.msg;
+        }
+        Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
     }
 
     private void onEditCommentComplete(Bundle resultData)
     {
         if (onCommentChangeListener != null)
         {
-            onCommentChangeListener.onCommentUpdate((Comment) resultData.getSerializable(StringConstants.COMMENT));
+            Comment comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
+            onCommentChangeListener.onCommentUpdate(comment);
+
+            int idx = comments.indexOf(comment);
+            Log.d(TAG, "Index of comment : " + idx);
+
+            if (idx != -1)
+            {
+                comments.remove(idx);
+                comments.add(idx, comment);
+            }
+
+            itemListAdapter.notifyDataSetChanged();
         }
     }
 
@@ -432,11 +481,11 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         }
     }
 
-    private void markCommentEnd(View v)
+    private void markCommentEnd(View v, CommentViewHolder holder)
     {
         AppUtils.hideSoftInput(getActivity(), v);
-        prepareForEditText(false);
-        editTextForTitle.clearFocus();
+        prepareForEditText(holder, false);
+        holder.title.clearFocus();
         itemsContainer.requestFocus();
     }
 }

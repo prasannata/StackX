@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
@@ -26,4 +26,32 @@ public class Comment extends StackXItem implements Serializable
     private static final long serialVersionUID = 4507419037482371574L;
 
     public long post_id;
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + (int) (post_id ^ (post_id >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Comment other = (Comment) obj;
+        if (id != other.id)
+            return false;
+        if (post_id != other.post_id)
+            return false;
+        return true;
+    }
+
 }
