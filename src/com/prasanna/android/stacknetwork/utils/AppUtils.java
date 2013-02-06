@@ -114,19 +114,28 @@ public class AppUtils
     {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout errorLayout = (RelativeLayout) inflater.inflate(R.layout.error, null);
-        String errorMsg = "Unknown error";
-
-        if (e.getCode() == null)
-        {
-            StackXError error = StackXError.deserialize(e.getErrorResponse());
-            errorMsg = error.name;
-        }
-        else
-            errorMsg = e.getCode().getDescription();
+        String errorMsg = getStackXErrorMsg(e);
 
         TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
         textView.setText(errorMsg);
         return errorLayout;
+    }
+
+    public static String getStackXErrorMsg(HttpException e)
+    {
+        String errorMsg = "Unknown error";
+
+        if (e != null)
+        {
+            if (e.getCode() == null)
+            {
+                StackXError error = StackXError.deserialize(e.getErrorResponse());
+                errorMsg = error.name;
+            }
+            else
+                errorMsg = e.getCode().getDescription();
+        }
+        return errorMsg;
     }
 
     public static void showSoftInput(Context context, View v)

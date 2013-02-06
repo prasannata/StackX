@@ -118,14 +118,14 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     public void onResume()
     {
         Log.d(TAG, "onResume");
-        
+
         super.onResume();
 
         if (itemListAdapter != null && itemListAdapter.getCount() > 0)
             itemListAdapter.notifyDataSetChanged();
         else
         {
-            if (itemListAdapter != null &&items != null && !items.isEmpty())
+            if (itemListAdapter != null && items != null && !items.isEmpty())
                 itemListAdapter.addAll(items);
         }
     }
@@ -175,6 +175,8 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
             getActivity().startService(intent);
             serviceRunning = true;
         }
+        else
+            dismissProgressBar();
     }
 
     protected void stopService(Intent intent)
@@ -267,7 +269,14 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         dismissProgressBar();
 
         getListView().setVisibility(View.GONE);
-        getParentLayout().addView(AppUtils.getErrorView(getActivity(), e));
+        View errorLayout = getParentLayout().findViewById(R.id.errorLayout);
+        if (errorLayout == null)
+            getParentLayout().addView(AppUtils.getErrorView(getActivity(), e));
+        else
+        {
+            TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
+            textView.setText(AppUtils.getStackXErrorMsg(e));
+        }
     }
 
     @Override
