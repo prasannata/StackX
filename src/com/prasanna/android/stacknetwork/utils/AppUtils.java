@@ -130,7 +130,10 @@ public class AppUtils
             if (e.getCode() == null)
             {
                 StackXError error = StackXError.deserialize(e.getErrorResponse());
-                errorMsg = error.name;
+                if (error != null)
+                    errorMsg = error.name;
+                else
+                    errorMsg = e.getStatusCode() + " " + e.getStatusDescription();
             }
             else
                 errorMsg = e.getCode().getDescription();

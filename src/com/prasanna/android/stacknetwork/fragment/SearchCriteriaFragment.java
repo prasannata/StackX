@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.database.SQLException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -80,8 +81,34 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private HashSet<String> includedTags = new HashSet<String>();;
     private HashSet<String> excludedTags = new HashSet<String>();;
     private Object tagFilterLock = new Object();
-    private ArrayList<String> tags;
+    private ArrayList<String> tags = new ArrayList<String>();
     private TagListAdapter tagArrayAdapter;
+
+    class GetTagsFromDbAsyncTask extends AsyncTask<Void, Void, Void>
+    {
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            if (tagArrayAdapter != null)
+            {
+                TagDAO tagDao = new TagDAO(getActivity());
+                try
+                {
+                    tagDao.open();
+                    tags.addAll(tagDao.getTagStringList(OperatingSite.getSite().apiSiteParameter));
+                }
+                catch (SQLException e)
+                {
+                    Log.d(TAG, e.getMessage());
+                }
+                finally
+                {
+                    tagDao.close();
+                }
+            }
+            return null;
+        }
+    }
 
     public interface OnRunSearchListener
     {
@@ -179,7 +206,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
         tagEditText.addTextChangedListener(this);
         tagEditText.setThreshold(1);
-        tagArrayAdapter = getTagArrayAdapter();
+        tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, tags);
         tagEditText.setAdapter(tagArrayAdapter);
 
         includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
@@ -189,7 +216,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         addUnknownTagToIncluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleIncludeUnknownTag);
         addUnknownTagToExcluded = (ToggleButton) criteriaLayout.findViewById(R.id.toggleExcludeUnknownTag);
-        
+
         prepareAddUnknownTagToIncluded();
         prepareAddUnknownTagToExcluded();
 
@@ -361,7 +388,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_TAG + currentNumRowsOfSelectedTags);
         return rowLayout;
     }
-    
+
     private void removeTagView(String tag, boolean include, TextView textView)
     {
         LinearLayout parent = (LinearLayout) textView.getParent();
@@ -395,6 +422,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         prepareRunSearch();
         prepareClearCriteria();
+        
+        new GetTagsFromDbAsyncTask().execute();
     }
 
     private void prepareRunSearch()
@@ -449,26 +478,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 AppUtils.hideSoftInput(getActivity(), v);
             }
         });
-    }
-
-    private TagListAdapter getTagArrayAdapter()
-    {
-        TagDAO tagDAO = new TagDAO(getActivity());
-        try
-        {
-            tagDAO.open();
-            tags = tagDAO.getTagStringList(OperatingSite.getSite().apiSiteParameter);
-        }
-        catch (SQLException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-        finally
-        {
-            tagDAO.close();
-        }
-
-        return new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
     }
 
     @Override
