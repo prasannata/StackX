@@ -30,6 +30,8 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.LinearLayout;
 
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
@@ -149,6 +151,9 @@ public class LogoutActivity extends Activity
             deleteMyTags();
             deleteWritePermissions();
             deleteMyProfile();
+            CookieSyncManager.createInstance(this);
+            CookieManager cookieManager = CookieManager.getInstance();
+            cookieManager.removeAllCookie();
             startLoginActivity();
         }
         else if (error != null && error.id > 0)
