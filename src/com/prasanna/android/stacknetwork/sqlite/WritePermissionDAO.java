@@ -31,7 +31,6 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class WritePermissionDAO extends AbstractBaseDao
 {
@@ -63,12 +62,7 @@ public class WritePermissionDAO extends AbstractBaseDao
                     values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
                     values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
                     if (permission.objectType != null)
-                    {
                         values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
-                        if (ObjectType.COMMENT.equals(permission.objectType))
-                            SharedPreferencesUtil.setLong(context, WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE,
-                                            permission.minSecondsBetweenActions);
-                    }
 
                     database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
                 }

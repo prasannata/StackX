@@ -106,7 +106,7 @@ public class AppUtils
 
         long lastCommentWrite = SharedPreferencesUtil.getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
         long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(context,
-                        WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
+                        WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
         return ((System.currentTimeMillis() - lastCommentWrite) / 1000 > minSecondsBetweenWrite);
     }
 

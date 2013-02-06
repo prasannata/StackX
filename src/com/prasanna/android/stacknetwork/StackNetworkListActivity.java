@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -78,7 +78,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
         else
         {
-            registerReceiverAndStartService();            
+            registerReceiverAndStartService();
         }
     }
 
@@ -175,6 +175,30 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         {
             writePermissionDAO.open();
             writePermissionDAO.insertAll(site, permissions);
+
+            for (WritePermission permission : permissions)
+            {
+                if (permission.objectType != null)
+                {
+                    switch (permission.objectType)
+                    {
+                        case ANSWER:
+                            SharedPreferencesUtil.setLong(this, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
+                                            permission.minSecondsBetweenActions);
+                            break;
+                        case COMMENT:
+                            SharedPreferencesUtil.setLong(this, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
+                                            permission.minSecondsBetweenActions);
+                            break;
+                        case QUESTION:
+                            SharedPreferencesUtil.setLong(this, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
+                                            permission.minSecondsBetweenActions);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
         catch (SQLException e)
         {

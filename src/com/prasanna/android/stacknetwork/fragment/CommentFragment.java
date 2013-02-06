@@ -393,7 +393,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         else
         {
             long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
-                            WritePermission.PREF_MIN_SECONDS_BETWEEN_WRITE, 0);
+                            WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
             Toast.makeText(getActivity(), "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
                             Toast.LENGTH_LONG).show();
         }

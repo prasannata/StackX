@@ -27,14 +27,16 @@ public abstract class AbstractBaseDao
 {
     private final DatabaseHelper databaseHelper;
     protected SQLiteDatabase database;
-    protected Context context;
 
     public AbstractBaseDao(Context context)
     {
-        this.context = context;
         databaseHelper = new DatabaseHelper(context);
     }
 
+    public boolean isOpen()
+    {
+        return database != null && database.isOpen();
+    }
     public void open() throws SQLException
     {
         database = databaseHelper.getWritableDatabase();
