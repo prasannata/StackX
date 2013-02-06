@@ -29,35 +29,41 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 {
     private final AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl;
 
+    /**
+     * 
+     * @param imageFetchAsyncTaskCompleteNotiferImpl
+     *            Completion notifier to be invoked. Will be invoked from the UI
+     *            thread.
+     */
     public GetImageAsyncTask(AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl)
     {
-	this.imageFetchAsyncTaskCompleteNotiferImpl = imageFetchAsyncTaskCompleteNotiferImpl;
+        this.imageFetchAsyncTaskCompleteNotiferImpl = imageFetchAsyncTaskCompleteNotiferImpl;
     }
 
     @Override
     protected Bitmap doInBackground(String... urls)
     {
-	if (urls != null && urls.length == 1)
-	{
-	    Bitmap bitmap = BitmapCache.getInstance().get(urls[0]);
+        if (urls != null && urls.length == 1)
+        {
+            Bitmap bitmap = BitmapCache.getInstance().get(urls[0]);
 
-	    if (bitmap == null)
-	    {
-		bitmap = SecureHttpHelper.getInstance().fetchImage((String) urls[0]);
-		BitmapCache.getInstance().add(urls[0], bitmap);
-	    }
+            if (bitmap == null)
+            {
+                bitmap = SecureHttpHelper.getInstance().fetchImage((String) urls[0]);
+                BitmapCache.getInstance().add(urls[0], bitmap);
+            }
 
-	    return bitmap;
-	}
+            return bitmap;
+        }
 
-	return null;
+        return null;
     }
 
     @Override
     protected void onPostExecute(Bitmap bitmap)
     {
-	if (imageFetchAsyncTaskCompleteNotiferImpl != null)
-	    imageFetchAsyncTaskCompleteNotiferImpl.notifyOnCompletion(bitmap);
+        if (imageFetchAsyncTaskCompleteNotiferImpl != null)
+            imageFetchAsyncTaskCompleteNotiferImpl.notifyOnCompletion(bitmap);
     }
 
 }

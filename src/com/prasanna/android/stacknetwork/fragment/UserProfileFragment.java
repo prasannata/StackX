@@ -27,6 +27,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.SQLException;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -68,6 +69,30 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private RestQueryResultReceiver resultReceiver;
     private long userId;
     private boolean forceRefresh;
+
+    class PersistMyAvatarAsyncTask extends AsyncTask<Bitmap, Void, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Bitmap... params)
+        {
+            ProfileDAO profileDAO = new ProfileDAO(getActivity());
+            try
+            {
+                profileDAO.open();
+                profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, params[0]);
+            }
+            catch (SQLException e)
+            {
+                Log.d(TAG, e.getMessage());
+            }
+            finally
+            {
+                profileDAO.close();
+            }
+            return null;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -201,9 +226,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
     private void runAsyncTaskToGetAvatar()
     {
-        final ProgressBar getAvatarProgressBar = (ProgressBar) profileHomeLayout
-                .findViewById(R.id.getAvatarProgressBar);
-        getAvatarProgressBar.setVisibility(View.VISIBLE);
+        final ProgressBar avatarProgressBar = (ProgressBar) profileHomeLayout.findViewById(R.id.getAvatarProgressBar);
+        avatarProgressBar.setVisibility(View.VISIBLE);
 
         AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
         {
@@ -211,29 +235,12 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             public void notifyOnCompletion(Bitmap result)
             {
                 displayAvatar(result);
-                getAvatarProgressBar.setVisibility(View.GONE);
+                avatarProgressBar.setVisibility(View.GONE);
 
                 if (me)
-                    persistMyAvatar(result);
+                    new PersistMyAvatarAsyncTask().execute(result);
             }
 
-            private void persistMyAvatar(Bitmap result)
-            {
-                ProfileDAO profileDAO = new ProfileDAO(getActivity());
-                try
-                {
-                    profileDAO.open();
-                    profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, result);
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    profileDAO.close();
-                }
-            }
         };
 
         GetImageAsyncTask imageAsyncTask = new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl);
@@ -247,7 +254,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
         textView.setText(getString(R.string.registered) + " "
-                + DateTimeUtils.getElapsedDurationSince(user.creationDate));
+                        + DateTimeUtils.getElapsedDurationSince(user.creationDate));
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
         textView.setText(AppUtils.formatReputation(user.reputation));
@@ -276,7 +283,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
         textView.setText(getString(R.string.lastSeen) + " "
-                + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+                        + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
     private void displayUserAccounts()
@@ -286,7 +293,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
                 TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                        R.layout.textview_black_textcolor, null);
+                                R.layout.textview_black_textcolor, null);
                 textView.setText(user.accounts.get(userAccountListCursor).siteName);
                 userAccountList.addView(textView);
             }
@@ -310,7 +317,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         }
 
         HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
-                .getSerializable(StringConstants.USER_ACCOUNTS);
+                        .getSerializable(StringConstants.USER_ACCOUNTS);
         if (accounts != null)
         {
             if (user.accounts == null)
