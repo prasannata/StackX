@@ -32,6 +32,8 @@ public interface HttpException extends Serializable
     
     int getStatusCode();
     
+    String getStatusDescription();
+    
     String getErrorResponse();
     
     Code getCode();

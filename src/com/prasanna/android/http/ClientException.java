@@ -54,11 +54,6 @@ public class ClientException extends AbstractHttpException implements Serializab
 
     private ClientErrorCode code;
 
-    public ClientException(int statusCode)
-    {
-        this(statusCode, null);
-    }
-
     public ClientException(ClientErrorCode code)
     {
         super();
@@ -66,11 +61,11 @@ public class ClientException extends AbstractHttpException implements Serializab
         this.code = code;
     }
 
-    public ClientException(int statusCode, String errorResponse)
+    public ClientException(int statusCode, String statusDescription, String errorResponse)
     {
-        super(statusCode, errorResponse);
+        super(statusCode, statusDescription, errorResponse);
     }
-
+    
     public ClientException(ClientErrorCode code, String errorResponse)
     {
         super(errorResponse);

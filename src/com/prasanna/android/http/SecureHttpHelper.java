@@ -277,11 +277,12 @@ public final class SecureHttpHelper
         {
             Log.d(TAG, "Http request failed: " + statusCode);
             Log.d(TAG, "Http request failure message: " + jsonText);
+            String statusDescription = httpResponse.getStatusLine().getReasonPhrase();
 
             if (statusCode >= HttpErrorFamily.SERVER_ERROR)
-                throw new ServerException(statusCode, jsonText);
+                throw new ServerException(statusCode, statusDescription, jsonText);
             else if (statusCode >= HttpErrorFamily.CLIENT_ERROR)
-                throw new ClientException(statusCode, jsonText);
+                throw new ClientException(statusCode, statusDescription, jsonText);
         }
 
         return jsonObject;

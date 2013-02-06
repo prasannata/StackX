@@ -23,6 +23,7 @@ public abstract class AbstractHttpException extends RuntimeException implements 
 {
     private String errorResponse;
     private int statusCode;
+    private String statusDescription;
 
     private static final long serialVersionUID = 7575439728639763037L;
 
@@ -50,13 +51,30 @@ public abstract class AbstractHttpException extends RuntimeException implements 
         super();
     }
 
+    public AbstractHttpException(int statusCode, String statusDescription, String errorResponse)
+    {
+        this.statusCode = statusCode;
+        this.statusDescription = statusDescription;
+        this.errorResponse = errorResponse;
+
+    }
+
+    @Override
     public String getErrorResponse()
     {
         return errorResponse;
     }
 
+    @Override
     public int getStatusCode()
     {
         return statusCode;
     }
+
+    @Override
+    public String getStatusDescription()
+    {
+        return statusDescription;
+    }
+
 }

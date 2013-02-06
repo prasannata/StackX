@@ -28,14 +28,14 @@ public class ServerException extends AbstractHttpException implements Serializab
 
     public ServerException(int statusCode)
     {
-        this(statusCode, null);
+        this(statusCode, null, null);
     }
 
-    public ServerException(int statusCode, String errorResponse)
+    public ServerException(int statusCode, String statusDescription, String errorResponse)
     {
-        super(statusCode, errorResponse);
+        super(statusCode, statusDescription, errorResponse);
     }
-    
+
     public ServerException(Code code)
     {
         super();
@@ -48,5 +48,4 @@ public class ServerException extends AbstractHttpException implements Serializab
     {
         return code;
     }
-
 }
