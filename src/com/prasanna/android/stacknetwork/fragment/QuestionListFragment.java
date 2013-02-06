@@ -94,7 +94,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                    new ArrayList<Question>(), this);
+                            new ArrayList<Question>(), this);
         }
 
         if (savedInstanceState != null)
@@ -115,7 +115,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (tag != null)
         {
             if ((action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG || action == QuestionsIntentService.GET_FAQ_FOR_TAG)
-                    && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
+                            && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             getActivity().getActionBar().setTitle(tag);
         }
@@ -232,45 +232,64 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     private void getFrontPage()
     {
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
 
-        startIntentService();
+        if (intent != null)
+        {
+            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
+            startIntentService();
+        }
     }
 
     private void getSimilarQuestions()
     {
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_SIMILAR);
-        intent.putExtra(StringConstants.TITLE, getBundle().getString(StringConstants.TITLE));
+        if (intent != null)
+        {
 
-        startIntentService();
+            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_SIMILAR);
+            intent.putExtra(StringConstants.TITLE, getBundle().getString(StringConstants.TITLE));
+
+            startIntentService();
+        }
     }
 
     private void getRelatedQuestions()
     {
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
-        intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
+        if (intent != null)
+        {
 
-        startIntentService();
+            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
+            intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
+
+            startIntentService();
+        }
     }
 
     private void getFaqsForTag()
     {
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
-        intent.putExtra(StringConstants.TAG, tag);
+        if (intent != null)
+        {
 
-        startIntentService();
+            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
+            intent.putExtra(StringConstants.TAG, tag);
+
+            startIntentService();
+        }
     }
 
     private void getQuestionsForTag()
     {
         intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
-        intent.putExtra(StringConstants.TAG, tag);
+        if (intent != null)
+        {
 
-        startIntentService();
+            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
+            intent.putExtra(StringConstants.TAG, tag);
+
+            startIntentService();
+        }
     }
 
     private void search(String query)
@@ -281,12 +300,15 @@ public class QuestionListFragment extends AbstractQuestionListFragment
             buildSearchCriteria(query);
         else
             criteria = criteria.nextPage();
+        if (intent != null)
+        {
 
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
-        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
-        intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
+            intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
+            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
+            intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
 
-        startIntentService();
+            startIntentService();
+        }
     }
 
     private void buildSearchCriteria(String query)

@@ -137,13 +137,17 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         showProgressBar();
 
         intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
-        intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
-        intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-        intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
-        intent.putExtra(StringConstants.PAGE, page++);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        if (intent != null)
+        {
+            intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
+            intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+            intent.putExtra(StringConstants.USER_ID, getActivity().getIntent()
+                            .getLongExtra(StringConstants.USER_ID, 0L));
+            intent.putExtra(StringConstants.PAGE, page++);
+            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
-        startService(intent);
+            startService(intent);
+        }
     }
 
     @Override

@@ -32,14 +32,18 @@ public class SearchQuestionListFragment extends QuestionListFragment
         }
     }
 
-    private void prepareIntent()
+    private void prepareIntentAndStartService()
     {
         if (intent == null)
         {
             intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
-            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-            intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
+            if (intent != null)
+            {
+
+                intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
+                intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+                intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
+            }
         }
         else
             intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria.nextPage());
@@ -68,7 +72,7 @@ public class SearchQuestionListFragment extends QuestionListFragment
                 Toast.makeText(getActivity(), "Search criteria saved", Toast.LENGTH_SHORT).show();
                 return true;
         }
-        
+
         return false;
     }
 
@@ -77,7 +81,7 @@ public class SearchQuestionListFragment extends QuestionListFragment
     {
         if (isAdded())
         {
-            prepareIntent();
+            prepareIntentAndStartService();
             showProgressBar();
             startService(intent);
         }
