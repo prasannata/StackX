@@ -30,7 +30,7 @@ import com.prasanna.android.stacknetwork.model.SearchCriteria;
 public class SearchCriteriaDAO extends AbstractBaseDao
 {
     public static final String TABLE_NAME = "SEARCH_CRITERIA";
-    
+
     public static final class SearchCriteriaTable
     {
         public static final String COLUMN_ID = "_id";
@@ -44,12 +44,12 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         public static final String COLUMN_LAST_MODIFIED = "last_modified";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " long primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
+                        + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
                         + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED + " integer, " + COLUMN_TAGGED
                         + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_CREATED + " long not null, "
                         + COLUMN_LAST_MODIFIED + " long not null);";
     }
-    
+
     public SearchCriteriaDAO(Context context)
     {
         super(context);
@@ -60,6 +60,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         if (searchCriteria != null)
         {
             ContentValues values = new ContentValues();
+            values.put(SearchCriteriaTable.COLUMN_NAME, searchCriteria.name);
             values.put(SearchCriteriaTable.COLUMN_Q, searchCriteria.getQuery());
             values.put(SearchCriteriaTable.COLUMN_ANSWERS, searchCriteria.getAnswerCount());
             values.put(SearchCriteriaTable.COLUMN_ANSWERED, searchCriteria.isAnswered());
@@ -71,25 +72,23 @@ public class SearchCriteriaDAO extends AbstractBaseDao
             values.put(SearchCriteriaTable.COLUMN_CREATED, currentTimeMillis);
             values.put(SearchCriteriaTable.COLUMN_LAST_MODIFIED, currentTimeMillis);
 
-           return database.insert(TABLE_NAME, null, values);
+            return database.insert(TABLE_NAME, null, values);
         }
-        
+
         return -1L;
     }
-    
+
     public SearchCriteria update(SearchCriteria searchCriteria)
     {
         if (searchCriteria != null)
         {
-            database.beginTransaction();
             delete(searchCriteria.dbId);
             searchCriteria.dbId = insert(searchCriteria);
-            database.endTransaction();
         }
 
         return searchCriteria;
     }
-    
+
     public ArrayList<SearchCriteria> readAll()
     {
         String orderBy = SearchCriteriaTable.COLUMN_CREATED + " ASC";
@@ -115,6 +114,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
     {
         SearchCriteria criteria = SearchCriteria.newCriteria();
         criteria.dbId = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
+        criteria.name = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_NAME));
         criteria.setQuery(cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_Q)));
         criteria.setMinAnswers(cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ANSWERS)));
         criteria.addIncludedTagsAsSemiColonDelimitedString(cursor.getString(cursor
@@ -131,7 +131,8 @@ public class SearchCriteriaDAO extends AbstractBaseDao
     public void delete(long id)
     {
         String whereClause = SearchCriteriaTable.COLUMN_ID + " = ?";
-        String[] whereArgs = { String.valueOf(id) };
+        String[] whereArgs =
+        { String.valueOf(id) };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
     }

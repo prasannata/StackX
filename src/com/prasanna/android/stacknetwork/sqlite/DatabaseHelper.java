@@ -45,7 +45,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_LAST_UPDATE_TIME = "last_update_time";
 
         private static final String CREATE_TABLE = "create table " + TABLE_AUDIT + "(" + COLUMN_ID
-                        + " long primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE
+                        + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE
                         + " text, " + COLUMN_LAST_UPDATE_TIME + " long not null);";
     }
 

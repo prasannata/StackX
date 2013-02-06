@@ -49,7 +49,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         public static final String COLUMN_SITE_URL = "site_url";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " long primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
+                        + " integer primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
                         + " integer not null, " + COLUMN_EDIT + " integer not null, " + COLUMN_MAX_DAILY_ACTIONS
                         + " integer not null, " + COLUMN_WAIT_TIME + " integer not null, " + COLUMN_OBJECT_TYPE
                         + " text not null, " + COLUMN_SITE + " text not null, " + COLUMN_SITE_URL + " text not null);";

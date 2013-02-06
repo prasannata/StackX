@@ -59,7 +59,7 @@ public class ProfileDAO extends AbstractBaseDao
         public static final String COLUMN_LAST_UPDATE = "last_update";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " long primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
+                        + " integer primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
                         + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
                         + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
                         + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT

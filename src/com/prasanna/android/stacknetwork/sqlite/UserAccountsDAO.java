@@ -46,7 +46,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         public static final String COLUMN_USER_TYPE = "user_type";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " long primary key autoincrement, " + COLUMN_USER_ID + " integer not null, "
+                        + " integer primary key autoincrement, " + COLUMN_USER_ID + " integer not null, "
                         + COLUMN_ACCOUNT_ID + " integer not null, " + COLUMN_SITE_NAME + " text not null, "
                         + COLUMN_SITE_URL + " text not null, " + COLUMN_USER_TYPE + " text);";
     }
