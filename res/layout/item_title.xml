@@ -7,16 +7,6 @@
     android:layout_marginRight="2dp"
     android:background="@color/white" >
 
-    <CheckBox
-        android:id="@+id/deleteItemCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:button="@drawable/checkbox"
-        android:gravity="center"
-        android:visibility="gone" />
-
     <include
         android:id="@+id/scoreAndAns"
         android:layout_alignParentLeft="true"

@@ -37,6 +37,7 @@ public abstract class AbstractBaseDao
     {
         return database != null && database.isOpen();
     }
+    
     public void open() throws SQLException
     {
         database = databaseHelper.getWritableDatabase();

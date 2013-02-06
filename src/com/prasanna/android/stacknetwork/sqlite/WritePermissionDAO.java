@@ -30,11 +30,30 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
-import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.WritePermissionTable;
 
 public class WritePermissionDAO extends AbstractBaseDao
 {
     private static final String TAG = WritePermissionDAO.class.getSimpleName();
+    public static final String TABLE_NAME = "WRITE_PERMISSION";
+
+    public static final class WritePermissionTable
+    {
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_ADD = "can_add";
+        public static final String COLUMN_DEL = "can_del";
+        public static final String COLUMN_EDIT = "can_edit";
+        public static final String COLUMN_MAX_DAILY_ACTIONS = "maxDailyActions";
+        public static final String COLUMN_WAIT_TIME = "waitBetweenWrite";
+        public static final String COLUMN_OBJECT_TYPE = "objectType";
+        public static final String COLUMN_SITE = "site";
+        public static final String COLUMN_SITE_URL = "site_url";
+
+        protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
+                        + " long primary key autoincrement, " + COLUMN_ADD + " integer not null, " + COLUMN_DEL
+                        + " integer not null, " + COLUMN_EDIT + " integer not null, " + COLUMN_MAX_DAILY_ACTIONS
+                        + " integer not null, " + COLUMN_WAIT_TIME + " integer not null, " + COLUMN_OBJECT_TYPE
+                        + " text not null, " + COLUMN_SITE + " text not null, " + COLUMN_SITE_URL + " text not null);";
+    }
 
     public WritePermissionDAO(Context context)
     {
@@ -64,7 +83,7 @@ public class WritePermissionDAO extends AbstractBaseDao
                     if (permission.objectType != null)
                         values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
 
-                    database.insert(DatabaseHelper.TABLE_WRITE_PERMISSION, null, values);
+                    database.insert(TABLE_NAME, null, values);
                 }
                 else
                 {
@@ -83,8 +102,7 @@ public class WritePermissionDAO extends AbstractBaseDao
                         + " = ?";
         String[] selectionArgs = { site, objectType.getValue() };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
-                        null, null);
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
@@ -100,8 +118,7 @@ public class WritePermissionDAO extends AbstractBaseDao
                         + WritePermissionTable.COLUMN_EDIT + "= ?";
         String[] selectionArgs = { "1", "1", "1" };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, cols, selection, selectionArgs, null,
-                        null, null);
+        Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
@@ -123,8 +140,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         String selection = WritePermissionTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_WRITE_PERMISSION, null, selection, selectionArgs, null,
-                        null, null);
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
@@ -166,6 +182,6 @@ public class WritePermissionDAO extends AbstractBaseDao
 
     public void deleteAll()
     {
-        database.delete(DatabaseHelper.TABLE_WRITE_PERMISSION, null, null);
+        database.delete(TABLE_NAME, null, null);
     }
 }

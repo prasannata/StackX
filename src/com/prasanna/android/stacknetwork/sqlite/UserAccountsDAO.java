@@ -29,12 +29,27 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
-import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.UserAccountsTable;
 
 public class UserAccountsDAO extends AbstractBaseDao
 {
     private static final String TAG = UserAccountsDAO.class.getSimpleName();
     public static final String AUDIT_ENTRY_TYPE = UserAccountsDAO.class.getSimpleName();
+    public static final String TABLE_NAME = "USER_ACCOUNTS";
+
+    public static final class UserAccountsTable
+    {
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_ACCOUNT_ID = "account_id";
+        public static final String COLUMN_SITE_NAME = "site_name";
+        public static final String COLUMN_SITE_URL = "site_url";
+        public static final String COLUMN_USER_TYPE = "user_type";
+
+        protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
+                        + " long primary key autoincrement, " + COLUMN_USER_ID + " integer not null, "
+                        + COLUMN_ACCOUNT_ID + " integer not null, " + COLUMN_SITE_NAME + " text not null, "
+                        + COLUMN_SITE_URL + " text not null, " + COLUMN_USER_TYPE + " text);";
+    }
 
     public UserAccountsDAO(Context context)
     {
@@ -58,7 +73,7 @@ public class UserAccountsDAO extends AbstractBaseDao
                 if (account.userType != null)
                     values.put(UserAccountsTable.COLUMN_USER_TYPE, account.userType.getValue());
 
-                database.insert(DatabaseHelper.TABLE_USER_ACCOUNTS, null, values);
+                database.insert(TABLE_NAME, null, values);
             }
 
             insertAuditEntry();
@@ -93,8 +108,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         String selection = UserAccountsTable.COLUMN_ACCOUNT_ID + " = ?";
         String[] selectionArgs = { String.valueOf(accountId) };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_USER_ACCOUNTS, null, selection, selectionArgs, null, null,
-                        null);
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 

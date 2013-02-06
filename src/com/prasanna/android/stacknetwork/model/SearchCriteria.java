@@ -20,7 +20,7 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,22 +79,27 @@ public class SearchCriteria implements Serializable
     }
 
     private static final int DEFAULT_SIZE = 15;
-    private static WeakReference<SearchCriteria> selfWeakReference;
+    private static SoftReference<SearchCriteria> self;
     private final HashMap<String, String> criteria;
     private ArrayList<String> includeTags;
     private ArrayList<String> excludeTags;
-    int page = 1;
+    private int page = 1;
 
+    public long dbId = -1;
+    public String name;
+    public long created = 0L;
+    public long lastModified = 0L;
+    
     public static SearchCriteria newCriteria(String query)
     {
-        selfWeakReference = new WeakReference<SearchCriteria>(new SearchCriteria(query));
-        return selfWeakReference.get();
+        self = new SoftReference<SearchCriteria>(new SearchCriteria(query));
+        return self.get();
     }
 
     public static SearchCriteria newCriteria()
     {
-        selfWeakReference = new WeakReference<SearchCriteria>(new SearchCriteria());
-        return selfWeakReference.get();
+        self = new SoftReference<SearchCriteria>(new SearchCriteria());
+        return self.get();
     }
 
     private SearchCriteria()
@@ -184,6 +189,47 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
+    public SearchCriteria addIncludedTagsAsSemiColonDelimitedString(String tags)
+    {
+        if(tags != null)
+            criteria.put(TAGGED, tags);
+        
+        return this;
+    }
+
+    public SearchCriteria addExcludedTagsAsSemiColonDelimitedString(String tags)
+    {
+        if(tags != null)
+            criteria.put(NOT_TAGGED, tags);
+        
+        return this;
+    }
+
+    public String getQuery()
+    {
+        return criteria.get(Q);
+    }
+    
+    public boolean isAnswered()
+    {
+        return criteria.get(ACCEPTED) != null && Boolean.valueOf(criteria.get(ACCEPTED));
+    }
+
+    public int getAnswerCount()
+    {
+        return criteria.get(ANSWERS) == null ? 0 : Integer.valueOf(criteria.get(ANSWERS));
+    }
+    
+    public String getIncludedTagsAsSemicolonDelimitedString()
+    {
+        return criteria.get(TAGGED);
+    }
+    
+    public String getExcludedTagsAsSemicolonDelimitedString()
+    {
+        return criteria.get(NOT_TAGGED);
+    }
+    
     public SearchCriteria build()
     {
         if (page == 1)

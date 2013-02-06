@@ -29,12 +29,48 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.User;
-import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.ProfileTable;
 
 public class ProfileDAO extends AbstractBaseDao
 {
+    public static final String TABLE_NAME = "USER_PROFILE";
+    
     private static final String TAG = ProfileDAO.class.getSimpleName();
 
+    public static final class ProfileTable
+    {
+        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_SITE = "site";
+        public static final String COLUMN_ME = "me";
+        public static final String COLUMN_DISPLAY_NAME = "display_name";
+        public static final String COLUMN_GOLD_BADGES = "gold_badges";
+        public static final String COLUMN_SILVER_BADGES = "silver_badges";
+        public static final String COLUMN_BRONZE_BADGES = "bronze_badges";
+        public static final String COLUMN_QUESTION_COUNT = "q_count";
+        public static final String COLUMN_ANSWER_COUNT = "a_count";
+        public static final String COLUMN_UPVOTE_COUNT = "u_count";
+        public static final String COLUMN_DOWNVOTE_COUNT = "d_count";
+        public static final String COLUMN_ACCEPT_RATE = "accept_rate";
+        public static final String COLUMN_REPUTATION = "reputation";
+        public static final String COLUMN_VIEWS = "views";
+        public static final String COLUMN_REG_DATE = "reg_date";
+        public static final String COLUMN_LAST_ACCESS = "last_access";
+        public static final String COLUMN_PROFILE_IMAGE_LINK = "profile_image_link";
+        public static final String COLUMN_PROFILE_IMAGE = "profile_image";
+        public static final String COLUMN_LAST_UPDATE = "last_update";
+
+        protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
+                        + " long primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
+                        + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
+                        + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
+                        + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT
+                        + " integer not null, " + COLUMN_UPVOTE_COUNT + " integer not null, " + COLUMN_DOWNVOTE_COUNT
+                        + " integer not null, " + COLUMN_ACCEPT_RATE + " integer not null, " + COLUMN_REPUTATION
+                        + " integer not null, " + COLUMN_VIEWS + " integer not null, " + COLUMN_REG_DATE
+                        + " long not null, " + COLUMN_LAST_ACCESS + " long not null, " + COLUMN_PROFILE_IMAGE_LINK
+                        + " text, " + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE + " long not null);";
+
+    }
+    
     public ProfileDAO(Context context)
     {
         super(context);

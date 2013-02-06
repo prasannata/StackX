@@ -25,11 +25,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSearchListener;
 import com.prasanna.android.stacknetwork.fragment.SearchQuestionListFragment;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener
 {
@@ -104,6 +106,34 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         super.onConfigurationChanged(newConfig);
 
         showOrHideQuestionListFragment(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == R.id.menu_save)
+        {
+            if (searchCriteriaFragment != null)
+                searchCriteriaFragment.saveCriteria(new AsyncTaskCompletionNotifier<Boolean>()
+                                {
+                    @Override
+                    public void notifyOnCompletion(Boolean result)
+                    {
+                        String toastMsg;
+                        
+                        if(result)
+                            toastMsg = "Criteria saved";
+                        else
+                            toastMsg = "Cannot save criteria";
+                        
+                        Toast.makeText(AdvancedSearchActivity.this, toastMsg, Toast.LENGTH_LONG).show();
+                    }
+                });
+            
+            return true;
+        }
+        else
+            return super.onOptionsItemSelected(item);
     }
 
     @Override

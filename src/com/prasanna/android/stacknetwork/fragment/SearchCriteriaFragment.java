@@ -54,10 +54,12 @@ import android.widget.ToggleButton;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
+import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.Validate;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class SearchCriteriaFragment extends Fragment implements TextWatcher
 {
@@ -83,6 +85,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private Object tagFilterLock = new Object();
     private ArrayList<String> tags = new ArrayList<String>();
     private TagListAdapter tagArrayAdapter;
+    private SearchCriteria searchCriteria;
 
     class GetTagsFromDbAsyncTask extends AsyncTask<Void, Void, Void>
     {
@@ -107,6 +110,48 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 }
             }
             return null;
+        }
+
+    }
+
+    class WriteCriteriaAsyncTask extends AsyncTask<Void, Void, Boolean>
+    {
+        private AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier;
+
+        public WriteCriteriaAsyncTask(AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+        {
+            this.asyncTaskCompletionNotifier = asyncTaskCompletionNotifier;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params)
+        {
+            SearchCriteriaDAO dao = new SearchCriteriaDAO(getActivity());
+            try
+            {
+                dao.open();
+
+                Log.d(TAG, "Saving search criteria");
+                dao.insert(searchCriteria);
+                return true;
+            }
+            catch (SQLException e)
+            {
+                Log.d(TAG, e.getMessage());
+            }
+            finally
+            {
+                dao.close();
+            }
+
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result)
+        {
+            if (asyncTaskCompletionNotifier != null)
+                asyncTaskCompletionNotifier.notifyOnCompletion(result);
         }
     }
 
@@ -422,7 +467,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         prepareRunSearch();
         prepareClearCriteria();
-        
+
         new GetTagsFromDbAsyncTask().execute();
     }
 
@@ -434,7 +479,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             @Override
             public void onClick(View v)
             {
-                SearchCriteria searchCriteria = SearchCriteria.newCriteria();
+                searchCriteria = SearchCriteria.newCriteria();
 
                 if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
                     searchCriteria.setQuery(searchQuery.getText().toString().trim());
@@ -547,5 +592,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     public void hideSoftInput()
     {
         AppUtils.hideSoftInput(getActivity(), getActivity().getWindow().getCurrentFocus());
+    }
+
+    public void saveCriteria(AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+    {
+        if (searchCriteria != null)
+            new WriteCriteriaAsyncTask(asyncTaskCompletionNotifier).execute();
     }
 }
