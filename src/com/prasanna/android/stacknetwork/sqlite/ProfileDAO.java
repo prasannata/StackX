@@ -148,6 +148,7 @@ public class ProfileDAO extends AbstractBaseDao
         user.profileViews = cursor.getInt(cursor.getColumnIndex(ProfileTable.COLUMN_VIEWS));
         user.creationDate = cursor.getLong(cursor.getColumnIndex(ProfileTable.COLUMN_REG_DATE));
         user.lastAccessTime = cursor.getLong(cursor.getColumnIndex(ProfileTable.COLUMN_LAST_ACCESS));
+        user.profileImageLink = cursor.getString(cursor.getColumnIndex(ProfileTable.COLUMN_PROFILE_IMAGE_LINK));
         byte[] image = cursor.getBlob(cursor.getColumnIndex(ProfileTable.COLUMN_PROFILE_IMAGE));
         if (image != null)
             user.avatar = BitmapFactory.decodeByteArray(image, 0, image.length);
