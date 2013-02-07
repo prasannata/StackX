@@ -96,6 +96,8 @@ public class SearchCriteriaListActivity extends ListActivity
 
     private class SearchCriteriaArrayAdapter extends ArrayAdapter<SearchCriteriaDomain>
     {
+        private static final int MAX_NUM_CHARS_FOR_DETAIL = 1000;
+
         public SearchCriteriaArrayAdapter(Context context, int resource, int textViewResourceId)
         {
             super(context, resource, textViewResourceId);
@@ -142,9 +144,15 @@ public class SearchCriteriaListActivity extends ListActivity
                 builder.append(", tagged: "
                                 + searchCriteriaDomain.searchCriteria.getIncludedTagsAsSemicolonDelimitedString());
 
+            if (builder.length() > MAX_NUM_CHARS_FOR_DETAIL)
+                return builder.substring(0, MAX_NUM_CHARS_FOR_DETAIL + 1) + "...";
+
             if (searchCriteriaDomain.searchCriteria.getExcludedTagsAsSemicolonDelimitedString() != null)
                 builder.append(", not tagged: "
                                 + searchCriteriaDomain.searchCriteria.getExcludedTagsAsSemicolonDelimitedString());
+
+            if (builder.length() > MAX_NUM_CHARS_FOR_DETAIL)
+                return builder.substring(0, MAX_NUM_CHARS_FOR_DETAIL + 1) + "...";
 
             return builder.toString();
         }
