@@ -37,6 +37,8 @@ import android.widget.ToggleButton;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class SearchCriteriaListActivity extends ListActivity
@@ -51,6 +53,9 @@ public class SearchCriteriaListActivity extends ListActivity
         TextView itemText;
         ToggleButton addAsTabToggle;
         TextView itemDetails;
+        TextView created;
+        TextView modified;
+        TextView ran;
     }
 
     class ReadAllSearchCriteriaFromDbAsyncTask extends AsyncTask<Void, Void, ArrayList<SearchCriteriaDomain>>
@@ -116,16 +121,19 @@ public class SearchCriteriaListActivity extends ListActivity
                 viewHolder.itemText = (TextView) convertView.findViewById(R.id.itemText);
                 viewHolder.itemDetails = (TextView) convertView.findViewById(R.id.itemDetails);
                 viewHolder.addAsTabToggle = (ToggleButton) convertView.findViewById(R.id.addTabToggle);
+                viewHolder.created = (TextView) convertView.findViewById(R.id.itemCreated);
+                viewHolder.modified = (TextView) convertView.findViewById(R.id.itemModified);
+                viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
                 convertView.setTag(viewHolder);
             }
             else
                 viewHolder = (SearchCriteriaViewHolder) convertView.getTag();
 
-            Log.d(TAG, "position = " + position);
-            Log.d(TAG, "item = " + getItem(position).name);
-
-            viewHolder.itemText.setText(getItem(position).name);
-            viewHolder.itemDetails.setText(getDetailsText(getItem(position)));
+            SearchCriteriaDomain item = getItem(position);
+            viewHolder.itemText.setText(item.name);
+            viewHolder.itemDetails.setText(getDetailsText(item));
+            viewHolder.created.setText("Created " + DateTimeUtils.getElapsedDurationSince(item.created / 1000));
+            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.ran) + " times");
             return convertView;
         }
 
