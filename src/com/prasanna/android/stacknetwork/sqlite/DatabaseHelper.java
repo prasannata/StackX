@@ -32,7 +32,6 @@ import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO.WritePermissi
 public class DatabaseHelper extends SQLiteOpenHelper
 {
     public static final String TABLE_AUDIT = "AUDIT";
-    public static final String TABLE_PROFILE = "PROFILE";
 
     private static final String DATABASE_NAME = "stackx.db";
     private static final int DATABASE_VERSION = 1;

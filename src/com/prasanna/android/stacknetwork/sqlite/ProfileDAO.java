@@ -33,7 +33,7 @@ import com.prasanna.android.stacknetwork.model.User;
 public class ProfileDAO extends AbstractBaseDao
 {
     public static final String TABLE_NAME = "USER_PROFILE";
-    
+
     private static final String TAG = ProfileDAO.class.getSimpleName();
 
     public static final class ProfileTable
@@ -70,7 +70,7 @@ public class ProfileDAO extends AbstractBaseDao
                         + " text, " + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE + " long not null);";
 
     }
-    
+
     public ProfileDAO(Context context)
     {
         super(context);
@@ -113,7 +113,7 @@ public class ProfileDAO extends AbstractBaseDao
 
             values.put(ProfileTable.COLUMN_LAST_UPDATE, System.currentTimeMillis());
 
-            database.insert(DatabaseHelper.TABLE_PROFILE, null, values);
+            database.insert(TABLE_NAME, null, values);
         }
     }
 
@@ -130,7 +130,7 @@ public class ProfileDAO extends AbstractBaseDao
             avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
             values.put(ProfileTable.COLUMN_PROFILE_IMAGE, stream.toByteArray());
 
-            database.update(DatabaseHelper.TABLE_PROFILE, values, whereClause, whereArgs);
+            database.update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
 
@@ -140,7 +140,7 @@ public class ProfileDAO extends AbstractBaseDao
         String[] selectionArgs =
         { "1", site };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PROFILE, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
@@ -155,7 +155,7 @@ public class ProfileDAO extends AbstractBaseDao
         String[] selectionArgs =
         { String.valueOf(userId), site };
 
-        Cursor cursor = database.query(DatabaseHelper.TABLE_PROFILE, null, selection, selectionArgs, null, null, null);
+        Cursor cursor = database.query(TABLE_NAME null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
@@ -194,7 +194,7 @@ public class ProfileDAO extends AbstractBaseDao
 
     public void deleteAll()
     {
-        database.delete(DatabaseHelper.TABLE_PROFILE, null, null);
+        database.delete(TABLE_NAME, null, null);
     }
 
     public void deleteMe(String site)
@@ -203,7 +203,7 @@ public class ProfileDAO extends AbstractBaseDao
         String[] whereArgs =
         { "1", site };
 
-        database.delete(DatabaseHelper.TABLE_PROFILE, whereClause, whereArgs);
+        database.delete(TABLE_NAME, whereClause, whereArgs);
     }
 
     public void deleteUser(long userId, String site)
@@ -212,6 +212,6 @@ public class ProfileDAO extends AbstractBaseDao
         String[] whereArgs =
         { String.valueOf(userId), site };
 
-        database.delete(DatabaseHelper.TABLE_PROFILE, whereClause, whereArgs);
+        database.delete(TABLE_NAME, whereClause, whereArgs);
     }
 }

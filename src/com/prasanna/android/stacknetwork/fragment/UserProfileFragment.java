@@ -314,17 +314,17 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             user = userPage.items.get(0);
             displayUserDetail();
-        }
 
-        HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
-                        .getSerializable(StringConstants.USER_ACCOUNTS);
-        if (accounts != null)
-        {
-            if (user.accounts == null)
-                user.accounts = new ArrayList<Account>();
+            HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
+                            .getSerializable(StringConstants.USER_ACCOUNTS);
+            if (accounts != null)
+            {
+                if (user.accounts == null)
+                    user.accounts = new ArrayList<Account>();
 
-            user.accounts.addAll(accounts.values());
-            displayUserAccounts();
+                user.accounts.addAll(accounts.values());
+                displayUserAccounts();
+            }
         }
     }
 
