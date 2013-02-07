@@ -706,43 +706,44 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         if (searchCriteriaDomain != null)
         {
             if (searchCriteriaDomain.id > 0)
-            {
                 new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_UPDATE,
                                 asyncTaskCompletionNotifier).execute();
-            }
             else
-            {
-                AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(getActivity());
-                saveAsDailogBuilder.setTitle("Save As");
-
-                final EditText input = new EditText(getActivity());
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.MATCH_PARENT);
-                input.setLayoutParams(lp);
-                saveAsDailogBuilder.setView(input);
-
-                saveAsDailogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        searchCriteriaDomain.name = input.getText().toString();
-                        searchCriteriaDomain.site = OperatingSite.getSite().apiSiteParameter;
-                        new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
-                                        WriteCriteriaAsyncTask.ACTION_ADD, asyncTaskCompletionNotifier).execute();
-                    }
-                });
-
-                saveAsDailogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-
-                saveAsDailogBuilder.show();
-            }
+                prepareSaveAsDialog(asyncTaskCompletionNotifier);
         }
+    }
+
+    private void prepareSaveAsDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+    {
+        AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(getActivity());
+        saveAsDailogBuilder.setTitle("Save As");
+
+        final EditText input = new EditText(getActivity());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        saveAsDailogBuilder.setView(input);
+
+        saveAsDailogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int whichButton)
+            {
+                searchCriteriaDomain.name = input.getText().toString();
+                searchCriteriaDomain.site = OperatingSite.getSite().apiSiteParameter;
+                new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_ADD,
+                                asyncTaskCompletionNotifier).execute();
+            }
+        });
+
+        saveAsDailogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int whichButton)
+            {
+                dialog.dismiss();
+            }
+        });
+
+        saveAsDailogBuilder.show();
     }
 
     public void loadCriteria(SearchCriteriaDomain searchCriteriaDomain)
