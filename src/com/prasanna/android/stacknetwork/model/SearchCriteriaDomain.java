@@ -23,8 +23,9 @@ public class SearchCriteriaDomain
 {
     public long id;
     public String name;
-    public int ran = 0;
     public long created = 0L;
     public long lastModified = 0L;
+    public long lastRun = 0L;
+    public int runCount = 0;
     public SearchCriteria searchCriteria;
 }

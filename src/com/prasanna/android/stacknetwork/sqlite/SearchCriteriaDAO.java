@@ -67,6 +67,8 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         {
             ContentValues values = new ContentValues();
             values.put(SearchCriteriaTable.COLUMN_NAME, searchCriteriaDomain.name);
+            values.put(SearchCriteriaTable.COLUMN_RUN_COUNT, searchCriteriaDomain.runCount);
+            values.put(SearchCriteriaTable.COLUMN_LAST_RUN, searchCriteriaDomain.lastRun);
             values.put(SearchCriteriaTable.COLUMN_Q, searchCriteriaDomain.searchCriteria.getQuery());
             values.put(SearchCriteriaTable.COLUMN_SORT, searchCriteriaDomain.searchCriteria.getSort());
             values.put(SearchCriteriaTable.COLUMN_ANSWERS, searchCriteriaDomain.searchCriteria.getAnswerCount());
@@ -90,8 +92,10 @@ public class SearchCriteriaDAO extends AbstractBaseDao
     {
         if (searchCriteriaDomain != null)
         {
+            database.beginTransaction();
             delete(searchCriteriaDomain.id);
             searchCriteriaDomain.id = insert(searchCriteriaDomain);
+            database.endTransaction();
         }
 
         return searchCriteriaDomain;

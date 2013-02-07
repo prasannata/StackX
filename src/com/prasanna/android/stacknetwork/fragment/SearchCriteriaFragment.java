@@ -89,7 +89,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private Object tagFilterLock = new Object();
     private ArrayList<String> tags = new ArrayList<String>();
     private TagListAdapter tagArrayAdapter;
-    private SearchCriteria searchCriteria;
+    private SearchCriteriaDomain searchCriteriaDomain;
 
     class GetTagsFromDbAsyncTask extends AsyncTask<Void, Void, Void>
     {
@@ -138,10 +138,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 dao.open();
 
                 Log.d(TAG, "Saving search criteria");
-                SearchCriteriaDomain domain = new SearchCriteriaDomain();
-                domain.name = name;
-                domain.searchCriteria = searchCriteria;
-                dao.insert(domain);
+                searchCriteriaDomain.name = name;
+                dao.insert(searchCriteriaDomain);
                 return true;
             }
             catch (SQLException e)
@@ -499,27 +497,30 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             @Override
             public void onClick(View v)
             {
-                searchCriteria = SearchCriteria.newCriteria();
+                searchCriteriaDomain = new SearchCriteriaDomain();
+                searchCriteriaDomain.searchCriteria = SearchCriteria.newCriteria();
 
                 if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
-                    searchCriteria.setQuery(searchQuery.getText().toString().trim());
+                    searchCriteriaDomain.searchCriteria.setQuery(searchQuery.getText().toString().trim());
 
                 switch (includeAnswers.getCheckedRadioButtonId())
                 {
                     case R.id.hasAnswers:
-                        searchCriteria.setMinAnswers(1);
+                        searchCriteriaDomain.searchCriteria.setMinAnswers(1);
                         break;
                     case R.id.isAnswered:
-                        searchCriteria.mustBeAnswered();
+                        searchCriteriaDomain.searchCriteria.mustBeAnswered();
                         break;
                     default:
                         break;
                 }
 
-                searchCriteria.includeTags(includedTags).excludeTags(excludedTags);
+                searchCriteriaDomain.searchCriteria.includeTags(includedTags).excludeTags(excludedTags);
 
-                searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
-                onRunSearchListener.onRunSearch(searchCriteria.build());
+                searchCriteriaDomain.searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
+                searchCriteriaDomain.runCount++;
+                searchCriteriaDomain.lastRun = System.currentTimeMillis();
+                onRunSearchListener.onRunSearch(searchCriteriaDomain.searchCriteria.build());
                 AppUtils.hideSoftInput(getActivity(), v);
             }
         });
@@ -629,7 +630,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     public void saveCriteria(String name, AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
     {
-        if (name != null && searchCriteria != null)
+        if (name != null && searchCriteriaDomain != null)
         {
             new WriteCriteriaAsyncTask(name, asyncTaskCompletionNotifier).execute();
         }

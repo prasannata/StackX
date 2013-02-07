@@ -133,7 +133,7 @@ public class SearchCriteriaListActivity extends ListActivity
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
             viewHolder.created.setText("Created " + DateTimeUtils.getElapsedDurationSince(item.created / 1000));
-            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.ran) + " times");
+            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
             return convertView;
         }
 
