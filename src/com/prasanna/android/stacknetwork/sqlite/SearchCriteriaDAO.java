@@ -52,7 +52,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
                         + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
                         + " text, " + COLUMN_SORT + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED
                         + " integer, " + COLUMN_TAGGED + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_RUN_COUNT
-                        + " long DEFVAL 0, " + COLUMN_LAST_RUN + " long DEFVAL 0, " + COLUMN_CREATED
+                        + " long DEFAULT \'0\', " + COLUMN_LAST_RUN + " long DEFAULTL \'0\', " + COLUMN_CREATED
                         + " long not null, " + COLUMN_LAST_MODIFIED + " long not null);";
     }
 
