@@ -155,7 +155,7 @@ public class ProfileDAO extends AbstractBaseDao
         String[] selectionArgs =
         { String.valueOf(userId), site };
 
-        Cursor cursor = database.query(TABLE_NAME null, selection, selectionArgs, null, null, null);
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
