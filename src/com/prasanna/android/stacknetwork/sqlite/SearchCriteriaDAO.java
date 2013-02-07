@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
@@ -93,9 +95,22 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         if (searchCriteriaDomain != null)
         {
             database.beginTransaction();
-            delete(searchCriteriaDomain.id);
-            searchCriteriaDomain.id = insert(searchCriteriaDomain);
-            database.endTransaction();
+
+            try
+            {
+                delete(searchCriteriaDomain.id);
+                searchCriteriaDomain.id = insert(searchCriteriaDomain);
+                database.setTransactionSuccessful();
+            }
+            catch (SQLException e)
+            {
+                Log.d(TABLE_NAME, "Update failed: " + e.getMessage());
+            }
+            finally
+            {
+                database.endTransaction();
+            }
+
         }
 
         return searchCriteriaDomain;

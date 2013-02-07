@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Tag;
@@ -69,22 +70,40 @@ public class TagDAO extends AbstractBaseDao
         }
     }
 
-    public void insert(String site, HashSet<Tag> tags)
+    public boolean insert(String site, HashSet<Tag> tags)
     {
         if (tags != null && !tags.isEmpty())
         {
             Log.d(TAG, "inserting tags into DB for site " + site);
 
-            for (Tag tag : tags)
+            try
             {
-                ContentValues values = new ContentValues();
-                values.put(TagsTable.COLUMN_VALUE, tag.name);
-                values.put(TagsTable.COLUMN_SITE, site);
-                database.insert(TABLE_NAME, null, values);
-            }
+                database.beginTransaction();
 
-            insertAuditEntry(site);
+                for (Tag tag : tags)
+                {
+                    ContentValues values = new ContentValues();
+                    values.put(TagsTable.COLUMN_VALUE, tag.name);
+                    values.put(TagsTable.COLUMN_SITE, site);
+                    database.insert(TABLE_NAME, null, values);
+                }
+
+                insertAuditEntry(site);
+
+                database.setTransactionSuccessful();
+                return true;
+            }
+            catch (SQLException e)
+            {
+                Log.d(TABLE_NAME, "insert failed: " + e.getMessage());
+            }
+            finally
+            {
+                database.endTransaction();
+            }
         }
+
+        return false;
     }
 
     private void insertAuditEntry(String site)
