@@ -26,6 +26,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
+import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 
 public class SearchCriteriaDAO extends AbstractBaseDao
 {
@@ -40,13 +41,16 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         public static final String COLUMN_ANSWERED = "answered";
         public static final String COLUMN_TAGGED = "tagged";
         public static final String COLUMN_NOT_TAGGED = "not_tagged";
+        public static final String COLUMN_RUN_COUNT = "run_count";
+        public static final String COLUMN_LAST_RUN = "last_run";
         public static final String COLUMN_CREATED = "created";
         public static final String COLUMN_LAST_MODIFIED = "last_modified";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
                         + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED + " integer, " + COLUMN_TAGGED
-                        + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_CREATED + " long not null, "
+                        + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_RUN_COUNT + " long DEFVAL 0, "
+                        + COLUMN_LAST_RUN + " long DEFVAL 0, " + COLUMN_CREATED + " long not null, "
                         + COLUMN_LAST_MODIFIED + " long not null);";
     }
 
@@ -55,18 +59,19 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         super(context);
     }
 
-    public long insert(SearchCriteria searchCriteria)
+    public long insert(SearchCriteriaDomain searchCriteriaDomain)
     {
-        if (searchCriteria != null)
+        if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
         {
             ContentValues values = new ContentValues();
-            values.put(SearchCriteriaTable.COLUMN_NAME, searchCriteria.name);
-            values.put(SearchCriteriaTable.COLUMN_Q, searchCriteria.getQuery());
-            values.put(SearchCriteriaTable.COLUMN_ANSWERS, searchCriteria.getAnswerCount());
-            values.put(SearchCriteriaTable.COLUMN_ANSWERED, searchCriteria.isAnswered());
-            values.put(SearchCriteriaTable.COLUMN_TAGGED, searchCriteria.getIncludedTagsAsSemicolonDelimitedString());
+            values.put(SearchCriteriaTable.COLUMN_NAME, searchCriteriaDomain.name);
+            values.put(SearchCriteriaTable.COLUMN_Q, searchCriteriaDomain.searchCriteria.getQuery());
+            values.put(SearchCriteriaTable.COLUMN_ANSWERS, searchCriteriaDomain.searchCriteria.getAnswerCount());
+            values.put(SearchCriteriaTable.COLUMN_ANSWERED, searchCriteriaDomain.searchCriteria.isAnswered());
+            values.put(SearchCriteriaTable.COLUMN_TAGGED,
+                            searchCriteriaDomain.searchCriteria.getIncludedTagsAsSemicolonDelimitedString());
             values.put(SearchCriteriaTable.COLUMN_NOT_TAGGED,
-                            searchCriteria.getExcludedTagsAsSemicolonDelimitedString());
+                            searchCriteriaDomain.searchCriteria.getExcludedTagsAsSemicolonDelimitedString());
 
             long currentTimeMillis = System.currentTimeMillis();
             values.put(SearchCriteriaTable.COLUMN_CREATED, currentTimeMillis);
@@ -78,18 +83,18 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         return -1L;
     }
 
-    public SearchCriteria update(SearchCriteria searchCriteria)
+    public SearchCriteriaDomain update(SearchCriteriaDomain searchCriteriaDomain)
     {
-        if (searchCriteria != null)
+        if (searchCriteriaDomain != null)
         {
-            delete(searchCriteria.dbId);
-            searchCriteria.dbId = insert(searchCriteria);
+            delete(searchCriteriaDomain.id);
+            searchCriteriaDomain.id = insert(searchCriteriaDomain);
         }
 
-        return searchCriteria;
+        return searchCriteriaDomain;
     }
 
-    public ArrayList<SearchCriteria> readAll()
+    public ArrayList<SearchCriteriaDomain> readAll()
     {
         String orderBy = SearchCriteriaTable.COLUMN_CREATED + " ASC";
 
@@ -98,7 +103,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        ArrayList<SearchCriteria> criteriaList = new ArrayList<SearchCriteria>();
+        ArrayList<SearchCriteriaDomain> criteriaList = new ArrayList<SearchCriteriaDomain>();
         cursor.moveToFirst();
 
         while (!cursor.isAfterLast())
@@ -110,11 +115,16 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         return criteriaList;
     }
 
-    private SearchCriteria getCriteria(Cursor cursor)
+    private SearchCriteriaDomain getCriteria(Cursor cursor)
     {
+        SearchCriteriaDomain domain = new SearchCriteriaDomain();
         SearchCriteria criteria = SearchCriteria.newCriteria();
-        criteria.dbId = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
-        criteria.name = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_NAME));
+
+        domain.id = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
+        domain.name = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_NAME));
+        domain.created = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_CREATED));
+        domain.lastModified = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_MODIFIED));
+
         criteria.setQuery(cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_Q)));
         criteria.setMinAnswers(cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ANSWERS)));
         criteria.addIncludedTagsAsSemiColonDelimitedString(cursor.getString(cursor
@@ -123,9 +133,9 @@ public class SearchCriteriaDAO extends AbstractBaseDao
                         .getColumnIndex(SearchCriteriaTable.COLUMN_NOT_TAGGED)));
         if (cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ANSWERED)) == 1)
             criteria.mustBeAnswered();
-        criteria.created = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_CREATED));
-        criteria.lastModified = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_MODIFIED));
-        return criteria;
+
+        domain.searchCriteria = criteria;
+        return domain;
     }
 
     public void delete(long id)

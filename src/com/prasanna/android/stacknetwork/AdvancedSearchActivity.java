@@ -19,12 +19,16 @@
 
 package com.prasanna.android.stacknetwork;
 
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
@@ -114,22 +118,51 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         if (item.getItemId() == R.id.menu_save)
         {
             if (searchCriteriaFragment != null)
-                searchCriteriaFragment.saveCriteria(new AsyncTaskCompletionNotifier<Boolean>()
-                                {
-                    @Override
-                    public void notifyOnCompletion(Boolean result)
+            {
+                AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(this);
+                saveAsDailogBuilder.setTitle("Save As");
+
+                final EditText input = new EditText(this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                saveAsDailogBuilder.setView(input);
+
+                saveAsDailogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int whichButton)
                     {
-                        String toastMsg;
-                        
-                        if(result)
-                            toastMsg = "Criteria saved";
-                        else
-                            toastMsg = "Cannot save criteria";
-                        
-                        Toast.makeText(AdvancedSearchActivity.this, toastMsg, Toast.LENGTH_LONG).show();
+                        searchCriteriaFragment.saveCriteria(input.getText().toString(),
+                                        new AsyncTaskCompletionNotifier<Boolean>()
+                                        {
+                                            @Override
+                                            public void notifyOnCompletion(Boolean result)
+                                            {
+                                                String toastMsg;
+
+                                                if (result)
+                                                    toastMsg = "Criteria saved";
+                                                else
+                                                    toastMsg = "Cannot save criteria";
+
+                                                Toast.makeText(AdvancedSearchActivity.this, toastMsg, Toast.LENGTH_LONG)
+                                                                .show();
+                                            }
+                                        });
                     }
                 });
-            
+
+                saveAsDailogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int whichButton)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+
+                saveAsDailogBuilder.show();
+            }
+
             return true;
         }
         else

@@ -75,7 +75,10 @@
     <string name="addComment">Add comment</string>
     <string name="post">Post</string>
     <string name="save">Save</string>
-    <string name="plusTab">+ Tab</string>
+    <string name="tab">Tab</string>
+    <string name="created">Created</string>
+    <string name="modified">Modified</string>
+    <string name="ran">Ran</string>
 
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>

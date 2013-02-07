@@ -125,6 +125,9 @@
         <activity
             android:name=".FullscreenTextActivity"
             android:configChanges="orientation|screenSize" />
+        <activity
+            android:name=".SearchCriteriaListActivity"
+            android:configChanges="orientation|screenSize" />
     </application>
 
 </manifest>

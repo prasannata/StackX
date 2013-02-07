@@ -52,6 +52,16 @@
                 android:layout_toLeftOf="@id/clearCriteria"
                 android:clickable="true"
                 android:src="@drawable/search_white_32x32" />
+
+            <ImageView
+                android:id="@+id/loadCriteria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_margin="3dp"
+                android:layout_toLeftOf="@id/runSearch"
+                android:clickable="true"
+                android:src="@drawable/collections_white_32x32" />
         </RelativeLayout>
 
         <EditText
@@ -118,7 +128,7 @@
                 android:textSize="15sp" />
 
             <ToggleButton
-                android:id="@+id/toggleIncludeUnknownTag"
+                android:id="@+id/toggleIncludeTag"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -130,7 +140,7 @@
                 android:textOn="@string/plusSign" />
 
             <ToggleButton
-                android:id="@+id/toggleExcludeUnknownTag"
+                android:id="@+id/toggleExcludeTag"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2012 Prasanna Thirumalai
+ Copyright (C) 2013 Prasanna Thirumalai
 
  This file is part of StackX.
 
@@ -85,11 +85,6 @@ public class SearchCriteria implements Serializable
     private ArrayList<String> excludeTags;
     private int page = 1;
 
-    public long dbId = -1;
-    public String name;
-    public long created = 0L;
-    public long lastModified = 0L;
-    
     public static SearchCriteria newCriteria(String query)
     {
         self = new SoftReference<SearchCriteria>(new SearchCriteria(query));
@@ -191,17 +186,17 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria addIncludedTagsAsSemiColonDelimitedString(String tags)
     {
-        if(tags != null)
+        if (tags != null)
             criteria.put(TAGGED, tags);
-        
+
         return this;
     }
 
     public SearchCriteria addExcludedTagsAsSemiColonDelimitedString(String tags)
     {
-        if(tags != null)
+        if (tags != null)
             criteria.put(NOT_TAGGED, tags);
-        
+
         return this;
     }
 
@@ -209,7 +204,7 @@ public class SearchCriteria implements Serializable
     {
         return criteria.get(Q);
     }
-    
+
     public boolean isAnswered()
     {
         return criteria.get(ACCEPTED) != null && Boolean.valueOf(criteria.get(ACCEPTED));
@@ -219,17 +214,17 @@ public class SearchCriteria implements Serializable
     {
         return criteria.get(ANSWERS) == null ? 0 : Integer.valueOf(criteria.get(ANSWERS));
     }
-    
+
     public String getIncludedTagsAsSemicolonDelimitedString()
     {
         return criteria.get(TAGGED);
     }
-    
+
     public String getExcludedTagsAsSemicolonDelimitedString()
     {
         return criteria.get(NOT_TAGGED);
     }
-    
+
     public SearchCriteria build()
     {
         if (page == 1)
@@ -260,6 +255,11 @@ public class SearchCriteria implements Serializable
         }
 
         return sb.toString();
+    }
+
+    public String getSort()
+    {
+        return criteria.get(SORT);
     }
 
     public SearchCriteria nextPage()

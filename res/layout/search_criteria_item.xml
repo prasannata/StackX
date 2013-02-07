@@ -2,31 +2,111 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dp"
-    android:background="@color/white"
-    android:orientation="horizontal" >
+    android:background="@drawable/rounded_border_grey_min_padding"
+    android:orientation="horizontal"
+    android:padding="2dp" >
 
-    <CheckBox
-        android:id="@+id/deleteItemCheckbox"
+    <LinearLayout
+        android:id="@+id/itemOptions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_gravity="center"
-        android:layout_marginLeft="5dp"
-        android:padding="2dp"
-        android:button="@drawable/checkbox"
-        android:gravity="center" />
+        android:layout_centerVertical="true"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/itemText"
+        <CheckBox
+            android:id="@+id/deleteItemCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_marginLeft="5dp"
+            android:button="@drawable/checkbox"
+            android:gravity="center"
+            android:padding="2dp" />
+
+        <ToggleButton
+            android:id="@+id/addTabToggle"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:background="@drawable/rounded_border_grey_min_padding"
+            android:gravity="center"
+            android:textColor="@color/lightGrey"
+            android:textOff="@string/tab"
+            android:textOn="@string/tab"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_gravity="center"
         android:layout_margin="2dp"
-        android:layout_toRightOf="@id/deleteItemCheckbox"
-        android:gravity="left"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:layout_toRightOf="@id/itemOptions"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/itemText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:gravity="left"
+            android:paddingLeft="5dp"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/itemDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/itemText"
+            android:layout_alignRight="@id/itemText"
+            android:layout_below="@id/itemText"
+            android:layout_toRightOf="@id/itemOptions"
+            android:gravity="left"
+            android:paddingLeft="5dp"
+            android:textColor="@color/grey"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/itemRan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/itemDetails"
+            android:layout_margin="5dp"
+            android:gravity="left"
+            android:text="@string/ran"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
+
+        <TextView
+            android:id="@+id/itemModified"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/itemDetails"
+            android:layout_margin="5dp"
+            android:layout_toLeftOf="@id/itemRan"
+            android:gravity="left"
+            android:text="@string/modified"
+            android:textColor="@color/black"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/itemCreated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/itemDetails"
+            android:layout_margin="5dp"
+            android:layout_toLeftOf="@id/itemModified"
+            android:gravity="left"
+            android:text="@string/created"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
+    </RelativeLayout>
 
 </RelativeLayout>
