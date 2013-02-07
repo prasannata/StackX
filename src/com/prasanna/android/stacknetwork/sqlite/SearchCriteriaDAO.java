@@ -27,6 +27,7 @@ import android.database.Cursor;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
+import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
 
 public class SearchCriteriaDAO extends AbstractBaseDao
 {
@@ -37,6 +38,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_Q = "q";
+        public static final String COLUMN_SORT = "sort";
         public static final String COLUMN_ANSWERS = "answers";
         public static final String COLUMN_ANSWERED = "answered";
         public static final String COLUMN_TAGGED = "tagged";
@@ -48,10 +50,10 @@ public class SearchCriteriaDAO extends AbstractBaseDao
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
-                        + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED + " integer, " + COLUMN_TAGGED
-                        + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_RUN_COUNT + " long DEFVAL 0, "
-                        + COLUMN_LAST_RUN + " long DEFVAL 0, " + COLUMN_CREATED + " long not null, "
-                        + COLUMN_LAST_MODIFIED + " long not null);";
+                        + " text, " + COLUMN_SORT + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED
+                        + " integer, " + COLUMN_TAGGED + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_RUN_COUNT
+                        + " long DEFVAL 0, " + COLUMN_LAST_RUN + " long DEFVAL 0, " + COLUMN_CREATED
+                        + " long not null, " + COLUMN_LAST_MODIFIED + " long not null);";
     }
 
     public SearchCriteriaDAO(Context context)
@@ -66,6 +68,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
             ContentValues values = new ContentValues();
             values.put(SearchCriteriaTable.COLUMN_NAME, searchCriteriaDomain.name);
             values.put(SearchCriteriaTable.COLUMN_Q, searchCriteriaDomain.searchCriteria.getQuery());
+            values.put(SearchCriteriaTable.COLUMN_SORT, searchCriteriaDomain.searchCriteria.getSort());
             values.put(SearchCriteriaTable.COLUMN_ANSWERS, searchCriteriaDomain.searchCriteria.getAnswerCount());
             values.put(SearchCriteriaTable.COLUMN_ANSWERED, searchCriteriaDomain.searchCriteria.isAnswered());
             values.put(SearchCriteriaTable.COLUMN_TAGGED,
@@ -125,6 +128,9 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         domain.created = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_CREATED));
         domain.lastModified = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_MODIFIED));
 
+        String sort = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_SORT));
+        if (sort != null)
+            criteria.sortBy(SearchSort.getEnum(sort));
         criteria.setQuery(cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_Q)));
         criteria.setMinAnswers(cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ANSWERS)));
         criteria.addIncludedTagsAsSemiColonDelimitedString(cursor.getString(cursor

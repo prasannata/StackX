@@ -116,7 +116,8 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria setMinAnswers(int minAns)
     {
-        criteria.put(ANSWERS, String.valueOf(minAns));
+        if (minAns > 0)
+            criteria.put(ANSWERS, String.valueOf(minAns));
         return this;
     }
 
@@ -128,7 +129,8 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria sortBy(SearchSort searchSort)
     {
-        criteria.put(SORT, searchSort.getValue());
+        if (searchSort != null)
+            criteria.put(SORT, searchSort.getValue());
         return this;
     }
 

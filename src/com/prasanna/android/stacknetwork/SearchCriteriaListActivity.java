@@ -134,8 +134,8 @@ public class SearchCriteriaListActivity extends ListActivity
                             && !searchCriteriaDomain.searchCriteria.getQuery().equals(""))
                 builder.append("query: " + searchCriteriaDomain.searchCriteria.getQuery() + ", ");
 
-            builder.append(". sort: " + searchCriteriaDomain.searchCriteria.getSort());
-            builder.append("answer count: " + searchCriteriaDomain.searchCriteria.getAnswerCount());
+            builder.append("sort: " + searchCriteriaDomain.searchCriteria.getSort());
+            builder.append(", answers: " + (searchCriteriaDomain.searchCriteria.getAnswerCount() > 0));
             builder.append(", answered: " + searchCriteriaDomain.searchCriteria.isAnswered());
 
             if (searchCriteriaDomain.searchCriteria.getIncludedTagsAsSemicolonDelimitedString() != null)
