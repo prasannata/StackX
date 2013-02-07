@@ -84,25 +84,12 @@
             android:textSize="10sp" />
 
         <TextView
-            android:id="@+id/itemModified"
+            android:id="@+id/itemLastRun"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/itemDetails"
             android:layout_margin="5dp"
             android:layout_toLeftOf="@id/itemRan"
-            android:gravity="left"
-            android:text="@string/modified"
-            android:textColor="@color/black"
-            android:textSize="10sp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/itemCreated"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/itemDetails"
-            android:layout_margin="5dp"
-            android:layout_toLeftOf="@id/itemModified"
             android:gravity="left"
             android:text="@string/created"
             android:textColor="@color/black"

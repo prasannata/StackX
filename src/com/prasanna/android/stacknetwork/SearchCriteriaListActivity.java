@@ -53,8 +53,7 @@ public class SearchCriteriaListActivity extends ListActivity
         TextView itemText;
         ToggleButton addAsTabToggle;
         TextView itemDetails;
-        TextView created;
-        TextView modified;
+        TextView lastRun;
         TextView ran;
     }
 
@@ -121,8 +120,7 @@ public class SearchCriteriaListActivity extends ListActivity
                 viewHolder.itemText = (TextView) convertView.findViewById(R.id.itemText);
                 viewHolder.itemDetails = (TextView) convertView.findViewById(R.id.itemDetails);
                 viewHolder.addAsTabToggle = (ToggleButton) convertView.findViewById(R.id.addTabToggle);
-                viewHolder.created = (TextView) convertView.findViewById(R.id.itemCreated);
-                viewHolder.modified = (TextView) convertView.findViewById(R.id.itemModified);
+                viewHolder.lastRun = (TextView) convertView.findViewById(R.id.itemLastRun);
                 viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
                 convertView.setTag(viewHolder);
             }
@@ -132,7 +130,7 @@ public class SearchCriteriaListActivity extends ListActivity
             SearchCriteriaDomain item = getItem(position);
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
-            viewHolder.created.setText("Created " + DateTimeUtils.getElapsedDurationSince(item.created / 1000));
+            viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.created / 1000));
             viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
             return convertView;
         }

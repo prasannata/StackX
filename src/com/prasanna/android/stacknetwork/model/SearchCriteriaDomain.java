@@ -21,7 +21,7 @@ package com.prasanna.android.stacknetwork.model;
 
 public class SearchCriteriaDomain
 {
-    public long id;
+    public long id = 0L;
     public String name;
     public long created = 0L;
     public long lastModified = 0L;

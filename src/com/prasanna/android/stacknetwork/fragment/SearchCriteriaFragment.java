@@ -139,7 +139,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
                 Log.d(TAG, "Saving search criteria");
                 searchCriteriaDomain.name = name;
-                dao.insert(searchCriteriaDomain);
+                if (searchCriteriaDomain.id > 0)
+                    dao.update(searchCriteriaDomain);
+                else
+                    dao.insert(searchCriteriaDomain);
                 return true;
             }
             catch (SQLException e)

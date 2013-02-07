@@ -145,6 +145,8 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         domain.id = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
         domain.name = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_NAME));
         domain.created = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_CREATED));
+        domain.runCount = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_RUN_COUNT));
+        domain.lastRun = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_RUN));
         domain.lastModified = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_MODIFIED));
 
         String sort = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_SORT));
@@ -166,8 +168,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
     public void delete(long id)
     {
         String whereClause = SearchCriteriaTable.COLUMN_ID + " = ?";
-        String[] whereArgs =
-        { String.valueOf(id) };
+        String[] whereArgs = { String.valueOf(id) };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
     }
