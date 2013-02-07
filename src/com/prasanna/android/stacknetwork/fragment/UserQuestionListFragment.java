@@ -44,7 +44,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     private Intent intent;
     private int page = 0;
     private int action;
-    private boolean initialServiceRan = false;
+    private boolean activityCreated = false;
 
     public static UserQuestionListFragment newFragment(int action)
     {
@@ -76,17 +76,30 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onResume()
+    public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(getLogTag(), "onResume");
+        Log.d(TAG, "onActivityCreated");
+        
+        super.onActivityCreated(savedInstanceState);
+        
+        if (savedInstanceState != null)
+            action = savedInstanceState.getInt(StringConstants.ACTION);
 
-        super.onResume();
-
-        if (!initialServiceRan)
+        if (!activityCreated)
         {
             startIntentService();
-            initialServiceRan = true;
+            activityCreated = true;
         }
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        Log.d(TAG, "onSaveInstanceState");
+        
+        outState.putInt(StringConstants.ACTION, action);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -98,16 +111,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
 
         menu.removeItem(R.id.q_ctx_comments);
         menu.removeItem(R.id.q_ctx_menu_user_profile);
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        Log.d(getLogTag(), "onDestroy");
-
-        super.onDestroy();
-
-        stopService(intent);
     }
 
     @Override
@@ -136,7 +139,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
                             .getLongExtra(StringConstants.USER_ID, 0L));
             intent.putExtra(StringConstants.PAGE, ++page);
             intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-            
+
             startService(intent);
         }
     }

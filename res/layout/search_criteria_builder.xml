@@ -128,7 +128,7 @@
                 android:textSize="15sp" />
 
             <ToggleButton
-                android:id="@+id/toggleIncludeTag"
+                android:id="@+id/toggleTagged"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -140,7 +140,7 @@
                 android:textOn="@string/plusSign" />
 
             <ToggleButton
-                android:id="@+id/toggleExcludeTag"
+                android:id="@+id/toggleNotTagged"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"

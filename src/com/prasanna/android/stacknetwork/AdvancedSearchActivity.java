@@ -125,22 +125,18 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 @Override
                 public void notifyOnCompletion(Boolean result)
                 {
-                    String toastMsg;
-
                     if (result)
-                        toastMsg = "Criteria saved";
+                        getActionBar().setTitle(searchCriteriaFragment.getCriteriaName());
                     else
-                        toastMsg = "Cannot save criteria";
-
-                    Toast.makeText(AdvancedSearchActivity.this, toastMsg, Toast.LENGTH_LONG).show();
+                        Toast.makeText(AdvancedSearchActivity.this, "Cannot save criteria", Toast.LENGTH_LONG).show();
                 }
             };
-            
+
             searchCriteriaFragment.saveCriteria(asyncTaskCompletionNotifier);
             return true;
         }
-        else
-            return super.onOptionsItemSelected(item);
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -130,22 +130,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         }
     }
 
-    @Override
-    public void onStop()
-    {
-        Log.d(TAG, "onStop");
-
-        super.onStop();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        Log.d(TAG, "onSaveInstanceState");
-
-        super.onSaveInstanceState(outState);
-    }
-
     protected void showProgressBar()
     {
         getProgressBar().setVisibility(View.VISIBLE);

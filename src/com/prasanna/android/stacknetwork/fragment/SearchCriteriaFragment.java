@@ -73,26 +73,28 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private static final String SELECTED_TAGS_LL_PREFIX_TAG = "selectedTags:ll:";
     private static final String SELECTED_TAGS_TV_PREFIX_TAG = "selectedTags:tv:";
 
-    private Spinner sortSpinner;
+    private boolean savedCriteria = false;
+    private int currentNumRowsOfSelectedTags = 0;
+    private OnRunSearchListener onRunSearchListener;
+    private Object tagFilterLock = new Object();
+    private TagListAdapter tagArrayAdapter;
+    private SearchCriteriaDomain searchCriteriaDomain;
     private ArrayList<String> sortOptionArray;
+    private HashSet<String> taggedSet = new HashSet<String>();;
+    private HashSet<String> notTaggedSet = new HashSet<String>();;
+    private ArrayList<String> tags = new ArrayList<String>();
+
+    private ScrollView criteriaLayout;
     private EditText searchQuery;
     private AutoCompleteTextView tagEditText;
     private ImageView runSearch;
     private ImageView loadCriteria;
     private ImageView clearCriteria;
-    private ToggleButton toggleButtonTagToInclude;
-    private ToggleButton toggleButtonTagToExclude;
-    private ScrollView criteriaLayout;
-    private OnRunSearchListener onRunSearchListener;
+    private ToggleButton toggleTagged;
+    private ToggleButton toggleNotTagged;
+    private Spinner sortSpinner;
     private RadioGroup includeAnswers;
     private LinearLayout selectedTags;
-    private int currentNumRowsOfSelectedTags = 0;
-    private HashSet<String> includedTags = new HashSet<String>();;
-    private HashSet<String> excludedTags = new HashSet<String>();;
-    private Object tagFilterLock = new Object();
-    private ArrayList<String> tags = new ArrayList<String>();
-    private TagListAdapter tagArrayAdapter;
-    private SearchCriteriaDomain searchCriteriaDomain;
 
     class GetTagsFromDbAsyncTask extends AsyncTask<Void, Void, Void>
     {
@@ -293,35 +295,36 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         super.onCreate(savedInstanceState);
 
-        criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
+        if (criteriaLayout == null)
+        {
+            criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
 
-        searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
-        selectedTags = (LinearLayout) criteriaLayout.findViewById(R.id.selectedTags);
-        tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
-        tagEditText.addTextChangedListener(this);
-        tagEditText.setThreshold(1);
-        tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
-        tagEditText.setAdapter(tagArrayAdapter);
+            searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
+            selectedTags = (LinearLayout) criteriaLayout.findViewById(R.id.selectedTags);
+            tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
+            includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
+            sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
+            runSearch = (ImageView) criteriaLayout.findViewById(R.id.runSearch);
+            loadCriteria = (ImageView) criteriaLayout.findViewById(R.id.loadCriteria);
+            clearCriteria = (ImageView) criteriaLayout.findViewById(R.id.clearCriteria);
+            toggleTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleTagged);
+            toggleNotTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleNotTagged);
 
-        includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
+            tagEditText.addTextChangedListener(this);
+            tagEditText.setThreshold(1);
+            tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
+            tagEditText.setAdapter(tagArrayAdapter);
 
-        sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
-        runSearch = (ImageView) criteriaLayout.findViewById(R.id.runSearch);
-        loadCriteria = (ImageView) criteriaLayout.findViewById(R.id.loadCriteria);
-        clearCriteria = (ImageView) criteriaLayout.findViewById(R.id.clearCriteria);
-
-        toggleButtonTagToInclude = (ToggleButton) criteriaLayout.findViewById(R.id.toggleIncludeTag);
-        toggleButtonTagToExclude = (ToggleButton) criteriaLayout.findViewById(R.id.toggleExcludeTag);
-
-        prepareToggleButtonTagToInclude();
-        prepareTogglBeuttonTagToExclude();
-
+            prepareToggedToggleButton();
+            prepareNotTaggedToggleButton();
+        }
+        
         return criteriaLayout;
     }
 
-    private void prepareToggleButtonTagToInclude()
+    private void prepareToggedToggleButton()
     {
-        toggleButtonTagToInclude.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        toggleTagged.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
@@ -342,15 +345,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 if (unknownTag != null && unknownTag.length() > 0)
                     updateSelectedTags(unknownTag, true, isChecked);
 
-                if (isChecked && toggleButtonTagToExclude.isChecked())
-                    toggleButtonTagToExclude.setChecked(false);
+                if (isChecked && toggleNotTagged.isChecked())
+                    toggleNotTagged.setChecked(false);
             }
         });
     }
 
-    private void prepareTogglBeuttonTagToExclude()
+    private void prepareNotTaggedToggleButton()
     {
-        toggleButtonTagToExclude.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        toggleNotTagged.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
@@ -371,8 +374,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 if (unknownTag != null && unknownTag.length() > 0)
                     updateSelectedTags(unknownTag, false, isChecked);
 
-                if (isChecked && toggleButtonTagToInclude.isChecked())
-                    toggleButtonTagToInclude.setChecked(false);
+                if (isChecked && toggleTagged.isChecked())
+                    toggleTagged.setChecked(false);
 
                 tagEditText.setText("");
             }
@@ -387,19 +390,19 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         {
             if (include)
             {
-                if (!includedTags.contains(tag))
+                if (!taggedSet.contains(tag))
                 {
-                    includedTags.add(tag);
-                    Log.d(TAG, tag + " added to included");
+                    taggedSet.add(tag);
+                    Log.d(TAG, tag + " tagged");
                     addTagView(textView, R.color.lichen);
                 }
             }
             else
             {
-                if (!excludedTags.contains(tag))
+                if (!notTaggedSet.contains(tag))
                 {
-                    excludedTags.add(tag);
-                    Log.d(TAG, tag + " added to excluded");
+                    notTaggedSet.add(tag);
+                    Log.d(TAG, tag + " not tagged");
                     addTagView(textView, R.color.pulp);
                 }
             }
@@ -408,13 +411,13 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         {
             if (include)
             {
-                includedTags.remove(tag);
+                taggedSet.remove(tag);
                 Log.d(TAG, tag + " removed from included");
                 removeTagView(tag, include, textView);
             }
             else
             {
-                excludedTags.remove(tag);
+                notTaggedSet.remove(tag);
                 Log.d(TAG, tag + " removed from excluded");
                 removeTagView(tag, include, textView);
             }
@@ -489,7 +492,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private void removeTagView(String tag, boolean include, TextView textView)
     {
         LinearLayout parent = (LinearLayout) textView.getParent();
-        boolean addedToOther = include ? excludedTags.contains(tag) : includedTags.contains(tag);
+        boolean addedToOther = include ? notTaggedSet.contains(tag) : taggedSet.contains(tag);
         if (parent != null && !addedToOther)
             parent.removeView(textView);
     }
@@ -543,8 +546,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 ((RadioButton) includeAnswers.findViewById(R.id.hasAnswers)).setChecked(true);
         }
 
-        addTags(searchCriteriaDomain.searchCriteria.getTaggedArray(), R.color.lichen, includedTags);
-        addTags(searchCriteriaDomain.searchCriteria.getNotTaggedArray(), R.color.pulp, excludedTags);
+        addTags(searchCriteriaDomain.searchCriteria.getTaggedArray(), R.color.lichen, taggedSet);
+        addTags(searchCriteriaDomain.searchCriteria.getNotTaggedArray(), R.color.pulp, notTaggedSet);
     }
 
     private void addTags(String[] tagArray, int colorResource, HashSet<String> destination)
@@ -588,7 +591,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         break;
                 }
 
-                searchCriteriaDomain.searchCriteria.includeTags(includedTags).excludeTags(excludedTags);
+                searchCriteriaDomain.searchCriteria.includeTags(taggedSet).excludeTags(notTaggedSet);
 
                 searchCriteriaDomain.searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
                 searchCriteriaDomain.runCount++;
@@ -619,14 +622,22 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             @Override
             public void onClick(View v)
             {
-                searchQuery.setText("");
-                tagEditText.setText("");
-                sortSpinner.setSelection(0);
-                includeAnswers.clearCheck();
-                includedTags.clear();
-                excludedTags.clear();
                 selectedTags.removeAllViews();
-                selectedTags.setVisibility(View.GONE);
+
+                if (savedCriteria)
+                {
+                    showSavedSearchCriteria();
+                }
+                else
+                {
+                    searchQuery.setText("");
+                    tagEditText.setText("");
+                    sortSpinner.setSelection(0);
+                    includeAnswers.clearCheck();
+                    taggedSet.clear();
+                    notTaggedSet.clear();
+                    selectedTags.setVisibility(View.GONE);
+                }
                 AppUtils.hideSoftInput(getActivity(), v);
             }
         });
@@ -637,8 +648,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     {
         if (s == null || s.length() == 0)
         {
-            toggleButtonTagToInclude.setChecked(false);
-            toggleButtonTagToExclude.setChecked(false);
+            toggleTagged.setChecked(false);
+            toggleNotTagged.setChecked(false);
         }
         else
         {
@@ -685,15 +696,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private void onFilterCompleteHandler(final Editable s, int count)
     {
-        if (includedTags.contains(s.toString()))
-            toggleButtonTagToInclude.setChecked(true);
+        if (taggedSet.contains(s.toString()))
+            toggleTagged.setChecked(true);
         else
-            toggleButtonTagToInclude.setChecked(false);
+            toggleTagged.setChecked(false);
 
-        if (excludedTags.contains(s.toString()))
-            toggleButtonTagToExclude.setChecked(true);
+        if (notTaggedSet.contains(s.toString()))
+            toggleNotTagged.setChecked(true);
         else
-            toggleButtonTagToExclude.setChecked(false);
+            toggleNotTagged.setChecked(false);
     }
 
     public void hideSoftInput()
@@ -748,6 +759,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     public void loadCriteria(SearchCriteriaDomain searchCriteriaDomain)
     {
-        this.searchCriteriaDomain = searchCriteriaDomain;
+        if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
+        {
+            savedCriteria = true;
+            this.searchCriteriaDomain = searchCriteriaDomain;
+        }
+    }
+
+    public String getCriteriaName()
+    {
+        return searchCriteriaDomain != null ? searchCriteriaDomain.name : null;
     }
 }
