@@ -19,22 +19,20 @@
 
 package com.prasanna.android.stacknetwork;
 
-import android.app.AlertDialog;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSearchListener;
 import com.prasanna.android.stacknetwork.fragment.SearchQuestionListFragment;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
+import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener
@@ -60,6 +58,10 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
             questionListFragment = (SearchQuestionListFragment) getFragmentManager().findFragmentById(
                             R.id.questionListFragment);
             viewInitialized = true;
+
+            if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
+                searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
+                                StringConstants.SEARCH_CRITERIA));
         }
 
         showOrHideQuestionListFragment(getResources().getConfiguration());
@@ -100,6 +102,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         boolean ret = super.onPrepareOptionsMenu(menu);
 
         menu.removeItem(R.id.menu_refresh);
+        menu.removeItem(R.id.menu_advanced_search);
 
         return ret & true;
     }
@@ -117,52 +120,23 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     {
         if (item.getItemId() == R.id.menu_save)
         {
-            if (searchCriteriaFragment != null)
+            AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<Boolean>()
             {
-                AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(this);
-                saveAsDailogBuilder.setTitle("Save As");
-
-                final EditText input = new EditText(this);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                LinearLayout.LayoutParams.MATCH_PARENT);
-                input.setLayoutParams(lp);
-                saveAsDailogBuilder.setView(input);
-
-                saveAsDailogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener()
+                @Override
+                public void notifyOnCompletion(Boolean result)
                 {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        searchCriteriaFragment.saveCriteria(input.getText().toString(),
-                                        new AsyncTaskCompletionNotifier<Boolean>()
-                                        {
-                                            @Override
-                                            public void notifyOnCompletion(Boolean result)
-                                            {
-                                                String toastMsg;
+                    String toastMsg;
 
-                                                if (result)
-                                                    toastMsg = "Criteria saved";
-                                                else
-                                                    toastMsg = "Cannot save criteria";
+                    if (result)
+                        toastMsg = "Criteria saved";
+                    else
+                        toastMsg = "Cannot save criteria";
 
-                                                Toast.makeText(AdvancedSearchActivity.this, toastMsg, Toast.LENGTH_LONG)
-                                                                .show();
-                                            }
-                                        });
-                    }
-                });
-
-                saveAsDailogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
-                {
-                    public void onClick(DialogInterface dialog, int whichButton)
-                    {
-                        dialog.dismiss();
-                    }
-                });
-
-                saveAsDailogBuilder.show();
-            }
-
+                    Toast.makeText(AdvancedSearchActivity.this, toastMsg, Toast.LENGTH_LONG).show();
+                }
+            };
+            
+            searchCriteriaFragment.saveCriteria(asyncTaskCompletionNotifier);
             return true;
         }
         else

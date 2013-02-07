@@ -31,5 +31,33 @@ public class SearchCriteriaDomain implements Serializable
     public long lastModified = 0L;
     public long lastRun = 0L;
     public int runCount = 0;
+    public boolean tab = false;
+    public String site;
     public SearchCriteria searchCriteria;
+    
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SearchCriteriaDomain other = (SearchCriteriaDomain) obj;
+        if (id != other.id)
+            return false;
+        return true;
+    }
+    
+    
 }

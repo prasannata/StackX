@@ -21,7 +21,6 @@ package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
 
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
@@ -29,12 +28,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,14 +48,18 @@ import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
-public class SearchCriteriaListActivity extends ListActivity
+public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 {
     private static final String TAG = SearchCriteriaListActivity.class.getSimpleName();
-
+    private static final String ACTION_BAR_TITLE = "Saved Searches";
     private SearchCriteriaArrayAdapter searchCriteriaArrayAdapter;
+    private ListView listView;
+    private ArrayList<SearchCriteriaDomain> toDeleteList = new ArrayList<SearchCriteriaDomain>();
+    private ArrayList<Long> criteriaIdsAsTab = new ArrayList<Long>();
 
     static class SearchCriteriaViewHolder
     {
@@ -66,14 +72,70 @@ public class SearchCriteriaListActivity extends ListActivity
         TextView ran;
     }
 
-    class ReadAllSearchCriteriaFromDbAsyncTask extends AsyncTask<Void, Void, ArrayList<SearchCriteriaDomain>>
+    private class AddDelCriteriaTabAsyncTaskCompletionNotifier implements AsyncTaskCompletionNotifier<Boolean>
     {
+        private View view;
+        private int action;
+        private SearchCriteriaDomain domain;
 
+        public AddDelCriteriaTabAsyncTaskCompletionNotifier(View view, SearchCriteriaDomain domain, int action)
+        {
+            this.view = view;
+            this.domain = domain;
+            this.action = action;
+        }
+
+        @Override
+        public void notifyOnCompletion(Boolean result)
+        {
+            String toastMsg = domain != null ? domain.name : "";
+
+            switch (action)
+            {
+                case WriteCriteriaAsyncTask.ACTION_DEL:
+                    toastMsg += " delete ";
+                    if (result)
+                        searchCriteriaArrayAdapter.remove(domain);
+                    break;
+                case WriteCriteriaAsyncTask.ACTION_DEL_MANY:
+                    toastMsg += "delete ";
+                    if (result)
+                        searchCriteriaArrayAdapter.remove(domain);
+                    break;
+
+                case WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB:
+                    toastMsg += " add tab";
+                    if (result)
+                        criteriaIdsAsTab.add(domain.id);
+                    else
+                        ((ToggleButton) view).setChecked(false);
+                    break;
+                case WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB:
+                    toastMsg += " remove tab ";
+                    if (result)
+                        criteriaIdsAsTab.remove(domain.id);
+                    else
+                        ((ToggleButton) view).setChecked(false);
+                    break;
+
+            }
+
+            if (result)
+                Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " succeeded", Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " failed", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class ReadAllSearchCriteriaFromDbAsyncTask extends AsyncTask<Void, Void, ArrayList<SearchCriteriaDomain>>
+    {
         private AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier;
+        private String site;
 
-        public ReadAllSearchCriteriaFromDbAsyncTask(
+        public ReadAllSearchCriteriaFromDbAsyncTask(String site,
                         AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier)
         {
+            this.site = site;
             this.asyncTaskCompletionNotifier = asyncTaskCompletionNotifier;
         }
 
@@ -84,7 +146,7 @@ public class SearchCriteriaListActivity extends ListActivity
             try
             {
                 dao.open();
-                return dao.readAll();
+                return dao.readAll(site);
             }
             catch (SQLException e)
             {
@@ -134,8 +196,16 @@ public class SearchCriteriaListActivity extends ListActivity
                 viewHolder.lastRun = (TextView) convertView.findViewById(R.id.itemLastRun);
                 viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
 
+                prepareDeleteCheckBox(viewHolder.delCheckBox, item);
                 prepareTabToggle(viewHolder.addTabToggle, item);
                 prepareItemClick(viewHolder.itemLayout, item);
+
+                if (item.tab)
+                {
+                    criteriaIdsAsTab.add(item.id);
+                    viewHolder.addTabToggle.setChecked(true);
+                }
+
                 convertView.setTag(viewHolder);
             }
             else
@@ -148,29 +218,34 @@ public class SearchCriteriaListActivity extends ListActivity
             return convertView;
         }
 
-        private void prepareTabToggle(final ToggleButton addTabToggle, final SearchCriteriaDomain domain)
+        private void prepareDeleteCheckBox(CheckBox delCheckBox, final SearchCriteriaDomain item)
         {
-            final int TAG_ADD_FAILED = 1;
-
-            final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<Boolean>()
+            delCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
             {
                 @Override
-                public void notifyOnCompletion(Boolean result)
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
                 {
-                    if (result)
+                    if (isChecked)
+                        toDeleteList.add(item);
+                    else
+                        toDeleteList.remove(item);
+
+                    if (toDeleteList.isEmpty())
                     {
-                        Toast.makeText(SearchCriteriaListActivity.this, domain.name + " tab update success",
-                                        Toast.LENGTH_LONG).show();
+                        if (actionBarMenu.findItem(R.id.menu_discard).isVisible())
+                            actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
                     }
                     else
                     {
-                        Toast.makeText(SearchCriteriaListActivity.this, domain.name + " tab update failed",
-                                        Toast.LENGTH_LONG).show();
-                        addTabToggle.setTag(TAG_ADD_FAILED);
-                        addTabToggle.setChecked(false);
+                        if (!actionBarMenu.findItem(R.id.menu_discard).isVisible())
+                            actionBarMenu.findItem(R.id.menu_discard).setVisible(true);
                     }
                 }
-            };
+            });
+        }
+
+        private void prepareTabToggle(final ToggleButton addTabToggle, final SearchCriteriaDomain domain)
+        {
 
             addTabToggle.setOnCheckedChangeListener(new OnCheckedChangeListener()
             {
@@ -179,26 +254,31 @@ public class SearchCriteriaListActivity extends ListActivity
                 {
                     if (isChecked)
                     {
-                        new SearchCriteriaFragment.WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, domain,
-                                        WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB, asyncTaskCompletionNotifier)
-                                        .execute();
-
-                        buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
-                        buttonView.setTextColor(getResources().getColor(R.color.delft));
+                        onCheckedChangedExecute(domain, buttonView, !criteriaIdsAsTab.contains(domain.id),
+                                        WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB, R.drawable.rounded_border_delft,
+                                        R.color.delft);
                     }
                     else
                     {
-                        buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
-                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
+                        onCheckedChangedExecute(domain, buttonView, criteriaIdsAsTab.contains(domain.id),
+                                        WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB,
+                                        R.drawable.rounded_border_grey_min_padding, R.color.lightGrey);
+                    }
+                }
 
-                        if (buttonView.getTag() == null)
-                        {
-                            new SearchCriteriaFragment.WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, domain,
-                                            WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB, asyncTaskCompletionNotifier)
-                                            .execute();
-                        }
-                        else
-                            buttonView.setTag(null);
+                private void onCheckedChangedExecute(final SearchCriteriaDomain domain, CompoundButton buttonView,
+                                boolean executeDbTask, int action, int backgroundResource, int textColorResource)
+                {
+                    buttonView.setBackgroundResource(backgroundResource);
+                    buttonView.setTextColor(getResources().getColor(textColorResource));
+
+                    if (executeDbTask)
+                    {
+                        AddDelCriteriaTabAsyncTaskCompletionNotifier asyncTaskCompletionNotifier = new AddDelCriteriaTabAsyncTaskCompletionNotifier(
+                                        buttonView, domain, action);
+
+                        new SearchCriteriaFragment.WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, domain,
+                                        action, asyncTaskCompletionNotifier).execute();
                     }
                 }
             });
@@ -212,6 +292,7 @@ public class SearchCriteriaListActivity extends ListActivity
                 public void onClick(View v)
                 {
                     Intent intent = new Intent(SearchCriteriaListActivity.this, AdvancedSearchActivity.class);
+                    intent.setAction(StringConstants.SEARCH_CRITERIA);
                     intent.putExtra(StringConstants.SEARCH_CRITERIA, item);
                     startActivity(intent);
                 }
@@ -248,14 +329,67 @@ public class SearchCriteriaListActivity extends ListActivity
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.list_view);
+        getActionBar().setTitle(ACTION_BAR_TITLE);
+
+        listView = (ListView) findViewById(android.R.id.list);
 
         searchCriteriaArrayAdapter = new SearchCriteriaArrayAdapter(this, R.layout.search_criteria_item, R.id.itemText);
-        setListAdapter(searchCriteriaArrayAdapter);
+        listView.setAdapter(searchCriteriaArrayAdapter);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        boolean ret = super.onPrepareOptionsMenu(menu);
+
+        if (menu != null)
+            menu.removeItem(R.id.menu_refresh);
+
+        return ret;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.menu_discard:
+                deleteCriterias();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteCriterias()
+    {
+        Long[] ids = new Long[toDeleteList.size()];
+        for (int i = 0; i < toDeleteList.size(); i++)
+            ids[i] = toDeleteList.get(i).id;
+
+        AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<Boolean>()
+        {
+
+            @Override
+            public void notifyOnCompletion(Boolean result)
+            {
+                if (result)
+                {
+                    for (SearchCriteriaDomain domain : toDeleteList)
+                        searchCriteriaArrayAdapter.remove(domain);
+
+                    searchCriteriaArrayAdapter.notifyDataSetChanged();
+                    if(searchCriteriaArrayAdapter.getCount() == 0)
+                        actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
+                }
+            }
+        };
+        new WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, null, WriteCriteriaAsyncTask.ACTION_DEL_MANY,
+                        asyncTaskCompletionNotifier).execute(ids);
     }
 
     @Override
@@ -267,7 +401,7 @@ public class SearchCriteriaListActivity extends ListActivity
 
         if (searchCriteriaArrayAdapter == null || searchCriteriaArrayAdapter.getCount() == 0)
         {
-            new ReadAllSearchCriteriaFromDbAsyncTask(new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>()
+            AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>()
             {
                 @Override
                 public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
@@ -278,9 +412,24 @@ public class SearchCriteriaListActivity extends ListActivity
                         searchCriteriaArrayAdapter.addAll(result);
                     }
                 }
-            }).execute();
+            };
+
+            new ReadAllSearchCriteriaFromDbAsyncTask(OperatingSite.getSite().apiSiteParameter,
+                            asyncTaskCompletionNotifier).execute();
         }
         else
             searchCriteriaArrayAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void refresh()
+    {
+        throw new UnsupportedOperationException("Refresh not supported");
+    }
+
+    @Override
+    protected boolean shouldSearchViewBeEnabled()
+    {
+        return false;
     }
 }

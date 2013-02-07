@@ -24,8 +24,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.SQLException;
 import android.os.AsyncTask;
@@ -45,6 +47,7 @@ import android.widget.Filter;
 import android.widget.Filter.FilterListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -118,7 +121,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     }
 
-    public static class WriteCriteriaAsyncTask extends AsyncTask<Void, Void, Boolean>
+    public static class WriteCriteriaAsyncTask extends AsyncTask<Long, Void, Boolean>
     {
         private final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier;
         private final SearchCriteriaDomain domain;
@@ -128,8 +131,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         public static final int ACTION_ADD = 1;
         public static final int ACTION_UPDATE = 2;
         public static final int ACTION_DEL = 3;
-        public static final int ACTION_ADD_AS_TAB = 4;
-        public static final int ACTION_REMOVE_AS_TAB = 5;
+        public static final int ACTION_DEL_MANY = 4;
+        public static final int ACTION_ADD_AS_TAB = 5;
+        public static final int ACTION_REMOVE_AS_TAB = 6;
 
         public WriteCriteriaAsyncTask(Context context, SearchCriteriaDomain domain, int action,
                         AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
@@ -141,7 +145,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         }
 
         @Override
-        protected Boolean doInBackground(Void... params)
+        protected Boolean doInBackground(Long... params)
         {
             SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
             try
@@ -159,7 +163,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         dao.update(domain);
                         return true;
                     case ACTION_DEL:
-                        dao.delete(domain.id);
+                        if (params != null && params.length > 0)
+                            dao.delete(params[0]);
+                        return true;
+                    case ACTION_DEL_MANY:
+                        if (params != null && params.length > 0)
+                            dao.deleteAll(params);
                         return true;
                     case ACTION_ADD_AS_TAB:
                         dao.updateCriteriaAsTabbed(domain.id, true);
@@ -335,8 +344,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
                 if (isChecked && toggleButtonTagToExclude.isChecked())
                     toggleButtonTagToExclude.setChecked(false);
-
-                tagEditText.setText("");
             }
         });
     }
@@ -384,7 +391,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 {
                     includedTags.add(tag);
                     Log.d(TAG, tag + " added to included");
-                    addTagView(textView, getResources().getColor(R.color.lichen), tag);
+                    addTagView(textView, R.color.lichen);
                 }
             }
             else
@@ -393,7 +400,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 {
                     excludedTags.add(tag);
                     Log.d(TAG, tag + " added to excluded");
-                    addTagView(textView, getResources().getColor(R.color.pulp), tag);
+                    addTagView(textView, R.color.pulp);
                 }
             }
         }
@@ -414,10 +421,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         }
     }
 
-    private void addTagView(TextView tagTextView, int bgColor, String tag)
+    private void addTagView(TextView tagTextView, int colorResource)
     {
-        tagTextView.setText(tag);
-        tagTextView.setBackgroundColor(bgColor);
+        tagTextView.setBackgroundColor(getResources().getColor(colorResource));
 
         LinearLayout currentRow = getTagRow(tagTextView);
 
@@ -496,6 +502,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             textView = getTextViewForTag();
             textView.setTag(SELECTED_TAGS_TV_PREFIX_TAG + tag);
         }
+        textView.setText(tag);
         return textView;
     }
 
@@ -516,6 +523,41 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         prepareClearCriteria();
 
         new GetTagsFromDbAsyncTask().execute();
+
+        if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
+            showSavedSearchCriteria();
+    }
+
+    private void showSavedSearchCriteria()
+    {
+        getActivity().getActionBar().setTitle(searchCriteriaDomain.name);
+
+        if (searchCriteriaDomain.searchCriteria.getQuery() != null)
+            searchQuery.setText(searchCriteriaDomain.searchCriteria.getQuery());
+
+        if (searchCriteriaDomain.searchCriteria.isAnswered())
+            ((RadioButton) includeAnswers.findViewById(R.id.isAnswered)).setChecked(true);
+        else
+        {
+            if (searchCriteriaDomain.searchCriteria.getAnswerCount() > 0)
+                ((RadioButton) includeAnswers.findViewById(R.id.hasAnswers)).setChecked(true);
+        }
+
+        addTags(searchCriteriaDomain.searchCriteria.getTaggedArray(), R.color.lichen, includedTags);
+        addTags(searchCriteriaDomain.searchCriteria.getNotTaggedArray(), R.color.pulp, excludedTags);
+    }
+
+    private void addTags(String[] tagArray, int colorResource, HashSet<String> destination)
+    {
+        if (tagArray != null)
+        {
+            for (String tag : tagArray)
+            {
+                TextView textView = getTextViewForSelectedTag(tag);
+                addTagView(textView, colorResource);
+                destination.add(tag);
+            }
+        }
     }
 
     private void prepareRunSearch()
@@ -525,8 +567,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             @Override
             public void onClick(View v)
             {
-                searchCriteriaDomain = new SearchCriteriaDomain();
-                searchCriteriaDomain.searchCriteria = SearchCriteria.newCriteria();
+                if (searchCriteriaDomain == null)
+                {
+                    searchCriteriaDomain = new SearchCriteriaDomain();
+                    searchCriteriaDomain.searchCriteria = SearchCriteria.newCriteria();
+                }
 
                 if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
                     searchCriteriaDomain.searchCriteria.setQuery(searchQuery.getText().toString().trim());
@@ -656,13 +701,52 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         AppUtils.hideSoftInput(getActivity(), getActivity().getWindow().getCurrentFocus());
     }
 
-    public void saveCriteria(String name, AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+    public void saveCriteria(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
     {
-        if (name != null && searchCriteriaDomain != null)
+        if (searchCriteriaDomain != null)
         {
-            searchCriteriaDomain.name = name;
-            new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_ADD,
-                            asyncTaskCompletionNotifier).execute();
+            if (searchCriteriaDomain.id > 0)
+            {
+                new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_UPDATE,
+                                asyncTaskCompletionNotifier).execute();
+            }
+            else
+            {
+                AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(getActivity());
+                saveAsDailogBuilder.setTitle("Save As");
+
+                final EditText input = new EditText(getActivity());
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.MATCH_PARENT);
+                input.setLayoutParams(lp);
+                saveAsDailogBuilder.setView(input);
+
+                saveAsDailogBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int whichButton)
+                    {
+                        searchCriteriaDomain.name = input.getText().toString();
+                        searchCriteriaDomain.site = OperatingSite.getSite().apiSiteParameter;
+                        new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
+                                        WriteCriteriaAsyncTask.ACTION_ADD, asyncTaskCompletionNotifier).execute();
+                    }
+                });
+
+                saveAsDailogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int whichButton)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+
+                saveAsDailogBuilder.show();
+            }
         }
+    }
+
+    public void loadCriteria(SearchCriteriaDomain searchCriteriaDomain)
+    {
+        this.searchCriteriaDomain = searchCriteriaDomain;
     }
 }

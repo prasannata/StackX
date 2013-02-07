@@ -110,7 +110,8 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria setQuery(String query)
     {
-        criteria.put(Q, query);
+        if (query != null)
+            criteria.put(Q, query);
         return this;
     }
 
@@ -274,6 +275,24 @@ public class SearchCriteria implements Serializable
     {
         criteria.put(TITLE, criteria.get(Q));
         return this;
+    }
+
+    public String[] getTaggedArray()
+    {
+        String tags = getIncludedTagsAsSemicolonDelimitedString();
+        if (tags == null)
+            return null;
+
+        return tags.split(";");
+    }
+
+    public String[] getNotTaggedArray()
+    {
+        String tags = getExcludedTagsAsSemicolonDelimitedString();
+        if (tags == null)
+            return null;
+
+        return tags.split(";");
     }
 
     public void addCriteria(String name, String value)

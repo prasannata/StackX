@@ -28,8 +28,8 @@ import android.database.SQLException;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
-import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
+import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 
 public class SearchCriteriaDAO extends AbstractBaseDao
 {
@@ -39,6 +39,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
     {
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_SITE = "site";
         public static final String COLUMN_Q = "q";
         public static final String COLUMN_SORT = "sort";
         public static final String COLUMN_ANSWERS = "answers";
@@ -52,12 +53,12 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         public static final String COLUMN_LAST_MODIFIED = "last_modified";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
-                        + " text, " + COLUMN_SORT + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED
-                        + " integer, " + COLUMN_TAGGED + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_TAB
-                        + " integer DEFAULT \'0\', " + COLUMN_RUN_COUNT + " long DEFAULT \'0\', " + COLUMN_LAST_RUN
-                        + " long DEFAULTL \'0\', " + COLUMN_CREATED + " long not null, " + COLUMN_LAST_MODIFIED
-                        + " long not null);";
+                        + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_SITE
+                        + " text not null, " + COLUMN_Q + " text, " + COLUMN_SORT + " text, " + COLUMN_ANSWERS
+                        + " integer, " + COLUMN_ANSWERED + " integer, " + COLUMN_TAGGED + " text, " + COLUMN_NOT_TAGGED
+                        + " text, " + COLUMN_TAB + " integer DEFAULT \'0\', " + COLUMN_RUN_COUNT
+                        + " long DEFAULT \'0\', " + COLUMN_LAST_RUN + " long DEFAULTL \'0\', " + COLUMN_CREATED
+                        + " long not null, " + COLUMN_LAST_MODIFIED + " long not null);";
     }
 
     public SearchCriteriaDAO(Context context)
@@ -71,6 +72,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         {
             ContentValues values = new ContentValues();
             values.put(SearchCriteriaTable.COLUMN_NAME, searchCriteriaDomain.name);
+            values.put(SearchCriteriaTable.COLUMN_SITE, searchCriteriaDomain.site);
             values.put(SearchCriteriaTable.COLUMN_RUN_COUNT, searchCriteriaDomain.runCount);
             values.put(SearchCriteriaTable.COLUMN_LAST_RUN, searchCriteriaDomain.lastRun);
             values.put(SearchCriteriaTable.COLUMN_Q, searchCriteriaDomain.searchCriteria.getQuery());
@@ -127,11 +129,14 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         database.update(TABLE_NAME, values, whereClause, whereArgs);
     }
 
-    public ArrayList<SearchCriteriaDomain> readAll()
+    public ArrayList<SearchCriteriaDomain> readAll(String site)
     {
+        String selection = SearchCriteriaTable.COLUMN_SITE + " = ?";
+        String[] selectionArgs = { site };
+
         String orderBy = SearchCriteriaTable.COLUMN_CREATED + " ASC";
 
-        Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, orderBy);
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, orderBy);
 
         if (cursor == null || cursor.getCount() == 0)
             return null;
@@ -155,7 +160,9 @@ public class SearchCriteriaDAO extends AbstractBaseDao
 
         domain.id = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
         domain.name = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_NAME));
+        domain.site = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_SITE));
         domain.created = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_CREATED));
+        domain.tab = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_TAB)) == 1;
         domain.runCount = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_RUN_COUNT));
         domain.lastRun = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_RUN));
         domain.lastModified = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_LAST_MODIFIED));
@@ -182,5 +189,14 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         String[] whereArgs = { String.valueOf(id) };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
+    }
+
+    public void deleteAll(Long[] ids)
+    {
+        if (ids != null)
+        {
+            for (Long id : ids)
+                delete(id);
+        }
     }
 }
