@@ -19,8 +19,12 @@
 
 package com.prasanna.android.stacknetwork.model;
 
-public class SearchCriteriaDomain
+import java.io.Serializable;
+
+public class SearchCriteriaDomain implements Serializable
 {
+    private static final long serialVersionUID = 8151064092604079290L;
+    
     public long id = 0L;
     public String name;
     public long created = 0L;

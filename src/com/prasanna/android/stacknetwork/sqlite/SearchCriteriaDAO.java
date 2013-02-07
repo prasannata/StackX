@@ -45,6 +45,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         public static final String COLUMN_ANSWERED = "answered";
         public static final String COLUMN_TAGGED = "tagged";
         public static final String COLUMN_NOT_TAGGED = "not_tagged";
+        public static final String COLUMN_TAB = "tab";
         public static final String COLUMN_RUN_COUNT = "run_count";
         public static final String COLUMN_LAST_RUN = "last_run";
         public static final String COLUMN_CREATED = "created";
@@ -53,9 +54,10 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, " + COLUMN_Q
                         + " text, " + COLUMN_SORT + " text, " + COLUMN_ANSWERS + " integer, " + COLUMN_ANSWERED
-                        + " integer, " + COLUMN_TAGGED + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_RUN_COUNT
-                        + " long DEFAULT \'0\', " + COLUMN_LAST_RUN + " long DEFAULTL \'0\', " + COLUMN_CREATED
-                        + " long not null, " + COLUMN_LAST_MODIFIED + " long not null);";
+                        + " integer, " + COLUMN_TAGGED + " text, " + COLUMN_NOT_TAGGED + " text, " + COLUMN_TAB
+                        + " integer DEFAULT \'0\', " + COLUMN_RUN_COUNT + " long DEFAULT \'0\', " + COLUMN_LAST_RUN
+                        + " long DEFAULTL \'0\', " + COLUMN_CREATED + " long not null, " + COLUMN_LAST_MODIFIED
+                        + " long not null);";
     }
 
     public SearchCriteriaDAO(Context context)
@@ -114,6 +116,15 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
 
         return searchCriteriaDomain;
+    }
+
+    public void updateCriteriaAsTabbed(long id, boolean add)
+    {
+        String whereClause = SearchCriteriaTable.COLUMN_ID + " = ?";
+        String[] whereArgs = { String.valueOf(id) };
+        ContentValues values = new ContentValues();
+        values.put(SearchCriteriaTable.COLUMN_TAB, add);
+        database.update(TABLE_NAME, values, whereClause, whereArgs);
     }
 
     public ArrayList<SearchCriteriaDomain> readAll()

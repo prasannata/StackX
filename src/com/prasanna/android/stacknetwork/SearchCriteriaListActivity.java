@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,13 +33,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
+import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.WriteCriteriaAsyncTask;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class SearchCriteriaListActivity extends ListActivity
@@ -50,8 +58,9 @@ public class SearchCriteriaListActivity extends ListActivity
     static class SearchCriteriaViewHolder
     {
         CheckBox delCheckBox;
+        ToggleButton addTabToggle;
+        RelativeLayout itemLayout;
         TextView itemText;
-        ToggleButton addAsTabToggle;
         TextView itemDetails;
         TextView lastRun;
         TextView ran;
@@ -111,28 +120,102 @@ public class SearchCriteriaListActivity extends ListActivity
         public View getView(int position, View convertView, ViewGroup parent)
         {
             SearchCriteriaViewHolder viewHolder;
+            SearchCriteriaDomain item = getItem(position);
 
             if (convertView == null)
             {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.search_criteria_item, null);
                 viewHolder = new SearchCriteriaViewHolder();
                 viewHolder.delCheckBox = (CheckBox) convertView.findViewById(R.id.deleteItemCheckbox);
+                viewHolder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.item);
                 viewHolder.itemText = (TextView) convertView.findViewById(R.id.itemText);
                 viewHolder.itemDetails = (TextView) convertView.findViewById(R.id.itemDetails);
-                viewHolder.addAsTabToggle = (ToggleButton) convertView.findViewById(R.id.addTabToggle);
+                viewHolder.addTabToggle = (ToggleButton) convertView.findViewById(R.id.addTabToggle);
                 viewHolder.lastRun = (TextView) convertView.findViewById(R.id.itemLastRun);
                 viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
+
+                prepareTabToggle(viewHolder.addTabToggle, item);
+                prepareItemClick(viewHolder.itemLayout, item);
                 convertView.setTag(viewHolder);
             }
             else
                 viewHolder = (SearchCriteriaViewHolder) convertView.getTag();
 
-            SearchCriteriaDomain item = getItem(position);
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
             viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.created / 1000));
             viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
             return convertView;
+        }
+
+        private void prepareTabToggle(final ToggleButton addTabToggle, final SearchCriteriaDomain domain)
+        {
+            final int TAG_ADD_FAILED = 1;
+
+            final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<Boolean>()
+            {
+                @Override
+                public void notifyOnCompletion(Boolean result)
+                {
+                    if (result)
+                    {
+                        Toast.makeText(SearchCriteriaListActivity.this, domain.name + " tab update success",
+                                        Toast.LENGTH_LONG).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(SearchCriteriaListActivity.this, domain.name + " tab update failed",
+                                        Toast.LENGTH_LONG).show();
+                        addTabToggle.setTag(TAG_ADD_FAILED);
+                        addTabToggle.setChecked(false);
+                    }
+                }
+            };
+
+            addTabToggle.setOnCheckedChangeListener(new OnCheckedChangeListener()
+            {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+                {
+                    if (isChecked)
+                    {
+                        new SearchCriteriaFragment.WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, domain,
+                                        WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB, asyncTaskCompletionNotifier)
+                                        .execute();
+
+                        buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
+                        buttonView.setTextColor(getResources().getColor(R.color.delft));
+                    }
+                    else
+                    {
+                        buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
+                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
+
+                        if (buttonView.getTag() == null)
+                        {
+                            new SearchCriteriaFragment.WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, domain,
+                                            WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB, asyncTaskCompletionNotifier)
+                                            .execute();
+                        }
+                        else
+                            buttonView.setTag(null);
+                    }
+                }
+            });
+        }
+
+        private void prepareItemClick(RelativeLayout itemLayout, final SearchCriteriaDomain item)
+        {
+            itemLayout.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent intent = new Intent(SearchCriteriaListActivity.this, AdvancedSearchActivity.class);
+                    intent.putExtra(StringConstants.SEARCH_CRITERIA, item);
+                    startActivity(intent);
+                }
+            });
         }
 
         private String getDetailsText(SearchCriteriaDomain searchCriteriaDomain)

@@ -118,32 +118,57 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     }
 
-    class WriteCriteriaAsyncTask extends AsyncTask<Void, Void, Boolean>
+    public static class WriteCriteriaAsyncTask extends AsyncTask<Void, Void, Boolean>
     {
         private final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier;
-        private final String name;
+        private final SearchCriteriaDomain domain;
+        private final Context context;
+        private final int action;
 
-        public WriteCriteriaAsyncTask(String name, AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+        public static final int ACTION_ADD = 1;
+        public static final int ACTION_UPDATE = 2;
+        public static final int ACTION_DEL = 3;
+        public static final int ACTION_ADD_AS_TAB = 4;
+        public static final int ACTION_REMOVE_AS_TAB = 5;
+
+        public WriteCriteriaAsyncTask(Context context, SearchCriteriaDomain domain, int action,
+                        AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
         {
-            this.name = name;
+            this.context = context;
+            this.domain = domain;
+            this.action = action;
             this.asyncTaskCompletionNotifier = asyncTaskCompletionNotifier;
         }
 
         @Override
         protected Boolean doInBackground(Void... params)
         {
-            SearchCriteriaDAO dao = new SearchCriteriaDAO(getActivity());
+            SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
             try
             {
                 dao.open();
 
                 Log.d(TAG, "Saving search criteria");
-                searchCriteriaDomain.name = name;
-                if (searchCriteriaDomain.id > 0)
-                    dao.update(searchCriteriaDomain);
-                else
-                    dao.insert(searchCriteriaDomain);
-                return true;
+
+                switch (action)
+                {
+                    case ACTION_ADD:
+                        dao.insert(domain);
+                        return true;
+                    case ACTION_UPDATE:
+                        dao.update(domain);
+                        return true;
+                    case ACTION_DEL:
+                        dao.delete(domain.id);
+                        return true;
+                    case ACTION_ADD_AS_TAB:
+                        dao.updateCriteriaAsTabbed(domain.id, true);
+                        return true;
+                    case ACTION_REMOVE_AS_TAB:
+                        dao.updateCriteriaAsTabbed(domain.id, false);
+                        return true;
+                }
+
             }
             catch (SQLException e)
             {
@@ -635,7 +660,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     {
         if (name != null && searchCriteriaDomain != null)
         {
-            new WriteCriteriaAsyncTask(name, asyncTaskCompletionNotifier).execute();
+            searchCriteriaDomain.name = name;
+            new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_ADD,
+                            asyncTaskCompletionNotifier).execute();
         }
     }
 }
