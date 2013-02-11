@@ -95,7 +95,7 @@ public class MyProfileService extends AbstractStackxService
         return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete()
         {
             @Override
-            public void onHandleMessageFinish(Message message)
+            public void onHandleMessageFinish(Message message, Object... args)
             {
                 setRunning(false);
                 MyProfileService.this.stopSelf(message.arg1);

@@ -6,12 +6,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.SQLException;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
@@ -23,7 +25,6 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class AccountSyncService extends AbstractStackxService
 {
-
     private static final String TAG = AccountSyncService.class.getSimpleName();
 
     private final static class ServiceHandler extends Handler
@@ -41,6 +42,7 @@ public class AccountSyncService extends AbstractStackxService
         @Override
         public void handleMessage(Message msg)
         {
+            boolean newThingsFound = false;
             HashMap<String, Site> sites = getSites();
             long accountsLastUpdated = SharedPreferencesUtil
                             .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
@@ -102,6 +104,7 @@ public class AccountSyncService extends AbstractStackxService
 
                             AppUtils.persistAccounts(context, newAccounts);
                             updateSites(newAccounts);
+                            newThingsFound = true;
                         }
 
                         if (existingAccountsSize != existingAccounts.size())
@@ -111,6 +114,7 @@ public class AccountSyncService extends AbstractStackxService
                             removeAccounts(existingAccounts);
                             removeWritePermissions(existingAccounts);
                             updateSites(newAccounts);
+                            newThingsFound = true;
                         }
                     }
 
@@ -119,7 +123,7 @@ public class AccountSyncService extends AbstractStackxService
                 }
             }
 
-            onHandlerComplete.onHandleMessageFinish(msg);
+            onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
         }
 
         private void updateSites(ArrayList<Account> newAccounts)
@@ -226,9 +230,13 @@ public class AccountSyncService extends AbstractStackxService
         return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete()
         {
             @Override
-            public void onHandleMessageFinish(Message message)
+            public void onHandleMessageFinish(Message message, Object... args)
             {
                 setRunning(false);
+                Boolean newThingsFound = (Boolean) args[0];
+                if (newThingsFound)
+                    AccountSyncService.this.sendBroadcast(new Intent(
+                                    StackNetworkListActivity.ACCOUNT_UPDATE_INTENT_FILTER));
                 AccountSyncService.this.stopSelf(message.arg1);
             }
         });

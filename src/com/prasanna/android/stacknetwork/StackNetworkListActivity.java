@@ -23,11 +23,16 @@ import java.util.ArrayList;
 
 import android.app.ListActivity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,12 +55,26 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 {
     private static final String TAG = StackNetworkListActivity.class.getSimpleName();
     private final String CHANGE_SITE_HINT = "change_site_hint";
+    public static final String ACCOUNT_UPDATE_INTENT_FILTER = "com.prasanna.android.stacknetwork.sites.update";
 
     private ProgressDialog progressDialog;
     private Intent intent = null;
     private ArrayList<Site> sites = new ArrayList<Site>();
     private SiteListAdapter siteListAdapter;
     private RestQueryResultReceiver receiver;
+    private RelativeLayout refreshOnUpdateOption;
+    private ImageView refreshSites;
+    private ImageView cancelRefreshSites;
+
+    private BroadcastReceiver accountUpdateReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if (refreshOnUpdateOption != null)
+                refreshOnUpdateOption.setVisibility(View.VISIBLE);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -65,7 +84,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.sitelist);
-
+        setupSiteListRefreshOption();
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
         siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, new ArrayList<Site>());
@@ -82,8 +101,42 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
             progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
                             "Loading sites, your accounts and permissions, this might take few seconds");
         }
-        
+
+        registerAccountUpdateBroadcastReceiver();
         startIntentService();
+    }
+
+    private void registerAccountUpdateBroadcastReceiver()
+    {
+        IntentFilter filter = new IntentFilter(ACCOUNT_UPDATE_INTENT_FILTER);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(accountUpdateReceiver, filter);
+    }
+
+    private void setupSiteListRefreshOption()
+    {
+        refreshOnUpdateOption = (RelativeLayout) findViewById(R.id.refreshOnUpdateOption);
+        refreshSites = (ImageView) findViewById(R.id.refreshSites);
+        refreshSites.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", "Loading sites");
+                startIntentService();
+                refreshOnUpdateOption.setVisibility(View.GONE);
+            }
+        });
+
+        cancelRefreshSites = (ImageView) findViewById(R.id.cancelRefreshSites);
+        cancelRefreshSites.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                refreshOnUpdateOption.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
@@ -102,6 +155,14 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         if (intent != null)
             stopService(intent);
+
+        try
+        {
+            unregisterReceiver(accountUpdateReceiver);
+        }
+        catch (IllegalArgumentException e)
+        {
+        }
     }
 
     private void startIntentService()
@@ -133,6 +194,8 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
                     if (sites != null)
                     {
+                        sites.clear();
+                        siteListAdapter.clear();
                         sites.addAll(result);
                         siteListAdapter.addAll(sites);
                     }

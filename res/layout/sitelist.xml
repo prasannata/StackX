@@ -7,6 +7,41 @@
 
     <include layout="@layout/stack_exchange_header" />
 
+    <RelativeLayout
+        android:id="@+id/refreshOnUpdateOption"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/updateInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:text="@string/updated"
+            android:textColor="@color/delft"
+            android:textSize="15sp" />
+
+        <ImageView
+            android:id="@+id/cancelRefreshSites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:padding="4dp"
+            android:src="@drawable/dark_32x32_cancel" />
+
+        <ImageView
+            android:id="@+id/refreshSites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/cancelRefreshSites"
+            android:padding="4dp"
+            android:src="@drawable/dark_32x32_refresh" />
+    </RelativeLayout>
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"

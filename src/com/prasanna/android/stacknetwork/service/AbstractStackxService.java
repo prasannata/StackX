@@ -17,7 +17,7 @@ import android.util.Log;
 public abstract class AbstractStackxService extends Service
 {
     private static final String TAG = AbstractStackxService.class.getSimpleName();
-    
+
     private static boolean isRunning = false;
     private Looper serviceLooper;
     private Handler serviceHandler;
@@ -28,7 +28,7 @@ public abstract class AbstractStackxService extends Service
 
     public interface OnHandlerComplete
     {
-        void onHandleMessageFinish(Message message);
+        void onHandleMessageFinish(Message message, Object... args);
     }
 
     public static boolean isRunning()
@@ -61,7 +61,7 @@ public abstract class AbstractStackxService extends Service
     public int onStartCommand(Intent intent, int flags, int startId)
     {
         Log.d(TAG, "onStartCommand");
-        
+
         setRunning(true);
 
         Message msg = serviceHandler.obtainMessage();
@@ -78,7 +78,7 @@ public abstract class AbstractStackxService extends Service
             if (isRunning)
             {
                 Log.d(TAG, "Object registered for service complete notification");
-                
+
                 toNotifyObjects.add(object);
             }
             else
@@ -98,7 +98,7 @@ public abstract class AbstractStackxService extends Service
             synchronized (object)
             {
                 Log.d(TAG, "Notifying object");
-                
+
                 object.notify();
             }
         }

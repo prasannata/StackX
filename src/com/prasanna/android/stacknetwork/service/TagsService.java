@@ -131,7 +131,7 @@ public class TagsService extends AbstractStackxService
         return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete()
         {
             @Override
-            public void onHandleMessageFinish(Message message)
+            public void onHandleMessageFinish(Message message, Object... args)
             {
                 TagsService.this.stopSelf(message.arg1);
                 
