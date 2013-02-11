@@ -315,13 +315,13 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     {
         criteria = SearchCriteria.newCriteria(query);
 
-        if (SharedPreferencesUtil.isOn(getActivity(), SettingsFragment.KEY_PREF_SEARCH_IN_TITLE, false))
+        if (SharedPreferencesUtil.isSet(getActivity(), SettingsFragment.KEY_PREF_SEARCH_IN_TITLE, false))
             criteria = criteria.queryMustInTitle();
 
-        if (SharedPreferencesUtil.isOn(getActivity(), SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS, false))
+        if (SharedPreferencesUtil.isSet(getActivity(), SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS, false))
             criteria = criteria.setMinAnswers(1);
 
-        if (SharedPreferencesUtil.isOn(getActivity(), SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED, false))
+        if (SharedPreferencesUtil.isSet(getActivity(), SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED, false))
             criteria = criteria.mustBeAnswered();
 
         criteria = criteria.sortBy(SearchSort.RELEVANCE).build();

@@ -75,8 +75,8 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = StringConstants.SITES;
         LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
-                        restEndPoint, AppUtils.getDefaultQueryParams());
+        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
+                        StackUri.STACKX_API_HOST, restEndPoint, AppUtils.getDefaultQueryParams());
         try
         {
             if (jsonObject != null)
@@ -90,13 +90,10 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                         JSONObject siteJsonObject = jsonArray.getJSONObject(i);
                         Site site = getSerializedSiteObject(new JSONObjectWrapper(siteJsonObject));
                         if (site != null)
-                        {
                             sites.put(site.link, site);
-                        }
                     }
                 }
             }
-
         }
         catch (JSONException e)
         {
@@ -111,6 +108,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
         site.logoUrl = siteJsonObject.getString(JsonFields.Site.LOGO_URL);
         site.name = siteJsonObject.getString(JsonFields.Site.NAME);
+        site.audience = siteJsonObject.getString(JsonFields.Site.AUDIENCE);
         site.link = siteJsonObject.getString(JsonFields.Site.SITE_URL);
         site.faviconUrl = siteJsonObject.getString(JsonFields.Site.FAVICON_URL);
         site.iconUrl = siteJsonObject.getString(JsonFields.Site.ICON_URL);
@@ -191,8 +189,8 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
-                        "/me", queryParams);
+        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
+                        StackUri.STACKX_API_HOST, "/me", queryParams);
 
         return getSerializedUserObject(jsonObject);
     }
@@ -276,7 +274,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getAnswers(restEndPoint, queryParams);
     }
 
-    public ArrayList<WritePermission> checkForWritePermission(String site)
+    public ArrayList<WritePermission> getWritePermissions(String site)
     {
         ArrayList<WritePermission> permissions = new ArrayList<WritePermission>();
 
@@ -401,7 +399,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/me/associated";
         int pageSize = 100;
-        
+
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.NETWORK_USER_TYPE_FILTER);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
@@ -414,7 +412,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/users/" + userId + "/associated";
         int pageSize = 100;
-        
+
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
@@ -462,8 +460,8 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         error.id = -1;
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
-                        restEndPoint, null);
+        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
+                        StackUri.STACKX_API_HOST, restEndPoint, null);
         boolean success = jsonObject != null && jsonObject.getJSONArray(JsonFields.ITEMS) != null
                         && jsonObject.getJSONArray(JsonFields.ITEMS).length() == 0;
         if (success == false)

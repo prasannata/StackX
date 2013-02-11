@@ -24,6 +24,7 @@
 
         <service android:name=".service.TagsService" />
         <service android:name=".service.MyProfileService" />
+        <service android:name=".service.AccountSyncService" />
         <service android:name=".service.PostIntentService" />
         <service android:name=".service.QuestionsIntentService" />
         <service android:name=".service.QuestionDetailsIntentService" />

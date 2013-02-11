@@ -86,6 +86,7 @@ public class TagListFragment extends ListFragment
             if (result != null)
             {
                 tags.clear();
+                listAdapter.clear();
                 tags.add(new Tag(StringConstants.FRONT_PAGE));
                 tags.addAll(result);
                 listAdapter.addAll(tags);
@@ -309,12 +310,10 @@ public class TagListFragment extends ListFragment
 
         super.onResume();
 
-        if (SharedPreferencesUtil.isOn(getActivity(), TAGS_DIRTY, false))
+        if (SharedPreferencesUtil.isSet(getActivity(), TAGS_DIRTY, false))
         {
-            tags.clear();
-            listAdapter.clear();
             runGetTagsTask();
-            SharedPreferencesUtil.setOnOff(getActivity(), TAGS_DIRTY, false);
+            SharedPreferencesUtil.setBoolean(getActivity(), TAGS_DIRTY, false);
         }
         else
         {

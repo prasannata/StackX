@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -35,13 +34,12 @@ import android.widget.Toast;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter;
 import com.prasanna.android.stacknetwork.adapter.SiteListAdapter.OnSiteSelectedListener;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.service.AccountSyncService;
 import com.prasanna.android.stacknetwork.service.MyProfileService;
 import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -55,7 +53,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
     private ProgressDialog progressDialog;
     private Intent intent = null;
-    private ArrayList<Site> sites;
+    private ArrayList<Site> sites = new ArrayList<Site>();
     private SiteListAdapter siteListAdapter;
     private RestQueryResultReceiver receiver;
 
@@ -70,16 +68,22 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
+        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, new ArrayList<Site>());
+        siteListAdapter.setOnSiteSelectedListener(this);
+        setListAdapter(siteListAdapter);
 
-        if (SharedPreferencesUtil.hasSiteListCache(getCacheDir()))
+        if (SharedPreferencesUtil.isSet(getApplicationContext(), StringConstants.SITES_INIT, false))
         {
-            sites = SharedPreferencesUtil.getSiteListFromCache(getCacheDir());
-            updateView();
+            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", "Loading sites");
+            startService(new Intent(getApplicationContext(), AccountSyncService.class));
         }
         else
         {
-            registerReceiverAndStartService();
+            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
+                            "Loading sites, your accounts and permissions, this might take few seconds");
         }
+        
+        startIntentService();
     }
 
     @Override
@@ -100,13 +104,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
             stopService(intent);
     }
 
-    private void registerReceiverAndStartService()
-    {
-        progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
-
-        startIntentService();
-    }
-
     private void startIntentService()
     {
         intent = new Intent(this, UserIntentService.class);
@@ -114,16 +111,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         intent.putExtra(StringConstants.ME, AppUtils.inAuthenticatedRealm(getApplicationContext()));
         intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
         startService(intent);
-    }
-
-    private void updateView()
-    {
-        if (sites != null && !sites.isEmpty())
-        {
-            siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, sites);
-            siteListAdapter.setOnSiteSelectedListener(this);
-            setListAdapter(siteListAdapter);
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -141,79 +128,21 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         {
             switch (resultCode)
             {
-                case UserIntentService.CHECK_WRITE_PERMISSION:
-                    ArrayList<WritePermission> permissions = (ArrayList<WritePermission>) resultData
-                                    .getSerializable(StringConstants.PERMISSION);
-                    persistPermissions((Site) resultData.getSerializable(StringConstants.SITE), permissions);
-                    break;
                 case UserIntentService.GET_USER_SITES:
-                    sites = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
+                    ArrayList<Site> result = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
 
                     if (sites != null)
                     {
-                        SharedPreferencesUtil.cacheSiteList(getCacheDir(), sites);
-                        updateView();
+                        sites.addAll(result);
+                        siteListAdapter.addAll(sites);
                     }
+
                     break;
                 default:
                     Log.d(TAG, "Unknown result code in result receiver");
                     break;
             }
         }
-    }
-
-    private void startGetTagsService()
-    {
-        startService(new Intent(this, TagsService.class));
-    }
-
-    private void persistPermissions(Site site, ArrayList<WritePermission> permissions)
-    {
-        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(this);
-
-        try
-        {
-            writePermissionDAO.open();
-            writePermissionDAO.insertAll(site, permissions);
-
-            for (WritePermission permission : permissions)
-            {
-                if (permission.objectType != null)
-                {
-                    switch (permission.objectType)
-                    {
-                        case ANSWER:
-                            SharedPreferencesUtil.setLong(this, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
-                                            permission.minSecondsBetweenActions);
-                            break;
-                        case COMMENT:
-                            SharedPreferencesUtil.setLong(this, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
-                                            permission.minSecondsBetweenActions);
-                            break;
-                        case QUESTION:
-                            SharedPreferencesUtil.setLong(this, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
-                                            permission.minSecondsBetweenActions);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-        catch (SQLException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-        finally
-        {
-            writePermissionDAO.close();
-        }
-    }
-
-    private void startMyProfileService()
-    {
-        if (AppUtils.inAuthenticatedRealm(this))
-            startService(new Intent(this, MyProfileService.class));
     }
 
     private void showError()
@@ -229,15 +158,26 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     {
         OperatingSite.setSite(site);
 
-        if (SharedPreferencesUtil.isOn(this, CHANGE_SITE_HINT, true))
+        if (SharedPreferencesUtil.isSet(this, CHANGE_SITE_HINT, true))
         {
             Toast.makeText(this, "Use options menu to change site any time.", Toast.LENGTH_LONG).show();
-            SharedPreferencesUtil.setOnOff(this, CHANGE_SITE_HINT, false);
+            SharedPreferencesUtil.setBoolean(this, CHANGE_SITE_HINT, false);
         }
 
         startMyProfileService();
         startGetTagsService();
         startQuestionsActivity();
+    }
+
+    private void startMyProfileService()
+    {
+        if (AppUtils.inAuthenticatedRealm(this))
+            startService(new Intent(this, MyProfileService.class));
+    }
+
+    private void startGetTagsService()
+    {
+        startService(new Intent(this, TagsService.class));
     }
 
     private void startQuestionsActivity()

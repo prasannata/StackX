@@ -38,4 +38,38 @@ public class Account implements Serializable
     public UserType userType;
     
     public Site site;
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (id ^ (id >>> 32));
+        result = prime * result + ((siteUrl == null) ? 0 : siteUrl.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Account other = (Account) obj;
+        if (id != other.id)
+            return false;
+        if (siteUrl == null)
+        {
+            if (other.siteUrl != null)
+                return false;
+        }
+        else if (!siteUrl.equals(other.siteUrl))
+            return false;
+        return true;
+    }
+    
+    
 }

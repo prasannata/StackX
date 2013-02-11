@@ -44,6 +44,7 @@ import com.prasanna.android.preference.DialogPreferenceImpl;
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
@@ -170,7 +171,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
                 Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
                 SharedPreferencesUtil.clearDefaultSite(getActivity());
-                SharedPreferencesUtil.clearSiteListCache(getActivity().getCacheDir());
+                SiteDAO.purge(SettingsFragment.this.getActivity());
                 startActivity(oAuthIntent);
                 return true;
             }

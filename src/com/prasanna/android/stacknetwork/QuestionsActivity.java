@@ -339,7 +339,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             if (item.getItemId() == R.id.menu_new_label)
             {
                 insertTagToDb();
-
                 return true;
             }
         }
@@ -357,8 +356,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             tagDAO.insert(OperatingSite.getSite().apiSiteParameter, tagLabel, true);
 
             Toast.makeText(this, tagLabel + " added to your tags", Toast.LENGTH_LONG).show();
-
-            SharedPreferencesUtil.setOnOff(this, TagListFragment.TAGS_DIRTY, true);
+            SharedPreferencesUtil.setBoolean(this, TagListFragment.TAGS_DIRTY, true);
         }
         catch (SQLException e)
         {

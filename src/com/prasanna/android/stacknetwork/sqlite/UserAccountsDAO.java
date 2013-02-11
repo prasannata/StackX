@@ -33,7 +33,7 @@ import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
 public class UserAccountsDAO extends AbstractBaseDao
 {
     private static final String TAG = UserAccountsDAO.class.getSimpleName();
-    public static final String AUDIT_ENTRY_TYPE = UserAccountsDAO.class.getSimpleName();
+    public static final String AUDIT_ENTRY_TYPE = "accounts";
     public static final String TABLE_NAME = "USER_ACCOUNTS";
 
     public static final class UserAccountsTable
@@ -134,6 +134,25 @@ public class UserAccountsDAO extends AbstractBaseDao
 
         if (userType != null)
             account.userType = UserType.getEnum(userType);
+
         return account;
+    }
+
+    public void deleteAll()
+    {
+        database.delete(TABLE_NAME, null, null);
+    }
+
+    public void deleteList(ArrayList<Account> deletedAccounts)
+    {
+        if (deletedAccounts != null)
+        {
+            for (Account account : deletedAccounts)
+            {
+                String whereClause = UserAccountsTable.COLUMN_SITE_URL;
+                String[] whereArgs = new String[] { account.siteUrl };
+                database.delete(TABLE_NAME, whereClause, whereArgs);
+            }
+        }
     }
 }

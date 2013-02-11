@@ -25,8 +25,10 @@ import java.util.HashMap;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.util.Log;
 
+import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
@@ -60,35 +62,49 @@ public class WritePermissionDAO extends AbstractBaseDao
         super(context);
     }
 
-    public void insertAll(Site site, ArrayList<WritePermission> permissions)
+    public void insert(Site site, ArrayList<WritePermission> permissions)
     {
         if (site != null && permissions != null)
         {
             Log.d(TAG, "Storing permissions");
 
-            for (WritePermission permission : permissions)
+            database.beginTransaction();
+            try
             {
-                if (permission.objectType != null)
+                for (WritePermission permission : permissions)
                 {
-                    Log.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: " + permission.canEdit
-                                    + ", delete: " + permission.canDelete);
-                    ContentValues values = new ContentValues();
-                    values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
-                    values.put(WritePermissionTable.COLUMN_EDIT, permission.canEdit);
-                    values.put(WritePermissionTable.COLUMN_DEL, permission.canDelete);
-                    values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
-                    values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
-                    values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
-                    values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
                     if (permission.objectType != null)
-                        values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
+                    {
+                        Log.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: "
+                                        + permission.canEdit + ", delete: " + permission.canDelete);
+                        ContentValues values = new ContentValues();
+                        values.put(WritePermissionTable.COLUMN_ADD, permission.canAdd);
+                        values.put(WritePermissionTable.COLUMN_EDIT, permission.canEdit);
+                        values.put(WritePermissionTable.COLUMN_DEL, permission.canDelete);
+                        values.put(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS, permission.maxDailyActions);
+                        values.put(WritePermissionTable.COLUMN_WAIT_TIME, permission.minSecondsBetweenActions);
+                        values.put(WritePermissionTable.COLUMN_SITE, site.apiSiteParameter);
+                        values.put(WritePermissionTable.COLUMN_SITE_URL, site.link);
+                        if (permission.objectType != null)
+                            values.put(WritePermissionTable.COLUMN_OBJECT_TYPE, permission.objectType.getValue());
 
-                    database.insert(TABLE_NAME, null, values);
+                        database.insert(TABLE_NAME, null, values);
+                    }
+                    else
+                    {
+                        Log.w(TAG, "Object type null for permission for site: " + site.apiSiteParameter);
+                    }
                 }
-                else
-                {
-                    Log.w(TAG, "Object type null for permission for site: " + site.apiSiteParameter);
-                }
+
+                database.setTransactionSuccessful();
+            }
+            catch (SQLException e)
+            {
+
+            }
+            finally
+            {
+                database.endTransaction();
             }
         }
     }
@@ -144,7 +160,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "Permissions retrieved from DB");
+        Log.d(TAG, "Permissions retrieved from DB for " + site);
 
         return getPermissions(cursor);
     }
@@ -183,5 +199,33 @@ public class WritePermissionDAO extends AbstractBaseDao
     public void deleteAll()
     {
         database.delete(TABLE_NAME, null, null);
+    }
+
+    public static void purge(Context context)
+    {
+        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
+        try
+        {
+            writePermissionDAO.open();
+            writePermissionDAO.deleteAll();
+        }
+        finally
+        {
+            writePermissionDAO.close();
+        }
+
+    }
+
+    public void deleteList(ArrayList<Account> deletedAccounts)
+    {
+        if(deletedAccounts != null)
+        {
+            for(Account account : deletedAccounts)
+            {
+                String whereClause = WritePermissionTable.COLUMN_SITE_URL;
+                String[] whereArgs = new String[] { account.siteUrl };
+                database.delete(TABLE_NAME, whereClause, whereArgs);
+            }
+        }
     }
 }

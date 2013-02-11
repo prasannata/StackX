@@ -239,13 +239,13 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName)
     {
-        checkBox.setChecked(SharedPreferencesUtil.isOn(getApplicationContext(), prefName, false));
+        checkBox.setChecked(SharedPreferencesUtil.isSet(getApplicationContext(), prefName, false));
         checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                SharedPreferencesUtil.setOnOff(getApplicationContext(), prefName, isChecked);
+                SharedPreferencesUtil.setBoolean(getApplicationContext(), prefName, isChecked);
             }
         });
     }

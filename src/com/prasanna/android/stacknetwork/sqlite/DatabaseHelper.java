@@ -25,6 +25,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO.ProfileTable;
 import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO.SearchCriteriaTable;
+import com.prasanna.android.stacknetwork.sqlite.SiteDAO.SiteTable;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO.TagsTable;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO.UserAccountsTable;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO.WritePermissionTable;
@@ -44,8 +45,8 @@ public class DatabaseHelper extends SQLiteOpenHelper
         public static final String COLUMN_LAST_UPDATE_TIME = "last_update_time";
 
         private static final String CREATE_TABLE = "create table " + TABLE_AUDIT + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE
-                        + " text, " + COLUMN_LAST_UPDATE_TIME + " long not null);";
+                        + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, "
+                        + COLUMN_SITE + " text, " + COLUMN_LAST_UPDATE_TIME + " long not null);";
     }
 
     public DatabaseHelper(Context context)
@@ -56,6 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
     @Override
     public void onCreate(SQLiteDatabase db)
     {
+        db.execSQL(SiteTable.CREATE_TABLE);
         db.execSQL(TagsTable.CREATE_TABLE);
         db.execSQL(AuditTable.CREATE_TABLE);
         db.execSQL(WritePermissionTable.CREATE_TABLE);

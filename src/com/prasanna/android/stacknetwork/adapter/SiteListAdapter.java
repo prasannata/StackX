@@ -53,49 +53,69 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         super(context, textViewResourceId, sites);
     }
 
+    static class ViewHolder
+    {
+        TextView siteNameView;
+        TextView registeredView;
+        ImageView writePermissionView;
+        ImageView defaultSiteOpt;
+    }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent)
     {
-        if (convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
+        ViewHolder holder;
 
-        TextView textView = (TextView) convertView.findViewById(R.id.siteName);
-        textView.setText(getItem(position).name);
+        if (convertView == null)
+        {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
+            holder = new ViewHolder();
+            holder.siteNameView = (TextView) convertView.findViewById(R.id.siteName);
+            holder.registeredView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
+            holder.writePermissionView = (ImageView) convertView.findViewById(R.id.writePermissionEnabled);
+            holder.defaultSiteOpt = (ImageView) convertView.findViewById(R.id.isDefaultSite);
+            convertView.setTag(holder);
+        }
+        else
+            holder = (ViewHolder) convertView.getTag();
+
+        holder.siteNameView.setText(getItem(position).name);
 
         if (getItem(position).userType.equals(UserType.REGISTERED))
-        {
-            textView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
-            textView.setVisibility(View.VISIBLE);
-        }
-
+            holder.registeredView.setVisibility(View.VISIBLE);
+        else
+            holder.registeredView.setVisibility(View.GONE);
+        
         if (getItem(position).writePermissions != null)
         {
             for (WritePermission permission : getItem(position).writePermissions)
             {
                 if (permission.canAdd & permission.canDelete & permission.canEdit)
                 {
-                    View writePermissionView = convertView.findViewById(R.id.writePermissionEnabled);
-                    writePermissionView.setVisibility(View.VISIBLE);
+                    holder.writePermissionView.setVisibility(View.VISIBLE);
                     break;
                 }
+                else
+                    holder.writePermissionView.setVisibility(View.GONE);
             }
         }
+        else
+            holder.writePermissionView.setVisibility(View.GONE);
 
-        setViewAndListenerForDefaultSiteOption(position, convertView);
+        setViewAndListenerForDefaultSiteOption(position, holder);
         setOnClickForSite(position, convertView);
         return convertView;
     }
 
-    private void setViewAndListenerForDefaultSiteOption(final int position, View layoutForSites)
+    private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder)
     {
         String currentDefaultSite = SharedPreferencesUtil.getDefaultSiteName(getContext());
-        final ImageView iv = (ImageView) layoutForSites.findViewById(R.id.isDefaultSite);
         if (isDefaultSite(currentDefaultSite, position))
-            iv.setImageResource(R.drawable.circle_delft);
+            holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
         else
-            iv.setImageResource(R.drawable.circle_white);
+            holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
 
-        iv.setOnClickListener(new View.OnClickListener()
+        holder.defaultSiteOpt.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -103,12 +123,12 @@ public class SiteListAdapter extends ArrayAdapter<Site>
                 String currentDefaultSite = SharedPreferencesUtil.getDefaultSiteName(getContext());
                 if (isDefaultSite(currentDefaultSite, position))
                 {
-                    iv.setImageResource(R.drawable.circle_white);
+                    holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
                     SharedPreferencesUtil.clearDefaultSite(getContext());
                 }
                 else
                 {
-                    iv.setImageResource(R.drawable.circle_delft);
+                    holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
                     SharedPreferencesUtil.setDefaultSite(getContext(), getItem(position));
                     notifyDataSetChanged();
                     Toast.makeText(getContext(), getItem(position).name + " set as default site.", Toast.LENGTH_LONG)

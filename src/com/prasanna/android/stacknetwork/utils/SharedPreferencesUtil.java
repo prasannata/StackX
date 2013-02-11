@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -27,9 +27,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 
 import android.content.Context;
@@ -40,10 +39,8 @@ import android.util.Log;
 
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.Account;
-import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User;
-import com.prasanna.android.stacknetwork.model.User.UserType;
 
 public class SharedPreferencesUtil
 {
@@ -56,7 +53,7 @@ public class SharedPreferencesUtil
         public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
     }
 
-    public static void setOnOff(Context context, String key, boolean on)
+    public static void setBoolean(Context context, String key, boolean on)
     {
         if (context != null && key != null)
         {
@@ -66,7 +63,7 @@ public class SharedPreferencesUtil
         }
     }
 
-    public static boolean isOn(Context context, String name, boolean defaultValue)
+    public static boolean isSet(Context context, String name, boolean defaultValue)
     {
         if (context == null || name == null)
             return defaultValue;
@@ -122,12 +119,12 @@ public class SharedPreferencesUtil
 
     public static boolean isFirstRun(Context context)
     {
-        return isOn(context, StringConstants.IS_FIRST_RUN, true);
+        return isSet(context, StringConstants.IS_FIRST_RUN, true);
     }
 
     public static void setFirstRunComplete(Context context)
     {
-        setOnOff(context, StringConstants.IS_FIRST_RUN, false);
+        setBoolean(context, StringConstants.IS_FIRST_RUN, false);
     }
 
     public static void clearDefaultSite(Context context)
@@ -201,80 +198,18 @@ public class SharedPreferencesUtil
         return present;
     }
 
-    public static void cacheSiteList(File cacheDir, ArrayList<Site> sites)
-    {
-        if (cacheDir != null && sites != null && sites.isEmpty() == false)
-        {
-            Log.d(TAG, "Caching sites");
-
-            writeObject(sites, cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
-
-            ArrayList<Site> registeredSites = new ArrayList<Site>();
-
-            for (Site site : sites)
-            {
-                if (site.userType.equals(UserType.REGISTERED))
-                {
-                    registeredSites.add(site);
-                }
-            }
-
-            SoftReference<ArrayList<Site>> registeredSitesSoftReference = new SoftReference<ArrayList<Site>>(
-                            registeredSites);
-
-            if (!registeredSites.isEmpty())
-                cacheRegisteredSites(cacheDir, registeredSitesSoftReference.get());
-
-        }
-    }
-
-    public static void clearSiteListCache(File cacheDir)
-    {
-        if (cacheDir != null)
-        {
-            deleteDir(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
-            deleteDir(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
-        }
-    }
-
-    public static void cacheQuestion(File cacheDir, Question question)
-    {
-        Log.d(TAG, "Caching question");
-
-        if (question != null && question.id > 0)
-        {
-            File directory = new File(cacheDir, StringConstants.QUESTIONS);
-
-            writeObject(question, directory, String.valueOf(question.id));
-        }
-    }
-
-    public static void cacheRegisteredSites(File cacheDir, ArrayList<Site> sites)
+    public static void cacheRegisteredSites(File cacheDir, HashSet<String> sites)
     {
         Log.d(TAG, "Caching registered sites");
 
-        HashMap<String, Site> sitesMap = new HashMap<String, Site>();
-
-        for (Site site : sites)
-        {
-            sitesMap.put(site.name, site);
-        }
-
-        writeObject(sitesMap, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
+        writeObject(sites, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
     }
 
     @SuppressWarnings("unchecked")
-    public static ArrayList<Site> getSiteListFromCache(File cacheDir)
+    public static HashSet<String> getRegisteredSitesForUser(File cacheDir)
     {
         Log.d(TAG, cacheDir.toString());
-        return (ArrayList<Site>) readObject(new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static HashMap<String, Site> getRegisteredSitesForUser(File cacheDir)
-    {
-        Log.d(TAG, cacheDir.toString());
-        return (HashMap<String, Site>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
+        return (HashSet<String>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
     }
 
     /**
@@ -432,9 +367,7 @@ public class SharedPreferencesUtil
             File cacheDir = context.getCacheDir();
 
             if (cacheDir != null && cacheDir.isDirectory())
-            {
                 deleteDir(cacheDir);
-            }
 
             clearSharedPreferences(context);
         }
@@ -548,8 +481,7 @@ public class SharedPreferencesUtil
     public static String getHumanReadableCacheSize(File cacheDir)
     {
         final int BYTE_UNIT = 1024;
-        final String[] sizeUnit =
-        { "K", "M" };
+        final String[] sizeUnit = { "K", "M" };
         long size = size(cacheDir);
 
         if (size < BYTE_UNIT)

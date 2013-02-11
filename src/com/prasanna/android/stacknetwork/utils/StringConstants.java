@@ -30,8 +30,10 @@ public class StringConstants
 
     public static final String ACCOUNTS = "accounts";
     public static final String ACCOUNT_ID = "account_id";
+    public static final String ACCOUNTS_LAST_UPDATED = "accounts_last_updated";
 
     public static final String SITES = "sites";
+    public static final String SITES_INIT = "sites_init";
     public static final String SITE = "site";
 
     public static final String QUESTION = "question";

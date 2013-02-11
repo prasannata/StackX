@@ -28,10 +28,14 @@ public class Site implements Serializable
 {
     private static final long serialVersionUID = 7057957647981597410L;
 
+    public long dbId;
+    
     public String name;
 
     public String apiSiteParameter;
 
+    public String audience;
+    
     public String link;
 
     public int headerResId;

@@ -214,4 +214,18 @@ public class ProfileDAO extends AbstractBaseDao
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
     }
+    
+    public static void purge(Context context)
+    {
+        ProfileDAO profileDao = new ProfileDAO(context);
+        try
+        {
+            profileDao.open();
+            profileDao.deleteAll();
+        }
+        finally
+        {
+            profileDao.close();
+        }
+    }
 }

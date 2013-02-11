@@ -21,6 +21,7 @@ package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import android.content.Intent;
@@ -37,8 +38,12 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
+import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
+import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -112,7 +117,7 @@ public class UserIntentService extends AbstractIntentService
                     break;
                 case GET_USER_SITES:
                     bundle.putSerializable(StringConstants.SITES,
-                            getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
+                                    getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
                     receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
@@ -157,7 +162,7 @@ public class UserIntentService extends AbstractIntentService
                         profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
                         profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
                         SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID,
-                                userPage.items.get(0).id);
+                                        userPage.items.get(0).id);
                     }
                 }
                 else
@@ -185,7 +190,7 @@ public class UserIntentService extends AbstractIntentService
     private boolean profileOlderThanThirtyMinutes(User myProfile)
     {
         return myProfile == null
-                || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
+                        || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
     }
 
     private HashMap<String, Account> getUserAccounts(boolean me, long userId)
@@ -204,7 +209,7 @@ public class UserIntentService extends AbstractIntentService
         try
         {
             long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
-                    -1);
+                            -1);
             if (currentAccountId != -1)
             {
                 userAccountsDao.open();
@@ -278,10 +283,18 @@ public class UserIntentService extends AbstractIntentService
 
     private ArrayList<Site> getUserSites(ResultReceiver receiver, boolean forAuthenicatedUser)
     {
+        ArrayList<Site> sites = getSites();
+
+        if(sites != null)
+        {
+            Log.d(TAG, "Returning site list from DB");
+            return sites;
+        }
+        
         LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
         if (!forAuthenicatedUser)
-            return new ArrayList<Site>(linkSitesMap.values());
+            return persistAndGetList(linkSitesMap);
 
         LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
         HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
@@ -289,13 +302,15 @@ public class UserIntentService extends AbstractIntentService
         if (linkAccountsMap != null && linkSitesMap != null)
         {
             long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
-                    -1);
+                            -1);
             if (currentAccountId == -1 && !linkAccountsMap.isEmpty())
             {
                 currentAccountId = linkAccountsMap.values().iterator().next().id;
 
                 Log.d(TAG, "Setting account id in shared preferences: " + currentAccountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, currentAccountId);
+                SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNTS_LAST_UPDATED,
+                                System.currentTimeMillis());
                 persistMyAccounts(linkAccountsMap);
             }
 
@@ -307,46 +322,162 @@ public class UserIntentService extends AbstractIntentService
 
                     Site site = linkSitesMap.get(siteUrl);
                     site.userType = linkAccountsMap.get(siteUrl).userType;
-                    site.writePermissions = userService.checkForWritePermission(site.apiSiteParameter);
-
-                    notifyReceiver(receiver, site);
-
+                    site.writePermissions = userService.getWritePermissions(site.apiSiteParameter);
+                    persistPermissions(site, site.writePermissions);
                     regSitesFirstMap.put(siteUrl, site);
                     linkSitesMap.remove(siteUrl);
                 }
             }
 
+            SharedPreferencesUtil.cacheRegisteredSites(getCacheDir(), new HashSet<String>(linkSitesMap.keySet()));
             regSitesFirstMap.putAll(linkSitesMap);
         }
 
-        return new ArrayList<Site>(regSitesFirstMap.values());
-
+        return persistAndGetList(regSitesFirstMap);
     }
 
-    private void persistMyAccounts(HashMap<String, Account> linkAccountsMap)
+    private ArrayList<Site> getSites()
     {
-        UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
+        SiteDAO siteDAO = new SiteDAO(getApplicationContext());
+
         try
         {
-            userAccountsDao.open();
-            userAccountsDao.insert(new ArrayList<Account>(linkAccountsMap.values()));
+            siteDAO.open();
+            return siteDAO.getSites();
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            Log.e(TAG, e.getMessage());
         }
         finally
         {
-            userAccountsDao.close();
+            siteDAO.close();
         }
+
+        return null;
     }
 
-    private void notifyReceiver(ResultReceiver receiver, Site site)
+    private ArrayList<Site> persistAndGetList(LinkedHashMap<String, Site> linkSitesMap)
     {
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(StringConstants.PERMISSION, site.writePermissions);
-        bundle.putSerializable(StringConstants.SITE, site);
-        receiver.send(CHECK_WRITE_PERMISSION, bundle);
+        ArrayList<Site> sites;
+        sites = new ArrayList<Site>(linkSitesMap.values());
+        persistSites(sites);
+        SharedPreferencesUtil.setBoolean(getApplicationContext(), StringConstants.SITES_INIT, true);
+        return sites;
+    }
+
+    private void persistSites(final ArrayList<Site> sites)
+    {
+        AppUtils.runOnBackgroundThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                SiteDAO dao = new SiteDAO(getApplicationContext());
+
+                dao.open();
+                try
+                {
+                    dao.insert(sites);
+                }
+                catch (SQLException e)
+                {
+                    Log.d(TAG, e.getMessage());
+                }
+                finally
+                {
+                    dao.close();
+                }
+            }
+        });
+    }
+
+    private void persistPermissions(final Site site, final ArrayList<WritePermission> permissions)
+    {
+        AppUtils.runOnBackgroundThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                persist(site, permissions);
+            }
+
+            private void persist(final Site site, final ArrayList<WritePermission> permissions)
+            {
+                WritePermissionDAO writePermissionDAO = new WritePermissionDAO(getApplicationContext());
+
+                try
+                {
+                    writePermissionDAO.open();
+                    writePermissionDAO.insert(site, permissions);
+
+                    for (WritePermission permission : permissions)
+                    {
+                        if (permission.objectType != null)
+                            switchOnObjectType(permission);
+                    }
+                }
+                catch (SQLException e)
+                {
+                    Log.d(TAG, e.getMessage());
+                }
+                finally
+                {
+                    writePermissionDAO.close();
+                }
+            }
+
+            private void switchOnObjectType(WritePermission permission)
+            {
+                switch (permission.objectType)
+                {
+                    case ANSWER:
+                        SharedPreferencesUtil.setLong(getApplicationContext(),
+                                        WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
+                                        permission.minSecondsBetweenActions);
+                        break;
+                    case COMMENT:
+                        SharedPreferencesUtil.setLong(getApplicationContext(),
+                                        WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
+                                        permission.minSecondsBetweenActions);
+                        break;
+                    case QUESTION:
+                        SharedPreferencesUtil.setLong(getApplicationContext(),
+                                        WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
+                                        permission.minSecondsBetweenActions);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+
+    private void persistMyAccounts(final HashMap<String, Account> linkAccountsMap)
+    {
+        AppUtils.runOnBackgroundThread(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
+                try
+                {
+                    userAccountsDao.open();
+                    userAccountsDao.insert(new ArrayList<Account>(linkAccountsMap.values()));
+                }
+                catch (SQLException e)
+                {
+                    Log.d(TAG, e.getMessage());
+                }
+                finally
+                {
+                    userAccountsDao.close();
+                }
+
+            }
+        });
     }
 
     private void deauthenticateApp(String accessToken)

@@ -37,6 +37,7 @@ import android.widget.LinearLayout;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
+import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -147,11 +148,13 @@ public class LogoutActivity extends Activity
             editor.commit();
 
             SharedPreferencesUtil.clear(getApplicationContext());
-            SharedPreferencesUtil.setFirstRunComplete(this);
-            deleteMyTags();
-            deleteWritePermissions();
-            deleteMyProfile();
-            CookieSyncManager.createInstance(this);
+            SharedPreferencesUtil.setFirstRunComplete(getApplicationContext());
+            SiteDAO.purge(getApplicationContext());
+            TagDAO.purge(getApplicationContext());
+            WritePermissionDAO.purge(getApplicationContext());
+            SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
+            ProfileDAO.purge(getApplicationContext());
+            CookieSyncManager.createInstance(getApplicationContext());
             CookieManager cookieManager = CookieManager.getInstance();
             cookieManager.removeAllCookie();
             startLoginActivity();
@@ -165,51 +168,6 @@ public class LogoutActivity extends Activity
         {
             Log.d(TAG, "Logout failed for unknown reason");
             finish();
-        }
-    }
-
-    private void deleteMyProfile()
-    {
-        SharedPreferencesUtil.remove(this, StringConstants.USER_ID);
-
-        ProfileDAO profileDao = new ProfileDAO(this);
-        try
-        {
-            profileDao.open();
-            profileDao.deleteAll();
-        }
-        finally
-        {
-            profileDao.close();
-        }
-    }
-
-    private void deleteWritePermissions()
-    {
-        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(this);
-        try
-        {
-            writePermissionDAO.open();
-            writePermissionDAO.deleteAll();
-        }
-        finally
-        {
-            writePermissionDAO.close();
-        }
-
-    }
-
-    private void deleteMyTags()
-    {
-        TagDAO tagDAO = new TagDAO(this);
-        try
-        {
-            tagDAO.open();
-            tagDAO.deleteAll();
-        }
-        finally
-        {
-            tagDAO.close();
         }
     }
 }

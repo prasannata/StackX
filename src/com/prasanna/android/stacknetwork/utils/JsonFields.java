@@ -68,6 +68,7 @@ public class JsonFields
     public static class Site
     {
         public static final String NAME = "name";
+        public static final String AUDIENCE = "audience";
         public static final String LOGO_URL = "logo_url";
         public static final String API_SITE_PARAMETER = "api_site_parameter";
         public static final String SITE_URL = "site_url";

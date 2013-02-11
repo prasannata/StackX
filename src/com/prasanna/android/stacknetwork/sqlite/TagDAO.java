@@ -31,7 +31,6 @@ import android.database.SQLException;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Tag;
-import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
 
 public class TagDAO extends AbstractBaseDao
 {
@@ -88,7 +87,7 @@ public class TagDAO extends AbstractBaseDao
                     database.insert(TABLE_NAME, null, values);
                 }
 
-                insertAuditEntry(site);
+                insertAuditEntry(AUDIT_ENTRY_TYPE, site);
 
                 database.setTransactionSuccessful();
                 return true;
@@ -106,35 +105,9 @@ public class TagDAO extends AbstractBaseDao
         return false;
     }
 
-    private void insertAuditEntry(String site)
-    {
-        ContentValues values = new ContentValues();
-        values.put(AuditTable.COLUMN_SITE, site);
-        values.put(AuditTable.COLUMN_TYPE, AUDIT_ENTRY_TYPE);
-        values.put(AuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
-        Log.d(TAG, "Audit entry for tags: " + values.toString());
-        database.insert(DatabaseHelper.TABLE_AUDIT, null, values);
-    }
-
     public long getLastUpdateTime(String site)
     {
-        String[] cols = new String[]
-        { AuditTable.COLUMN_LAST_UPDATE_TIME };
-        String selection = DatabaseHelper.AuditTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs =
-        { site };
-
-        Cursor cursor = database.query(DatabaseHelper.TABLE_AUDIT, cols, selection, selectionArgs, null, null, null);
-
-        if (cursor == null || cursor.getCount() == 0)
-        {
-            Log.d(TAG, "getLastUpdateTime for " + site + ", no entries found");
-            return 0L;
-        }
-
-        cursor.moveToFirst();
-
-        return cursor.getLong(0);
+        return getLastUpdateTime(AUDIT_ENTRY_TYPE, site);
     }
 
     public LinkedHashSet<Tag> getTagSet(String site)
@@ -181,11 +154,9 @@ public class TagDAO extends AbstractBaseDao
 
     private Cursor getCursor(String site)
     {
-        String[] cols = new String[]
-        { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
+        String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = TagsTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs =
-        { site };
+        String[] selectionArgs = { site };
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, orderBy);
@@ -194,11 +165,9 @@ public class TagDAO extends AbstractBaseDao
 
     public LinkedHashSet<Tag> getTags(String site, boolean includeLocalTags)
     {
-        String[] cols = new String[]
-        { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
+        String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
-        String[] selectionArgs =
-        { site, includeLocalTags ? "1" : "0" };
+        String[] selectionArgs = { site, includeLocalTags ? "1" : "0" };
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, orderBy);
@@ -228,25 +197,29 @@ public class TagDAO extends AbstractBaseDao
     public void deleteAll()
     {
         database.delete(TABLE_NAME, null, null);
+        deleteAuditEntry(AUDIT_ENTRY_TYPE, null);
     }
 
     public void deleteTagsFromServerForSite(String site)
     {
         String whereClause = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
-        String[] whereArgs =
-        { site, "0" };
+        String[] whereArgs = { site, "0" };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
-
-        deleteAuditEntry(site);
+        deleteAuditEntry(AUDIT_ENTRY_TYPE, site);
     }
 
-    private void deleteAuditEntry(String site)
+    public static void purge(Context context)
     {
-        String whereClause = TagsTable.COLUMN_SITE + " = ?";
-        String[] whereArgs =
-        { site };
-        database.delete(DatabaseHelper.TABLE_AUDIT, whereClause, whereArgs);
+        TagDAO tagDAO = new TagDAO(context);
+        try
+        {
+            tagDAO.open();
+            tagDAO.deleteAll();
+        }
+        finally
+        {
+            tagDAO.close();
+        }
     }
-
 }

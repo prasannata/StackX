@@ -19,9 +19,15 @@
 
 package com.prasanna.android.stacknetwork.sqlite;
 
+import java.util.ArrayList;
+
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
 
 public abstract class AbstractBaseDao
 {
@@ -37,15 +43,71 @@ public abstract class AbstractBaseDao
     {
         return database != null && database.isOpen();
     }
-    
+
     public void open() throws SQLException
     {
-        database = databaseHelper.getWritableDatabase();
+        if (!isOpen())
+            database = databaseHelper.getWritableDatabase();
+    }
+
+    public void openReadOnly() throws SQLException
+    {
+        database = databaseHelper.getReadableDatabase();
     }
 
     public void close()
     {
         databaseHelper.close();
+    }
+
+    protected void insertAuditEntry(String type, String site)
+    {
+        ContentValues values = new ContentValues();
+        if (site != null)
+            values.put(AuditTable.COLUMN_SITE, site);
+        values.put(AuditTable.COLUMN_TYPE, type);
+        values.put(AuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
+        database.insert(DatabaseHelper.TABLE_AUDIT, null, values);
+    }
+
+    protected void deleteAuditEntry(String type, String site)
+    {
+        ArrayList<String> whereArgs = new ArrayList<String>();
+        whereArgs.add(type);
+
+        String whereClause = AuditTable.COLUMN_TYPE + " = ?";
+        if (site != null)
+        {
+            whereClause += " and " + AuditTable.COLUMN_SITE + " = ?";
+            whereArgs.add(site);
+        }
+
+        database.delete(DatabaseHelper.TABLE_AUDIT, whereClause, whereArgs.toArray(new String[whereArgs.size()]));
+    }
+
+    protected long getLastUpdateTime(String type, String site)
+    {
+        ArrayList<String> selectionArgs = new ArrayList<String>();
+        selectionArgs.add(type);
+
+        String[] cols = new String[] { AuditTable.COLUMN_LAST_UPDATE_TIME };
+        String selection = AuditTable.COLUMN_TYPE + " = ?";
+
+        if (site != null)
+        {
+            selection += " and " + AuditTable.COLUMN_SITE + " = ?";
+            selectionArgs.add(site);
+        }
+
+        Cursor cursor = database.query(DatabaseHelper.TABLE_AUDIT, cols, selection,
+                        selectionArgs.toArray(new String[selectionArgs.size()]), null, null, null);
+
+        if (cursor == null || cursor.getCount() == 0)
+            return 0L;
+
+        cursor.moveToFirst();
+
+        return cursor.getLong(0);
     }
 
 }
