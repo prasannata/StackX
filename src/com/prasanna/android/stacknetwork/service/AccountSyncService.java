@@ -68,11 +68,11 @@ public class AccountSyncService extends AbstractStackxService
             if (AppUtils.aDaySince(sitesLastUpdated))
                 refreshSiteList(sites);
 
-            // long accountsLastUpdated = SharedPreferencesUtil
-            // .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
-            //
-            // if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
-            newThingsFound = syncAccounts(sites);
+            long accountsLastUpdated = SharedPreferencesUtil
+                            .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
+
+            if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
+                newThingsFound = syncAccounts(sites);
 
             onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
         }
