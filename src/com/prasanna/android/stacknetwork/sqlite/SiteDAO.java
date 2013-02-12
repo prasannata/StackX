@@ -245,7 +245,7 @@ public class SiteDAO extends AbstractBaseDao
         database.update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
-    public void updateRegistrationInfo(ArrayList<Account> newAccounts)
+    public void updateRegistrationInfo(ArrayList<Account> newAccounts, boolean allRegistered)
     {
         for (Account account : newAccounts)
         {
@@ -254,7 +254,7 @@ public class SiteDAO extends AbstractBaseDao
 
             ContentValues values = new ContentValues();
 
-            if (account.userType != null)
+            if (allRegistered)
                 values.put(SiteTable.COLUMN_USER_TYPE, account.userType.getValue());
             else
                 values.put(SiteTable.COLUMN_USER_TYPE, (String) null);
@@ -301,13 +301,13 @@ public class SiteDAO extends AbstractBaseDao
         }
     }
 
-    public static void updateSites(final Context context, final ArrayList<Account> accounts)
+    public static void updateSites(final Context context, final ArrayList<Account> accounts, final boolean allRegistered)
     {
         SiteDAO siteDAO = new SiteDAO(context);
         try
         {
             siteDAO.open();
-            siteDAO.updateRegistrationInfo(accounts);
+            siteDAO.updateRegistrationInfo(accounts, allRegistered);
         }
         catch (SQLException e)
         {

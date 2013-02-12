@@ -128,7 +128,7 @@ public class AccountSyncService extends AbstractStackxService
                             }
 
                             DbRequestThreadExecutor.persistAccounts(context, newAccounts);
-                            SiteDAO.updateSites(context, newAccounts);
+                            SiteDAO.updateSites(context, newAccounts, true);
                             newThingsFound = true;
                         }
 
@@ -138,7 +138,7 @@ public class AccountSyncService extends AbstractStackxService
 
                             UserAccountsDAO.delete(context, existingAccounts);
                             WritePermissionDAO.delete(context, existingAccounts);
-                            SiteDAO.updateSites(context, newAccounts);
+                            SiteDAO.updateSites(context, existingAccounts, false);
                             newThingsFound = true;
                         }
                     }
