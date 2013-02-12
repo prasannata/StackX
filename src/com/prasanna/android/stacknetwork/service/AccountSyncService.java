@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +34,7 @@ import android.util.Log;
 import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
@@ -68,87 +68,133 @@ public class AccountSyncService extends AbstractStackxService
             if (AppUtils.aDaySince(sitesLastUpdated))
                 refreshSiteList(sites);
 
-            long accountsLastUpdated = SharedPreferencesUtil
-                            .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
+            // long accountsLastUpdated = SharedPreferencesUtil
+            // .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
+            //
+            // if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
+            newThingsFound = syncAccounts(sites);
 
-            if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
+            onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
+        }
+
+        private boolean syncAccounts(HashMap<String, Site> sites)
+        {
+            boolean accountsAdded = false;
+            boolean accountsDeleted = false;
+
+            Log.d(TAG, "Syncing user accounts");
+
+            long accountId = SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L);
+            HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getAccounts(1);
+            ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
+            if (existingAccounts == null)
             {
-                Log.d(TAG, "Syncing user accounts");
-
-                long accountId = SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L);
-                HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getAccounts(1);
+                Log.d(TAG, "User with no accounts has accounts");
+                addNewAccounts(sites, retrievedAccounts);
+                accountsAdded = true;
+            }
+            else
+            {
                 if (retrievedAccounts != null)
                 {
-                    ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
-                    if (existingAccounts == null)
-                    {
-                        Log.d(TAG, "User with no accounts has accounts");
-                        DbRequestThreadExecutor.persistAccounts(context,
-                                        new ArrayList<Account>(retrievedAccounts.values()));
-                    }
-                    else
-                    {
-                        ArrayList<Account> newAccounts = null;
-                        int existingAccountsSize = existingAccounts.size();
-                        Iterator<Account> existingAccountIter = existingAccounts.iterator();
-                        while (existingAccountIter.hasNext())
-                        {
-                            Account existingAccount = existingAccountIter.next();
+                    accountsDeleted = checkAndUpdateForDeletedAccounts(new HashMap<String, Account>(retrievedAccounts),
+                                    new ArrayList<Account>(existingAccounts));
 
-                            if (!retrievedAccounts.containsKey(existingAccount.siteUrl))
-                            {
-                                Log.d(TAG, "deleted account: " + existingAccount.siteName);
-                                existingAccountIter.remove();
-                            }
-                            else
-                            {
-                                Log.d(TAG, "Existing account: " + existingAccount.siteName);
-                                retrievedAccounts.remove(existingAccount.siteUrl);
-                            }
-                        }
-
-                        if (!retrievedAccounts.isEmpty())
-                        {
-                            Log.d(TAG, "Adding new accounts to DB");
-
-                            for (Map.Entry<String, Account> entry : retrievedAccounts.entrySet())
-                            {
-                                Log.d(TAG, "New account: " + entry.getValue().siteName);
-                                if (newAccounts == null)
-                                    newAccounts = new ArrayList<Account>();
-
-                                Site site = sites.get(entry.getValue().siteUrl);
-                                if (site != null)
-                                {
-                                    site.writePermissions = UserServiceHelper.getInstance().getWritePermissions(
-                                                    site.apiSiteParameter);
-                                    DbRequestThreadExecutor.persistPermissions(context, site, site.writePermissions);
-                                }
-                                newAccounts.add(entry.getValue());
-                            }
-
-                            DbRequestThreadExecutor.persistAccounts(context, newAccounts);
-                            SiteDAO.updateSites(context, newAccounts, true);
-                            newThingsFound = true;
-                        }
-
-                        if (existingAccountsSize != existingAccounts.size())
-                        {
-                            Log.d(TAG, "Removing accounts from DB");
-
-                            UserAccountsDAO.delete(context, existingAccounts);
-                            WritePermissionDAO.delete(context, existingAccounts);
-                            SiteDAO.updateSites(context, existingAccounts, false);
-                            newThingsFound = true;
-                        }
-                    }
-
-                    SharedPreferencesUtil.setLong(context, StringConstants.ACCOUNTS_LAST_UPDATED,
-                                    System.currentTimeMillis());
+                    accountsAdded = checkAndUpdateNewAccounts(sites, new HashMap<String, Account>(retrievedAccounts),
+                                    new ArrayList<Account>(existingAccounts));
                 }
             }
 
-            onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
+            SharedPreferencesUtil.setLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, System.currentTimeMillis());
+            return accountsAdded || accountsDeleted;
+        }
+
+        private boolean checkAndUpdateForDeletedAccounts(HashMap<String, Account> retrievedAccounts,
+                        ArrayList<Account> existingAccounts)
+        {
+            int existingAccountsSize = existingAccounts.size();
+            Iterator<Account> existingAccountIter = existingAccounts.iterator();
+
+            while (existingAccountIter.hasNext())
+            {
+                Account existingAccount = existingAccountIter.next();
+
+                if (retrievedAccounts.containsKey(existingAccount.siteUrl))
+                {
+                    Log.d(TAG, "deleted account: " + existingAccount.siteName);
+                    existingAccountIter.remove();
+                }
+            }
+
+            if (existingAccounts.size() > 0 && existingAccountsSize != existingAccounts.size())
+            {
+                Log.d(TAG, "Removing accounts from DB");
+                removeAccounts(existingAccounts);
+                return true;
+            }
+
+            return false;
+        }
+
+        private void removeAccounts(ArrayList<Account> existingAccounts)
+        {
+            UserAccountsDAO.delete(context, existingAccounts);
+            WritePermissionDAO.delete(context, existingAccounts);
+            SiteDAO.updateSites(context, existingAccounts, false);
+        }
+
+        private boolean checkAndUpdateNewAccounts(HashMap<String, Site> sites,
+                        HashMap<String, Account> retrievedAccounts, ArrayList<Account> existingAccounts)
+        {
+            ArrayList<Account> newAccounts = null;
+            for (Account existingAccount : existingAccounts)
+            {
+                if (retrievedAccounts.containsKey(existingAccount.siteUrl))
+                    retrievedAccounts.remove(existingAccount.siteUrl);
+            }
+
+            if (!retrievedAccounts.isEmpty())
+            {
+                for (String key : retrievedAccounts.keySet())
+                {
+                    Log.d(TAG, "New account : " + key);
+                    Site site = sites.get(key);
+                    getAndPersistWritePermissions(site);
+                    if (newAccounts == null)
+                        newAccounts = new ArrayList<Account>();
+
+                    newAccounts.add(retrievedAccounts.get(key));
+                }
+
+                if (newAccounts != null)
+                {
+                    UserAccountsDAO.insertAll(context, newAccounts);
+                    DbRequestThreadExecutor.persistAccounts(context, newAccounts);
+                    SiteDAO.updateSites(context, newAccounts, true);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void addNewAccounts(HashMap<String, Site> sites, HashMap<String, Account> retrievedAccounts)
+        {
+            UserAccountsDAO.insertAll(context, new ArrayList<Account>(retrievedAccounts.values()));
+
+            for (String siteUrl : retrievedAccounts.keySet())
+            {
+                Site site = sites.get(siteUrl);
+                getAndPersistWritePermissions(site);
+            }
+        }
+
+        private void getAndPersistWritePermissions(Site site)
+        {
+            ArrayList<WritePermission> writePermissions = UserServiceHelper.getInstance().getWritePermissions(
+                            site.apiSiteParameter);
+            if (writePermissions != null)
+                DbRequestThreadExecutor.persistPermissionsInCurrentThread(context, site, writePermissions);
         }
 
         private void refreshSiteList(HashMap<String, Site> sites)

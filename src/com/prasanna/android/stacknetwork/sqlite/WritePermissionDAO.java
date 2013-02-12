@@ -116,7 +116,8 @@ public class WritePermissionDAO extends AbstractBaseDao
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
                         + " = ?";
-        String[] selectionArgs = { site, objectType.getValue() };
+        String[] selectionArgs =
+        { site, objectType.getValue() };
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -129,10 +130,12 @@ public class WritePermissionDAO extends AbstractBaseDao
 
     public ArrayList<String> getSites()
     {
-        String[] cols = { WritePermissionTable.COLUMN_SITE };
+        String[] cols =
+        { WritePermissionTable.COLUMN_SITE };
         String selection = WritePermissionTable.COLUMN_ADD + " = ? and" + WritePermissionTable.COLUMN_DEL + " = ? and "
                         + WritePermissionTable.COLUMN_EDIT + "= ?";
-        String[] selectionArgs = { "1", "1", "1" };
+        String[] selectionArgs =
+        { "1", "1", "1" };
 
         Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -154,7 +157,8 @@ public class WritePermissionDAO extends AbstractBaseDao
             return null;
 
         String selection = WritePermissionTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs = { site };
+        String[] selectionArgs =
+        { site };
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -218,17 +222,19 @@ public class WritePermissionDAO extends AbstractBaseDao
 
     public void delete(ArrayList<Account> deletedAccounts)
     {
-        if(deletedAccounts != null)
+        if (deletedAccounts != null)
         {
-            for(Account account : deletedAccounts)
+            for (Account account : deletedAccounts)
             {
+                Log.d(TAG, "Deleting write permission for " + account.siteUrl);
                 String whereClause = WritePermissionTable.COLUMN_SITE_URL + " = ?";
-                String[] whereArgs = new String[] { account.siteUrl };
+                String[] whereArgs = new String[]
+                { account.siteUrl };
                 database.delete(TABLE_NAME, whereClause, whereArgs);
             }
         }
     }
-    
+
     public static void delete(final Context context, final ArrayList<Account> deletedAccounts)
     {
         WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);

@@ -81,11 +81,13 @@ public class SiteListAdapter extends ArrayAdapter<Site>
 
         holder.siteNameView.setText(getItem(position).name);
 
-        if (getItem(position).userType.equals(UserType.REGISTERED))
+        if (getItem(position).userType != null && getItem(position).userType.equals(UserType.REGISTERED))
             holder.registeredView.setVisibility(View.VISIBLE);
         else
             holder.registeredView.setVisibility(View.GONE);
-        
+
+        holder.writePermissionView.setVisibility(View.GONE);
+
         if (getItem(position).writePermissions != null)
         {
             for (WritePermission permission : getItem(position).writePermissions)
@@ -95,12 +97,8 @@ public class SiteListAdapter extends ArrayAdapter<Site>
                     holder.writePermissionView.setVisibility(View.VISIBLE);
                     break;
                 }
-                else
-                    holder.writePermissionView.setVisibility(View.GONE);
             }
         }
-        else
-            holder.writePermissionView.setVisibility(View.GONE);
 
         setViewAndListenerForDefaultSiteOption(position, holder);
         setOnClickForSite(position, convertView);

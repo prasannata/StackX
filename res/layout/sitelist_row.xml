@@ -29,32 +29,35 @@
         android:textColor="@color/black"
         android:textSize="15sp" />
 
-    <ImageView
-        android:id="@+id/writePermissionEnabled"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="2dp"
-        android:layout_marginTop="5dp"
-        android:gravity="center"
-        android:src="@drawable/dark_32x32_edit"
-        android:visibility="gone" />
+        android:layout_marginTop="5dp" >
 
-    <TextView
-        android:id="@+id/siteUserTypeRegistered"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="5dp"
-        android:layout_toLeftOf="@id/writePermissionEnabled"
-        android:layout_toRightOf="@id/siteName"
-        android:gravity="right|center_vertical"
-        android:text="@string/registered"
-        android:textColor="@color/darkGreen"
-        android:textSize="8sp"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/siteUserTypeRegistered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="5dp"
+            android:gravity="right|center_vertical"
+            android:text="@string/registered"
+            android:textColor="@color/darkGreen"
+            android:textSize="8sp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/writePermissionEnabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="2dp"
+            android:src="@drawable/dark_32x32_edit"
+            android:visibility="gone" />
+    </LinearLayout>
 
 </RelativeLayout>

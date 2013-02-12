@@ -77,55 +77,56 @@ public class DbRequestThreadExecutor
             @Override
             public void run()
             {
-                persist(site, permissions);
-            }
-
-            private void persist(final Site site, final ArrayList<WritePermission> permissions)
-            {
-                WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-
-                try
-                {
-                    writePermissionDAO.open();
-                    writePermissionDAO.insert(site, permissions);
-
-                    for (WritePermission permission : permissions)
-                    {
-                        if (permission.objectType != null)
-                            switchOnObjectType(permission);
-                    }
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    writePermissionDAO.close();
-                }
-            }
-
-            private void switchOnObjectType(WritePermission permission)
-            {
-                switch (permission.objectType)
-                {
-                    case ANSWER:
-                        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    case COMMENT:
-                        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    case QUESTION:
-                        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    default:
-                        break;
-                }
+                persistPermissionsInCurrentThread(context, site, permissions);
             }
         });
+    }
+
+    public static void persistPermissionsInCurrentThread(final Context context, final Site site,
+                    final ArrayList<WritePermission> permissions)
+    {
+        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
+
+        try
+        {
+            writePermissionDAO.open();
+            writePermissionDAO.insert(site, permissions);
+
+            for (WritePermission permission : permissions)
+            {
+                if (permission.objectType != null)
+                    switchOnObjectType(context, permission);
+            }
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            writePermissionDAO.close();
+        }
+    }
+
+    private static void switchOnObjectType(final Context context, final WritePermission permission)
+    {
+        switch (permission.objectType)
+        {
+            case ANSWER:
+                SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
+                                permission.minSecondsBetweenActions);
+                break;
+            case COMMENT:
+                SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
+                                permission.minSecondsBetweenActions);
+                break;
+            case QUESTION:
+                SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
+                                permission.minSecondsBetweenActions);
+                break;
+            default:
+                break;
+        }
     }
 
     public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site)
@@ -150,7 +151,7 @@ public class DbRequestThreadExecutor
                 return null;
             }
         };
-        
+
         Future<HashMap<String, SearchCriteria>> future = executor.submit(callable);
         try
         {

@@ -92,9 +92,11 @@ public class UserAccountsDAO extends AbstractBaseDao
 
     public long getLastUpdateTime()
     {
-        String[] cols = { AuditTable.COLUMN_LAST_UPDATE_TIME };
+        String[] cols =
+        { AuditTable.COLUMN_LAST_UPDATE_TIME };
         String selection = AuditTable.COLUMN_TYPE + " = ?";
-        String[] selectionArgs = { AUDIT_ENTRY_TYPE };
+        String[] selectionArgs =
+        { AUDIT_ENTRY_TYPE };
 
         Cursor cursor = database.query(DatabaseHelper.TABLE_AUDIT, cols, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -107,7 +109,8 @@ public class UserAccountsDAO extends AbstractBaseDao
     public ArrayList<Account> getAccounts(long accountId)
     {
         String selection = UserAccountsTable.COLUMN_ACCOUNT_ID + " = ?";
-        String[] selectionArgs = { String.valueOf(accountId) };
+        String[] selectionArgs =
+        { String.valueOf(accountId) };
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
@@ -150,8 +153,11 @@ public class UserAccountsDAO extends AbstractBaseDao
         {
             for (Account account : deletedAccounts)
             {
+                Log.d(TAG, "User account deleted for " + account.siteUrl);
+
                 String whereClause = UserAccountsTable.COLUMN_SITE_URL + " = ?";
-                String[] whereArgs = new String[] { account.siteUrl };
+                String[] whereArgs = new String[]
+                { account.siteUrl };
                 database.delete(TABLE_NAME, whereClause, whereArgs);
             }
         }

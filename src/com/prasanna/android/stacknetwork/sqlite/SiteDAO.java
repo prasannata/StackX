@@ -241,7 +241,8 @@ public class SiteDAO extends AbstractBaseDao
     public void update(Site site)
     {
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
-        String[] whereArgs = new String[] { site.apiSiteParameter };
+        String[] whereArgs = new String[]
+        { site.apiSiteParameter };
         database.update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
@@ -250,15 +251,17 @@ public class SiteDAO extends AbstractBaseDao
         for (Account account : newAccounts)
         {
             String whereClause = SiteTable.COLUMN_SITE_URL + "= ?";
-            String[] whereArgs = new String[] { account.siteUrl };
+            String[] whereArgs = new String[]
+            { account.siteUrl };
 
             ContentValues values = new ContentValues();
 
             if (allRegistered)
                 values.put(SiteTable.COLUMN_USER_TYPE, account.userType.getValue());
             else
-                values.put(SiteTable.COLUMN_USER_TYPE, (String) null);
+                values.put(SiteTable.COLUMN_USER_TYPE, "");
 
+            Log.d(TAG, "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
             database.update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
