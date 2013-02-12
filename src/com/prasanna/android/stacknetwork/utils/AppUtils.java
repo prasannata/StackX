@@ -120,6 +120,15 @@ public class AppUtils
         textView.setText(errorMsg);
         return errorLayout;
     }
+    
+    public static View getEmptyItemsView(Context context)
+    {
+        View noItemsFoundView = LayoutInflater.from(context).inflate(R.layout.empty_items, null);
+        TextView tv = (TextView) noItemsFoundView.findViewById(R.id.emptyStatus);
+        tv.setText("Nada");
+        tv.setTextSize(15f);
+        return noItemsFoundView;
+    }
 
     public static String getStackXErrorMsg(HttpException e)
     {

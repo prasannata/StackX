@@ -406,11 +406,13 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 @Override
                 public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
                 {
+                    searchCriteriaArrayAdapter.clear();
+                    listView.removeAllViews();
+                    
                     if (result != null)
-                    {
-                        searchCriteriaArrayAdapter.clear();
                         searchCriteriaArrayAdapter.addAll(result);
-                    }
+                    else
+                        listView.addFooterView(AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this));
                 }
             };
 
