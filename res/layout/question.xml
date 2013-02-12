@@ -115,7 +115,7 @@
         android:layout_gravity="bottom|left"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="7dp"
-        android:src="@drawable/navigation_back"
+        android:src="@drawable/dark_32x32_back"
         android:visibility="gone" />
 
 </FrameLayout>

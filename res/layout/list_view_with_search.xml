@@ -33,7 +33,7 @@
             android:layout_height="30dp"
             android:layout_marginRight="5dp"
             android:layout_weight="0.1"
-            android:background="@drawable/navigation_cancel"
+            android:background="@drawable/dark_24x24_cancel"
             android:padding="5dp"
             android:visibility="gone" />
     </LinearLayout>

@@ -64,7 +64,7 @@
         android:layout_below="@id/textInput"
         android:layout_marginTop="4dp"
         android:clickable="false"
-        android:drawableRight="@drawable/send_now_dark_32x32"
+        android:drawableRight="@drawable/dark_32x32_send_now"
         android:gravity="center"
         android:text="@string/post"
         android:textColor="@color/lightGrey"

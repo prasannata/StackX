@@ -41,7 +41,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_gravity="right"
                 android:layout_margin="3dp"
-                android:src="@drawable/undo_white_32x32" />
+                android:src="@drawable/light_32x32_undo" />
 
             <ImageView
                 android:id="@+id/runSearch"
@@ -51,7 +51,7 @@
                 android:layout_margin="3dp"
                 android:layout_toLeftOf="@id/clearCriteria"
                 android:clickable="true"
-                android:src="@drawable/search_white_32x32" />
+                android:src="@drawable/light_32x32_search" />
 
             <ImageView
                 android:id="@+id/loadCriteria"
@@ -61,7 +61,7 @@
                 android:layout_margin="3dp"
                 android:layout_toLeftOf="@id/runSearch"
                 android:clickable="true"
-                android:src="@drawable/collections_white_32x32" />
+                android:src="@drawable/light_32x32_collections" />
         </RelativeLayout>
 
         <EditText

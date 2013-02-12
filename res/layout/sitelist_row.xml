@@ -6,6 +6,17 @@
     android:background="@drawable/rounded_border_grey"
     android:orientation="horizontal" >
 
+    <RadioButton
+        android:id="@+id/isDefaultSite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp" />
+
     <ImageView
         android:id="@+id/isDefaultSite"
         android:layout_width="wrap_content"
@@ -39,7 +50,7 @@
         android:layout_marginRight="2dp"
         android:layout_marginTop="5dp"
         android:gravity="center"
-        android:src="@drawable/content_edit_32x32"
+        android:src="@drawable/dark_32x32_edit"
         android:visibility="gone" />
 
     <TextView
@@ -49,8 +60,8 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="2dp"
         android:layout_marginTop="5dp"
-        android:layout_toRightOf="@id/siteName"
         android:layout_toLeftOf="@id/writePermissionEnabled"
+        android:layout_toRightOf="@id/siteName"
         android:gravity="right|center_vertical"
         android:text="@string/registered"
         android:textColor="@color/darkGreen"

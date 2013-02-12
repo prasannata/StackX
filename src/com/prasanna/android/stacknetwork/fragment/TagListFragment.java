@@ -175,7 +175,7 @@ public class TagListFragment extends ListFragment
 
             if (adapter.getItem(position).local)
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                        R.drawable.make_available_offline, 0);
+                        R.drawable.dark_32x32_make_available_offline, 0);
             else
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 

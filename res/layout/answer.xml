@@ -86,7 +86,7 @@
         android:layout_gravity="bottom|left"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="7dp"
-        android:src="@drawable/question_mark_normal" />
+        android:src="@drawable/dark_32x32_question_mark" />
 
     <LinearLayout
         android:id="@+id/qTitleLayout"
@@ -114,7 +114,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
-            android:src="@drawable/navigation_cancel" />
+            android:src="@drawable/dark_24x24_cancel" />
     </LinearLayout>
 
 </FrameLayout>

@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_marginTop="5dp"
-                android:src="@drawable/av_next" />
+                android:src="@drawable/dark_48x48_av_next" />
 
             <TextView
                 android:id="@+id/skipText"

@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/social_reply_dark_24x24"
+            android:src="@drawable/dark_24x24_social_reply"
             android:visibility="gone" />
 
         <LinearLayout
@@ -62,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:src="@drawable/accept_dark_24x24"
+                android:src="@drawable/dark_24x24_accept"
                 android:visibility="gone" />
 
             <ImageView
@@ -70,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:src="@drawable/navigation_cancel"
+                android:src="@drawable/dark_24x24_cancel"
                 android:visibility="gone" />
             
             <ImageView
@@ -78,7 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:src="@drawable/content_edit_dark_24x24"
+                android:src="@drawable/dark_24x24_edit"
                 android:visibility="gone" />
 
             <ImageView
@@ -86,7 +86,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:src="@drawable/content_discard_dark_24x24"
+                android:src="@drawable/dark_24x24_discard"
                 android:visibility="gone" />
         </LinearLayout>
     </RelativeLayout>
