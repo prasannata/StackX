@@ -222,7 +222,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         {
             for(Account account : deletedAccounts)
             {
-                String whereClause = WritePermissionTable.COLUMN_SITE_URL;
+                String whereClause = WritePermissionTable.COLUMN_SITE_URL + " = ?";
                 String[] whereArgs = new String[] { account.siteUrl };
                 database.delete(TABLE_NAME, whereClause, whereArgs);
             }
