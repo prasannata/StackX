@@ -38,12 +38,10 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
-import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
-import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.DbRequestThreadExecutor;
 import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -239,7 +237,7 @@ public class UserIntentService extends AbstractIntentService
         }
 
         HashMap<String, Account> accounts = userService.getAccounts(1);
-        persistMyAccounts(accounts);
+        DbRequestThreadExecutor.persistAccounts(getApplicationContext(), new ArrayList<Account>(accounts.values()));
         return accounts;
     }
 
@@ -285,12 +283,12 @@ public class UserIntentService extends AbstractIntentService
     {
         ArrayList<Site> sites = getSites();
 
-        if(sites != null)
+        if (sites != null)
         {
             Log.d(TAG, "Returning site list from DB");
             return sites;
         }
-        
+
         LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
         if (!forAuthenicatedUser)
@@ -311,7 +309,7 @@ public class UserIntentService extends AbstractIntentService
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, currentAccountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNTS_LAST_UPDATED,
                                 System.currentTimeMillis());
-                persistMyAccounts(linkAccountsMap);
+                DbRequestThreadExecutor.persistAccounts(getApplicationContext(), new ArrayList<Account>(linkAccountsMap.values()));
             }
 
             for (String siteUrl : linkAccountsMap.keySet())
@@ -323,7 +321,7 @@ public class UserIntentService extends AbstractIntentService
                     Site site = linkSitesMap.get(siteUrl);
                     site.userType = linkAccountsMap.get(siteUrl).userType;
                     site.writePermissions = userService.getWritePermissions(site.apiSiteParameter);
-                    persistPermissions(site, site.writePermissions);
+                    DbRequestThreadExecutor.persistPermissions(getApplicationContext(), site, site.writePermissions);
                     regSitesFirstMap.put(siteUrl, site);
                     linkSitesMap.remove(siteUrl);
                 }
@@ -359,125 +357,10 @@ public class UserIntentService extends AbstractIntentService
 
     private ArrayList<Site> persistAndGetList(LinkedHashMap<String, Site> linkSitesMap)
     {
-        ArrayList<Site> sites;
-        sites = new ArrayList<Site>(linkSitesMap.values());
-        persistSites(sites);
+        ArrayList<Site> sites = new ArrayList<Site>(linkSitesMap.values());
+        DbRequestThreadExecutor.persistSites(getApplicationContext(), sites);
         SharedPreferencesUtil.setBoolean(getApplicationContext(), StringConstants.SITES_INIT, true);
         return sites;
-    }
-
-    private void persistSites(final ArrayList<Site> sites)
-    {
-        AppUtils.runOnBackgroundThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                SiteDAO dao = new SiteDAO(getApplicationContext());
-
-                dao.open();
-                try
-                {
-                    dao.insert(sites);
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    dao.close();
-                }
-            }
-        });
-    }
-
-    private void persistPermissions(final Site site, final ArrayList<WritePermission> permissions)
-    {
-        AppUtils.runOnBackgroundThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                persist(site, permissions);
-            }
-
-            private void persist(final Site site, final ArrayList<WritePermission> permissions)
-            {
-                WritePermissionDAO writePermissionDAO = new WritePermissionDAO(getApplicationContext());
-
-                try
-                {
-                    writePermissionDAO.open();
-                    writePermissionDAO.insert(site, permissions);
-
-                    for (WritePermission permission : permissions)
-                    {
-                        if (permission.objectType != null)
-                            switchOnObjectType(permission);
-                    }
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    writePermissionDAO.close();
-                }
-            }
-
-            private void switchOnObjectType(WritePermission permission)
-            {
-                switch (permission.objectType)
-                {
-                    case ANSWER:
-                        SharedPreferencesUtil.setLong(getApplicationContext(),
-                                        WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    case COMMENT:
-                        SharedPreferencesUtil.setLong(getApplicationContext(),
-                                        WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    case QUESTION:
-                        SharedPreferencesUtil.setLong(getApplicationContext(),
-                                        WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-    }
-
-    private void persistMyAccounts(final HashMap<String, Account> linkAccountsMap)
-    {
-        AppUtils.runOnBackgroundThread(new Runnable()
-        {
-
-            @Override
-            public void run()
-            {
-                UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
-                try
-                {
-                    userAccountsDao.open();
-                    userAccountsDao.insert(new ArrayList<Account>(linkAccountsMap.values()));
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    userAccountsDao.close();
-                }
-
-            }
-        });
     }
 
     private void deauthenticateApp(String accessToken)

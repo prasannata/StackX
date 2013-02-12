@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2013 Prasanna Thirumalai
+    
+    This file is part of StackX.
+
+    StackX is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    StackX is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with StackX.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
@@ -7,7 +26,6 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -20,6 +38,7 @@ import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.DbRequestThreadExecutor;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -43,7 +62,7 @@ public class AccountSyncService extends AbstractStackxService
         public void handleMessage(Message msg)
         {
             boolean newThingsFound = false;
-            HashMap<String, Site> sites = getSites();
+            HashMap<String, Site> sites = SiteDAO.getAll(context);
             long accountsLastUpdated = SharedPreferencesUtil
                             .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
 
@@ -51,14 +70,16 @@ public class AccountSyncService extends AbstractStackxService
             {
                 Log.d(TAG, "Syncing user accounts");
 
-                ArrayList<Account> existingAccounts = getExistingAccounts();
+                long accountId = SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L);
+                ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
                 HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getAccounts(1);
                 if (retrievedAccounts != null)
                 {
                     if (existingAccounts == null)
                     {
                         Log.d(TAG, "User with no accounts has accounts");
-                        AppUtils.persistAccounts(context, new ArrayList<Account>(retrievedAccounts.values()));
+                        DbRequestThreadExecutor.persistAccounts(context,
+                                        new ArrayList<Account>(retrievedAccounts.values()));
                     }
                     else
                     {
@@ -97,13 +118,13 @@ public class AccountSyncService extends AbstractStackxService
                                 {
                                     site.writePermissions = UserServiceHelper.getInstance().getWritePermissions(
                                                     site.apiSiteParameter);
-                                    AppUtils.persistPermissions(context, site, site.writePermissions);
+                                    DbRequestThreadExecutor.persistPermissions(context, site, site.writePermissions);
                                 }
                                 newAccounts.add(entry.getValue());
                             }
 
-                            AppUtils.persistAccounts(context, newAccounts);
-                            updateSites(newAccounts);
+                            DbRequestThreadExecutor.persistAccounts(context, newAccounts);
+                            SiteDAO.updateSites(context, newAccounts);
                             newThingsFound = true;
                         }
 
@@ -111,9 +132,9 @@ public class AccountSyncService extends AbstractStackxService
                         {
                             Log.d(TAG, "Removing accounts from DB");
 
-                            removeAccounts(existingAccounts);
-                            removeWritePermissions(existingAccounts);
-                            updateSites(newAccounts);
+                            UserAccountsDAO.delete(context, existingAccounts);
+                            WritePermissionDAO.delete(context, existingAccounts);
+                            SiteDAO.updateSites(context, newAccounts);
                             newThingsFound = true;
                         }
                     }
@@ -124,103 +145,6 @@ public class AccountSyncService extends AbstractStackxService
             }
 
             onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
-        }
-
-        private void updateSites(ArrayList<Account> newAccounts)
-        {
-            SiteDAO siteDAO = new SiteDAO(context);
-            try
-            {
-                siteDAO.open();
-                siteDAO.updateRegistrationInfo(newAccounts);
-            }
-            catch (SQLException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-            finally
-            {
-                siteDAO.close();
-            }
-        }
-
-        private void removeWritePermissions(ArrayList<Account> deletedAccounts)
-        {
-            WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-            try
-            {
-                writePermissionDAO.open();
-                writePermissionDAO.deleteList(deletedAccounts);
-            }
-            catch (SQLException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-            finally
-            {
-                writePermissionDAO.close();
-            }
-        }
-
-        private void removeAccounts(final ArrayList<Account> deletedAccounts)
-        {
-            UserAccountsDAO userAccountsDao = new UserAccountsDAO(context);
-
-            try
-            {
-                userAccountsDao.open();
-                userAccountsDao.deleteList(deletedAccounts);
-            }
-            catch (SQLException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-            finally
-            {
-                userAccountsDao.close();
-            }
-        }
-
-        private ArrayList<Account> getExistingAccounts()
-        {
-            UserAccountsDAO accountsDAO = new UserAccountsDAO(context);
-
-            try
-            {
-                accountsDAO.open();
-                return accountsDAO.getAccounts(SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L));
-            }
-            catch (SQLException e)
-            {
-                Log.e(TAG, e.getMessage());
-            }
-            finally
-            {
-                accountsDAO.close();
-            }
-
-            return null;
-        }
-
-        private HashMap<String, Site> getSites()
-        {
-            SiteDAO siteDAO = new SiteDAO(context);
-
-            try
-            {
-                siteDAO.open();
-                return siteDAO.getLinkSitesMap();
-            }
-            catch (SQLException e)
-            {
-                Log.e(TAG, e.getMessage());
-            }
-            finally
-            {
-                siteDAO.close();
-            }
-
-            return null;
         }
     }
 

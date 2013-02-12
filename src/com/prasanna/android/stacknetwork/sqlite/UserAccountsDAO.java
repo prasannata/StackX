@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Account;
@@ -155,4 +156,64 @@ public class UserAccountsDAO extends AbstractBaseDao
             }
         }
     }
+
+    public static void insertAll(Context context, ArrayList<Account> accounts)
+    {
+        UserAccountsDAO userAccountsDao = new UserAccountsDAO(context);
+        try
+        {
+            userAccountsDao.open();
+            userAccountsDao.insert(accounts);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            userAccountsDao.close();
+        }
+    }
+
+    public static ArrayList<Account> get(final Context context, final long id)
+    {
+        UserAccountsDAO accountsDAO = new UserAccountsDAO(context);
+
+        try
+        {
+            accountsDAO.open();
+            return accountsDAO.getAccounts(id);
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            accountsDAO.close();
+        }
+
+        return null;
+    }
+    
+    public static void delete(Context context, final ArrayList<Account> deletedAccounts)
+    {
+        UserAccountsDAO userAccountsDao = new UserAccountsDAO(context);
+
+        try
+        {
+            userAccountsDao.open();
+            userAccountsDao.deleteList(deletedAccounts);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            userAccountsDao.close();
+        }
+    }
+
+
 }

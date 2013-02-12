@@ -216,7 +216,7 @@ public class WritePermissionDAO extends AbstractBaseDao
 
     }
 
-    public void deleteList(ArrayList<Account> deletedAccounts)
+    public void delete(ArrayList<Account> deletedAccounts)
     {
         if(deletedAccounts != null)
         {
@@ -226,6 +226,24 @@ public class WritePermissionDAO extends AbstractBaseDao
                 String[] whereArgs = new String[] { account.siteUrl };
                 database.delete(TABLE_NAME, whereClause, whereArgs);
             }
+        }
+    }
+    
+    public static void delete(final Context context, final ArrayList<Account> deletedAccounts)
+    {
+        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
+        try
+        {
+            writePermissionDAO.open();
+            writePermissionDAO.delete(deletedAccounts);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            writePermissionDAO.close();
         }
     }
 }

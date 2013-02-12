@@ -171,7 +171,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
                 Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
                 SharedPreferencesUtil.clearDefaultSite(getActivity());
-                SiteDAO.purge(SettingsFragment.this.getActivity());
+                SiteDAO.deleteAll(SettingsFragment.this.getActivity());
                 startActivity(oAuthIntent);
                 return true;
             }

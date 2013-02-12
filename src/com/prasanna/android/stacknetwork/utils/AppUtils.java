@@ -20,16 +20,13 @@
 package com.prasanna.android.stacknetwork.utils;
 
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.database.SQLException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,17 +36,11 @@ import android.widget.TextView;
 
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.model.Account;
-import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 
 public class AppUtils
 {
-    private static final String TAG = AppUtils.class.getSimpleName();
-
     public static String formatReputation(int reputation)
     {
         if (reputation > 0)
@@ -200,90 +191,4 @@ public class AppUtils
     {
         return System.currentTimeMillis() - ms > IntegerConstants.MS_IN_HALF_AN_HOUR;
     }
-
-    public static void persistAccounts(final Context context, final ArrayList<Account> newAccounts)
-    {
-        AppUtils.runOnBackgroundThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                UserAccountsDAO userAccountsDao = new UserAccountsDAO(context);
-                try
-                {
-                    userAccountsDao.open();
-                    userAccountsDao.insert(newAccounts);
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    userAccountsDao.close();
-                }
-            }
-        });
-    }
-
-    public static void persistPermissions(final Context context, final Site site,
-                    final ArrayList<WritePermission> permissions)
-    {
-        AppUtils.runOnBackgroundThread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                persist(site, permissions);
-            }
-
-            private void persist(final Site site, final ArrayList<WritePermission> permissions)
-            {
-                WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-
-                try
-                {
-                    writePermissionDAO.open();
-                    writePermissionDAO.insert(site, permissions);
-
-                    for (WritePermission permission : permissions)
-                    {
-                        if (permission.objectType != null)
-                            switchOnObjectType(permission);
-                    }
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    writePermissionDAO.close();
-                }
-            }
-
-            private void switchOnObjectType(WritePermission permission)
-            {
-                switch (permission.objectType)
-                {
-                    case ANSWER:
-                        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    case COMMENT:
-                        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    case QUESTION:
-                        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
-                                        permission.minSecondsBetweenActions);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-    }
-
 }

@@ -200,25 +200,6 @@ public class SiteDAO extends AbstractBaseDao
         deleteAuditEntry(AUDIT_ENTRY_TYPE, null);
     }
 
-    public static void purge(Context context)
-    {
-        SiteDAO dao = new SiteDAO(context);
-
-        dao.open();
-        try
-        {
-            dao.deleteAll();
-        }
-        catch (SQLException e)
-        {
-            Log.d(TAG, e.getMessage());
-        }
-        finally
-        {
-            dao.close();
-        }
-    }
-
     public void update(Site site)
     {
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
@@ -243,4 +224,82 @@ public class SiteDAO extends AbstractBaseDao
             database.update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
+
+    public static void insertAll(Context context, ArrayList<Site> sites)
+    {
+        SiteDAO dao = new SiteDAO(context);
+
+        try
+        {
+            dao.open();
+            dao.insert(sites);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+    }
+
+    public static void updateSites(final Context context, final ArrayList<Account> accounts)
+    {
+        SiteDAO siteDAO = new SiteDAO(context);
+        try
+        {
+            siteDAO.open();
+            siteDAO.updateRegistrationInfo(accounts);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            siteDAO.close();
+        }
+    }
+
+    public static HashMap<String, Site> getAll(final Context context)
+    {
+        SiteDAO siteDAO = new SiteDAO(context);
+
+        try
+        {
+            siteDAO.open();
+            return siteDAO.getLinkSitesMap();
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            siteDAO.close();
+        }
+
+        return null;
+    }
+
+    public static void deleteAll(Context context)
+    {
+        SiteDAO dao = new SiteDAO(context);
+
+        try
+        {
+            dao.open();
+            dao.deleteAll();
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+    }
+
 }
