@@ -68,21 +68,34 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (sort != null)
             fragmentTag = fragmentTag + "_" + sort;
 
-        QuestionListFragment newFragment = QuestionsActivity.getFragment(fragmentTag);
+        QuestionListFragment fragment = getFragment(fragmentTag);
 
+        fragment.fragmentTag = fragmentTag;
+        fragment.sort = sort;
+        fragment.action = action;
+        fragment.tag = tag;
+
+        return fragment;
+    }
+
+    private static QuestionListFragment getFragment(String fragmentTag)
+    {
+        QuestionListFragment newFragment = QuestionsActivity.getFragment(fragmentTag);
         if (newFragment == null)
         {
             Log.d(TAG, "Creating new fragment: " + fragmentTag);
-
             newFragment = new QuestionListFragment();
         }
-
-        newFragment.fragmentTag = fragmentTag;
-        newFragment.sort = sort;
-        newFragment.action = action;
-        newFragment.tag = tag;
-
         return newFragment;
+    }
+
+    public static QuestionListFragment newFragment(String fragmentTag, SearchCriteria searchCriteria)
+    {
+        QuestionListFragment fragment = getFragment(fragmentTag);
+        fragment.fragmentTag = fragmentTag;
+        fragment.criteria = searchCriteria;
+        fragment.action = QuestionsIntentService.SEARCH;
+        return fragment;
     }
 
     @Override
@@ -166,7 +179,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                     getRelatedQuestions();
                     break;
                 case QuestionsIntentService.SEARCH:
-                    search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
+                    if (criteria == null)
+                        search(getActivity().getIntent().getStringExtra(SearchManager.QUERY));
+                    else
+                        startSearchIntentService();
                     break;
                 default:
                     Log.d(TAG, "Unknown action: " + action);
@@ -300,15 +316,18 @@ public class QuestionListFragment extends AbstractQuestionListFragment
             buildSearchCriteria(query);
         else
             criteria = criteria.nextPage();
+
         if (intent != null)
-        {
+            startSearchIntentService();
+    }
 
-            intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
-            intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
-            intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
+    private void startSearchIntentService()
+    {
+        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
+        intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
+        intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
 
-            startIntentService();
-        }
+        startIntentService();
     }
 
     private void buildSearchCriteria(String query)

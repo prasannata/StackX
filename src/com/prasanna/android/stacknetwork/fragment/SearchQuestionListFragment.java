@@ -5,8 +5,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
@@ -61,19 +59,6 @@ public class SearchQuestionListFragment extends QuestionListFragment
     {
         Log.d(TAG, "onPrepareOptionsMenu");
         menu.findItem(R.id.menu_save).setVisible(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case R.id.menu_save:
-                Toast.makeText(getActivity(), "Search criteria saved", Toast.LENGTH_SHORT).show();
-                return true;
-        }
-
-        return false;
     }
 
     @Override

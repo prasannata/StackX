@@ -20,14 +20,23 @@
 package com.prasanna.android.stacknetwork.utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import android.content.Context;
 import android.database.SQLException;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Account;
+import com.prasanna.android.stacknetwork.model.SearchCriteria;
+import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
@@ -35,7 +44,7 @@ import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 public class DbRequestThreadExecutor
 {
     private static final String TAG = DbRequestThreadExecutor.class.getSimpleName();
-    
+
     public static void persistSites(final Context context, final ArrayList<Site> sites)
     {
         AppUtils.runOnBackgroundThread(new Runnable()
@@ -117,5 +126,45 @@ public class DbRequestThreadExecutor
                 }
             }
         });
+    }
+
+    public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site)
+    {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<HashMap<String, SearchCriteria>> future = executor
+                        .submit(new Callable<HashMap<String, SearchCriteria>>()
+                        {
+                            @Override
+                            public HashMap<String, SearchCriteria> call() throws Exception
+                            {
+                                ArrayList<SearchCriteriaDomain> criteriaForCustomTabs = SearchCriteriaDAO
+                                                .getCriteriaForCustomTabs(context, site);
+                                if (criteriaForCustomTabs != null)
+                                {
+                                    Log.d(TAG, "custom tabs found");
+                                    HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
+                                    for (SearchCriteriaDomain searchCriteriaDomain : criteriaForCustomTabs)
+                                        searchCriterias.put(searchCriteriaDomain.name,
+                                                        searchCriteriaDomain.searchCriteria);
+                                    return searchCriterias;
+                                }
+
+                                return null;
+                            }
+                        });
+        try
+        {
+            return future.get();
+        }
+        catch (InterruptedException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        catch (ExecutionException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return null;
     }
 }

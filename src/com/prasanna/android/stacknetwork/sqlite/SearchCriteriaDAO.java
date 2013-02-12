@@ -33,6 +33,7 @@ import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 
 public class SearchCriteriaDAO extends AbstractBaseDao
 {
+    private static final String TAG = SearchCriteriaDAO.class.getSimpleName();
     public static final String TABLE_NAME = "SEARCH_CRITERIA";
 
     public static final class SearchCriteriaTable
@@ -129,12 +130,36 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         database.update(TABLE_NAME, values, whereClause, whereArgs);
     }
 
-    public ArrayList<SearchCriteriaDomain> readAll(String site)
+    public ArrayList<SearchCriteriaDomain> getAll(String site)
     {
         String selection = SearchCriteriaTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
 
         String orderBy = SearchCriteriaTable.COLUMN_CREATED + " ASC";
+
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, orderBy);
+
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        ArrayList<SearchCriteriaDomain> criteriaList = new ArrayList<SearchCriteriaDomain>();
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast())
+        {
+            criteriaList.add(getCriteria(cursor));
+            cursor.moveToNext();
+        }
+
+        return criteriaList;
+    }
+
+    public ArrayList<SearchCriteriaDomain> getCriteriaForCustomTabs(String site)
+    {
+        String selection = SearchCriteriaTable.COLUMN_SITE + " = ? and " + SearchCriteriaTable.COLUMN_TAB + " = ?";
+        String[] selectionArgs = { site, "1" };
+
+        String orderBy = SearchCriteriaTable.COLUMN_NAME + " Collate NOCASE";
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, orderBy);
 
@@ -199,4 +224,46 @@ public class SearchCriteriaDAO extends AbstractBaseDao
                 delete(id);
         }
     }
+
+    public static ArrayList<SearchCriteriaDomain> getAll(final Context context, final String site)
+    {
+        SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
+        try
+        {
+            dao.open();
+            return dao.getAll(site);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+
+        return null;
+    }
+    
+    public static ArrayList<SearchCriteriaDomain> getCriteriaForCustomTabs(final Context context, final String site)
+    {
+        SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
+        try
+        {
+            dao.open();
+            return dao.getCriteriaForCustomTabs(site);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+
+        return null;
+
+    }
+
 }

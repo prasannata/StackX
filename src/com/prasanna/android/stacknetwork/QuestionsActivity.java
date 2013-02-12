@@ -19,6 +19,9 @@
 
 package com.prasanna.android.stacknetwork;
 
+import java.util.HashMap;
+import java.util.Observable;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Fragment;
@@ -37,8 +40,10 @@ import com.prasanna.android.provider.RecentQueriesProvider;
 import com.prasanna.android.stacknetwork.fragment.QuestionListFragment;
 import com.prasanna.android.stacknetwork.fragment.TagListFragment;
 import com.prasanna.android.stacknetwork.fragment.TagListFragment.OnTagSelectListener;
+import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
+import com.prasanna.android.stacknetwork.utils.DbRequestThreadExecutor;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
@@ -51,7 +56,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private static final String TAB_TITLE_NEW = "New";
     private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
     private static final String TAB_TITLE_FAQ = "FAQ";
-    private static final String SAVED = "saved";
     private static final String LAST_SELECTED_TAB = "last_selected_tab";
 
     private static QuestionsActivity self;
@@ -61,6 +65,15 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private String intentAction;
     private String tag;
     private int action;
+
+    public class CustomTabsObservable extends Observable
+    {
+        public void notifyOnCustomTabsFound(HashMap<String, SearchCriteria> searchCriterias)
+        {
+            setChanged();
+            notifyObservers(searchCriterias);
+        }
+    }
 
     public static QuestionListFragment getFragment(String fragmentTag)
     {
@@ -216,6 +229,18 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             createTab(TAB_TITLE_FAQ,
                             QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
         }
+        else
+        {
+            HashMap<String, SearchCriteria> customTabs = DbRequestThreadExecutor.getSearchesMarkedForTab(
+                            getApplicationContext(), OperatingSite.getSite().apiSiteParameter);
+
+            if (customTabs != null)
+            {
+                for (String key : customTabs.keySet())
+                    createTab(key, QuestionListFragment.newFragment(key, customTabs.get(key)));
+            }
+
+        }
     }
 
     private void createTab(String title, QuestionListFragment fragment)
@@ -242,7 +267,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         if (getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
             outState.putInt(LAST_SELECTED_TAB, getActionBar().getSelectedNavigationIndex());
 
-        outState.putBoolean(SAVED, true);
         outState.putInt(StringConstants.ACTION, action);
         outState.putString(StringConstants.TAG, tag);
 

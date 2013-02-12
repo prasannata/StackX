@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -142,22 +141,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         @Override
         protected ArrayList<SearchCriteriaDomain> doInBackground(Void... params)
         {
-            SearchCriteriaDAO dao = new SearchCriteriaDAO(SearchCriteriaListActivity.this);
-            try
-            {
-                dao.open();
-                return dao.readAll(site);
-            }
-            catch (SQLException e)
-            {
-                Log.d(TAG, e.getMessage());
-            }
-            finally
-            {
-                dao.close();
-            }
-
-            return null;
+            return SearchCriteriaDAO.getAll(SearchCriteriaListActivity.this, site);
         }
 
         @Override
@@ -383,7 +367,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                         searchCriteriaArrayAdapter.remove(domain);
 
                     searchCriteriaArrayAdapter.notifyDataSetChanged();
-                    if(searchCriteriaArrayAdapter.getCount() == 0)
+                    if (searchCriteriaArrayAdapter.getCount() == 0)
                         actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
                 }
             }
@@ -403,16 +387,29 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         {
             AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>()
             {
+                private View emptyItemsView;
+
                 @Override
                 public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
                 {
                     searchCriteriaArrayAdapter.clear();
-                    listView.removeAllViews();
-                    
+
                     if (result != null)
+                    {
+                        if (emptyItemsView == null)
+                        {
+                            listView.removeFooterView(emptyItemsView);
+                            emptyItemsView = null;
+                        }
                         searchCriteriaArrayAdapter.addAll(result);
+                    }
                     else
-                        listView.addFooterView(AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this));
+                    {
+                        if (emptyItemsView == null)
+                            emptyItemsView = AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this);
+
+                        listView.addFooterView(emptyItemsView);
+                    }
                 }
             };
 
