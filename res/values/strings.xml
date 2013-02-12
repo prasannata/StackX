@@ -81,6 +81,9 @@
     <string name="ran">Ran</string>
     <string name="updated">Updated</string>
 
+    <!-- Sites updated  -->
+    <string name="siteListUpdated">Site list updated!</string>
+    
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>
     <string name="search_hasAnswers">Has Answers</string>

@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import android.content.Context;
@@ -63,6 +64,10 @@ public class AccountSyncService extends AbstractStackxService
         {
             boolean newThingsFound = false;
             HashMap<String, Site> sites = SiteDAO.getAll(context);
+            long sitesLastUpdated = SiteDAO.getLastUpdateTime(context);
+            if (AppUtils.aDaySince(sitesLastUpdated))
+                refreshSiteList(sites);
+
             long accountsLastUpdated = SharedPreferencesUtil
                             .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
 
@@ -145,6 +150,16 @@ public class AccountSyncService extends AbstractStackxService
             }
 
             onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
+        }
+
+        private void refreshSiteList(HashMap<String, Site> sites)
+        {
+            LinkedHashMap<String, Site> retrievedSites = UserServiceHelper.getInstance().getAllSitesInNetwork();
+            for (String key : retrievedSites.keySet())
+            {
+                if (!sites.containsKey(key))
+                    SiteDAO.insert(context, retrievedSites.get(key));
+            }
         }
     }
 

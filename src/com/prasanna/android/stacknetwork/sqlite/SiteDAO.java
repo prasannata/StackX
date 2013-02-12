@@ -69,6 +69,32 @@ public class SiteDAO extends AbstractBaseDao
         this.context = context;
     }
 
+    public long insert(Site site)
+    {
+        long id = 0L;
+        
+        if (site != null)
+        {
+            database.beginTransaction();
+            try
+            {
+                id = database.insert(TABLE_NAME, null, getContentValues(site));
+                insertAuditEntry(AUDIT_ENTRY_TYPE, null);
+                database.setTransactionSuccessful();
+            }
+            catch (SQLException e)
+            {
+                Log.d(TAG, e.getMessage());
+            }
+            finally
+            {
+                database.endTransaction();
+            }
+        }
+        
+        return id;
+    }
+
     public void insert(ArrayList<Site> sites)
     {
         if (sites != null)
@@ -225,6 +251,25 @@ public class SiteDAO extends AbstractBaseDao
         }
     }
 
+    public static void insert(Context context, Site site)
+    {
+        SiteDAO dao = new SiteDAO(context);
+
+        try
+        {
+            dao.open();
+            dao.insert(site);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+    }
+
     public static void insertAll(Context context, ArrayList<Site> sites)
     {
         SiteDAO dao = new SiteDAO(context);
@@ -281,6 +326,27 @@ public class SiteDAO extends AbstractBaseDao
         }
 
         return null;
+    }
+
+    public static long getLastUpdateTime(final Context context)
+    {
+        SiteDAO siteDAO = new SiteDAO(context);
+
+        try
+        {
+            siteDAO.open();
+            return siteDAO.getLastUpdateTime();
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            siteDAO.close();
+        }
+
+        return 0L;
     }
 
     public static void deleteAll(Context context)

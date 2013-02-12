@@ -11,9 +11,11 @@
         android:id="@+id/refreshOnUpdateOption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="0.75dp"
+        android:background="@drawable/rounded_border_delft"
         android:orientation="horizontal"
         android:padding="5dp"
-        android:visibility="gone" >
+        android:visibility="visible" >
 
         <TextView
             android:id="@+id/updateInfo"
@@ -21,9 +23,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:text="@string/updated"
+            android:text="@string/siteListUpdated"
             android:textColor="@color/delft"
-            android:textSize="15sp" />
+            android:textSize="14sp" />
 
         <ImageView
             android:id="@+id/cancelRefreshSites"
