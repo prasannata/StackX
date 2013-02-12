@@ -239,7 +239,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
                 for (String key : customTabs.keySet())
                     createTab(key, QuestionListFragment.newFragment(key, customTabs.get(key)));
             }
-
         }
     }
 

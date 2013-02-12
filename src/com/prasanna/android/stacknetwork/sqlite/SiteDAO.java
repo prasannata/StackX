@@ -72,7 +72,7 @@ public class SiteDAO extends AbstractBaseDao
     public long insert(Site site)
     {
         long id = 0L;
-        
+
         if (site != null)
         {
             database.beginTransaction();
@@ -91,7 +91,7 @@ public class SiteDAO extends AbstractBaseDao
                 database.endTransaction();
             }
         }
-        
+
         return id;
     }
 
@@ -151,14 +151,26 @@ public class SiteDAO extends AbstractBaseDao
 
         cursor.moveToFirst();
 
+        ArrayList<Site> registerdSites = new ArrayList<Site>();
         ArrayList<Site> sites = new ArrayList<Site>();
         while (!cursor.isAfterLast())
         {
-            sites.add(getSiteObject(cursor));
+            Site site = getSiteObject(cursor);
+            if (site.userType != null && UserType.REGISTERED.equals(site.userType))
+                registerdSites.add(site);
+            else
+                sites.add(site);
             cursor.moveToNext();
         }
 
-        return sites;
+        if (registerdSites.isEmpty())
+            return sites;
+        else
+        {
+            ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>(registerdSites);
+            sitesWithRegisteredFirst.addAll(sites);
+            return sitesWithRegisteredFirst;
+        }
     }
 
     public HashMap<String, Site> getLinkSitesMap()

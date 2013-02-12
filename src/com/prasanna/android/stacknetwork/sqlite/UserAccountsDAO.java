@@ -150,7 +150,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         {
             for (Account account : deletedAccounts)
             {
-                String whereClause = UserAccountsTable.COLUMN_SITE_URL;
+                String whereClause = UserAccountsTable.COLUMN_SITE_URL + " = ?";
                 String[] whereArgs = new String[] { account.siteUrl };
                 database.delete(TABLE_NAME, whereClause, whereArgs);
             }
@@ -195,7 +195,7 @@ public class UserAccountsDAO extends AbstractBaseDao
 
         return null;
     }
-    
+
     public static void delete(Context context, final ArrayList<Account> deletedAccounts)
     {
         UserAccountsDAO userAccountsDao = new UserAccountsDAO(context);
@@ -214,6 +214,5 @@ public class UserAccountsDAO extends AbstractBaseDao
             userAccountsDao.close();
         }
     }
-
 
 }

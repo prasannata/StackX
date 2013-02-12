@@ -76,10 +76,10 @@ public class AccountSyncService extends AbstractStackxService
                 Log.d(TAG, "Syncing user accounts");
 
                 long accountId = SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L);
-                ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
                 HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getAccounts(1);
                 if (retrievedAccounts != null)
                 {
+                    ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
                     if (existingAccounts == null)
                     {
                         Log.d(TAG, "User with no accounts has accounts");
@@ -88,9 +88,8 @@ public class AccountSyncService extends AbstractStackxService
                     }
                     else
                     {
-                        int existingAccountsSize = existingAccounts.size();
-
                         ArrayList<Account> newAccounts = null;
+                        int existingAccountsSize = existingAccounts.size();
                         Iterator<Account> existingAccountIter = existingAccounts.iterator();
                         while (existingAccountIter.hasNext())
                         {

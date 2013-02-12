@@ -35,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -57,8 +58,10 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     private static final String ACTION_BAR_TITLE = "Saved Searches";
     private SearchCriteriaArrayAdapter searchCriteriaArrayAdapter;
     private ListView listView;
+    private ArrayList<SearchCriteriaDomain> savedSearchList = new ArrayList<SearchCriteriaDomain>();
     private ArrayList<SearchCriteriaDomain> toDeleteList = new ArrayList<SearchCriteriaDomain>();
     private ArrayList<Long> criteriaIdsAsTab = new ArrayList<Long>();
+    private View emptyItemsView;
 
     static class SearchCriteriaViewHolder
     {
@@ -180,10 +183,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 viewHolder.lastRun = (TextView) convertView.findViewById(R.id.itemLastRun);
                 viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
 
-                prepareDeleteCheckBox(viewHolder.delCheckBox, item);
-                prepareTabToggle(viewHolder.addTabToggle, item);
-                prepareItemClick(viewHolder.itemLayout, item);
-
                 if (item.tab)
                 {
                     criteriaIdsAsTab.add(item.id);
@@ -194,6 +193,20 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             }
             else
                 viewHolder = (SearchCriteriaViewHolder) convertView.getTag();
+
+            prepareDeleteCheckBox(viewHolder.delCheckBox, item);
+            prepareTabToggle(viewHolder.addTabToggle, item);
+            prepareItemClick(viewHolder.itemLayout, item);
+
+            if (toDeleteList.contains(item))
+                viewHolder.delCheckBox.setChecked(true);
+            else
+                viewHolder.delCheckBox.setChecked(false);
+
+            if (criteriaIdsAsTab.contains(item.id))
+                viewHolder.addTabToggle.setChecked(true);
+            else
+                viewHolder.addTabToggle.setChecked(false);
 
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
@@ -209,10 +222,13 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
                 {
-                    if (isChecked)
+                    if (isChecked && !toDeleteList.contains(item))
                         toDeleteList.add(item);
                     else
-                        toDeleteList.remove(item);
+                    {
+                        if (toDeleteList.contains(item))
+                            toDeleteList.remove(item);
+                    }
 
                     if (toDeleteList.isEmpty())
                     {
@@ -230,7 +246,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 
         private void prepareTabToggle(final ToggleButton addTabToggle, final SearchCriteriaDomain domain)
         {
-
             addTabToggle.setOnCheckedChangeListener(new OnCheckedChangeListener()
             {
                 @Override
@@ -319,9 +334,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 
         setContentView(R.layout.list_view);
         getActionBar().setTitle(ACTION_BAR_TITLE);
-
         listView = (ListView) findViewById(android.R.id.list);
-
         searchCriteriaArrayAdapter = new SearchCriteriaArrayAdapter(this, R.layout.search_criteria_item, R.id.itemText);
         listView.setAdapter(searchCriteriaArrayAdapter);
     }
@@ -357,21 +370,34 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 
         AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<Boolean>()
         {
-
             @Override
             public void notifyOnCompletion(Boolean result)
             {
                 if (result)
                 {
-                    for (SearchCriteriaDomain domain : toDeleteList)
-                        searchCriteriaArrayAdapter.remove(domain);
+                    Log.d(TAG, "Criteria deleted");
 
-                    searchCriteriaArrayAdapter.notifyDataSetChanged();
-                    if (searchCriteriaArrayAdapter.getCount() == 0)
-                        actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
+                    savedSearchList.removeAll(toDeleteList);
+                    searchCriteriaArrayAdapter.notifyDataSetInvalidated();
+                    searchCriteriaArrayAdapter.clear();
+
+                    if (!savedSearchList.isEmpty())
+                    {
+                        searchCriteriaArrayAdapter.addAll(savedSearchList);
+                        searchCriteriaArrayAdapter.notifyDataSetChanged();
+                    }
+                    else
+                    {
+                        addContentView(getEmptyView(), new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    }
+
+                    actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
+                    toDeleteList.clear();
                 }
             }
         };
+
         new WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, null, WriteCriteriaAsyncTask.ACTION_DEL_MANY,
                         asyncTaskCompletionNotifier).execute(ids);
     }
@@ -387,29 +413,22 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         {
             AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>()
             {
-                private View emptyItemsView;
-
                 @Override
                 public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
                 {
+                    Log.d(TAG, "Saved searches read from DB");
+                    searchCriteriaArrayAdapter.notifyDataSetInvalidated();
                     searchCriteriaArrayAdapter.clear();
 
-                    if (result != null)
+                    if (result != null && !result.isEmpty())
                     {
-                        if (emptyItemsView == null)
-                        {
-                            listView.removeFooterView(emptyItemsView);
-                            emptyItemsView = null;
-                        }
-                        searchCriteriaArrayAdapter.addAll(result);
+                        savedSearchList.addAll(result);
+                        searchCriteriaArrayAdapter.addAll(savedSearchList);
                     }
                     else
-                    {
-                        if (emptyItemsView == null)
-                            emptyItemsView = AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this);
-
-                        listView.addFooterView(emptyItemsView);
-                    }
+                        addContentView(getEmptyView(), new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    searchCriteriaArrayAdapter.notifyDataSetChanged();
                 }
             };
 
@@ -430,5 +449,13 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     protected boolean shouldSearchViewBeEnabled()
     {
         return false;
+    }
+
+    private View getEmptyView()
+    {
+        if (emptyItemsView == null)
+            emptyItemsView = AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this);
+
+        return emptyItemsView;
     }
 }

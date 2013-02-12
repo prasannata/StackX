@@ -131,27 +131,27 @@ public class DbRequestThreadExecutor
     public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site)
     {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<HashMap<String, SearchCriteria>> future = executor
-                        .submit(new Callable<HashMap<String, SearchCriteria>>()
-                        {
-                            @Override
-                            public HashMap<String, SearchCriteria> call() throws Exception
-                            {
-                                ArrayList<SearchCriteriaDomain> criteriaForCustomTabs = SearchCriteriaDAO
-                                                .getCriteriaForCustomTabs(context, site);
-                                if (criteriaForCustomTabs != null)
-                                {
-                                    Log.d(TAG, "custom tabs found");
-                                    HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
-                                    for (SearchCriteriaDomain searchCriteriaDomain : criteriaForCustomTabs)
-                                        searchCriterias.put(searchCriteriaDomain.name,
-                                                        searchCriteriaDomain.searchCriteria);
-                                    return searchCriterias;
-                                }
+        Callable<HashMap<String, SearchCriteria>> callable = new Callable<HashMap<String, SearchCriteria>>()
+        {
+            @Override
+            public HashMap<String, SearchCriteria> call() throws Exception
+            {
+                ArrayList<SearchCriteriaDomain> criteriaForCustomTabs = SearchCriteriaDAO.getCriteriaForCustomTabs(
+                                context, site);
+                if (criteriaForCustomTabs != null)
+                {
+                    Log.d(TAG, "custom tabs found");
+                    HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
+                    for (SearchCriteriaDomain searchCriteriaDomain : criteriaForCustomTabs)
+                        searchCriterias.put(searchCriteriaDomain.name, searchCriteriaDomain.searchCriteria);
+                    return searchCriterias;
+                }
 
-                                return null;
-                            }
-                        });
+                return null;
+            }
+        };
+        
+        Future<HashMap<String, SearchCriteria>> future = executor.submit(callable);
         try
         {
             return future.get();

@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CompoundButton;
@@ -318,7 +319,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             prepareToggedToggleButton();
             prepareNotTaggedToggleButton();
         }
-        
+
         return criteriaLayout;
     }
 
@@ -720,11 +721,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_UPDATE,
                                 asyncTaskCompletionNotifier).execute();
             else
-                prepareSaveAsDialog(asyncTaskCompletionNotifier);
+                prepareAndShowSaveAsDialog(asyncTaskCompletionNotifier);
         }
     }
 
-    private void prepareSaveAsDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+    private void prepareAndShowSaveAsDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
     {
         AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(getActivity());
         saveAsDailogBuilder.setTitle("Save As");
@@ -754,7 +755,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             }
         });
 
-        saveAsDailogBuilder.show();
+        AlertDialog dialog = saveAsDailogBuilder.create();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        dialog.show();
     }
 
     public void loadCriteria(SearchCriteriaDomain searchCriteriaDomain)
