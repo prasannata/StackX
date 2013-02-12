@@ -15,7 +15,7 @@
         android:background="@drawable/rounded_border_delft"
         android:orientation="horizontal"
         android:padding="5dp"
-        android:visibility="visible" >
+        android:visibility="gone" >
 
         <TextView
             android:id="@+id/updateInfo"
