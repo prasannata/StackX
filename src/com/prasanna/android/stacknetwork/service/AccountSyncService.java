@@ -80,6 +80,7 @@ public class AccountSyncService extends AbstractStackxService
         private boolean syncAccounts(HashMap<String, Site> sites)
         {
             boolean accountsAdded = false;
+            boolean accountsModified = false;
             boolean accountsDeleted = false;
 
             Log.d(TAG, "Syncing user accounts");
@@ -99,14 +100,40 @@ public class AccountSyncService extends AbstractStackxService
                 {
                     accountsDeleted = checkAndUpdateForDeletedAccounts(new HashMap<String, Account>(retrievedAccounts),
                                     new ArrayList<Account>(existingAccounts));
-
                     accountsAdded = checkAndUpdateNewAccounts(sites, new HashMap<String, Account>(retrievedAccounts),
                                     new ArrayList<Account>(existingAccounts));
+                    accountsModified = checkForWriterPermissionsForExistingAccounts(sites,
+                                    new HashMap<String, Account>(retrievedAccounts), new ArrayList<Account>(
+                                                    existingAccounts));
                 }
             }
 
             SharedPreferencesUtil.setLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, System.currentTimeMillis());
-            return accountsAdded || accountsDeleted;
+            return accountsAdded || accountsModified || accountsDeleted;
+        }
+
+        private boolean checkForWriterPermissionsForExistingAccounts(HashMap<String, Site> sites,
+                        HashMap<String, Account> retrievedAccounts, ArrayList<Account> existingAccounts)
+        {
+            Iterator<Account> iterator = existingAccounts.iterator();
+            
+            while (iterator.hasNext())
+            {
+                if (!retrievedAccounts.containsKey(iterator.next().siteUrl))
+                    iterator.remove();
+            }
+
+            if (!existingAccounts.isEmpty())
+            {
+                for (Account account : existingAccounts)
+                {
+                    Log.d(TAG, "Checking for change in write permission for " + account.siteUrl);
+                    Site site = sites.get(account.siteUrl);
+                    getAndPersistWritePermissions(site);
+                }
+                return true;
+            }
+            return false;
         }
 
         private boolean checkAndUpdateForDeletedAccounts(HashMap<String, Account> retrievedAccounts,
