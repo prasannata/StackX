@@ -247,8 +247,8 @@ public class SearchCriteria implements Serializable
 
     private String getAsDelimitedString(ArrayList<String> tags, String delim)
     {
-        Iterator<String> iterator = tags.iterator();
         StringBuilder sb = new StringBuilder();
+        Iterator<String> iterator = tags.iterator();
 
         while (iterator.hasNext())
         {
@@ -305,4 +305,45 @@ public class SearchCriteria implements Serializable
         return criteria;
     }
 
+    public SearchCriteria clear()
+    {
+        if (criteria != null)
+            criteria.clear();
+
+        if (includeTags != null)
+            includeTags.clear();
+
+        if (excludeTags != null)
+            excludeTags.clear();
+
+        return this;
+    }
+
+    public static SearchCriteria copy(SearchCriteria that)
+    {
+        if (that != null)
+        {
+            SearchCriteria criteria = new SearchCriteria();
+            criteria.setQuery(that.getQuery());
+            criteria.setMinAnswers(criteria.getAnswerCount());
+            if (criteria.isAnswered())
+                criteria.mustBeAnswered();
+            String[] tagArray = that.getTaggedArray();
+            if (tagArray != null)
+            {
+                for (String tag : tagArray)
+                    criteria.includeTag(tag);
+            }
+
+            tagArray = that.getNotTaggedArray();
+            if (tagArray != null)
+            {
+                for (String tag : that.getNotTaggedArray())
+                    criteria.excludeTag(tag);
+            }
+            return criteria;
+        }
+
+        return null;
+    }
 }

@@ -244,7 +244,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return getQuestionModel(questionsJsonResponse);
     }
 
-    public StackXPage<Question> searchAdvanced(SearchCriteria searchCriteria)
+    public StackXPage<Question> advancedSearch(SearchCriteria searchCriteria)
     {
         String restEndPoint = "search/advanced";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();

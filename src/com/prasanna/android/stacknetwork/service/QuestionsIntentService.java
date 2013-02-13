@@ -99,7 +99,7 @@ public class QuestionsIntentService extends AbstractIntentService
                 case SEARCH_ADVANCED:
                     SearchCriteria criteria = (SearchCriteria) intent
                                     .getSerializableExtra(StringConstants.SEARCH_CRITERIA);
-                    bundle.putSerializable(StringConstants.QUESTIONS, questionService.searchAdvanced(criteria));
+                    bundle.putSerializable(StringConstants.QUESTIONS, questionService.advancedSearch(criteria));
                     break;
 
                 default:
