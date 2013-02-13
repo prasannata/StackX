@@ -28,20 +28,28 @@
         android:layout_alignRight="@id/score"
         android:layout_below="@id/score"
         android:layout_gravity="center"
-        android:layout_marginBottom="1dp"
-        android:layout_marginTop="1dp"
         android:background="@color/delft" />
 
     <TextView
         android:id="@+id/answerCount"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/score"
-        android:layout_alignRight="@id/score"
         android:layout_below="@id/score_answer_hr"
         android:layout_gravity="center"
         android:gravity="center"
         android:textColor="@color/black"
         android:textSize="12sp" />
 
+    <TextView
+        android:id="@+id/answerCountAnswered"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/score_answer_hr"
+        android:layout_gravity="center"
+        android:background="@color/lichen"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textSize="12sp" 
+        android:visibility="gone"/>
+    
 </RelativeLayout>

@@ -68,6 +68,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         TextView views;
         TextView owner;
         ArrayList<TextView> tagViews;
+        public TextView answerCountAnswered;
     }
 
     @Override
@@ -193,6 +194,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
             holder.score = (TextView) questionRowLayout.findViewById(R.id.score);
             holder.answerCount = (TextView) questionRowLayout.findViewById(R.id.answerCount);
+            holder.answerCountAnswered = (TextView) questionRowLayout.findViewById(R.id.answerCountAnswered);
             holder.title = (TextView) questionRowLayout.findViewById(R.id.itemTitle);
             holder.views = (TextView) questionRowLayout.findViewById(R.id.questionViewsValue);
             holder.owner = (TextView) questionRowLayout.findViewById(R.id.questionOwner);
@@ -211,12 +213,19 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     private void setupViewForQuestionMetadata(QuestionViewHolder holder, Question question)
     {
         holder.score.setText(AppUtils.formatNumber(question.score));
-        holder.answerCount.setText(AppUtils.formatNumber(question.answerCount));
 
         if (question.hasAcceptedAnswer)
-            holder.answerCount.setBackgroundColor(getResources().getColor(R.color.lichen));
+        {
+            holder.answerCountAnswered.setText(AppUtils.formatNumber(question.answerCount));
+            holder.answerCountAnswered.setVisibility(View.VISIBLE);
+            holder.answerCount.setVisibility(View.GONE);
+        }
         else
-            holder.answerCount.setBackgroundColor(getResources().getColor(R.color.white));
+        {
+            holder.answerCount.setText(AppUtils.formatNumber(question.answerCount));
+            holder.answerCount.setVisibility(View.VISIBLE);
+            holder.answerCountAnswered.setVisibility(View.GONE);
+        }
 
         holder.title.setText(Html.fromHtml(question.title));
         holder.views.setText("Views:" + AppUtils.formatNumber(question.viewCount));
