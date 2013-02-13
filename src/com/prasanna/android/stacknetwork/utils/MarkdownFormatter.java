@@ -346,7 +346,18 @@ public class MarkdownFormatter
         final TextView textView = (TextView) codeLayout.findViewById(R.id.code);
         textView.setText(text);
 
-        ImageView imageView = (ImageView) codeLayout.findViewById(R.id.copyCode);
+        ImageView imageView = (ImageView) codeLayout.findViewById(R.id.emailCode);
+        imageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent emailIntent = IntentUtils.createEmailIntent("", text);
+                context.startActivity(Intent.createChooser(emailIntent, ""));
+            }
+        });
+
+        imageView = (ImageView) codeLayout.findViewById(R.id.copyCode);
         imageView.setOnClickListener(new View.OnClickListener()
         {
             @Override

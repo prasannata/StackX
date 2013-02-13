@@ -13,18 +13,25 @@
         android:orientation="horizontal" >
 
         <ImageView
+            android:id="@+id/emailCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:src="@drawable/dark_24x24_email" />
+
+        <ImageView
             android:id="@+id/copyCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="5dp"
-            android:src="@drawable/dark_32x32_copy" />
+            android:padding="5dp"
+            android:src="@drawable/dark_24x24_copy" />
 
         <ImageView
             android:id="@+id/fullScreenImg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:paddingRight="5dp"
+            android:padding="5dp"
             android:src="@drawable/dark_24x24_full_screen" />
     </LinearLayout>
 

@@ -11,25 +11,6 @@
             android:title="@string/defaultSite" />
     </PreferenceCategory>
     <PreferenceCategory
-        android:key="pref_storage"
-        android:persistent="false"
-        android:title="@string/storage" >
-        <EditTextPreference
-            android:defaultValue="2"
-            android:inputType="numberDecimal"
-            android:key="pref_cacheMaxSize"
-            android:title="@string/cacheMaxSizeInMb" />
-
-        <com.prasanna.android.preference.DialogPreferenceImpl
-            android:dialogMessage="@string/sureQuestion"
-            android:key="pref_clearCache"
-            android:negativeButtonText="@android:string/cancel"
-            android:persistent="false"
-            android:positiveButtonText="@android:string/ok"
-            android:title="@string/clearCache" >
-        </com.prasanna.android.preference.DialogPreferenceImpl>
-    </PreferenceCategory>
-    <PreferenceCategory
         android:key="pref_inbox"
         android:persistent="false"
         android:title="@string/inbox" >

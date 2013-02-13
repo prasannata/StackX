@@ -38,9 +38,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.prasanna.android.preference.DialogPreferenceImpl;
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
@@ -77,7 +75,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private RingtonePreference notifRingTonePref;
     private EditTextPreference cacheMaxSizePreference;
     private PreferenceCategory inboxPrefCategory;
-    private DialogPreferenceImpl clearCacheDialogPreference;
 
     public static int getInboxRefreshInterval(Context context)
     {
@@ -116,12 +113,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         addPreferencesFromResource(R.xml.preferences);
 
         setupDefaultSitePreference();
-
         setupAccountPreference();
-
         setupInboxPreference();
-
-        setupStoragePreferences();
     }
 
     private void setupDefaultSitePreference()
@@ -245,38 +238,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
                         DEFAULT_RINGTONE));
         setRingtoneSummary(ringtoneUri);
-    }
-
-    private void setupStoragePreferences()
-    {
-        setupCacheClearPreference();
-
-        setupCacheMaxSizePreference();
-    }
-
-    private void setupCacheClearPreference()
-    {
-        clearCacheDialogPreference = (DialogPreferenceImpl) findPreference(KEY_PREF_CLEAR_CACHE);
-        clearCacheDialogPreference.setOnClickListener(new DialogInterface.OnClickListener()
-        {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
-            {
-                if (DialogInterface.BUTTON_POSITIVE == which)
-                {
-                    SharedPreferencesUtil.deleteAllQuestions(getActivity().getCacheDir());
-                    Toast.makeText(getActivity(), "Cache cleared", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    private void setupCacheMaxSizePreference()
-    {
-        String currentCacheSize = SharedPreferencesUtil.getQuestionDirSize(getActivity().getCacheDir());
-
-        cacheMaxSizePreference = (EditTextPreference) findPreference(KEY_PREF_CACHE_MAX_SIZE);
-        cacheMaxSizePreference.setSummary(getCacheSizeSummary(currentCacheSize));
     }
 
     private String getCacheSizeSummary(String currentCacheSize)
