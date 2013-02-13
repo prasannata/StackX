@@ -404,7 +404,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onActivityCreated");
+        Log.d(TAG, "onResume");
 
         super.onResume();
 
