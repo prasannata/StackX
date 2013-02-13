@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import android.content.Context;
 import android.content.Intent;
@@ -60,7 +61,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     private ListView listView;
     private ArrayList<SearchCriteriaDomain> savedSearchList = new ArrayList<SearchCriteriaDomain>();
     private ArrayList<SearchCriteriaDomain> toDeleteList = new ArrayList<SearchCriteriaDomain>();
-    private ArrayList<Long> criteriaIdsAsTab = new ArrayList<Long>();
+    private HashSet<Long> criteriaIdsAsTab = new HashSet<Long>();
     private View emptyItemsView;
 
     static class SearchCriteriaViewHolder
@@ -184,10 +185,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
 
                 if (item.tab)
-                {
                     criteriaIdsAsTab.add(item.id);
-                    viewHolder.addTabToggle.setChecked(true);
-                }
 
                 convertView.setTag(viewHolder);
             }
@@ -253,24 +251,25 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 {
                     if (isChecked)
                     {
+                        buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
+                        buttonView.setTextColor(getResources().getColor(R.color.delft));
+
                         onCheckedChangedExecute(domain, buttonView, !criteriaIdsAsTab.contains(domain.id),
-                                        WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB, R.drawable.rounded_border_delft,
-                                        R.color.delft);
+                                        WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB);
                     }
                     else
                     {
+                        buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
+                        buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
+
                         onCheckedChangedExecute(domain, buttonView, criteriaIdsAsTab.contains(domain.id),
-                                        WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB,
-                                        R.drawable.rounded_border_grey_min_padding, R.color.lightGrey);
+                                        WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB);
                     }
                 }
 
                 private void onCheckedChangedExecute(final SearchCriteriaDomain domain, CompoundButton buttonView,
-                                boolean executeDbTask, int action, int backgroundResource, int textColorResource)
+                                boolean executeDbTask, int action)
                 {
-                    buttonView.setBackgroundResource(backgroundResource);
-                    buttonView.setTextColor(getResources().getColor(textColorResource));
-
                     if (executeDbTask)
                     {
                         AddDelCriteriaTabAsyncTaskCompletionNotifier asyncTaskCompletionNotifier = new AddDelCriteriaTabAsyncTaskCompletionNotifier(
