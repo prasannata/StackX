@@ -62,8 +62,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private static final String TAG = CommentFragment.class.getSimpleName();
     private ArrayList<Comment> comments;
     private HashMap<ObjectType, WritePermission> writePermissions;
-    private OnCommentChangeListener onCommentChangeListener;
     private ProgressDialog progressDialog;
+    private OnCommentChangeListener onCommentChangeListener;
+    private OnCommentReplyListener onCommentReplyListener;
 
     public interface OnCommentChangeListener
     {
@@ -72,10 +73,33 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         void onCommentDelete(long commentId);
     }
 
+    public interface OnCommentReplyListener
+    {
+        void onReplyTo(Comment comment);
+    }
+
+    static class CommentViewHolder
+    {
+        TextView score;
+        EditText title;
+        TextView owner;
+        ImageView editComment;
+        ImageView replyToComment;
+        ImageView finishEditComment;
+        ImageView cancelEditComment;
+        ImageView deleteComment;
+        LinearLayout commentEditOptions;
+        RelativeLayout commentWriteOptions;
+    }
+
+    public void setOnCommentReplyListener(OnCommentReplyListener onCommentReplyListener)
+    {
+        this.onCommentReplyListener = onCommentReplyListener;
+    }
+
     public void setOnCommentChangeListener(OnCommentChangeListener onCommentChangeListener)
     {
         this.onCommentChangeListener = onCommentChangeListener;
-        Log.d(TAG, "OnCommentChangeListener: " + (onCommentChangeListener != null));
     }
 
     public void setComments(ArrayList<Comment> comments)
@@ -146,20 +170,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         return TAG;
     }
 
-    static class CommentViewHolder
-    {
-        TextView score;
-        EditText title;
-        TextView owner;
-        ImageView editComment;
-        ImageView replyToComment;
-        ImageView finishEditComment;
-        ImageView cancelEditComment;
-        ImageView deleteComment;
-        LinearLayout commentEditOptions;
-        RelativeLayout commentWriteOptions;
-    }
-
     @Override
     public View getView(final Comment comment, View convertView, ViewGroup parent)
     {
@@ -188,8 +198,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         else
             holder = (CommentViewHolder) commentLayout.getTag();
 
-        Log.d(TAG, "Comment body: " + comment.body);
-
         holder.score.setText(AppUtils.formatNumber(comment.score));
         holder.title.setText("");
         holder.title.append(Html.fromHtml(comment.body));
@@ -206,7 +214,10 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         holder.commentWriteOptions.setVisibility(View.VISIBLE);
 
         if (canAddComment() && !myComment)
+        {
+            Log.d(TAG, "I can reply to comment");
             setupReplyToComment(comment, holder);
+        }
         else
         {
             if (myComment)
@@ -234,8 +245,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                Toast.makeText(getActivity(), "Reply to comment by " + comment.owner.displayName, Toast.LENGTH_LONG)
-                                .show();
+                if (onCommentReplyListener != null)
+                    onCommentReplyListener.onReplyTo(comment);
             }
         });
     }

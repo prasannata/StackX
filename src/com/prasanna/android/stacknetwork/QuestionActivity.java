@@ -43,6 +43,7 @@ import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentReplyListener;
 import com.prasanna.android.stacknetwork.fragment.PostCommentFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -64,7 +65,7 @@ import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
-        StackXRestQueryResultReceiver, PageSelectAdapter
+                StackXRestQueryResultReceiver, PageSelectAdapter, OnCommentReplyListener
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
@@ -105,7 +106,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             {
                 if (question.answers.get(position - 1).accepted)
                     return QuestionActivity.this.getString(R.string.accepted) + " "
-                            + QuestionActivity.this.getString(R.string.answer);
+                                    + QuestionActivity.this.getString(R.string.answer);
                 else
                     return QuestionActivity.this.getString(R.string.answer) + " " + position;
             }
@@ -182,7 +183,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     private void enableAddCommentIfPermitted(Menu menu)
     {
         boolean canAddComment = WritePermissionUtil.canAdd(getApplicationContext(),
-                OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
+                        OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
 
         if (AppUtils.inAuthenticatedRealm(this) && canAddComment)
         {
@@ -199,23 +200,46 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             @Override
             public void onClick(View v)
             {
-                String fragmentTag = null;
-
-                if (viewPager.getCurrentItem() == 0)
-                {
-                    fragmentTag = question.id + "-comment";
-                    displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id,
-                            fragmentTag);
-                }
-                else
-                {
-                    Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
-                    fragmentTag = answer.id + "-comment";
-                    displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id,
-                            fragmentTag);
-                }
+                setupPostCommentFragment(null);
             }
         });
+    }
+
+    private void setupPostCommentFragment(String defaultText)
+    {
+        if (viewPager.getCurrentItem() == 0)
+        {
+            displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id, question.id
+                            + "-comment", defaultText);
+        }
+        else
+        {
+            Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
+            displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id, answer.id
+                            + "-comment", defaultText);
+        }
+    }
+
+    private void displayPostCommentFragment(String title, long id, String fragmentTag, String defaultText)
+    {
+        postCommentFragment = new PostCommentFragment();
+        postCommentFragment.setPostId(id);
+        postCommentFragment.setTitle(title);
+        postCommentFragment.setResultReceiver(resultReceiver);
+
+        if (commentsDraft.get(fragmentTag) != null)
+            postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));
+        else
+        {
+            if (defaultText != null)
+                postCommentFragment.setDefaultText(defaultText);
+        }
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentContainer, postCommentFragment, fragmentTag);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.addToBackStack(fragmentTag);
+        transaction.commit();
     }
 
     private void setupViewPager()
@@ -583,10 +607,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
             String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
-                    + viewPager.getCurrentItem();
+                            + viewPager.getCurrentItem();
 
+            commentFragment.setOnCommentReplyListener(this);
             OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
-                    .findFragmentByTag(currentViewPagerFragmentTag);
+                            .findFragmentByTag(currentViewPagerFragmentTag);
 
             if (onCommentChangeListener != null)
                 commentFragment.setOnCommentChangeListener(onCommentChangeListener);
@@ -662,20 +687,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
     }
 
-    private void displayPostCommentFragment(String title, long id, String fragmentTag)
+    @Override
+    public void onReplyTo(Comment comment)
     {
-        postCommentFragment = new PostCommentFragment();
-        postCommentFragment.setPostId(id);
-        postCommentFragment.setTitle(title);
-        postCommentFragment.setResultReceiver(resultReceiver);
-
-        if (commentsDraft.get(fragmentTag) != null)
-            postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));
-
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, postCommentFragment, fragmentTag);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.addToBackStack(fragmentTag);
-        transaction.commit();
+        if (comment != null && comment.owner != null)
+            setupPostCommentFragment("@" + comment.owner.displayName);
     }
 }

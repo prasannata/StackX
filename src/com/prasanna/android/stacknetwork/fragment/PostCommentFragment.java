@@ -65,6 +65,7 @@ public class PostCommentFragment extends Fragment
     private TextView charCount;
     private TextView sendStatus;
     private ProgressBar sendProgressBar;
+    private String defaultText;
 
     private class CommentTextWatcher implements TextWatcher
     {
@@ -124,6 +125,11 @@ public class PostCommentFragment extends Fragment
     public void setDraftText(String draftText)
     {
         this.draftText = draftText;
+    }
+
+    public void setDefaultText(String defaultText)
+    {
+        this.defaultText = defaultText;
     }
 
     public void setSendError(String errorResponse)
@@ -196,6 +202,11 @@ public class PostCommentFragment extends Fragment
 
         if (draftText != null)
             editText.setText(draftText);
+        else
+        {
+            if (defaultText != null)
+                editText.setText(defaultText);
+        }
 
         if (savedInstanceState != null && savedInstanceState.getString(TEXT) != null)
             editText.setText(savedInstanceState.getString(TEXT));
