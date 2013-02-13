@@ -62,6 +62,17 @@
                 android:layout_toLeftOf="@id/runSearch"
                 android:clickable="true"
                 android:src="@drawable/light_32x32_collections" />
+
+            <ImageView
+                android:id="@+id/newCriteria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_margin="3dp"
+                android:layout_toLeftOf="@id/loadCriteria"
+                android:clickable="true"
+                android:src="@drawable/light_32x32_new"
+                android:visibility="gone" />
         </RelativeLayout>
 
         <EditText
