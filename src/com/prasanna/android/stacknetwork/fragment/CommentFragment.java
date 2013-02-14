@@ -31,7 +31,9 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -133,6 +135,17 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         getListView().setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
         getListView().setItemsCanFocus(true);
         getListView().setClickable(false);
+        getListView().setOnTouchListener(new OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                Log.d(TAG, "onTouch");
+                AppUtils.hideSoftInput(getActivity(), v);
+                dismissAnotherReplyCommentEditTextIfExist();
+                return false;
+            }
+        });
 
         getWritePermissions();
     }
@@ -265,13 +278,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                if (lastSelectedViewForReply != null)
-                {
-                    Log.d(TAG, "Removing last selected reply");
-                    lastSelectedViewForReply.viewGroup.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
-                    lastSelectedViewForReply.replyToComment.setVisibility(View.VISIBLE);
-                    lastSelectedViewForReply.postCommentView.hide();
-                }
+                dismissAnotherReplyCommentEditTextIfExist();
 
                 getListView().setSelectionFromTop(position, 0);
                 itemsContainer.clearFocus();
@@ -545,5 +552,17 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     public void setResultReceiver(RestQueryResultReceiver resultReceiver)
     {
         this.resultReceiver = resultReceiver;
+    }
+
+    private void dismissAnotherReplyCommentEditTextIfExist()
+    {
+        if (lastSelectedViewForReply != null)
+        {
+            Log.d(TAG, "Removing last selected reply");
+            lastSelectedViewForReply.viewGroup.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
+            lastSelectedViewForReply.replyToComment.setVisibility(View.VISIBLE);
+            lastSelectedViewForReply.postCommentView.hide();
+            lastSelectedViewForReply = null;
+        }
     }
 }
