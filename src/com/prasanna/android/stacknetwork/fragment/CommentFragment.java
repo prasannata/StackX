@@ -140,7 +140,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
-                Log.d(TAG, "onTouch");
                 AppUtils.hideSoftInput(getActivity(), v);
                 dismissAnotherReplyCommentEditTextIfExist();
                 return false;
