@@ -67,6 +67,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private OnCommentChangeListener onCommentChangeListener;
     private PostCommentView postCommentView;
     private RestQueryResultReceiver resultReceiver;
+    protected CommentViewHolder lastSelectedViewForReply;
 
     public interface OnCommentChangeListener
     {
@@ -264,11 +265,21 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
+                if (lastSelectedViewForReply != null)
+                {
+                    Log.d(TAG, "Removing last selected reply");
+                    lastSelectedViewForReply.viewGroup.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
+                    lastSelectedViewForReply.replyToComment.setVisibility(View.VISIBLE);
+                    lastSelectedViewForReply.postCommentView.hide();
+                }
+
                 getListView().setSelectionFromTop(position, 0);
                 itemsContainer.clearFocus();
                 holder.replyToComment.setVisibility(View.GONE);
                 holder.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                 holder.postCommentView.show();
+
+                lastSelectedViewForReply = holder;
             }
         });
     }

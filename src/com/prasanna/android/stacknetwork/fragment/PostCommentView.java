@@ -176,18 +176,6 @@ public class PostCommentView
     {
         editText = (EditText) parentLayout.findViewById(R.id.textInput);
         editText.addTextChangedListener(new CommentTextWatcher());
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener()
-        {
-
-            @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (hasFocus)
-                    Log.d(TAG, "Focus gained: " + v.findFocus().getId());
-                else
-                    Log.d(TAG, "Focus lost: ");
-            }
-        });
         if (draftText != null)
             editText.setText(draftText);
 
