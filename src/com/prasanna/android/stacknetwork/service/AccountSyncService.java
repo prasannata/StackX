@@ -64,16 +64,18 @@ public class AccountSyncService extends AbstractStackxService
         {
             boolean newThingsFound = false;
             HashMap<String, Site> sites = SiteDAO.getAll(context);
-            long sitesLastUpdated = SiteDAO.getLastUpdateTime(context);
-            if (AppUtils.aDaySince(sitesLastUpdated))
-                refreshSiteList(sites);
+            if (sites != null)
+            {
+                long sitesLastUpdated = SiteDAO.getLastUpdateTime(context);
+                if (AppUtils.aDaySince(sitesLastUpdated))
+                    refreshSiteList(sites);
 
-            long accountsLastUpdated = SharedPreferencesUtil
-                            .getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
+                long accountsLastUpdated = SharedPreferencesUtil.getLong(context,
+                                StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
 
-            if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
-                newThingsFound = syncAccounts(sites);
-
+                if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
+                    newThingsFound = syncAccounts(sites);
+            }
             onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
         }
 
@@ -116,7 +118,7 @@ public class AccountSyncService extends AbstractStackxService
                         HashMap<String, Account> retrievedAccounts, ArrayList<Account> existingAccounts)
         {
             Iterator<Account> iterator = existingAccounts.iterator();
-            
+
             while (iterator.hasNext())
             {
                 if (!retrievedAccounts.containsKey(iterator.next().siteUrl))
