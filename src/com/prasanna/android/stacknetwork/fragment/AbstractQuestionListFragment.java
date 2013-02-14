@@ -119,7 +119,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     }
 
     @Override
-    public View getView(Question item, View convertView, ViewGroup parent)
+    public View getView(Question item, int position, View convertView, ViewGroup parent)
     {
         convertView = build(convertView, getActivity(), item);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.itemContextMenu);

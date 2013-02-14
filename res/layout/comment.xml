@@ -39,6 +39,7 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@id/commentTitle"
         android:layout_marginTop="5dp"
+        android:descendantFocusability="afterDescendants"
         android:visibility="gone" >
 
         <ImageView
@@ -103,11 +104,5 @@
         android:gravity="center"
         android:textColor="@color/delft"
         android:textSize="12sp" />
-
-    <include
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/post_comment"
-        android:visibility="gone" />
 
 </RelativeLayout>

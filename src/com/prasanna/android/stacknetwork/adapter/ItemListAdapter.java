@@ -34,7 +34,7 @@ public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
 
     public interface ListItemView<T>
     {
-        View getView(T item, View convertView, ViewGroup parent);
+        View getView(T item, int position, View convertView, ViewGroup parent);
     }
 
     public ItemListAdapter(Context context, int textViewResourceId, ArrayList<T> items, ListItemView<T> listItemView)
@@ -46,6 +46,6 @@ public class ItemListAdapter<T extends StackXItem> extends ArrayAdapter<T>
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        return listItemView.getView(getItem(position), convertView, parent);
+        return listItemView.getView(getItem(position), position, convertView, parent);
     }
 }

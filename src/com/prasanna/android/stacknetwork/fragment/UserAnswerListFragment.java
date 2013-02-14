@@ -205,7 +205,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    public View getView(final Answer answer, View convertView, ViewGroup parent)
+    public View getView(final Answer answer, int position, View convertView, ViewGroup parent)
     {
         LinearLayout answerRow = (LinearLayout) convertView;
 

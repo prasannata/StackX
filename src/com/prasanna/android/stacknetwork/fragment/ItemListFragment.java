@@ -31,7 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -59,7 +58,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     protected boolean serviceRunning = false;
     protected RestQueryResultReceiver resultReceiver;
     protected List<StackXPage<T>> pages;
-    protected LinearLayout itemsContainer;
+    protected ViewGroup itemsContainer;
     protected ArrayList<T> items;
     protected ItemListAdapter<T> itemListAdapter;
 

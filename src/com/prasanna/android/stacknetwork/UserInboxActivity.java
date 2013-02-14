@@ -211,7 +211,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    public View getView(InboxItem item, View convertView, ViewGroup parent)
+    public View getView(InboxItem item, int position, View convertView, ViewGroup parent)
     {
         RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.inbox_item, null);
 

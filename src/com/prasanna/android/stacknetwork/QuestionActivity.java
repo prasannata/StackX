@@ -43,7 +43,6 @@ import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
-import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentReplyListener;
 import com.prasanna.android.stacknetwork.fragment.PostCommentFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -65,7 +64,7 @@ import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
-                StackXRestQueryResultReceiver, PageSelectAdapter, OnCommentReplyListener
+                StackXRestQueryResultReceiver, PageSelectAdapter
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
@@ -304,9 +303,19 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         Log.d(TAG, "onBackPressed");
 
-        super.onBackPressed();
-
-        discardPostCommentFragmentIfVisible(false);
+        if (commentFragment != null && commentFragment.isVisible())
+        {
+            if (!commentFragment.onBackPressed())
+            {
+                super.onBackPressed();
+                discardPostCommentFragmentIfVisible(false);
+            }
+        }
+        else
+        {
+            super.onBackPressed();
+            discardPostCommentFragmentIfVisible(false);
+        }
     }
 
     @Override
@@ -606,10 +615,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             Log.d(TAG, "Creating comment fragment");
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
+            commentFragment.setResultReceiver(resultReceiver);
             String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
                             + viewPager.getCurrentItem();
 
-            commentFragment.setOnCommentReplyListener(this);
             OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
                             .findFragmentByTag(currentViewPagerFragmentTag);
 
@@ -685,12 +694,5 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
             viewPager.setCurrentItem(0);
         }
-    }
-
-    @Override
-    public void onReplyTo(Comment comment)
-    {
-        if (comment != null && comment.owner != null)
-            setupPostCommentFragment("@" + comment.owner.displayName);
     }
 }
