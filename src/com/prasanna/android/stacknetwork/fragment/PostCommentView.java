@@ -20,45 +20,34 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.StackXError;
-import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
-import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class PostCommentView
 {
-    private static final String TAG = PostCommentView.class.getSimpleName();
-    private static final String TEXT = "text";
     private static final int COMMENT_MIN_LEN = 15;
 
-    private RelativeLayout parentLayout;
+    private ScrollView parentLayout;
     private EditText editText;
     private TextView commentContext;
     private TextView sendComment;
     private String title;
     private long postId;
     private String draftText;
-    private RestQueryResultReceiver resultReceiver;
     private TextView charCount;
     private TextView sendStatus;
     private ProgressBar sendProgressBar;
@@ -66,7 +55,6 @@ public class PostCommentView
 
     private class CommentTextWatcher implements TextWatcher
     {
-
         @Override
         public void afterTextChanged(Editable s)
         {
@@ -99,6 +87,11 @@ public class PostCommentView
                 }
             }
         }
+    }
+
+    public interface OnSendCommentListener
+    {
+        boolean sendComment(long postId, String body);
     }
 
     public PostCommentView(Fragment fragment)
@@ -147,51 +140,38 @@ public class PostCommentView
         sendComment.setTextColor(fragment.getResources().getColor(R.color.delft));
     }
 
-    public void setResultReceiver(RestQueryResultReceiver resultReceiver)
-    {
-        this.resultReceiver = resultReceiver;
-    }
-
     public View getView(LayoutInflater inflater, int postCommentLayoutResId, ViewGroup container,
                     Bundle savedInstanceState)
     {
-        parentLayout = (RelativeLayout) inflater.inflate(postCommentLayoutResId, null);
+        parentLayout = (ScrollView) inflater.inflate(postCommentLayoutResId, null);
         charCount = (TextView) parentLayout.findViewById(R.id.charCount);
         sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
         sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
 
-        prepareSendComment();
-        prepareEditText(savedInstanceState);
+        return parentLayout;
+    }
+
+    public void prepare(OnSendCommentListener onSendCommentListener)
+    {
+        prepareSendComment(onSendCommentListener);
+        prepareEditText();
 
         if (title != null)
         {
             commentContext = (TextView) parentLayout.findViewById(R.id.commentContext);
             commentContext.setText(Html.fromHtml(title));
         }
-
-        return parentLayout;
     }
 
-    private void prepareEditText(Bundle savedInstanceState)
+    private void prepareEditText()
     {
         editText = (EditText) parentLayout.findViewById(R.id.textInput);
         editText.addTextChangedListener(new CommentTextWatcher());
         if (draftText != null)
             editText.setText(draftText);
-
-        if (savedInstanceState != null && savedInstanceState.getString(TEXT) != null)
-            editText.setText(savedInstanceState.getString(TEXT));
     }
 
-    public void onSaveInstanceState(Bundle outState)
-    {
-        Log.d(TAG, "onSaveInstanceState");
-
-        if (editText != null && editText.getText() != null)
-            outState.putString(TEXT, editText.getText().toString());
-    }
-
-    private void prepareSendComment()
+    private void prepareSendComment(final OnSendCommentListener onSendCommentListener)
     {
         sendComment = (TextView) parentLayout.findViewById(R.id.sendComment);
         sendComment.setOnClickListener(new View.OnClickListener()
@@ -201,34 +181,11 @@ public class PostCommentView
             {
                 if (editText.getText() != null && editText.getText().toString().length() > 0)
                 {
-                    if (fragment.isAdded())
-                        sendComment();
+                    if (onSendCommentListener.sendComment(postId, editText.getText().toString()))
+                        updateUIElements();
                 }
             }
         });
-    }
-
-    private void sendComment()
-    {
-        if (AppUtils.allowedToWrite(fragment.getActivity()))
-        {
-            Intent intent = new Intent(fragment.getActivity(), WriteIntentService.class);
-            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
-            intent.putExtra(StringConstants.POST_ID, postId);
-            intent.putExtra(StringConstants.BODY, editText.getText().toString());
-            updateUIElements();
-            fragment.getActivity().startService(intent);
-        }
-        else
-        {
-            long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(fragment.getActivity(),
-                            WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
-            Toast.makeText(fragment.getActivity(),
-                            "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
-                            Toast.LENGTH_LONG).show();
-        }
-
     }
 
     private void updateUIElements()
@@ -248,24 +205,22 @@ public class PostCommentView
     public void show()
     {
         if (View.GONE == parentLayout.getVisibility())
-        {
             parentLayout.setVisibility(View.VISIBLE);
-            if (editText.getText() != null)
-                editText.setSelection(editText.getText().length());
-            editText.requestFocus();
 
-            AppUtils.showSoftInput(fragment.getActivity(), editText);
-        }
+        if (editText.getText() != null)
+            editText.setSelection(editText.getText().length());
+
+        editText.requestFocus();
+        AppUtils.showSoftInput(fragment.getActivity(), editText);
     }
 
     public void hide()
     {
         if (View.VISIBLE == parentLayout.getVisibility())
-        {
             parentLayout.setVisibility(View.GONE);
-            editText.clearFocus();
-            AppUtils.hideSoftInput(fragment.getActivity(), editText);
-        }
+
+        editText.clearFocus();
+        AppUtils.hideSoftInput(fragment.getActivity(), editText);
     }
 
     public boolean isVisible()

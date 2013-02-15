@@ -218,8 +218,8 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     private String getTimeAndOwnerDisplay(String acceptRate)
     {
         return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
-                + AppUtils.formatReputation(question.owner.reputation) + "]";
+                        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
+                        + AppUtils.formatReputation(question.owner.reputation) + "]";
     }
 
     private void displayNumComments()
@@ -289,6 +289,19 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     }
 
     @Override
+    public void onCommentAdd(Comment comment)
+    {
+        // One reply to comments come here, add new comment is directly handled
+        // by QuestionAcitivy. So no need to initialize comments if nul because
+        // it can never be null here.
+        if (comment != null && question.comments != null)
+        {
+            question.comments.add(comment);
+            updateCacheWithNewCommentIfExists(comment);
+        }
+    }
+
+    @Override
     public void onCommentUpdate(Comment comment)
     {
         if (question.comments != null)
@@ -334,10 +347,14 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         displayNumComments();
     }
 
-    private void removeQuestionFromCache()
+    private void updateCacheWithNewCommentIfExists(Comment comment)
     {
         if (QuestionsCache.getInstance().containsKey(question.id))
-            QuestionsCache.getInstance().remove(question.id);
+        {
+            Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
+            cachedQuestion.comments.add(comment);
+            QuestionsCache.getInstance().add(question.id, cachedQuestion);
+        }
     }
 
     private void updateCacheIfNeeded()
@@ -349,4 +366,11 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             QuestionsCache.getInstance().add(question.id, cachedQuestion);
         }
     }
+
+    private void removeQuestionFromCache()
+    {
+        if (QuestionsCache.getInstance().containsKey(question.id))
+            QuestionsCache.getInstance().remove(question.id);
+    }
+
 }

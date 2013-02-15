@@ -78,6 +78,7 @@ public class WriteIntentService extends AbstractIntentService
         catch (AbstractHttpException e)
         {
             Bundle bundle = new Bundle();
+            bundle.putInt(StringConstants.REQUEST_CODE, action);
             bundle.putSerializable(StringConstants.EXCEPTION, e);
             receiver.send(ERROR, bundle);
         }
@@ -90,7 +91,7 @@ public class WriteIntentService extends AbstractIntentService
         resultData.putSerializable(StringConstants.COMMENT, comment);
         receiver.send(ACTION_ADD_COMMENT, resultData);
     }
-    
+
     private void editComment(long commentId, String editedText, ResultReceiver receiver)
     {
         Bundle resultData = new Bundle();
@@ -98,7 +99,7 @@ public class WriteIntentService extends AbstractIntentService
         resultData.putSerializable(StringConstants.COMMENT, comment);
         receiver.send(ACTION_EDIT_COMMENT, resultData);
     }
-    
+
     private void deleteComment(long commentId, ResultReceiver receiver)
     {
         WriteServiceHelper.getInstance().deleteComment(commentId);

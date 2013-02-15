@@ -20,27 +20,16 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.Html;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.model.StackXError;
+import com.prasanna.android.stacknetwork.fragment.PostCommentView.OnSendCommentListener;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
@@ -51,102 +40,65 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class PostCommentFragment extends Fragment
 {
     private static final String TAG = PostCommentFragment.class.getSimpleName();
+
     private static final String TEXT = "text";
-    private static final int COMMENT_MIN_LEN = 15;
-
-    private RelativeLayout parentLayout;
-    private EditText editText;
-    private TextView commentContext;
-    private TextView sendComment;
-    private String title;
-    private long postId;
-    private String draftText;
     private RestQueryResultReceiver resultReceiver;
-    private TextView charCount;
-    private TextView sendStatus;
-    private ProgressBar sendProgressBar;
-    private String defaultText;
+    private PostCommentView postCommentView;
 
-    private class CommentTextWatcher implements TextWatcher
+    private class OnSendCommentListenerImpl implements OnSendCommentListener
     {
-
         @Override
-        public void afterTextChanged(Editable s)
+        public boolean sendComment(long postId, String body)
         {
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after)
-        {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count)
-        {
-            if (!PostCommentFragment.this.isRemoving() || !PostCommentFragment.this.isDetached())
+            if (isAdded())
             {
-                charCount.setText(String.valueOf(s.length()));
-
-                if (s.length() >= COMMENT_MIN_LEN && !sendComment.isClickable())
+                if (AppUtils.allowedToWrite(getActivity()))
                 {
-                    sendComment.setTextColor(getResources().getColor(R.color.delft));
-                    sendComment.setClickable(true);
+                    Intent intent = new Intent(getActivity(), WriteIntentService.class);
+                    intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+                    intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+                    intent.putExtra(StringConstants.POST_ID, postId);
+                    intent.putExtra(StringConstants.BODY, body);
+                    getActivity().startService(intent);
+                    return true;
                 }
                 else
                 {
-                    if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
-                    {
-                        sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
-                        sendComment.setClickable(false);
-                    }
+                    long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
+                                    WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+                    Toast.makeText(getActivity(),
+                                    "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
+                                    Toast.LENGTH_LONG).show();
                 }
             }
+
+            return false;
         }
+    }
+
+    public PostCommentFragment()
+    {
+        postCommentView = new PostCommentView(this);
     }
 
     public void setPostId(long id)
     {
-        this.postId = id;
+        postCommentView.setPostId(id);
     }
 
     public void setTitle(String title)
     {
-        this.title = title;
-    }
-
-    public String getCurrentText()
-    {
-        if (editText != null && editText.getText() != null)
-            return editText.getText().toString();
-
-        return null;
+        postCommentView.setTitle(title);
     }
 
     public void setDraftText(String draftText)
     {
-        this.draftText = draftText;
-    }
-
-    public void setDefaultText(String defaultText)
-    {
-        this.defaultText = defaultText;
+        postCommentView.setDraftText(draftText);
     }
 
     public void setSendError(String errorResponse)
     {
-        sendProgressBar.setVisibility(View.GONE);
-
-        if (sendStatus != null)
-        {
-            String failureText = "Failed";
-            StackXError error = StackXError.deserialize(errorResponse);
-            sendStatus.setText(error != null ? error.name : failureText);
-            sendStatus.setTextColor(Color.RED);
-            sendStatus.setVisibility(View.VISIBLE);
-        }
-
-        editText.setFocusableInTouchMode(true);
-        sendComment.setClickable(true);
+        postCommentView.setSendError(errorResponse);
     }
 
     public void setResultReceiver(RestQueryResultReceiver resultReceiver)
@@ -154,64 +106,29 @@ public class PostCommentFragment extends Fragment
         this.resultReceiver = resultReceiver;
     }
 
+    public void hideSoftKeyboard()
+    {
+        postCommentView.hideSoftKeyboard();
+    }
+
+    public String getCurrentText()
+    {
+        return postCommentView.getCurrentText();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        parentLayout = (RelativeLayout) inflater.inflate(R.layout.post_comment, null);
-        charCount = (TextView) parentLayout.findViewById(R.id.charCount);
-        sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
-        sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
-
-        prepareSendComment();
-        prepareEditText(savedInstanceState);
-
-        if (title != null)
-        {
-            commentContext = (TextView) parentLayout.findViewById(R.id.commentContext);
-            commentContext.setText(Html.fromHtml(title));
-        }
-
-        return parentLayout;
+        return postCommentView.getView(inflater, R.layout.post_comment, container, savedInstanceState);
     }
 
-    private void prepareEditText(Bundle savedInstanceState)
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
     {
-        editText = (EditText) parentLayout.findViewById(R.id.textInput);
-        editText.setOnFocusChangeListener(new OnFocusChangeListener()
-        {
-            @Override
-            public void onFocusChange(final View v, boolean hasFocus)
-            {
-                if (hasFocus)
-                {
-                    editText.post(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
-                                            Context.INPUT_METHOD_SERVICE);
-                            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
-                        }
-                    });
-                }
-            }
-        });
+        super.onActivityCreated(savedInstanceState);
 
-        editText.addTextChangedListener(new CommentTextWatcher());
-
-        if (draftText != null)
-            editText.setText(draftText);
-        else
-        {
-            if (defaultText != null)
-                editText.setText(defaultText);
-        }
-
-        if (savedInstanceState != null && savedInstanceState.getString(TEXT) != null)
-            editText.setText(savedInstanceState.getString(TEXT));
-
-        editText.requestFocus();
+        postCommentView.prepare(new OnSendCommentListenerImpl());
+        postCommentView.show();
     }
 
     @Override
@@ -219,62 +136,9 @@ public class PostCommentFragment extends Fragment
     {
         Log.d(TAG, "onSaveInstanceState");
 
-        if (editText != null && editText.getText() != null)
-            outState.putString(TEXT, editText.getText().toString());
+        if (postCommentView.getCurrentText() != null)
+            outState.putString(TEXT, postCommentView.getCurrentText().toString());
 
         super.onSaveInstanceState(outState);
-    }
-
-    private void prepareSendComment()
-    {
-        sendComment = (TextView) parentLayout.findViewById(R.id.sendComment);
-        sendComment.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (editText.getText() != null && editText.getText().toString().length() > 0)
-                {
-                    if (isAdded())
-                        sendComment();
-                }
-            }
-        });
-    }
-
-    private void sendComment()
-    {
-        if (AppUtils.allowedToWrite(getActivity()))
-        {
-            Intent intent = new Intent(getActivity(), WriteIntentService.class);
-            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
-            intent.putExtra(StringConstants.POST_ID, postId);
-            intent.putExtra(StringConstants.BODY, editText.getText().toString());
-            updateUIElements();
-            getActivity().startService(intent);
-        }
-        else
-        {
-            long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
-                            WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
-            Toast.makeText(getActivity(), "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
-                            Toast.LENGTH_LONG).show();
-        }
-
-    }
-
-    private void updateUIElements()
-    {
-        editText.setFocusable(false);
-        sendComment.setClickable(false);
-        sendProgressBar.setVisibility(View.VISIBLE);
-        sendStatus.setVisibility(View.GONE);
-    }
-
-    public void hideSoftKeyboard()
-    {
-        if (isVisible() && editText != null)
-            AppUtils.hideSoftInput(getActivity(), editText);
     }
 }

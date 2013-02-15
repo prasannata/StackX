@@ -119,8 +119,8 @@
         </activity>
         <activity
             android:name=".QuestionActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize" />

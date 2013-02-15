@@ -228,11 +228,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         if (commentsDraft.get(fragmentTag) != null)
             postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));
-        else
-        {
-            if (defaultText != null)
-                postCommentFragment.setDefaultText(defaultText);
-        }
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, postCommentFragment, fragmentTag);
@@ -553,7 +548,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
     }
 
-    protected void handleError(Bundle resultData)
+    private void handleError(Bundle resultData)
     {
         setProgressBarIndeterminateVisibility(false);
 
@@ -615,7 +610,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             Log.d(TAG, "Creating comment fragment");
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
-            commentFragment.setResultReceiver(resultReceiver);
             String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
                             + viewPager.getCurrentItem();
 

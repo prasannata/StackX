@@ -39,6 +39,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
+import com.prasanna.android.stacknetwork.fragment.PostCommentView.OnSendCommentListener;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
@@ -67,12 +69,14 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private HashMap<ObjectType, WritePermission> writePermissions;
     private ProgressDialog progressDialog;
     private OnCommentChangeListener onCommentChangeListener;
-    private PostCommentView postCommentView;
     private RestQueryResultReceiver resultReceiver;
     protected CommentViewHolder lastSelectedViewForReply;
+    private OnSendCommentListenerImpl onSendCommentListenerImpl;
 
     public interface OnCommentChangeListener
     {
+        void onCommentAdd(Comment comment);
+
         void onCommentUpdate(Comment comment);
 
         void onCommentDelete(long commentId);
@@ -81,6 +85,36 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     public interface OnCommentReplyListener
     {
         void onReplyTo(Comment comment);
+    }
+
+    private class OnSendCommentListenerImpl implements OnSendCommentListener
+    {
+        public boolean sendComment(long postId, String body)
+        {
+            if (isAdded())
+            {
+                if (AppUtils.allowedToWrite(getActivity()))
+                {
+                    Intent intent = new Intent(getActivity(), WriteIntentService.class);
+                    intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+                    intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+                    intent.putExtra(StringConstants.POST_ID, postId);
+                    intent.putExtra(StringConstants.BODY, body);
+                    getActivity().startService(intent);
+                    return true;
+                }
+                else
+                {
+                    long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
+                                    WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+                    Toast.makeText(getActivity(),
+                                    "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
+                                    Toast.LENGTH_LONG).show();
+                }
+            }
+
+            return false;
+        }
     }
 
     static class CommentViewHolder
@@ -206,14 +240,18 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             holder.commentEditOptions = (LinearLayout) commentLayout.findViewById(R.id.commentEditOptions);
             holder.postCommentView = getReplyToCommentLayout(comment, commentLayout);
 
-            if (AppUtils.inAuthenticatedRealm(getActivity()))
-                setupCommentWriteOptions(comment, position, holder);
-
+            onSendCommentListenerImpl = new OnSendCommentListenerImpl();
             commentLayout.setTag(holder);
         }
         else
             holder = (CommentViewHolder) commentLayout.getTag();
 
+        if (AppUtils.inAuthenticatedRealm(getActivity()))
+            setupCommentWriteOptions(comment, position, holder);
+
+        holder.postCommentView.setPostId(comment.post_id);
+        holder.postCommentView.setDraftText("@" + comment.owner.displayName + " ");
+        holder.postCommentView.prepare(onSendCommentListenerImpl);
         holder.score.setText(AppUtils.formatNumber(comment.score));
         holder.title.setText("");
         holder.title.append(Html.fromHtml(comment.body));
@@ -256,11 +294,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private PostCommentView getReplyToCommentLayout(Comment comment, final RelativeLayout parentLayout)
     {
         PostCommentView postCommentView = new PostCommentView(CommentFragment.this);
-        postCommentView.setResultReceiver(resultReceiver);
-        postCommentView.setPostId(comment.post_id);
-        postCommentView.setDraftText("@" + comment.owner.displayName + " ");
-        RelativeLayout replyToCommentLayout = (RelativeLayout) postCommentView.getView(
-                        LayoutInflater.from(getActivity()), R.layout.post_comment, null, null);
+        ScrollView replyToCommentLayout = (ScrollView) postCommentView.getView(LayoutInflater.from(getActivity()),
+                        R.layout.post_comment, null, null);
         replyToCommentLayout.setVisibility(View.GONE);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                         RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -468,11 +503,14 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
         switch (resultCode)
         {
+            case WriteIntentService.ACTION_ADD_COMMENT:
+                Log.d(TAG, "Receiver invoked for ACTION_ADD_COMMENT");
+                onAddCommentComplete(resultData);
+                break;
             case WriteIntentService.ACTION_EDIT_COMMENT:
                 Log.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
                 onEditCommentComplete(resultData);
                 break;
-
             case WriteIntentService.ACTION_DEL_COMMENT:
                 Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
                 onDelCommentComplete(resultData);
@@ -496,11 +534,23 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
     }
 
+    private void onAddCommentComplete(Bundle resultData)
+    {
+        Comment comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
+        if (comment != null && onCommentChangeListener != null)
+        {
+            comments.add(comment);
+            onCommentChangeListener.onCommentAdd(comment);
+            itemListAdapter.notifyDataSetChanged();
+        }
+    }
+
     private void onEditCommentComplete(Bundle resultData)
     {
-        if (onCommentChangeListener != null)
+        Comment comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
+
+        if (comment != null && onCommentChangeListener != null)
         {
-            Comment comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
             onCommentChangeListener.onCommentUpdate(comment);
 
             int idx = comments.indexOf(comment);
@@ -539,18 +589,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     public boolean onBackPressed()
     {
-        if (postCommentView != null && postCommentView.isVisible())
-        {
-            postCommentView.hide();
-            return true;
-        }
-
         return false;
-    }
-
-    public void setResultReceiver(RestQueryResultReceiver resultReceiver)
-    {
-        this.resultReceiver = resultReceiver;
     }
 
     private void dismissAnotherReplyCommentEditTextIfExist()

@@ -46,6 +46,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
@@ -256,9 +257,9 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     private String getAutherDisplayText(String acceptRate)
     {
         Spanned authorName = answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
-                : new SpannableString("");
+                        : new SpannableString("");
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
-                + AppUtils.formatReputation(answer.owner.reputation) + "]";
+                        + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
 
     private void enableCommentsInContextMenu(ContextMenu menu)
@@ -321,5 +322,36 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     {
         if (QuestionsCache.getInstance().containsKey(answer.questionId))
             QuestionsCache.getInstance().remove(answer.questionId);
+    }
+
+    @Override
+    public void onCommentAdd(Comment comment)
+    {
+        // One reply to comments come here, add new comment is directly handled
+        // by QuestionAcitivy. So no need to initialize comments if nul because
+        // it can never be null here.
+        if (comment != null && answer.comments != null)
+        {
+            answer.comments.add(comment);
+            updateCacheWithNewCommentIfExists(comment);
+        }
+    }
+
+    private void updateCacheWithNewCommentIfExists(Comment comment)
+    {
+        if (QuestionsCache.getInstance().containsKey(answer.questionId))
+        {
+            Question cachedQuestion = QuestionsCache.getInstance().get(answer.questionId);
+            for (Answer answer : cachedQuestion.answers)
+            {
+                if (answer.id == comment.post_id)
+                {
+                    answer.comments.add(comment);
+                    break;
+                }
+
+            }
+            QuestionsCache.getInstance().add(answer.questionId, cachedQuestion);
+        }
     }
 }
