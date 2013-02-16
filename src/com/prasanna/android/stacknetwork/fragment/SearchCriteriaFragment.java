@@ -616,14 +616,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         break;
                 }
 
-                if (savedCriteria)
-                    new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
-                                    WriteCriteriaAsyncTask.ACTION_UPDATE, null).execute();
-
                 searchCriteriaDomain.searchCriteria.includeTags(taggedSet).excludeTags(notTaggedSet);
                 searchCriteriaDomain.searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
                 searchCriteriaDomain.runCount++;
                 searchCriteriaDomain.lastRun = System.currentTimeMillis();
+                
+                if (savedCriteria)
+                    new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
+                                    WriteCriteriaAsyncTask.ACTION_UPDATE, null).execute();
+
                 onRunSearchListener.onRunSearch(searchCriteriaDomain.searchCriteria.build());
                 AppUtils.hideSoftInput(getActivity(), v);
             }
