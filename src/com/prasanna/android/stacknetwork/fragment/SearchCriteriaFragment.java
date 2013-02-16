@@ -319,9 +319,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
             tagEditText.setAdapter(tagArrayAdapter);
 
-            if(savedCriteria)
+            if (savedCriteria)
                 newCriteria.setVisibility(View.VISIBLE);
-            
+
             prepareToggedToggleButton();
             prepareNotTaggedToggleButton();
         }
@@ -434,9 +434,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private void addTagView(TextView tagTextView, int colorResource)
     {
         tagTextView.setBackgroundColor(getResources().getColor(colorResource));
-
         LinearLayout currentRow = getTagRow(tagTextView);
-
         TextView findViewWithTag = (TextView) currentRow.findViewWithTag(tagTextView.getTag());
 
         if (findViewWithTag == null)
@@ -513,6 +511,25 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             textView.setTag(SELECTED_TAGS_TV_PREFIX_TAG + tag);
         }
         textView.setText(tag);
+        return textView;
+    }
+
+    private TextView getTextViewForTag()
+    {
+        final TextView textView = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.tags_layout, null);
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (textView.getText() != null)
+                {
+                    tagEditText.setText(textView.getText());
+                    tagEditText.setSelection(textView.getText().length());
+                }
+            }
+        });
+
         return textView;
     }
 
@@ -599,6 +616,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         break;
                 }
 
+                if (savedCriteria)
+                    new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
+                                    WriteCriteriaAsyncTask.ACTION_UPDATE, null).execute();
+
                 searchCriteriaDomain.searchCriteria.includeTags(taggedSet).excludeTags(notTaggedSet);
                 searchCriteriaDomain.searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
                 searchCriteriaDomain.runCount++;
@@ -616,7 +637,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             @Override
             public void onClick(View v)
             {
-                AppUtils.hideSoftInput(getActivity(), v);   
+                savedCriteria = false;
+                AppUtils.hideSoftInput(getActivity(), v);
                 Intent intent = new Intent(getActivity(), AdvancedSearchActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -660,6 +682,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     notTaggedSet.clear();
                     selectedTags.setVisibility(View.GONE);
                 }
+
                 AppUtils.hideSoftInput(getActivity(), v);
             }
         });
@@ -680,7 +703,15 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 @Override
                 public void onFilterComplete(int count)
                 {
-                    onFilterCompleteHandler(s, count);
+                    if (taggedSet.contains(s.toString()))
+                        toggleTagged.setChecked(true);
+                    else
+                        toggleTagged.setChecked(false);
+
+                    if (notTaggedSet.contains(s.toString()))
+                        toggleNotTagged.setChecked(true);
+                    else
+                        toggleNotTagged.setChecked(false);
                 }
             });
         }
@@ -694,44 +725,17 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
-
     }
 
-    private TextView getTextViewForTag()
+    public void loadCriteria(SearchCriteriaDomain searchCriteriaDomain)
     {
-        final TextView textView = (TextView) LayoutInflater.from(getActivity()).inflate(R.layout.tags_layout, null);
-        textView.setOnClickListener(new View.OnClickListener()
+        if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
         {
-            @Override
-            public void onClick(View v)
-            {
-                if (textView.getText() != null)
-                {
-                    tagEditText.setText(textView.getText());
-                    tagEditText.setSelection(textView.getText().length());
-                }
-            }
-        });
-
-        return textView;
-    }
-
-    private void onFilterCompleteHandler(final Editable s, int count)
-    {
-        if (taggedSet.contains(s.toString()))
-            toggleTagged.setChecked(true);
-        else
-            toggleTagged.setChecked(false);
-
-        if (notTaggedSet.contains(s.toString()))
-            toggleNotTagged.setChecked(true);
-        else
-            toggleNotTagged.setChecked(false);
-    }
-
-    public void hideSoftInput()
-    {
-        AppUtils.hideSoftInput(getActivity(), getActivity().getWindow().getCurrentFocus());
+            savedCriteria = true;
+            this.searchCriteriaDomain = searchCriteriaDomain;
+            if (newCriteria != null)
+                newCriteria.setVisibility(View.VISIBLE);
+        }
     }
 
     public void saveCriteria(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
@@ -742,11 +746,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_UPDATE,
                                 asyncTaskCompletionNotifier).execute();
             else
-                prepareAndShowSaveAsDialog(asyncTaskCompletionNotifier);
+                showSaveAsDialog(asyncTaskCompletionNotifier);
         }
     }
 
-    private void prepareAndShowSaveAsDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+    private void showSaveAsDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
     {
         AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(getActivity());
         saveAsDailogBuilder.setTitle("Save As");
@@ -779,17 +783,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         AlertDialog dialog = saveAsDailogBuilder.create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         dialog.show();
-    }
-
-    public void loadCriteria(SearchCriteriaDomain searchCriteriaDomain)
-    {
-        if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
-        {
-            savedCriteria = true;
-            this.searchCriteriaDomain = searchCriteriaDomain;
-            if(newCriteria != null)
-                newCriteria.setVisibility(View.VISIBLE);
-        }
     }
 
     public String getCriteriaName()

@@ -225,6 +225,25 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
     }
 
+    public static void updateCriteria(Context context, SearchCriteriaDomain searchCriteriaDomain)
+    {
+        SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
+        try
+        {
+            dao.open();
+            dao.update(searchCriteriaDomain);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+
+    }
+
     public static ArrayList<SearchCriteriaDomain> getAll(final Context context, final String site)
     {
         SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
@@ -244,7 +263,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
 
         return null;
     }
-    
+
     public static ArrayList<SearchCriteriaDomain> getCriteriaForCustomTabs(final Context context, final String site)
     {
         SearchCriteriaDAO dao = new SearchCriteriaDAO(context);

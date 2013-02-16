@@ -32,6 +32,7 @@ import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.OnRunSe
 import com.prasanna.android.stacknetwork.fragment.SearchQuestionListFragment;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
@@ -80,7 +81,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 {
                     getActionBar().setDisplayHomeAsUpEnabled(true);
                     ft.hide(searchCriteriaFragment);
-                    searchCriteriaFragment.hideSoftInput();
+                    AppUtils.hideSoftInput(this, getWindow().getCurrentFocus());
                 }
             }
             else
@@ -157,7 +158,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     public void onRunSearch(SearchCriteria searchCriteria)
     {
-        showSearchResults(searchCriteria, false);
+        runSearchAndShowResults(searchCriteria, false);
     }
 
     @Override
@@ -180,7 +181,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         return super.onActionBarHomeButtonClick(menuItem);
     }
 
-    private void showSearchResults(SearchCriteria searchCriteria, boolean addToBackStack)
+    private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack)
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
