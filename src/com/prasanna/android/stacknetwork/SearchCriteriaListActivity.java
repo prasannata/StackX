@@ -56,6 +56,7 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 {
     public static final int MAX_SAVED_SEARCHES = 10;
+    public static final int MAX_CUSTOM_TABS = 3;
 
     private static final String TAG = SearchCriteriaListActivity.class.getSimpleName();
     private static final String ACTION_BAR_TITLE = "Saved Searches";
@@ -101,29 +102,34 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 case WriteCriteriaAsyncTask.ACTION_DEL:
                     toastMsg += " delete ";
                     if (result)
+                    {
+                        if (domain.tab)
+                            criteriaIdsAsTab.remove(domain.id);
                         searchCriteriaArrayAdapter.remove(domain);
+                    }
                     break;
-                case WriteCriteriaAsyncTask.ACTION_DEL_MANY:
-                    toastMsg += "delete ";
-                    if (result)
-                        searchCriteriaArrayAdapter.remove(domain);
-                    break;
-
                 case WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB:
                     toastMsg += " add tab";
                     if (result)
+                    {
                         criteriaIdsAsTab.add(domain.id);
+                        domain.tab  = true;
+                        searchCriteriaArrayAdapter.notifyDataSetChanged();
+                    }
                     else
                         ((ToggleButton) view).setChecked(false);
                     break;
                 case WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB:
                     toastMsg += " remove tab ";
                     if (result)
+                    {
                         criteriaIdsAsTab.remove(domain.id);
+                        domain.tab  = false;
+                        searchCriteriaArrayAdapter.notifyDataSetChanged();
+                    }
                     else
                         ((ToggleButton) view).setChecked(false);
                     break;
-
             }
 
             if (result)
@@ -157,7 +163,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             if (asyncTaskCompletionNotifier != null)
                 asyncTaskCompletionNotifier.notifyOnCompletion(result);
         }
-
     }
 
     private class SearchCriteriaArrayAdapter extends ArrayAdapter<SearchCriteriaDomain>
@@ -187,9 +192,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 viewHolder.lastRun = (TextView) convertView.findViewById(R.id.itemLastRun);
                 viewHolder.ran = (TextView) convertView.findViewById(R.id.itemRan);
 
-                if (item.tab)
-                    criteriaIdsAsTab.add(item.id);
-
                 convertView.setTag(viewHolder);
             }
             else
@@ -204,10 +206,20 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             else
                 viewHolder.delCheckBox.setChecked(false);
 
-            if (criteriaIdsAsTab.contains(item.id))
+            if (item.tab)
+            {
+                criteriaIdsAsTab.add(item.id);
+                viewHolder.addTabToggle.setVisibility(View.VISIBLE);
                 viewHolder.addTabToggle.setChecked(true);
+            }
             else
+            {
                 viewHolder.addTabToggle.setChecked(false);
+                if (criteriaIdsAsTab.size() == MAX_CUSTOM_TABS)
+                    viewHolder.addTabToggle.setVisibility(View.GONE);
+                else
+                    viewHolder.addTabToggle.setVisibility(View.VISIBLE);
+            }
 
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
@@ -383,6 +395,15 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     searchCriteriaArrayAdapter.notifyDataSetInvalidated();
                     searchCriteriaArrayAdapter.clear();
 
+                    actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
+                    AppUtils.decrementNumSavedSearches(getApplicationContext(), toDeleteList.size());
+                    for (SearchCriteriaDomain deletedDomain : toDeleteList)
+                    {
+                        if (deletedDomain.tab)
+                            criteriaIdsAsTab.remove(deletedDomain.id);
+                    }
+                    toDeleteList.clear();
+
                     if (!savedSearchList.isEmpty())
                     {
                         searchCriteriaArrayAdapter.addAll(savedSearchList);
@@ -393,10 +414,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                         addContentView(getEmptyView(), new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
                     }
-
-                    actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
-                    AppUtils.decrementNumSavedSearches(getApplicationContext(), toDeleteList.size());
-                    toDeleteList.clear();
                 }
             }
         };
