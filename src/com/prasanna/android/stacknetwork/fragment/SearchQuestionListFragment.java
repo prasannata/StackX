@@ -9,6 +9,7 @@ import android.view.Menu;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
@@ -17,35 +18,8 @@ public class SearchQuestionListFragment extends QuestionListFragment
     private static final String TAG = SearchQuestionListFragment.class.getSimpleName();
     private Intent intent;
     private SearchCriteria searchCriteria;
-
-    public void search(SearchCriteria searchCriteria)
-    {
-        Log.d(TAG, "Running search criteria");
-        if (searchCriteria != null)
-        {
-            itemListAdapter.clear();
-            itemListAdapter.notifyDataSetChanged();
-            this.searchCriteria = searchCriteria;
-            startIntentService();
-        }
-    }
-
-    private void prepareIntentAndStartService()
-    {
-        if (intent == null)
-        {
-            intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
-            if (intent != null)
-            {
-
-                intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
-                intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-                intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
-            }
-        }
-        else
-            intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria.nextPage());
-    }
+    private Menu menu;
+    private boolean saved = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -58,7 +32,10 @@ public class SearchQuestionListFragment extends QuestionListFragment
     public void onPrepareOptionsMenu(Menu menu)
     {
         Log.d(TAG, "onPrepareOptionsMenu");
-        menu.findItem(R.id.menu_save).setVisible(true);
+
+        this.menu = menu;
+        if (saved || !AppUtils.savedSearchesMaxed(getActivity()))
+            menu.findItem(R.id.menu_save).setVisible(true);
     }
 
     @Override
@@ -94,4 +71,47 @@ public class SearchQuestionListFragment extends QuestionListFragment
         return itemListAdapter != null && itemListAdapter.getCount() > 0;
     }
 
+    public void search(SearchCriteria searchCriteria, boolean saved)
+    {
+        Log.d(TAG, "Running search criteria");
+
+        if (searchCriteria != null)
+        {
+            this.saved = saved;
+
+            if (menu != null)
+            {
+                if (saved)
+                    menu.findItem(R.id.menu_save).setVisible(true);
+                else
+                {
+                    if (AppUtils.savedSearchesMaxed(getActivity()))
+                        menu.findItem(R.id.menu_save).setVisible(false);
+                    else
+                        menu.findItem(R.id.menu_save).setVisible(true);
+                }
+            }
+            itemListAdapter.clear();
+            itemListAdapter.notifyDataSetChanged();
+            this.searchCriteria = searchCriteria;
+            startIntentService();
+        }
+    }
+
+    private void prepareIntentAndStartService()
+    {
+        if (intent == null)
+        {
+            intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+            if (intent != null)
+            {
+
+                intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
+                intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+                intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
+            }
+        }
+        else
+            intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria.nextPage());
+    }
 }

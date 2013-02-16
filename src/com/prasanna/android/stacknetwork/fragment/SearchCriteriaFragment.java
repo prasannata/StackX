@@ -74,7 +74,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private static final String TAG = SearchCriteriaFragment.class.getSimpleName();
     private static final String SELECTED_TAGS_LL_PREFIX_TAG = "selectedTags:ll:";
     private static final String SELECTED_TAGS_TV_PREFIX_TAG = "selectedTags:tv:";
-
+    
     private boolean savedCriteria = false;
     private int currentNumRowsOfSelectedTags = 0;
     private OnRunSearchListener onRunSearchListener;
@@ -206,7 +206,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     public interface OnRunSearchListener
     {
-        void onRunSearch(SearchCriteria searchCriteria);
+        void onRunSearch(SearchCriteria searchCriteria, boolean savedCriteria);
     }
 
     public class TagFilter extends Filter
@@ -625,7 +625,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
                                     WriteCriteriaAsyncTask.ACTION_UPDATE, null).execute();
 
-                onRunSearchListener.onRunSearch(searchCriteriaDomain.searchCriteria.build());
+                onRunSearchListener.onRunSearch(searchCriteriaDomain.searchCriteria.build(), savedCriteria);
                 AppUtils.hideSoftInput(getActivity(), v);
             }
         });

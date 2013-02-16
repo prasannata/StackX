@@ -36,6 +36,8 @@ import android.widget.TextView;
 
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.SearchCriteriaListActivity;
+import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 
@@ -120,7 +122,7 @@ public class AppUtils
         textView.setText(errorMsg);
         return errorLayout;
     }
-    
+
     public static View getEmptyItemsView(Context context)
     {
         View noItemsFoundView = LayoutInflater.from(context).inflate(R.layout.empty_items, null);
@@ -184,6 +186,34 @@ public class AppUtils
         };
         t.start();
         return t;
+    }
+
+    public static void incrementNumSavedSearches(Context context)
+    {
+        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+
+        SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, ++num);
+    }
+
+    public static void decrementNumSavedSearches(Context context)
+    {
+        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+
+        if (num > 0)
+            SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, --num);
+    }
+
+    public static void decrementNumSavedSearches(Context context, int by)
+    {
+        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+
+        if (num > 0 && num - by >=0 )
+            SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, num - by);
+    }
+
+    public static boolean savedSearchesMaxed(Context context)
+    {
+        return SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0) == SearchCriteriaListActivity.MAX_SAVED_SEARCHES;
     }
 
     public static boolean anHourSince(long ms)

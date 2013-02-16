@@ -55,8 +55,11 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 {
+    public static final int MAX_SAVED_SEARCHES = 1;
+
     private static final String TAG = SearchCriteriaListActivity.class.getSimpleName();
     private static final String ACTION_BAR_TITLE = "Saved Searches";
+
     private SearchCriteriaArrayAdapter searchCriteriaArrayAdapter;
     private ListView listView;
     private ArrayList<SearchCriteriaDomain> savedSearchList = new ArrayList<SearchCriteriaDomain>();
@@ -392,6 +395,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
 
                     actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
+                    AppUtils.decrementNumSavedSearches(getApplicationContext(), toDeleteList.size());
                     toDeleteList.clear();
                 }
             }

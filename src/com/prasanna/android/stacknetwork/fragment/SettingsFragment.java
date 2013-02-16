@@ -64,6 +64,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_SEARCH_IN_TITLE = "pref_searchInTitle";
     public static final String KEY_PREF_SEARCH_ONLY_WITH_ANSWERS = "pref_searchOnlyWithAnswers";
     public static final String KEY_PREF_SEARCH_ONLY_ANSWERED = "pref_searchOnlyAnswered";
+    public static final String KEY_PREF_NUM_SAVED_SEARCHES = "pref_numSavedSearches";
 
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 

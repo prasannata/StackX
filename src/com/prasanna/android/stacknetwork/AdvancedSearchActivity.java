@@ -128,6 +128,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 {
                     if (result)
                     {
+                        AppUtils.incrementNumSavedSearches(getApplicationContext());
                         getActionBar().setTitle(searchCriteriaFragment.getCriteriaName());
                         Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
                     }
@@ -156,9 +157,9 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    public void onRunSearch(SearchCriteria searchCriteria)
+    public void onRunSearch(SearchCriteria searchCriteria, boolean savedCriteria)
     {
-        runSearchAndShowResults(searchCriteria, false);
+        runSearchAndShowResults(searchCriteria, false, savedCriteria);
     }
 
     @Override
@@ -181,7 +182,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         return super.onActionBarHomeButtonClick(menuItem);
     }
 
-    private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack)
+    private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack, boolean savedCriteria)
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
@@ -193,6 +194,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         }
         ft.commit();
 
-        questionListFragment.search(searchCriteria);
+        questionListFragment.search(searchCriteria, savedCriteria);
     }
 }
