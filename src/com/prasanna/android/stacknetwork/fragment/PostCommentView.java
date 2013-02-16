@@ -30,7 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
@@ -41,7 +41,7 @@ public class PostCommentView
 {
     private static final int COMMENT_MIN_LEN = 15;
 
-    private ScrollView parentLayout;
+    private RelativeLayout parentLayout;
     private EditText editText;
     private TextView commentContext;
     private TextView sendComment;
@@ -143,7 +143,7 @@ public class PostCommentView
     public View getView(LayoutInflater inflater, int postCommentLayoutResId, ViewGroup container,
                     Bundle savedInstanceState)
     {
-        parentLayout = (ScrollView) inflater.inflate(postCommentLayoutResId, null);
+        parentLayout = (RelativeLayout) inflater.inflate(postCommentLayoutResId, null);
         charCount = (TextView) parentLayout.findViewById(R.id.charCount);
         sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
         sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
@@ -167,8 +167,6 @@ public class PostCommentView
     {
         editText = (EditText) parentLayout.findViewById(R.id.textInput);
         editText.addTextChangedListener(new CommentTextWatcher());
-        if (draftText != null)
-            editText.setText(draftText);
     }
 
     private void prepareSendComment(final OnSendCommentListener onSendCommentListener)
@@ -206,6 +204,9 @@ public class PostCommentView
     {
         if (View.GONE == parentLayout.getVisibility())
             parentLayout.setVisibility(View.VISIBLE);
+
+        if (draftText != null)
+            editText.setText(Html.fromHtml(draftText));
 
         if (editText.getText() != null)
             editText.setSelection(editText.getText().length());

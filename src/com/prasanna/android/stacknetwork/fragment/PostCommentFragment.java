@@ -141,4 +141,9 @@ public class PostCommentFragment extends Fragment
 
         super.onSaveInstanceState(outState);
     }
+
+    public void refreshView()
+    {
+        postCommentView.show();
+    }
 }
