@@ -55,7 +55,7 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 {
-    public static final int MAX_SAVED_SEARCHES = 1;
+    public static final int MAX_SAVED_SEARCHES = 10;
 
     private static final String TAG = SearchCriteriaListActivity.class.getSimpleName();
     private static final String ACTION_BAR_TITLE = "Saved Searches";
