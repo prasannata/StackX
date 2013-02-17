@@ -307,6 +307,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     Intent intent = new Intent(SearchCriteriaListActivity.this, AdvancedSearchActivity.class);
                     intent.setAction(StringConstants.SEARCH_CRITERIA);
                     intent.putExtra(StringConstants.SEARCH_CRITERIA, item);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 }
             });
