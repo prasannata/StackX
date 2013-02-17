@@ -104,26 +104,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         @Override
         protected Void doInBackground(Void... params)
         {
-            if (tagArrayAdapter != null)
-            {
-                TagDAO tagDao = new TagDAO(getActivity());
-                try
-                {
-                    tagDao.open();
-                    tags.addAll(tagDao.getTagStringList(OperatingSite.getSite().apiSiteParameter));
-                }
-                catch (SQLException e)
-                {
-                    Log.d(TAG, e.getMessage());
-                }
-                finally
-                {
-                    tagDao.close();
-                }
-            }
+            ArrayList<String> persistedTags = TagDAO.get(getActivity(), OperatingSite.getSite().apiSiteParameter);
+            if (persistedTags != null)
+                tags.addAll(persistedTags);
             return null;
         }
-
     }
 
     public static class WriteCriteriaAsyncTask extends AsyncTask<Long, Void, Boolean>
@@ -533,7 +518,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         return textView;
     }
 
-    
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {

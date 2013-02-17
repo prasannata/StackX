@@ -209,6 +209,25 @@ public class TagDAO extends AbstractBaseDao
         deleteAuditEntry(AUDIT_ENTRY_TYPE, site);
     }
 
+    public static ArrayList<String> get(Context context, String site)
+    {
+        TagDAO tagDao = new TagDAO(context);
+        try
+        {
+            tagDao.open();
+            return tagDao.getTagStringList(site);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            tagDao.close();
+        }
+        return null;
+    }
+
     public static void purge(Context context)
     {
         TagDAO tagDAO = new TagDAO(context);
