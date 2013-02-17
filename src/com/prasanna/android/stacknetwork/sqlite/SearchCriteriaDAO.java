@@ -208,6 +208,17 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         return domain;
     }
 
+    public boolean exists(long id)
+    {
+        String selection = SearchCriteriaTable.COLUMN_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(id) };
+
+
+        Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
+
+        return cursor != null && cursor.getCount() > 0;
+    }
+
     public void delete(long id)
     {
         String whereClause = SearchCriteriaTable.COLUMN_ID + " = ?";
@@ -285,4 +296,24 @@ public class SearchCriteriaDAO extends AbstractBaseDao
 
     }
 
+    public static boolean exists(final Context context, long id)
+    {
+        SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
+        try
+        {
+            dao.open();
+            return dao.exists(id);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+
+        return false;
+        
+    }
 }

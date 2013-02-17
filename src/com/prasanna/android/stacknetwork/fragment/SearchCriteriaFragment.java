@@ -74,7 +74,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private static final String TAG = SearchCriteriaFragment.class.getSimpleName();
     private static final String SELECTED_TAGS_LL_PREFIX_TAG = "selectedTags:ll:";
     private static final String SELECTED_TAGS_TV_PREFIX_TAG = "selectedTags:tv:";
-    
+
     private boolean savedCriteria = false;
     private int currentNumRowsOfSelectedTags = 0;
     private OnRunSearchListener onRunSearchListener;
@@ -157,7 +157,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 dao.open();
 
-                Log.d(TAG, "Saving search criteria");
+                Log.d(TAG, "Search criteria DAO action: " + action);
 
                 switch (action)
                 {
@@ -533,6 +533,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         return textView;
     }
 
+    
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
@@ -620,7 +621,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 searchCriteriaDomain.searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
                 searchCriteriaDomain.runCount++;
                 searchCriteriaDomain.lastRun = System.currentTimeMillis();
-                
+
                 if (savedCriteria)
                     new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
                                     WriteCriteriaAsyncTask.ACTION_UPDATE, null).execute();
@@ -655,7 +656,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             public void onClick(View v)
             {
                 AppUtils.hideSoftInput(getActivity(), v);
-                startActivity(new Intent(getActivity(), SearchCriteriaListActivity.class));
+                Intent intent = new Intent(getActivity(), SearchCriteriaListActivity.class);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
         });
     }
@@ -753,6 +757,13 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private void showSaveAsDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
     {
+        AlertDialog dialog = getDialog(asyncTaskCompletionNotifier);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        dialog.show();
+    }
+
+    private AlertDialog getDialog(final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
+    {
         AlertDialog.Builder saveAsDailogBuilder = new AlertDialog.Builder(getActivity());
         saveAsDailogBuilder.setTitle("Save As");
 
@@ -781,9 +792,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             }
         });
 
-        AlertDialog dialog = saveAsDailogBuilder.create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-        dialog.show();
+        return saveAsDailogBuilder.create();
     }
 
     public String getCriteriaName()
