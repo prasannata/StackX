@@ -21,15 +21,23 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.fragment.PostCommentView.OnSendCommentListener;
+import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
@@ -40,65 +48,88 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class PostCommentFragment extends Fragment
 {
     private static final String TAG = PostCommentFragment.class.getSimpleName();
-
+    private static final int COMMENT_MIN_LEN = 15;
     private static final String TEXT = "text";
+    
     private RestQueryResultReceiver resultReceiver;
-    private PostCommentView postCommentView;
+    private RelativeLayout parentLayout;
+    private EditText editText;
+    private TextView commentContext;
+    private TextView sendComment;
+    private String title;
+    private long postId;
+    private String draftText;
+    private TextView charCount;
+    private TextView sendStatus;
+    private ProgressBar sendProgressBar;
 
-    private class OnSendCommentListenerImpl implements OnSendCommentListener
+    private class CommentTextWatcher implements TextWatcher
     {
         @Override
-        public boolean sendComment(long postId, String body)
+        public void afterTextChanged(Editable s)
         {
-            if (isAdded())
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after)
+        {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count)
+        {
+            if (!isRemoving() || !isDetached())
             {
-                if (AppUtils.allowedToWrite(getActivity()))
+                charCount.setText(String.valueOf(s.length()));
+
+                if (s.length() >= COMMENT_MIN_LEN)
                 {
-                    Intent intent = new Intent(getActivity(), WriteIntentService.class);
-                    intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-                    intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
-                    intent.putExtra(StringConstants.POST_ID, postId);
-                    intent.putExtra(StringConstants.BODY, body);
-                    getActivity().startService(intent);
-                    return true;
+                    sendComment.setTextColor(getResources().getColor(R.color.delft));
+                    sendComment.setClickable(true);
                 }
                 else
                 {
-                    long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
-                                    WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
-                    Toast.makeText(getActivity(),
-                                    "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
-                                    Toast.LENGTH_LONG).show();
+                    if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                    {
+                        sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
+                        sendComment.setClickable(false);
+                    }
                 }
             }
-
-            return false;
         }
-    }
-
-    public PostCommentFragment()
-    {
-        postCommentView = new PostCommentView(this);
     }
 
     public void setPostId(long id)
     {
-        postCommentView.setPostId(id);
+        this.postId = id;
     }
 
     public void setTitle(String title)
     {
-        postCommentView.setTitle(title);
+        this.title = title;
     }
 
     public void setDraftText(String draftText)
     {
-        postCommentView.setDraftText(draftText);
+        this.draftText = draftText;
     }
 
     public void setSendError(String errorResponse)
     {
-        postCommentView.setSendError(errorResponse);
+        sendProgressBar.setVisibility(View.GONE);
+
+        if (sendStatus != null)
+        {
+            String failureText = "Failed";
+            StackXError error = StackXError.deserialize(errorResponse);
+            sendStatus.setText(error != null ? error.name : failureText);
+            sendStatus.setTextColor(Color.RED);
+            sendStatus.setVisibility(View.VISIBLE);
+        }
+
+        editText.setFocusableInTouchMode(true);
+        sendComment.setClickable(true);
+        sendComment.setTextColor(getResources().getColor(R.color.delft));
     }
 
     public void setResultReceiver(RestQueryResultReceiver resultReceiver)
@@ -106,20 +137,23 @@ public class PostCommentFragment extends Fragment
         this.resultReceiver = resultReceiver;
     }
 
-    public void hideSoftKeyboard()
-    {
-        postCommentView.hideSoftKeyboard();
-    }
-
     public String getCurrentText()
     {
-        return postCommentView.getCurrentText();
+        if (editText != null && editText.getText() != null)
+            return editText.getText().toString();
+
+        return null;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        return postCommentView.getView(inflater, R.layout.post_comment, container, savedInstanceState);
+        parentLayout = (RelativeLayout) inflater.inflate( R.layout.post_comment, null);
+        charCount = (TextView) parentLayout.findViewById(R.id.charCount);
+        sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
+        sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
+
+        return parentLayout;
     }
 
     @Override
@@ -127,8 +161,8 @@ public class PostCommentFragment extends Fragment
     {
         super.onActivityCreated(savedInstanceState);
 
-        postCommentView.prepare(new OnSendCommentListenerImpl());
-        postCommentView.show();
+        prepare();
+        show();
     }
 
     @Override
@@ -136,14 +170,115 @@ public class PostCommentFragment extends Fragment
     {
         Log.d(TAG, "onSaveInstanceState");
 
-        if (postCommentView.getCurrentText() != null)
-            outState.putString(TEXT, postCommentView.getCurrentText().toString());
+        if (getCurrentText() != null)
+            outState.putString(TEXT, getCurrentText().toString());
 
         super.onSaveInstanceState(outState);
     }
 
     public void refreshView()
     {
-        postCommentView.show();
+        show();
     }
+    
+    public void prepare()
+    {
+        prepareSendComment();
+        prepareEditText();
+
+        if (title != null)
+        {
+            commentContext = (TextView) parentLayout.findViewById(R.id.commentContext);
+            commentContext.setText(Html.fromHtml(title));
+        }
+    }
+
+    private void prepareEditText()
+    {
+        editText = (EditText) parentLayout.findViewById(R.id.textInput);
+        editText.addTextChangedListener(new CommentTextWatcher());
+    }
+
+    private void prepareSendComment()
+    {
+        sendComment = (TextView) parentLayout.findViewById(R.id.sendComment);
+        sendComment.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (editText.getText() != null && editText.getText().toString().length() > 0)
+                {
+                    if (sendComment(postId, editText.getText().toString()))
+                        updateUIElements();
+                }
+            }
+        });
+    }
+
+    private void updateUIElements()
+    {
+        editText.setFocusable(false);
+        sendComment.setClickable(false);
+        sendProgressBar.setVisibility(View.VISIBLE);
+        sendStatus.setVisibility(View.GONE);
+    }
+
+    public void hideSoftKeyboard()
+    {
+        if (isVisible() && editText != null)
+            AppUtils.hideSoftInput(getActivity(), editText);
+    }
+
+    public void show()
+    {
+        if (View.GONE == parentLayout.getVisibility())
+            parentLayout.setVisibility(View.VISIBLE);
+
+        if (draftText != null)
+            editText.setText(Html.fromHtml(draftText));
+
+        if (editText.getText() != null)
+            editText.setSelection(editText.getText().length());
+
+        editText.requestFocus();
+        AppUtils.showSoftInput(getActivity(), editText);
+    }
+
+    public void hide()
+    {
+        if (View.VISIBLE == parentLayout.getVisibility())
+            parentLayout.setVisibility(View.GONE);
+
+        editText.clearFocus();
+        AppUtils.hideSoftInput(getActivity(), editText);
+    }
+    
+    private boolean sendComment(long postId, String body)
+    {
+        if (isAdded())
+        {
+            if (AppUtils.allowedToWrite(getActivity()))
+            {
+                Intent intent = new Intent(getActivity(), WriteIntentService.class);
+                intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+                intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+                intent.putExtra(StringConstants.POST_ID, postId);
+                intent.putExtra(StringConstants.BODY, body);
+                getActivity().startService(intent);
+                return true;
+            }
+            else
+            {
+                long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
+                                WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+                Toast.makeText(getActivity(),
+                                "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
+                                Toast.LENGTH_LONG).show();
+            }
+        }
+
+        return false;
+    }
+
 }
