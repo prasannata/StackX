@@ -131,7 +131,8 @@ public class AccountSyncService extends AbstractStackxService
                 {
                     Log.d(TAG, "Checking for change in write permission for " + account.siteUrl);
                     Site site = sites.get(account.siteUrl);
-                    getAndPersistWritePermissions(site);
+                    if (site != null && site.apiSiteParameter != null)
+                        getAndPersistWritePermissions(site);
                 }
                 return true;
             }
