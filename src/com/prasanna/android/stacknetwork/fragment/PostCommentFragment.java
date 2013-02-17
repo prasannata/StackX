@@ -63,6 +63,8 @@ public class PostCommentFragment extends Fragment
     private TextView charCount;
     private TextView sendStatus;
     private ProgressBar sendProgressBar;
+    private boolean myEdit = false;
+    private long commentId;
 
     private class CommentTextWatcher implements TextWatcher
     {
@@ -109,6 +111,11 @@ public class PostCommentFragment extends Fragment
         this.postId = id;
     }
 
+    public void setCommentId(long commentId)
+    {
+        this.commentId = commentId;
+    }
+
     public void setTitle(String title)
     {
         this.title = title;
@@ -117,6 +124,11 @@ public class PostCommentFragment extends Fragment
     public void setDraftText(String draftText)
     {
         this.draftText = draftText;
+    }
+
+    public void setMyEdit(boolean myEdit)
+    {
+        this.myEdit = myEdit;
     }
 
     public void setSendError(String errorResponse)
@@ -265,12 +277,7 @@ public class PostCommentFragment extends Fragment
         {
             if (AppUtils.allowedToWrite(getActivity()))
             {
-                Intent intent = new Intent(getActivity(), WriteIntentService.class);
-                intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
-                intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
-                intent.putExtra(StringConstants.POST_ID, postId);
-                intent.putExtra(StringConstants.BODY, body);
-                getActivity().startService(intent);
+                startCommentWriteService(postId, body);
                 return true;
             }
             else
@@ -286,4 +293,19 @@ public class PostCommentFragment extends Fragment
         return false;
     }
 
+    private void startCommentWriteService(long postId, String body)
+    {
+        Intent intent = new Intent(getActivity(), WriteIntentService.class);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        if (myEdit)
+        {
+            intent.putExtra(StringConstants.COMMENT_ID, commentId);
+            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_EDIT_COMMENT);
+        }
+        else
+            intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+        intent.putExtra(StringConstants.POST_ID, postId);
+        intent.putExtra(StringConstants.BODY, body);
+        getActivity().startService(intent);
+    }
 }
