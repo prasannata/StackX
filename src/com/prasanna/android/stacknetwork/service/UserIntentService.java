@@ -235,9 +235,7 @@ public class UserIntentService extends AbstractIntentService
             userAccountsDao.close();
         }
 
-        HashMap<String, Account> accounts = userService.getAccounts(1);
-        DbRequestThreadExecutor.persistAccounts(getApplicationContext(), new ArrayList<Account>(accounts.values()));
-        return accounts;
+        return userService.getAccounts(1);
     }
 
     private StackXPage<Question> getQuestions(boolean me, long userId, int page)

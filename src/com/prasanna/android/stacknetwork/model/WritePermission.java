@@ -21,7 +21,7 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class WritePermission implements Serializable
+public class WritePermission implements Serializable, Comparable<WritePermission>
 {
     private static final long serialVersionUID = -1311818798901923216L;
 
@@ -65,6 +65,7 @@ public class WritePermission implements Serializable
         }
     }
 
+    public long id;
     public boolean canAdd = false;
     public boolean canDelete = false;
     public boolean canEdit = false;
@@ -72,4 +73,27 @@ public class WritePermission implements Serializable
     public int minSecondsBetweenActions = -1;
     public ObjectType objectType;
     public long userId;
+    
+    @Override
+    public int compareTo(WritePermission another)
+    {
+        int EQUAL = 0;
+        int NOT_EQUAL = -1;
+        
+        if(another == null)
+            return NOT_EQUAL;
+        
+        if(canAdd != another.canAdd)
+            return NOT_EQUAL;
+        if(canDelete != another.canDelete)
+            return NOT_EQUAL;
+        if(canEdit != another.canEdit)
+            return NOT_EQUAL;
+        if(maxDailyActions != another.maxDailyActions)
+            return NOT_EQUAL;
+        if(minSecondsBetweenActions != another.minSecondsBetweenActions)
+            return NOT_EQUAL;
+        
+        return EQUAL;
+    }
 }

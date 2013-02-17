@@ -133,7 +133,7 @@ public class LogoutActivity extends Activity
             SharedPreferencesUtil.setFirstRunComplete(getApplicationContext());
             SiteDAO.deleteAll(getApplicationContext());
             TagDAO.purge(getApplicationContext());
-            WritePermissionDAO.purge(getApplicationContext());
+            WritePermissionDAO.deleteAll(getApplicationContext());
             SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
             ProfileDAO.purge(getApplicationContext());
             CookieSyncManager.createInstance(getApplicationContext());

@@ -35,6 +35,7 @@ import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
@@ -117,6 +118,7 @@ public class AccountSyncService extends AbstractStackxService
         private boolean checkForWriterPermissionsForExistingAccounts(HashMap<String, Site> sites,
                         HashMap<String, Account> retrievedAccounts, ArrayList<Account> existingAccounts)
         {
+            boolean permissionsUpdated = false;
             Iterator<Account> iterator = existingAccounts.iterator();
 
             while (iterator.hasNext())
@@ -132,11 +134,10 @@ public class AccountSyncService extends AbstractStackxService
                     Log.d(TAG, "Checking for change in write permission for " + account.siteUrl);
                     Site site = sites.get(account.siteUrl);
                     if (site != null && site.apiSiteParameter != null)
-                        getAndPersistWritePermissions(site);
+                        permissionsUpdated = getAndPersistWritePermissions(site);
                 }
-                return true;
             }
-            return false;
+            return permissionsUpdated;
         }
 
         private boolean checkAndUpdateForDeletedAccounts(HashMap<String, Account> retrievedAccounts,
@@ -151,7 +152,7 @@ public class AccountSyncService extends AbstractStackxService
 
                 if (retrievedAccounts.containsKey(existingAccount.siteUrl))
                 {
-                    Log.d(TAG, "deleted account: " + existingAccount.siteName);
+                    Log.d(TAG, "Existing account: " + existingAccount.siteName);
                     existingAccountIter.remove();
                 }
             }
@@ -188,8 +189,6 @@ public class AccountSyncService extends AbstractStackxService
                 for (String key : retrievedAccounts.keySet())
                 {
                     Log.d(TAG, "New account : " + key);
-                    Site site = sites.get(key);
-                    getAndPersistWritePermissions(site);
                     if (newAccounts == null)
                         newAccounts = new ArrayList<Account>();
 
@@ -199,7 +198,6 @@ public class AccountSyncService extends AbstractStackxService
                 if (newAccounts != null)
                 {
                     UserAccountsDAO.insertAll(context, newAccounts);
-                    DbRequestThreadExecutor.persistAccounts(context, newAccounts);
                     SiteDAO.updateSites(context, newAccounts, true);
                     return true;
                 }
@@ -219,12 +217,49 @@ public class AccountSyncService extends AbstractStackxService
             }
         }
 
-        private void getAndPersistWritePermissions(Site site)
+        private boolean getAndPersistWritePermissions(Site site)
         {
             ArrayList<WritePermission> writePermissions = UserServiceHelper.getInstance().getWritePermissions(
                             site.apiSiteParameter);
             if (writePermissions != null)
-                DbRequestThreadExecutor.persistPermissionsInCurrentThread(context, site, writePermissions);
+            {
+                HashMap<ObjectType, WritePermission> existingPermissions = WritePermissionDAO.getPermissions(context,
+                                site.apiSiteParameter);
+                if (existingPermissions == null)
+                {
+                    Log.d(TAG, "Getting write permissions for " + site.apiSiteParameter);
+                    DbRequestThreadExecutor.persistPermissionsInCurrentThread(context, site, writePermissions);
+                    return true;
+                }
+                else
+                {
+                    return checkIfPermissionsUpdated(site, writePermissions, existingPermissions);
+                }
+            }
+
+            return false;
+        }
+
+        private boolean checkIfPermissionsUpdated(Site site, ArrayList<WritePermission> writePermissions,
+                        HashMap<ObjectType, WritePermission> existingPermissions)
+        {
+            boolean updated = false;
+            for (WritePermission writePermission : writePermissions)
+            {
+                WritePermission existingPermission = existingPermissions.get(writePermission.objectType);
+                if (existingPermission != null)
+                {
+                    updated = writePermission.compareTo(existingPermission) != 0;
+
+                    if (updated)
+                    {
+                        Log.d(TAG, "Updating write permission for " + writePermission.objectType + " for "
+                                        + site.apiSiteParameter);
+                        WritePermissionDAO.update(context, existingPermission.id, site, writePermission);
+                    }
+                }
+            }
+            return updated;
         }
 
         private void refreshSiteList(HashMap<String, Site> sites)
