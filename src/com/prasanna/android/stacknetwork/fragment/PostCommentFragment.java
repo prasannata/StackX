@@ -96,6 +96,9 @@ public class PostCommentFragment extends Fragment
                         sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
                         sendComment.setClickable(false);
                     }
+
+                    if (s.length() > COMMENT_MAX_LEN)
+                        charCount.setText(String.valueOf(s.length() - COMMENT_MAX_LEN));
                 }
             }
         }
