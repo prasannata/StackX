@@ -44,7 +44,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     private Intent intent;
     private int page = 0;
     private int action;
-    private boolean activityCreated = false;
 
     public static UserQuestionListFragment newFragment(int action)
     {
@@ -79,24 +78,27 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     public void onActivityCreated(Bundle savedInstanceState)
     {
         Log.d(TAG, "onActivityCreated");
-        
+
         super.onActivityCreated(savedInstanceState);
-        
+
         if (savedInstanceState != null)
             action = savedInstanceState.getInt(StringConstants.ACTION);
-
-        if (!activityCreated)
-        {
-            startIntentService();
-            activityCreated = true;
-        }
     }
-    
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        if (itemListAdapter != null && itemListAdapter.getCount() == 0)
+            startIntentService();
+    }
+
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
         Log.d(TAG, "onSaveInstanceState");
-        
+
         outState.putInt(StringConstants.ACTION, action);
 
         super.onSaveInstanceState(outState);
@@ -114,25 +116,13 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onStop()
-    {
-        Log.d(getLogTag(), "onStop");
-
-        super.onStop();
-
-        stopService(intent);
-    }
-
-    @Override
     protected void startIntentService()
     {
-        Log.d(TAG, "startIntentService for action " + action);
-
-        showProgressBar();
-
         intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
         if (intent != null)
         {
+            showProgressBar();
+
             intent.putExtra(StringConstants.ACTION, action);
             intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
             intent.putExtra(StringConstants.USER_ID, getActivity().getIntent()

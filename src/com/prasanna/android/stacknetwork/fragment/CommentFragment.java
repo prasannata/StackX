@@ -106,6 +106,11 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         this.comments = comments;
     }
 
+    public void setResultReceiver(RestQueryResultReceiver resultReceiver)
+    {
+        this.resultReceiver = resultReceiver;
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {

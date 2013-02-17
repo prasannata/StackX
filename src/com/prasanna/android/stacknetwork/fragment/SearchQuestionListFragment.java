@@ -56,16 +56,6 @@ public class SearchQuestionListFragment extends QuestionListFragment
             getActivity().getActionBar().setDisplayHomeAsUpEnabled(!hidden);
     }
 
-    @Override
-    public void onStop()
-    {
-        Log.d(getLogTag(), "onStop");
-
-        super.onStop();
-
-        stopService(intent);
-    }
-
     public boolean hasResults()
     {
         return itemListAdapter != null && itemListAdapter.getCount() > 0;

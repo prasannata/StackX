@@ -82,19 +82,9 @@ public class LogoutActivity extends Activity
     }
 
     @Override
-    protected void onDestroy()
+    public void onStop()
     {
-        super.onDestroy();
-        stopServiceAndUnregisterReceiver();
-    }
-
-    private void stopServiceAndUnregisterReceiver()
-    {
-        if (deauthAppIntent != null)
-        {
-            stopService(deauthAppIntent);
-        }
-
+        super.onStop();
         try
         {
             unregisterReceiver(receiver);
@@ -103,14 +93,6 @@ public class LogoutActivity extends Activity
         {
             Log.d(TAG, e.getMessage());
         }
-    }
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-
-        stopServiceAndUnregisterReceiver();
     }
 
     private void startIntentService(String accessToken)

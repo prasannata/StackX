@@ -149,35 +149,11 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     }
 
     @Override
-    public void onStop()
-    {
-        super.onStop();
-
-        stopServiceAndUnregsiterReceivers();
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        super.onDestroy();
-
-        stopServiceAndUnregsiterReceivers();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState)
     {
         outState.putBoolean(StringConstants.ME, me);
         outState.putLong(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         super.onSaveInstanceState(outState);
-    }
-
-    private void stopServiceAndUnregsiterReceivers()
-    {
-        if (userProfileIntent != null)
-        {
-            getActivity().stopService(userProfileIntent);
-        }
     }
 
     private void startUserProfileService()

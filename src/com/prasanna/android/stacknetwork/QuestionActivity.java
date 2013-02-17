@@ -285,15 +285,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     }
 
     @Override
-    protected void onStop()
-    {
-        super.onStop();
-
-        if (intent != null)
-            stopService(intent);
-    }
-
-    @Override
     public void onBackPressed()
     {
         Log.d(TAG, "onBackPressed");
@@ -602,6 +593,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             Log.d(TAG, "Creating comment fragment");
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
+            commentFragment.setResultReceiver(resultReceiver);
+            
             String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
                             + viewPager.getCurrentItem();
 

@@ -140,21 +140,9 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     }
 
     @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-
-        if (intent != null)
-            stopService(intent);
-    }
-
-    @Override
     public void onStop()
     {
         super.onStop();
-
-        if (intent != null)
-            stopService(intent);
 
         try
         {

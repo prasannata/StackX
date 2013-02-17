@@ -147,16 +147,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onStop()
-    {
-        Log.d(getLogTag(), "onStop");
-
-        super.onStop();
-
-        stopService(intent);
-    }
-
     private void findActionAndStartService()
     {
         if (!created)

@@ -49,8 +49,9 @@ public class PostCommentFragment extends Fragment
 {
     private static final String TAG = PostCommentFragment.class.getSimpleName();
     private static final int COMMENT_MIN_LEN = 15;
+    private static final int COMMENT_MAX_LEN = 600;
     private static final String TEXT = "text";
-    
+
     private RestQueryResultReceiver resultReceiver;
     private RelativeLayout parentLayout;
     private EditText editText;
@@ -82,14 +83,15 @@ public class PostCommentFragment extends Fragment
             {
                 charCount.setText(String.valueOf(s.length()));
 
-                if (s.length() >= COMMENT_MIN_LEN)
+                if (s.length() >= COMMENT_MIN_LEN && s.length() <= COMMENT_MAX_LEN)
                 {
+                    charCount.setText(String.valueOf(COMMENT_MAX_LEN - s.length()));
                     sendComment.setTextColor(getResources().getColor(R.color.delft));
                     sendComment.setClickable(true);
                 }
                 else
                 {
-                    if (s.length() < COMMENT_MIN_LEN && sendComment.isClickable())
+                    if ((s.length() < COMMENT_MIN_LEN || s.length() > COMMENT_MAX_LEN) && sendComment.isClickable())
                     {
                         sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
                         sendComment.setClickable(false);
@@ -148,7 +150,7 @@ public class PostCommentFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        parentLayout = (RelativeLayout) inflater.inflate( R.layout.post_comment, null);
+        parentLayout = (RelativeLayout) inflater.inflate(R.layout.post_comment, null);
         charCount = (TextView) parentLayout.findViewById(R.id.charCount);
         sendStatus = (TextView) parentLayout.findViewById(R.id.sendStatus);
         sendProgressBar = (ProgressBar) parentLayout.findViewById(R.id.sendProgress);
@@ -180,7 +182,7 @@ public class PostCommentFragment extends Fragment
     {
         show();
     }
-    
+
     public void prepare()
     {
         prepareSendComment();
@@ -253,7 +255,7 @@ public class PostCommentFragment extends Fragment
         editText.clearFocus();
         AppUtils.hideSoftInput(getActivity(), editText);
     }
-    
+
     private boolean sendComment(long postId, String body)
     {
         if (isAdded())

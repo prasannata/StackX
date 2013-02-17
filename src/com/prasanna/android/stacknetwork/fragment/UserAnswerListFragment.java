@@ -62,7 +62,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     private static final String MULTIPLE_NEW_LINES_AT_END = "[\\n]+$";
 
     private int position;
-    private boolean activityCreated = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -164,32 +163,17 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         super.onActivityCreated(savedInstanceState);
 
         registerForContextMenu(getListView());
+    }
 
-        if (!activityCreated)
-        {
+    @Override
+    public void onResume()
+    {
+        Log.d(getLogTag(), "onResume");
+        
+        super.onResume();
+
+        if (itemListAdapter != null && itemListAdapter.getCount() == 0)
             startIntentService();
-            activityCreated = true;
-        }
-    }
-
-    @Override
-    public void onDestroy()
-    {
-        Log.d(getLogTag(), "onDestroy");
-
-        super.onDestroy();
-
-        stopService(intent);
-    }
-
-    @Override
-    public void onStop()
-    {
-        Log.d(getLogTag(), "onStop");
-
-        super.onStop();
-
-        stopService(intent);
     }
 
     @Override

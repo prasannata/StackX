@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.prasanna.android.stacknetwork.service;
 
 import java.io.Serializable;
@@ -47,13 +48,14 @@ public abstract class AbstractIntentService extends IntentService
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
-    
-    @Override  
+
+    @Override
     protected void onHandleIntent(Intent intent)
     {
-        if(!helloWorld())
+        if (!helloWorld())
             throw new ClientException(ClientException.ClientErrorCode.NO_NETWORK);
     }
+
     protected void broadcastHttpErrorIntent(StackXError error)
     {
         Log.d(TAG, "broadcastHttpErrorIntent: " + error.msg);

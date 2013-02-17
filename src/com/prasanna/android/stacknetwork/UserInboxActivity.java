@@ -69,7 +69,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     private StackXPage<InboxItem> currentPageObject;
 
     @Override
-    public void onCreate(android.os.Bundle savedInstanceState)
+    public void onCreate(Bundle savedInstanceState)
     {
         Log.d(TAG, "onCreate");
 
@@ -138,15 +138,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
             itemListAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-
-        if (intent != null)
-            stopService(intent);
-    }
-
     private void startIntentService()
     {
         if (!serviceRunning)
@@ -155,16 +146,14 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
                             .getDefaultSharedPreferences(getApplicationContext());
             if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
             {
-                intent = new Intent(this, UserIntentService.class);
+                intent = new Intent(getApplicationContext(), UserIntentService.class);
                 intent.setAction(StringConstants.INBOX_ITEMS);
                 intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
                 intent.putExtra(StringConstants.PAGE, ++page);
                 intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
 
                 progressBar.setVisibility(View.VISIBLE);
-
                 startService(intent);
-
                 serviceRunning = true;
             }
         }
