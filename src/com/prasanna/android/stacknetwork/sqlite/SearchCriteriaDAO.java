@@ -121,6 +121,35 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         return searchCriteriaDomain;
     }
 
+    public void updateRunInformation(long id)
+    {
+        SearchCriteriaDomain searchCriteriaDomain = get(id);
+        if (searchCriteriaDomain != null)
+        {
+            String whereClause = SearchCriteriaTable.COLUMN_ID + " = ?";
+            String[] whereArgs = { String.valueOf(id) };
+            ContentValues values = new ContentValues();
+            values.put(SearchCriteriaTable.COLUMN_RUN_COUNT, ++searchCriteriaDomain.runCount);
+            values.put(SearchCriteriaTable.COLUMN_LAST_RUN, System.currentTimeMillis());
+            database.update(TABLE_NAME, values, whereClause, whereArgs);
+        }
+    }
+
+    public SearchCriteriaDomain get(long id)
+    {
+        String selectionClause = SearchCriteriaTable.COLUMN_ID + " = ?";
+        String[] selectionArgs = { String.valueOf(id) };
+        Cursor cursor = database.query(TABLE_NAME, null, selectionClause, selectionArgs, null, null, null);
+
+        if (cursor == null || cursor.getCount() == 0)
+            return null;
+
+        cursor.moveToFirst();
+        
+        return getCriteria(cursor);
+
+    }
+
     public void updateCriteriaAsTabbed(long id, boolean add)
     {
         String whereClause = SearchCriteriaTable.COLUMN_ID + " = ?";
@@ -183,7 +212,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         SearchCriteriaDomain domain = new SearchCriteriaDomain();
         SearchCriteria criteria = SearchCriteria.newCriteria();
 
-        domain.id = cursor.getInt(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
+        domain.id = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_ID));
         domain.name = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_NAME));
         domain.site = cursor.getString(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_SITE));
         domain.created = cursor.getLong(cursor.getColumnIndex(SearchCriteriaTable.COLUMN_CREATED));
@@ -212,7 +241,6 @@ public class SearchCriteriaDAO extends AbstractBaseDao
     {
         String selection = SearchCriteriaTable.COLUMN_ID + " = ?";
         String[] selectionArgs = { String.valueOf(id) };
-
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
 
@@ -314,6 +342,6 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
 
         return false;
-        
+
     }
 }

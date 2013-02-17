@@ -120,10 +120,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         public static final int ACTION_ADD = 1;
         public static final int ACTION_UPDATE = 2;
-        public static final int ACTION_DEL = 3;
-        public static final int ACTION_DEL_MANY = 4;
-        public static final int ACTION_ADD_AS_TAB = 5;
-        public static final int ACTION_REMOVE_AS_TAB = 6;
+        public static final int ACTION_UPDATE_LAST_RUN = 3;
+        public static final int ACTION_DEL = 4;
+        public static final int ACTION_DEL_MANY = 5;
+        public static final int ACTION_ADD_AS_TAB = 6;
+        public static final int ACTION_REMOVE_AS_TAB = 7;
 
         public WriteCriteriaAsyncTask(Context context, SearchCriteriaDomain domain, int action,
                         AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier)
@@ -151,6 +152,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         return true;
                     case ACTION_UPDATE:
                         dao.update(domain);
+                        return true;
+                    case ACTION_UPDATE_LAST_RUN:
+                        dao.updateRunInformation(domain.id);
                         return true;
                     case ACTION_DEL:
                         if (params != null && params.length > 0)
@@ -538,7 +542,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         new GetTagsFromDbAsyncTask().execute();
 
         if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
+        {
+            String sort = searchCriteriaDomain.searchCriteria.getSort();
+            if (sort != null)
+                sortSpinner.setSelection(sortOptionArray.indexOf(sort));
             showSavedSearchCriteria();
+        }
     }
 
     private void showSavedSearchCriteria()
@@ -603,12 +612,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
                 searchCriteriaDomain.searchCriteria.includeTags(taggedSet).excludeTags(notTaggedSet);
                 searchCriteriaDomain.searchCriteria.sortBy(SearchSort.getEnum((String) sortSpinner.getSelectedItem()));
-                searchCriteriaDomain.runCount++;
-                searchCriteriaDomain.lastRun = System.currentTimeMillis();
 
                 if (savedCriteria)
                     new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain,
-                                    WriteCriteriaAsyncTask.ACTION_UPDATE, null).execute();
+                                    WriteCriteriaAsyncTask.ACTION_UPDATE_LAST_RUN, null).execute();
 
                 onRunSearchListener.onRunSearch(searchCriteriaDomain.searchCriteria.build(), savedCriteria);
                 AppUtils.hideSoftInput(getActivity(), v);

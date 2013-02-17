@@ -208,7 +208,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 
             if (item.tab)
             {
-                criteriaIdsAsTab.add(item.id);
                 viewHolder.addTabToggle.setVisibility(View.VISIBLE);
                 viewHolder.addTabToggle.setChecked(true);
             }
@@ -216,14 +215,14 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             {
                 viewHolder.addTabToggle.setChecked(false);
                 if (criteriaIdsAsTab.size() == MAX_CUSTOM_TABS)
-                    viewHolder.addTabToggle.setVisibility(View.GONE);
+                    viewHolder.addTabToggle.setVisibility(View.INVISIBLE);
                 else
                     viewHolder.addTabToggle.setVisibility(View.VISIBLE);
             }
 
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
-            viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.created / 1000));
+            viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
             viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
             return convertView;
         }
@@ -443,12 +442,22 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 
                     if (result != null && !result.isEmpty())
                     {
+                        for(SearchCriteriaDomain domain : result)
+                        {
+                            if(domain.tab)
+                                criteriaIdsAsTab.add(domain.id);
+                        }
                         savedSearchList.addAll(result);
                         searchCriteriaArrayAdapter.addAll(savedSearchList);
                     }
                     else
-                        addContentView(getEmptyView(), new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                    {
+                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        layoutParams.topMargin = 10;
+                        addContentView(getEmptyView(), layoutParams);
+                    }
+                    
                     searchCriteriaArrayAdapter.notifyDataSetChanged();
                 }
             };
