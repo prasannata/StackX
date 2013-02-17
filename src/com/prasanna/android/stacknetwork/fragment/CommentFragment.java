@@ -110,7 +110,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     {
         this.resultReceiver = resultReceiver;
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
@@ -221,7 +221,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         else
         {
             holder.viewGroup.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
-            holder.replyToComment.setVisibility(View.VISIBLE);
+            if (!isMyComment(comment))
+                holder.replyToComment.setVisibility(View.VISIBLE);
         }
 
         return commentLayout;
@@ -263,7 +264,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 selectedViewForReply.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                 Log.d(TAG, "Select comment for reply: " + selectedViewForReply.id);
 
-                displayPostCommentFragment(comment.post_id, "@" + comment.owner.displayName + " ");
+                displayPostCommentFragment(comment.post_id, "@" + comment.owner.displayName.replaceAll("\\s", "") + " ");
                 getListView().smoothScrollToPositionFromTop(position, 0);
             }
         });
