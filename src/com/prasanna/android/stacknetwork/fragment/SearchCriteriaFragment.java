@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -81,7 +82,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     private Object tagFilterLock = new Object();
     private TagListAdapter tagArrayAdapter;
     private SearchCriteriaDomain searchCriteriaDomain;
-    private ArrayList<String> sortOptionArray;
     private HashSet<String> taggedSet = new HashSet<String>();;
     private HashSet<String> notTaggedSet = new HashSet<String>();;
     private ArrayList<String> tags = new ArrayList<String>();
@@ -531,9 +531,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         getActivity().getActionBar().setTitle(getActivity().getString(R.string.advanced_search));
 
-        sortOptionArray = new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.searchSortArray)));
-        sortSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, sortOptionArray));
-
         prepareRunSearch();
         prepareNewCriteria();
         prepareLoadCriteria();
@@ -543,6 +540,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
         {
+            List<String> sortOptionArray = Arrays.asList(getResources().getStringArray(R.array.searchSortArray));
             String sort = searchCriteriaDomain.searchCriteria.getSort();
             if (sort != null)
                 sortSpinner.setSelection(sortOptionArray.indexOf(sort));
