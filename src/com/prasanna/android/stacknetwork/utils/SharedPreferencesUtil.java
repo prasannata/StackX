@@ -28,7 +28,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Locale;
 
 import android.content.Context;
@@ -38,20 +37,12 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
-import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.model.User;
 
 public class SharedPreferencesUtil
 {
     private static final String TAG = SharedPreferencesUtil.class.getSimpleName();
     private static String userAccessToken;
-
-    public static class CacheFileName
-    {
-        public static final String SITE_CACHE_FILE_NAME = "sites";
-        public static final String REGD_SITE_CACHE_FILE_NAME = "registeredSites";
-    }
 
     public static void setBoolean(Context context, String key, boolean on)
     {
@@ -182,34 +173,6 @@ public class SharedPreferencesUtil
                 }
             }
         }
-    }
-
-    public static boolean hasSiteListCache(File cacheDir)
-    {
-        boolean present = false;
-        File file = new File(cacheDir, CacheFileName.SITE_CACHE_FILE_NAME);
-
-        if (file != null)
-        {
-            present = file.exists();
-        }
-
-        Log.d(TAG, "Sites cached: " + present);
-        return present;
-    }
-
-    public static void cacheRegisteredSites(File cacheDir, HashSet<String> sites)
-    {
-        Log.d(TAG, "Caching registered sites");
-
-        writeObject(sites, cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static HashSet<String> getRegisteredSitesForUser(File cacheDir)
-    {
-        Log.d(TAG, cacheDir.toString());
-        return (HashSet<String>) readObject(new File(cacheDir, CacheFileName.REGD_SITE_CACHE_FILE_NAME));
     }
 
     /**
@@ -492,67 +455,5 @@ public class SharedPreferencesUtil
         int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
 
         return String.format(Locale.US, "%.1f %sB", size / Math.pow(BYTE_UNIT, exp), sizeUnit[exp - 1]);
-    }
-
-    public static String getQuestionDirSize(File cacheDir)
-    {
-        return getHumanReadableCacheSize(new File(cacheDir, StringConstants.QUESTIONS));
-    }
-
-    public static void deleteQuestion(File cacheDir, long questionId)
-    {
-        File directory = new File(cacheDir, StringConstants.QUESTIONS);
-        deleteFile(new File(directory, String.valueOf(questionId)));
-    }
-
-    public static void deleteAllQuestions(File cacheDir)
-    {
-        File directory = new File(cacheDir, StringConstants.QUESTIONS);
-        deleteDir(directory);
-    }
-
-    public static void cacheMe(File cacheDir, User user)
-    {
-        if (cacheDir != null && user != null)
-        {
-            File dir = new File(cacheDir, StringConstants.ME);
-            writeObject(user, dir, OperatingSite.getSite().name + "." + StringConstants.ME);
-        }
-    }
-
-    public static User getMe(File cacheDir)
-    {
-        if (cacheDir != null)
-        {
-            File dir = new File(cacheDir, StringConstants.ME);
-            File file = new File(dir, OperatingSite.getSite().name + "." + StringConstants.ME);
-            if (file.exists())
-                return (User) readObject(file);
-        }
-
-        return null;
-    }
-
-    public static void cacheMeAccounts(File cacheDir, ArrayList<Account> accounts)
-    {
-        if (cacheDir != null && accounts != null)
-        {
-            File dir = new File(cacheDir, StringConstants.ME);
-            writeObject(accounts, dir, StringConstants.ACCOUNTS);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static ArrayList<Account> getMeAccounts(File cacheDir)
-    {
-        if (cacheDir != null)
-        {
-            File dir = new File(cacheDir, StringConstants.ME);
-            File file = new File(dir, StringConstants.ACCOUNTS);
-            if (file.exists())
-                return (ArrayList<Account>) readObject(file);
-        }
-
-        return null;
     }
 }

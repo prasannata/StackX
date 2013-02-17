@@ -21,7 +21,6 @@ package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import android.content.Intent;
@@ -327,7 +326,6 @@ public class UserIntentService extends AbstractIntentService
                 }
             }
 
-            SharedPreferencesUtil.cacheRegisteredSites(getCacheDir(), new HashSet<String>(linkSitesMap.keySet()));
             regSitesFirstMap.putAll(linkSitesMap);
         }
 

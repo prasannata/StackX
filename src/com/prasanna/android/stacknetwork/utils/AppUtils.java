@@ -40,6 +40,7 @@ import com.prasanna.android.stacknetwork.SearchCriteriaListActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 
 public class AppUtils
 {
@@ -71,8 +72,7 @@ public class AppUtils
     public static boolean inRegisteredSite(Context context)
     {
         return inAuthenticatedRealm(context)
-                        && SharedPreferencesUtil.getRegisteredSitesForUser(context.getCacheDir()).contains(
-                                        OperatingSite.getSite().apiSiteParameter);
+                        && SiteDAO.isRegisteredForSite(context, OperatingSite.getSite().apiSiteParameter);
     }
 
     public static Map<String, String> getDefaultQueryParams()

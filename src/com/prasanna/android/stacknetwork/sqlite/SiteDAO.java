@@ -266,6 +266,17 @@ public class SiteDAO extends AbstractBaseDao
         }
     }
 
+    public boolean isRegistered(String site)
+    {
+        String[] cols = new String[] { SiteTable.COLUMN_API_SITE_PARAMTETER };
+        String selection = SiteTable.COLUMN_API_SITE_PARAMTETER + " = ? and " + SiteTable.COLUMN_USER_TYPE + " = ?";
+        String[] selectionArgs = { site, UserType.REGISTERED.getValue() };
+
+        Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
+        
+        return cursor != null && cursor.getCount() > 0;
+    }
+    
     public static void insert(Context context, Site site)
     {
         SiteDAO dao = new SiteDAO(context);
@@ -362,6 +373,27 @@ public class SiteDAO extends AbstractBaseDao
         }
 
         return 0L;
+    }
+
+    public static boolean isRegisteredForSite(final Context context, final String site)
+    {
+        SiteDAO siteDAO = new SiteDAO(context);
+
+        try
+        {
+            siteDAO.open();
+            return siteDAO.isRegistered(site);
+        }
+        catch (SQLException e)
+        {
+            Log.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            siteDAO.close();
+        }
+
+        return false;
     }
 
     public static void deleteAll(Context context)
