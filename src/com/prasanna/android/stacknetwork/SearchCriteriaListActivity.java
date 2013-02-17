@@ -100,7 +100,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             switch (action)
             {
                 case WriteCriteriaAsyncTask.ACTION_DEL:
-                    toastMsg += " delete ";
+                    toastMsg += " deleted";
                     if (result)
                     {
                         if (domain.tab)
@@ -109,22 +109,22 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                     break;
                 case WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB:
-                    toastMsg += " add tab";
+                    toastMsg += " tab added";
                     if (result)
                     {
                         criteriaIdsAsTab.add(domain.id);
-                        domain.tab  = true;
+                        domain.tab = true;
                         searchCriteriaArrayAdapter.notifyDataSetChanged();
                     }
                     else
                         ((ToggleButton) view).setChecked(false);
                     break;
                 case WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB:
-                    toastMsg += " remove tab ";
+                    toastMsg += " tab removed";
                     if (result)
                     {
                         criteriaIdsAsTab.remove(domain.id);
-                        domain.tab  = false;
+                        domain.tab = false;
                         searchCriteriaArrayAdapter.notifyDataSetChanged();
                     }
                     else
@@ -133,9 +133,9 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             }
 
             if (result)
-                Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " succeeded", Toast.LENGTH_LONG).show();
+                Toast.makeText(SearchCriteriaListActivity.this, toastMsg, Toast.LENGTH_LONG).show();
             else
-                Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " (fail)", Toast.LENGTH_LONG).show();
         }
     }
 
