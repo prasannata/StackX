@@ -70,6 +70,19 @@ public abstract class AbstractBaseDao
         database.insert(DatabaseHelper.TABLE_AUDIT, null, values);
     }
 
+    public void updateAuditEntry(String type, String site)
+    {
+        String whereClause = AuditTable.COLUMN_TYPE + "= ?";
+        String[] whereArgs = new String[] { type };
+
+        ContentValues values = new ContentValues();
+        if (site != null)
+            values.put(AuditTable.COLUMN_SITE, site);
+        values.put(AuditTable.COLUMN_TYPE, type);
+        values.put(AuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
+        database.update(DatabaseHelper.TABLE_AUDIT, values, whereClause, whereArgs);
+    }
+
     protected void deleteAuditEntry(String type, String site)
     {
         ArrayList<String> whereArgs = new ArrayList<String>();

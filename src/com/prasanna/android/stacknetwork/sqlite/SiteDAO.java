@@ -415,4 +415,24 @@ public class SiteDAO extends AbstractBaseDao
         }
     }
 
+    public static void updateLastUpdateTime(Context context)
+    {
+        SiteDAO dao = new SiteDAO(context);
+
+        try
+        {
+            dao.open();
+            dao.updateAuditEntry(AUDIT_ENTRY_TYPE, null);
+        }
+        catch (SQLException e)
+        {
+            Log.d(TAG, e.getMessage());
+        }
+        finally
+        {
+            dao.close();
+        }
+
+    }
+
 }

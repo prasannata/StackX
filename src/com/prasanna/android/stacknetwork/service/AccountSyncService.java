@@ -230,10 +230,15 @@ public class AccountSyncService extends AbstractStackxService
         private void refreshSiteList(HashMap<String, Site> sites)
         {
             LinkedHashMap<String, Site> retrievedSites = UserServiceHelper.getInstance().getAllSitesInNetwork();
-            for (String key : retrievedSites.keySet())
+            if (retrievedSites != null)
             {
-                if (!sites.containsKey(key))
-                    SiteDAO.insert(context, retrievedSites.get(key));
+                for (String key : retrievedSites.keySet())
+                {
+                    if (!sites.containsKey(key))
+                        SiteDAO.insert(context, retrievedSites.get(key));
+                }
+                
+                SiteDAO.updateLastUpdateTime(context);
             }
         }
     }
