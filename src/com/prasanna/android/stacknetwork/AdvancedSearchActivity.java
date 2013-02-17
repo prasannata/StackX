@@ -39,7 +39,6 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener
 {
     private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
-    private boolean viewInitialized = false;
     private SearchQuestionListFragment questionListFragment;
     private SearchCriteriaFragment searchCriteriaFragment;
 
@@ -50,20 +49,15 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
 
         super.onCreate(savedInstanceState);
 
-        if (!viewInitialized)
-        {
-            Log.d(TAG, "initializing view");
-            setContentView(R.layout.advanced_search);
-            searchCriteriaFragment = (SearchCriteriaFragment) getFragmentManager().findFragmentById(
-                            R.id.searchCriteriaFragment);
-            questionListFragment = (SearchQuestionListFragment) getFragmentManager().findFragmentById(
-                            R.id.questionListFragment);
-            viewInitialized = true;
+        setContentView(R.layout.advanced_search);
+        searchCriteriaFragment = (SearchCriteriaFragment) getFragmentManager().findFragmentById(
+                        R.id.searchCriteriaFragment);
+        questionListFragment = (SearchQuestionListFragment) getFragmentManager().findFragmentById(
+                        R.id.questionListFragment);
 
-            if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
-                searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
-                                StringConstants.SEARCH_CRITERIA));
-        }
+        if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
+            searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
+                            StringConstants.SEARCH_CRITERIA));
 
         showOrHideQuestionListFragment(getResources().getConfiguration());
     }
@@ -90,7 +84,10 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 ft.show(searchCriteriaFragment);
                 if (questionListFragment.hasResults())
                     ft.show(questionListFragment);
+                else
+                    ft.hide(questionListFragment);
             }
+            
             ft.commit();
         }
     }
