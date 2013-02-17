@@ -232,13 +232,19 @@ public class AccountSyncService extends AbstractStackxService
             LinkedHashMap<String, Site> retrievedSites = UserServiceHelper.getInstance().getAllSitesInNetwork();
             if (retrievedSites != null)
             {
+                boolean updateAuditEntry = true;
                 for (String key : retrievedSites.keySet())
                 {
                     if (!sites.containsKey(key))
+                    {
                         SiteDAO.insert(context, retrievedSites.get(key));
+                        if (updateAuditEntry)
+                            updateAuditEntry = false;
+                    }
                 }
-                
-                SiteDAO.updateLastUpdateTime(context);
+
+                if (updateAuditEntry)
+                    SiteDAO.updateLastUpdateTime(context);
             }
         }
     }
