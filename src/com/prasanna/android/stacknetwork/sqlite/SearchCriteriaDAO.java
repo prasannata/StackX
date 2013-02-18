@@ -115,6 +115,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
             values.put(SearchCriteriaTable.COLUMN_Q, searchCriteriaDomain.searchCriteria.getQuery());
             values.put(SearchCriteriaTable.COLUMN_SORT, searchCriteriaDomain.searchCriteria.getSort());
             values.put(SearchCriteriaTable.COLUMN_ANSWERS, searchCriteriaDomain.searchCriteria.getAnswerCount());
+            values.put(SearchCriteriaTable.COLUMN_TAB, searchCriteriaDomain.tab);
             values.put(SearchCriteriaTable.COLUMN_ANSWERED, searchCriteriaDomain.searchCriteria.isAnswered());
             values.put(SearchCriteriaTable.COLUMN_TAGGED,
                             searchCriteriaDomain.searchCriteria.getIncludedTagsAsSemicolonDelimitedString());

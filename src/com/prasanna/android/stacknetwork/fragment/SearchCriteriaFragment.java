@@ -110,6 +110,27 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         }
     }
 
+    private class WriteCriteriaAsyncTaskCompletionNotifierWrapper implements AsyncTaskCompletionNotifier<Boolean>
+    {
+        private final int action;
+        private final AsyncTaskCompletionNotifier<Boolean> notifier;
+
+        public WriteCriteriaAsyncTaskCompletionNotifierWrapper(int action, AsyncTaskCompletionNotifier<Boolean> notifier)
+        {
+            this.action = action;
+            this.notifier = notifier;
+        }
+
+        @Override
+        public void notifyOnCompletion(Boolean result)
+        {
+            if (action == WriteCriteriaAsyncTask.ACTION_ADD)
+                newCriteria.setVisibility(View.VISIBLE);
+
+            notifier.notifyOnCompletion(result);
+        }
+    }
+
     public static class WriteCriteriaAsyncTask extends AsyncTask<Long, Void, Boolean>
     {
         private final AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier;
@@ -578,6 +599,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 {
                     case R.id.hasAnswers:
                         searchCriteriaDomain.searchCriteria.setMinAnswers(1);
+                        searchCriteriaDomain.searchCriteria.needNotBeAnswered();
                         break;
                     case R.id.isAnswered:
                         searchCriteriaDomain.searchCriteria.mustBeAnswered();
@@ -747,8 +769,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 searchCriteriaDomain.name = input.getText().toString();
                 searchCriteriaDomain.site = OperatingSite.getSite().apiSiteParameter;
+                WriteCriteriaAsyncTaskCompletionNotifierWrapper wrapperNotifier =
+                                new WriteCriteriaAsyncTaskCompletionNotifierWrapper(WriteCriteriaAsyncTask.ACTION_ADD,
+                                                asyncTaskCompletionNotifier);
                 new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_ADD,
-                                asyncTaskCompletionNotifier).execute();
+                                wrapperNotifier).execute();
             }
         });
 
