@@ -76,6 +76,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 }
                 else
                 {
+                    getActionBar().setDisplayHomeAsUpEnabled(false);
                     ft.show(searchCriteriaFragment);
                     ft.hide(questionListFragment);
                 }
@@ -85,10 +86,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 getActionBar().setDisplayHomeAsUpEnabled(false);
                 ft.show(searchCriteriaFragment);
                 if (questionListFragment.hasResults())
-                {
-                    Log.d(TAG, "Showing question list fragment");
                     ft.show(questionListFragment);
-                }
                 else
                     ft.hide(questionListFragment);
             }
