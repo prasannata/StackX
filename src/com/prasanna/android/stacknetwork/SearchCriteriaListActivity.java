@@ -73,6 +73,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     private ArrayList<SearchCriteriaDomain> toDeleteList = new ArrayList<SearchCriteriaDomain>();
     private HashSet<Long> criteriaIdsAsTab = new HashSet<Long>();
     private View emptyItemsView;
+    private ArrayList<String> sortOptionArray;
 
     static class SearchCriteriaViewHolder
     {
@@ -118,9 +119,8 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     toastMsg += " tab added";
                     if (result)
                     {
-                        criteriaIdsAsTab.add(domain.id);
                         domain.tab = true;
-                        searchCriteriaArrayAdapter.notifyDataSetChanged();
+                        updateTabbedListAndRefreshView(true);
                     }
                     else
                         ((ToggleButton) view).setChecked(false);
@@ -129,9 +129,8 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     toastMsg += " tab removed";
                     if (result)
                     {
-                        criteriaIdsAsTab.remove(domain.id);
                         domain.tab = false;
-                        searchCriteriaArrayAdapter.notifyDataSetChanged();
+                        updateTabbedListAndRefreshView(false);
                     }
                     else
                         ((ToggleButton) view).setChecked(false);
@@ -142,6 +141,16 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 Toast.makeText(SearchCriteriaListActivity.this, toastMsg, Toast.LENGTH_LONG).show();
             else
                 Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " (fail)", Toast.LENGTH_LONG).show();
+        }
+
+        private void updateTabbedListAndRefreshView(boolean add)
+        {
+            if (add)
+                criteriaIdsAsTab.add(domain.id);
+            else
+                criteriaIdsAsTab.remove(domain.id);
+            searchCriteriaArrayAdapter.notifyDataSetChanged();
+            updateSortOrderIfTabbed();
         }
     }
 
@@ -365,7 +374,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     private void setupSortSpinner()
     {
         sortSpinner = (Spinner) findViewById(R.id.searchSortSpinner);
-        ArrayList<String> sortOptionArray =
+        sortOptionArray =
                         new ArrayList<String>(Arrays.asList(getResources().getStringArray(
                                         R.array.searchCriteriaSortArray)));
         sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item, sortOptionArray));
@@ -378,10 +387,10 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 if (sort != null)
                 {
                     Log.d(TAG, "sort = " + sort);
-                    
-                    new ReadAllSearchCriteriaFromDbAsyncTask(OperatingSite.getSite().apiSiteParameter,Sort.getEnum(sort),
-                                    getReadCriteriaTaskCompletionNotifier()).execute();
-                    
+
+                    new ReadAllSearchCriteriaFromDbAsyncTask(OperatingSite.getSite().apiSiteParameter, Sort
+                                    .getEnum(sort), getReadCriteriaTaskCompletionNotifier()).execute();
+
                 }
 
             }
@@ -530,5 +539,21 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             emptyItemsView = AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this);
 
         return emptyItemsView;
+    }
+
+    private void updateSortOrderIfTabbed()
+    {
+        if (sortSpinner.getSelectedItemPosition() == sortOptionArray.indexOf(Sort.TABBED.getValue()))
+        {
+            ArrayList<SearchCriteriaDomain> criteriaList =
+                            SearchCriteriaDAO.getAll(getApplicationContext(), OperatingSite.getSite().apiSiteParameter,
+                                            Sort.TABBED);
+            searchCriteriaArrayAdapter.notifyDataSetInvalidated();
+            savedSearchList.clear();
+            searchCriteriaArrayAdapter.clear();
+            savedSearchList.addAll(criteriaList);
+            searchCriteriaArrayAdapter.addAll(savedSearchList);
+            searchCriteriaArrayAdapter.notifyDataSetChanged();
+        }
     }
 }
