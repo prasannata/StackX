@@ -50,10 +50,10 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.advanced_search);
-        searchCriteriaFragment = (SearchCriteriaFragment) getFragmentManager().findFragmentById(
-                        R.id.searchCriteriaFragment);
-        questionListFragment = (SearchQuestionListFragment) getFragmentManager().findFragmentById(
-                        R.id.questionListFragment);
+        searchCriteriaFragment =
+                        (SearchCriteriaFragment) getFragmentManager().findFragmentById(R.id.searchCriteriaFragment);
+        questionListFragment =
+                        (SearchQuestionListFragment) getFragmentManager().findFragmentById(R.id.questionListFragment);
 
         if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
             searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
@@ -62,18 +62,22 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
 
     private void showOrHideQuestionListFragment(Configuration configuration)
     {
-        if (questionListFragment.isAdded() && searchCriteriaFragment.isAdded())
+        if (!searchCriteriaFragment.isRemoving() && !questionListFragment.isRemoving())
         {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
             {
-                if (!questionListFragment.hasResults())
-                    ft.hide(questionListFragment);
-                else
+                if (questionListFragment.hasResults())
                 {
                     getActionBar().setDisplayHomeAsUpEnabled(true);
                     ft.hide(searchCriteriaFragment);
+                    ft.show(questionListFragment);
                     AppUtils.hideSoftInput(this, getWindow().getCurrentFocus());
+                }
+                else
+                {
+                    ft.show(searchCriteriaFragment);
+                    ft.hide(questionListFragment);
                 }
             }
             else
@@ -81,12 +85,22 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
                 getActionBar().setDisplayHomeAsUpEnabled(false);
                 ft.show(searchCriteriaFragment);
                 if (questionListFragment.hasResults())
+                {
+                    Log.d(TAG, "Showing question list fragment");
                     ft.show(questionListFragment);
+                }
                 else
                     ft.hide(questionListFragment);
             }
-            
-            ft.commit();
+
+            // Why not commit? While in SearchCriteriaFragment, change
+            // orientation to landscape, launch SearchCriteriaListActivity.
+            // While in SearchCriteriaListActivity, change orientation back to
+            // portrait and press back. IllegalStateException is thrown saying
+            // commit cannot be performed after onSaveInstanceState has been
+            // called. Hence, commitAllowingStateLoss. But not convinced this is
+            // ok.
+            ft.commitAllowingStateLoss();
         }
     }
 
@@ -107,10 +121,21 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     protected void onStart()
     {
         Log.d(TAG, "onStart");
-        
+
         super.onStart();
-        
+
         showOrHideQuestionListFragment(getResources().getConfiguration());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        Log.d(TAG, "onConfigurationChanged");
+
+        super.onConfigurationChanged(newConfig);
+
+        showOrHideQuestionListFragment(newConfig);
+
     }
 
     @Override
@@ -118,27 +143,30 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     {
         if (item.getItemId() == R.id.menu_save)
         {
-            AsyncTaskCompletionNotifier<Boolean> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<Boolean>()
-            {
-                @Override
-                public void notifyOnCompletion(Boolean result)
-                {
-                    if (result)
-                    {
-                        AppUtils.incrementNumSavedSearches(getApplicationContext());
-                        getActionBar().setTitle(searchCriteriaFragment.getCriteriaName());
-                        Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
-                    }
-                    else
-                        Toast.makeText(AdvancedSearchActivity.this, "Cannot save criteria", Toast.LENGTH_LONG).show();
-                }
-            };
-
-            searchCriteriaFragment.saveCriteria(asyncTaskCompletionNotifier);
+            searchCriteriaFragment.saveCriteria(getSaveCriteriaTaskCompletionNotifier());
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private AsyncTaskCompletionNotifier<Boolean> getSaveCriteriaTaskCompletionNotifier()
+    {
+        return new AsyncTaskCompletionNotifier<Boolean>()
+        {
+            @Override
+            public void notifyOnCompletion(Boolean result)
+            {
+                if (result)
+                {
+                    AppUtils.incrementNumSavedSearches(getApplicationContext());
+                    getActionBar().setTitle(searchCriteriaFragment.getCriteriaName());
+                    Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(AdvancedSearchActivity.this, "Cannot save criteria", Toast.LENGTH_LONG).show();
+            }
+        };
     }
 
     @Override

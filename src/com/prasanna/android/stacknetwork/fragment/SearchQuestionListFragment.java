@@ -43,7 +43,7 @@ public class SearchQuestionListFragment extends QuestionListFragment
     {
         if (isAdded())
         {
-            prepareIntentAndStartService();
+            prepareIntent();
             showProgressBar();
             startService(intent);
         }
@@ -88,7 +88,7 @@ public class SearchQuestionListFragment extends QuestionListFragment
         }
     }
 
-    private void prepareIntentAndStartService()
+    private void prepareIntent()
     {
         if (intent == null)
         {

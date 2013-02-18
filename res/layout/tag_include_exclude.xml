@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-    <TextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/tag"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@color/white"
-        android:gravity="left|center"
-        android:padding="5dp"
-        android:textColor="@color/black"
-        android:textSize="15sp" />
-
-
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tag"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:background="@color/white"
+    android:gravity="left|center"
+    android:textIsSelectable="true"
+    android:padding="5dp"
+    android:textColor="@color/black"
+    android:textSize="15sp" />
