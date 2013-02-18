@@ -58,13 +58,11 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
             searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
                             StringConstants.SEARCH_CRITERIA));
-
-        showOrHideQuestionListFragment(getResources().getConfiguration());
     }
 
     private void showOrHideQuestionListFragment(Configuration configuration)
     {
-        if (questionListFragment != null)
+        if (questionListFragment.isAdded() && searchCriteriaFragment.isAdded())
         {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
@@ -106,11 +104,13 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
+    protected void onStart()
     {
-        super.onConfigurationChanged(newConfig);
-
-        showOrHideQuestionListFragment(newConfig);
+        Log.d(TAG, "onStart");
+        
+        super.onStart();
+        
+        showOrHideQuestionListFragment(getResources().getConfiguration());
     }
 
     @Override
