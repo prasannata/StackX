@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -428,8 +427,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         if (findViewWithTag == null)
         {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams params =
+                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                            LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(3, 0, 3, 0);
             currentRow.addView(tagTextView, params);
         }
@@ -442,10 +442,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         int maxWidth = getResources().getDisplayMetrics().widthPixels - 25;
 
-        LinearLayout currentRow = (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
-                        + currentNumRowsOfSelectedTags);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout currentRow =
+                        (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
+                                        + currentNumRowsOfSelectedTags);
+        LinearLayout.LayoutParams layoutParams =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, 2, 0, 2);
 
         if (currentRow == null)
@@ -475,8 +477,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         LinearLayout rowLayout = new LinearLayout(context);
         rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.topMargin = topMargin;
         rowLayout.setLayoutParams(layoutParams);
         rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_TAG + currentNumRowsOfSelectedTags);
@@ -530,7 +533,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         super.onActivityCreated(savedInstanceState);
 
         getActivity().getActionBar().setTitle(getActivity().getString(R.string.advanced_search));
-
+        ArrayList<String> sortOptionArray =
+                        new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.searchSortArray)));
+        sortSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, sortOptionArray));
         prepareRunSearch();
         prepareNewCriteria();
         prepareLoadCriteria();
@@ -540,7 +545,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         if (searchCriteriaDomain != null && searchCriteriaDomain.searchCriteria != null)
         {
-            List<String> sortOptionArray = Arrays.asList(getResources().getStringArray(R.array.searchSortArray));
             String sort = searchCriteriaDomain.searchCriteria.getSort();
             if (sort != null)
                 sortSpinner.setSelection(sortOptionArray.indexOf(sort));
@@ -757,8 +761,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         saveAsDailogBuilder.setTitle("Save As");
 
         final EditText input = new EditText(getActivity());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams lp =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.MATCH_PARENT);
         input.setLayoutParams(lp);
         saveAsDailogBuilder.setView(input);
 

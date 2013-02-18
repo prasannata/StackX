@@ -62,6 +62,42 @@ public class SearchCriteriaDAO extends AbstractBaseDao
                         + " long not null, " + COLUMN_LAST_MODIFIED + " long not null);";
     }
 
+    public enum Sort
+    {
+        ACTIVITY("activity"),
+        CREATION("creation"),
+        FREQUENCY("frequency"),
+        TABBED("tabbed");
+
+        private final String value;
+
+        private Sort(String value)
+        {
+            this.value = value;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+
+        public static Sort getEnum(String value)
+        {
+            if (value != null)
+            {
+                try
+                {
+                    return valueOf(value.toUpperCase());
+                }
+                catch (IllegalArgumentException e)
+                {
+                }
+            }
+
+            return null;
+        }
+    }
+
     public SearchCriteriaDAO(Context context)
     {
         super(context);
@@ -145,7 +181,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
             return null;
 
         cursor.moveToFirst();
-        
+
         return getCriteria(cursor);
 
     }
@@ -159,12 +195,27 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         database.update(TABLE_NAME, values, whereClause, whereArgs);
     }
 
-    public ArrayList<SearchCriteriaDomain> getAll(String site)
+    public ArrayList<SearchCriteriaDomain> getAll(String site, Sort sort)
     {
         String selection = SearchCriteriaTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
 
         String orderBy = SearchCriteriaTable.COLUMN_CREATED + " ASC";
+
+        switch (sort)
+        {
+            case ACTIVITY:
+                orderBy = SearchCriteriaTable.COLUMN_LAST_RUN + " DESC";
+                break;
+            case FREQUENCY:
+                orderBy = SearchCriteriaTable.COLUMN_RUN_COUNT + " DESC";
+                break;
+            case TABBED:
+                orderBy = SearchCriteriaTable.COLUMN_TAB + " DESC";
+                break;
+            default:
+                break;
+        }
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, orderBy);
 
@@ -283,13 +334,13 @@ public class SearchCriteriaDAO extends AbstractBaseDao
 
     }
 
-    public static ArrayList<SearchCriteriaDomain> getAll(final Context context, final String site)
+    public static ArrayList<SearchCriteriaDomain> getAll(final Context context, final String site, final Sort sort)
     {
         SearchCriteriaDAO dao = new SearchCriteriaDAO(context);
         try
         {
             dao.open();
-            return dao.getAll(site);
+            return dao.getAll(site, sort);
         }
         catch (SQLException e)
         {

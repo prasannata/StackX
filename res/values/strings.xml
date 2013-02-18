@@ -107,6 +107,13 @@
         <item>creation</item>
         <item>votes</item>
     </string-array>
+    <string-array name="searchCriteriaSortArray">
+        <item>tabbed</item>
+        <item>activity</item>
+        <item>creation</item>
+        <item>frequency</item>
+    </string-array>
+    
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>
         <item>30</item>

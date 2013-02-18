@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import android.content.Context;
@@ -32,6 +33,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -39,6 +42,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -47,6 +51,7 @@ import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment;
 import com.prasanna.android.stacknetwork.fragment.SearchCriteriaFragment.WriteCriteriaAsyncTask;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
+import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO.Sort;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -61,6 +66,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     private static final String TAG = SearchCriteriaListActivity.class.getSimpleName();
     private static final String ACTION_BAR_TITLE = "Saved Searches";
 
+    private Spinner sortSpinner;
     private SearchCriteriaArrayAdapter searchCriteriaArrayAdapter;
     private ListView listView;
     private ArrayList<SearchCriteriaDomain> savedSearchList = new ArrayList<SearchCriteriaDomain>();
@@ -143,18 +149,20 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     {
         private AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier;
         private String site;
+        private Sort sort;
 
-        public ReadAllSearchCriteriaFromDbAsyncTask(String site,
+        public ReadAllSearchCriteriaFromDbAsyncTask(String site, Sort sort,
                         AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier)
         {
             this.site = site;
+            this.sort = sort;
             this.asyncTaskCompletionNotifier = asyncTaskCompletionNotifier;
         }
 
         @Override
         protected ArrayList<SearchCriteriaDomain> doInBackground(Void... params)
         {
-            return SearchCriteriaDAO.getAll(SearchCriteriaListActivity.this, site);
+            return SearchCriteriaDAO.getAll(SearchCriteriaListActivity.this, site, sort);
         }
 
         @Override
@@ -286,8 +294,8 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 {
                     if (executeDbTask)
                     {
-                        AddDelCriteriaTabAsyncTaskCompletionNotifier asyncTaskCompletionNotifier = new AddDelCriteriaTabAsyncTaskCompletionNotifier(
-                                        buttonView, domain, action);
+                        AddDelCriteriaTabAsyncTaskCompletionNotifier asyncTaskCompletionNotifier =
+                                        new AddDelCriteriaTabAsyncTaskCompletionNotifier(buttonView, domain, action);
 
                         new SearchCriteriaFragment.WriteCriteriaAsyncTask(SearchCriteriaListActivity.this, domain,
                                         action, asyncTaskCompletionNotifier).execute();
@@ -346,11 +354,43 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.list_view);
+        setContentView(R.layout.search_criteria_list_view);
         getActionBar().setTitle(ACTION_BAR_TITLE);
         listView = (ListView) findViewById(android.R.id.list);
         searchCriteriaArrayAdapter = new SearchCriteriaArrayAdapter(this, R.layout.search_criteria_item, R.id.itemText);
         listView.setAdapter(searchCriteriaArrayAdapter);
+        setupSortSpinner();
+    }
+
+    private void setupSortSpinner()
+    {
+        sortSpinner = (Spinner) findViewById(R.id.searchSortSpinner);
+        ArrayList<String> sortOptionArray =
+                        new ArrayList<String>(Arrays.asList(getResources().getStringArray(
+                                        R.array.searchCriteriaSortArray)));
+        sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item, sortOptionArray));
+        sortSpinner.setOnItemSelectedListener(new OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View view, int position, long id)
+            {
+                String sort = (String) adapter.getItemAtPosition(position);
+                if (sort != null)
+                {
+                    Log.d(TAG, "sort = " + sort);
+                    
+                    new ReadAllSearchCriteriaFromDbAsyncTask(OperatingSite.getSite().apiSiteParameter,Sort.getEnum(sort),
+                                    getReadCriteriaTaskCompletionNotifier()).execute();
+                    
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0)
+            {
+            }
+        });
     }
 
     @Override
@@ -430,43 +470,46 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         super.onResume();
 
         if (searchCriteriaArrayAdapter == null || searchCriteriaArrayAdapter.getCount() == 0)
-        {
-            AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> asyncTaskCompletionNotifier = new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>()
-            {
-                @Override
-                public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
-                {
-                    Log.d(TAG, "Saved searches read from DB");
-                    searchCriteriaArrayAdapter.notifyDataSetInvalidated();
-                    searchCriteriaArrayAdapter.clear();
-
-                    if (result != null && !result.isEmpty())
-                    {
-                        for(SearchCriteriaDomain domain : result)
-                        {
-                            if(domain.tab)
-                                criteriaIdsAsTab.add(domain.id);
-                        }
-                        savedSearchList.addAll(result);
-                        searchCriteriaArrayAdapter.addAll(savedSearchList);
-                    }
-                    else
-                    {
-                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.topMargin = 10;
-                        addContentView(getEmptyView(), layoutParams);
-                    }
-                    
-                    searchCriteriaArrayAdapter.notifyDataSetChanged();
-                }
-            };
-
-            new ReadAllSearchCriteriaFromDbAsyncTask(OperatingSite.getSite().apiSiteParameter,
-                            asyncTaskCompletionNotifier).execute();
-        }
+            new ReadAllSearchCriteriaFromDbAsyncTask(OperatingSite.getSite().apiSiteParameter, Sort.TABBED,
+                            getReadCriteriaTaskCompletionNotifier()).execute();
         else
             searchCriteriaArrayAdapter.notifyDataSetChanged();
+    }
+
+    private AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> getReadCriteriaTaskCompletionNotifier()
+    {
+        return new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>()
+        {
+            @Override
+            public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
+            {
+                Log.d(TAG, "Saved searches read from DB");
+                savedSearchList.clear();
+                searchCriteriaArrayAdapter.notifyDataSetInvalidated();
+                searchCriteriaArrayAdapter.clear();
+
+                if (result != null && !result.isEmpty())
+                {
+                    for (SearchCriteriaDomain domain : result)
+                    {
+                        if (domain.tab)
+                            criteriaIdsAsTab.add(domain.id);
+                    }
+                    savedSearchList.addAll(result);
+                    searchCriteriaArrayAdapter.addAll(result);
+                }
+                else
+                {
+                    LinearLayout.LayoutParams layoutParams =
+                                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                    layoutParams.topMargin = 10;
+                    addContentView(getEmptyView(), layoutParams);
+                }
+
+                searchCriteriaArrayAdapter.notifyDataSetChanged();
+            }
+        };
     }
 
     @Override

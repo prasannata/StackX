@@ -32,7 +32,6 @@
                 android:layout_margin="3dp"
                 android:layout_toRightOf="@id/sortLabel"
                 android:drawSelectorOnTop="true"
-                android:entries="@array/searchSortArray"
                 android:spinnerMode="dropdown" />
 
             <ImageView
