@@ -185,14 +185,14 @@ public class AppUtils
 
     public static void incrementNumSavedSearches(Context context)
     {
-        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+        long num = getNumSavedSearches(context);
 
         SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, ++num);
     }
 
     public static void decrementNumSavedSearches(Context context)
     {
-        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+        long num = getNumSavedSearches(context);
 
         if (num > 0)
             SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, --num);
@@ -200,16 +200,20 @@ public class AppUtils
 
     public static void decrementNumSavedSearches(Context context, int by)
     {
-        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+        long num = getNumSavedSearches(context);
 
         if (num > 0 && num - by >= 0)
             SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, num - by);
     }
 
+    public static long getNumSavedSearches(Context context)
+    {
+        return SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
+    }
+
     public static boolean savedSearchesMaxed(Context context)
     {
-        long num = SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
-        return num == SearchCriteriaListActivity.MAX_SAVED_SEARCHES;
+        return getNumSavedSearches(context) == SearchCriteriaListActivity.MAX_SAVED_SEARCHES;
     }
 
     public static boolean anHourSince(long ms)

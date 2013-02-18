@@ -239,8 +239,11 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
-            viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
-            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
+            if (item.lastRun > 0)
+                viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
+            else
+                viewHolder.lastRun.setText("Never");
+            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) +  " times");
             return convertView;
         }
 
@@ -445,7 +448,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     searchCriteriaArrayAdapter.clear();
 
                     actionBarMenu.findItem(R.id.menu_discard).setVisible(false);
-                    AppUtils.decrementNumSavedSearches(getApplicationContext(), toDeleteList.size());
+
                     for (SearchCriteriaDomain deletedDomain : toDeleteList)
                     {
                         if (deletedDomain.tab)
@@ -460,8 +463,14 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                     else
                     {
-                        addContentView(getEmptyView(), new LinearLayout.LayoutParams(
-                                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+                        if (findViewById(R.id.emptyStatus) == null)
+                        {
+                            LinearLayout.LayoutParams layoutParams =
+                                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                                            LinearLayout.LayoutParams.WRAP_CONTENT);
+                            layoutParams.topMargin = 10;
+                            addContentView(getEmptyView(), layoutParams);
+                        }
                     }
                 }
             }
@@ -509,11 +518,14 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 }
                 else
                 {
-                    LinearLayout.LayoutParams layoutParams =
-                                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                                    LinearLayout.LayoutParams.WRAP_CONTENT);
-                    layoutParams.topMargin = 10;
-                    addContentView(getEmptyView(), layoutParams);
+                    if (findViewById(R.id.emptyStatus) == null)
+                    {
+                        LinearLayout.LayoutParams layoutParams =
+                                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                        layoutParams.topMargin = 10;
+                        addContentView(getEmptyView(), layoutParams);
+                    }
                 }
 
                 searchCriteriaArrayAdapter.notifyDataSetChanged();

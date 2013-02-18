@@ -135,6 +135,7 @@
                 android:hint="@string/tags"
                 android:inputType="text"
                 android:textColor="@color/black"
+                android:completionThreshold="1"
                 android:textCursorDrawable="@null"
                 android:textSize="15sp" />
 

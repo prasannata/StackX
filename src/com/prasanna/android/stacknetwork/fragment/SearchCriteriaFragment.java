@@ -148,6 +148,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 {
                     case ACTION_ADD:
                         dao.insert(domain);
+                        AppUtils.incrementNumSavedSearches(context);
                         return true;
                     case ACTION_UPDATE:
                         dao.update(domain);
@@ -157,11 +158,17 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                         return true;
                     case ACTION_DEL:
                         if (params != null && params.length > 0)
+                        {
                             dao.delete(params[0]);
+                            AppUtils.decrementNumSavedSearches(context);
+                        }
                         return true;
                     case ACTION_DEL_MANY:
                         if (params != null && params.length > 0)
+                        {
                             dao.deleteAll(params);
+                            AppUtils.decrementNumSavedSearches(context, params.length);
+                        }
                         return true;
                     case ACTION_ADD_AS_TAB:
                         dao.updateCriteriaAsTabbed(domain.id, true);
@@ -303,29 +310,26 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             toggleNotTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleNotTagged);
 
             tagEditText.addTextChangedListener(this);
-            tagEditText.setThreshold(1);
             tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
             tagEditText.setAdapter(tagArrayAdapter);
 
             if (savedCriteria)
                 newCriteria.setVisibility(View.VISIBLE);
 
-            prepareToggedToggleButton();
-            prepareNotTaggedToggleButton();
+            prepareToggedToggleButton(toggleTagged, toggleNotTagged, true);
+            prepareToggedToggleButton(toggleNotTagged, toggleTagged, false);
         }
 
         return criteriaLayout;
     }
 
-    private void prepareToggedToggleButton()
+    private void prepareToggedToggleButton(final ToggleButton source, final ToggleButton other, final boolean add)
     {
-        toggleTagged.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        source.setOnCheckedChangeListener(new OnCheckedChangeListener()
         {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                String unknownTag = tagEditText.getText().toString();
-
                 if (isChecked)
                 {
                     buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
@@ -337,42 +341,12 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
                 }
 
-                if (unknownTag != null && unknownTag.length() > 0)
-                    updateSelectedTags(unknownTag, true, isChecked);
-
-                if (isChecked && toggleNotTagged.isChecked())
-                    toggleNotTagged.setChecked(false);
-            }
-        });
-    }
-
-    private void prepareNotTaggedToggleButton()
-    {
-        toggleNotTagged.setOnCheckedChangeListener(new OnCheckedChangeListener()
-        {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
                 String unknownTag = tagEditText.getText().toString();
-
-                if (isChecked)
-                {
-                    buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
-                    buttonView.setTextColor(getResources().getColor(R.color.delft));
-                }
-                else
-                {
-                    buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
-                    buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
-                }
-
                 if (unknownTag != null && unknownTag.length() > 0)
-                    updateSelectedTags(unknownTag, false, isChecked);
+                    updateSelectedTags(unknownTag, add, isChecked);
 
-                if (isChecked && toggleTagged.isChecked())
-                    toggleTagged.setChecked(false);
-
-                tagEditText.setText("");
+                if (isChecked && other.isChecked())
+                    other.setChecked(false);
             }
         });
     }

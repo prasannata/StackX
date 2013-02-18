@@ -5,7 +5,7 @@
     android:layout_height="40dp"
     android:background="@color/white"
     android:gravity="left|center"
-    android:textIsSelectable="true"
+    android:textIsSelectable="false"
     android:padding="5dp"
     android:textColor="@color/black"
     android:textSize="15sp" />
