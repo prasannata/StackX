@@ -27,7 +27,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
@@ -109,7 +109,7 @@ public class LoginActivity extends Activity
 
     private void setupSkipLogin()
     {
-        RelativeLayout skipLoginTextView = (RelativeLayout) findViewById(R.id.skipLoginLayout);
+        TextView skipLoginTextView = (TextView) findViewById(R.id.skipLogin);
         skipLoginTextView.setOnClickListener(new View.OnClickListener()
         {
             private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
