@@ -80,6 +80,7 @@
     <string name="modified">Modified</string>
     <string name="ran">Ran</string>
     <string name="updated">Updated</string>
+    <string name="nada">Nada</string>
 
     <!-- Sites updated  -->
     <string name="siteListUpdated">Site list updated!</string>

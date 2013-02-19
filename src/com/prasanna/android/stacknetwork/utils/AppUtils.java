@@ -102,8 +102,8 @@ public class AppUtils
             return false;
 
         long lastCommentWrite = SharedPreferencesUtil.getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
-        long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(context,
-                        WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+        long minSecondsBetweenWrite =
+                        SharedPreferencesUtil.getLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
         return ((System.currentTimeMillis() - lastCommentWrite) / 1000 > minSecondsBetweenWrite);
     }
 
@@ -120,11 +120,7 @@ public class AppUtils
 
     public static View getEmptyItemsView(Context context)
     {
-        View noItemsFoundView = LayoutInflater.from(context).inflate(R.layout.empty_items, null);
-        TextView tv = (TextView) noItemsFoundView.findViewById(R.id.emptyStatus);
-        tv.setText("Nada");
-        tv.setTextSize(15f);
-        return noItemsFoundView;
+        return LayoutInflater.from(context).inflate(R.layout.empty_items, null);
     }
 
     public static String getStackXErrorMsg(HttpException e)

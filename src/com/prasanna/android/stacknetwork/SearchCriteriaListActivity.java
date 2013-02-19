@@ -39,7 +39,6 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -60,6 +59,7 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 
 public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 {
+    private static final String REMAINING = "Remaining ";
     public static final int MAX_SAVED_SEARCHES = 10;
     public static final int MAX_CUSTOM_TABS = 3;
 
@@ -67,13 +67,15 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     private static final String ACTION_BAR_TITLE = "Saved Searches";
 
     private Spinner sortSpinner;
-    private SearchCriteriaArrayAdapter searchCriteriaArrayAdapter;
     private ListView listView;
+    private TextView emptyItemsView;
+    private TextView remainingSearch;
+
+    private SearchCriteriaArrayAdapter searchCriteriaArrayAdapter;
     private ArrayList<SearchCriteriaDomain> savedSearchList = new ArrayList<SearchCriteriaDomain>();
     private ArrayList<SearchCriteriaDomain> toDeleteList = new ArrayList<SearchCriteriaDomain>();
-    private HashSet<Long> criteriaIdsAsTab = new HashSet<Long>();
-    private View emptyItemsView;
     private ArrayList<String> sortOptionArray;
+    private HashSet<Long> criteriaIdsAsTab = new HashSet<Long>();
 
     static class SearchCriteriaViewHolder
     {
@@ -178,7 +180,11 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         protected void onPostExecute(ArrayList<SearchCriteriaDomain> result)
         {
             if (asyncTaskCompletionNotifier != null)
+            {
+                remainingSearch.setText(REMAINING
+                                + (MAX_SAVED_SEARCHES - AppUtils.getNumSavedSearches(getApplicationContext())));
                 asyncTaskCompletionNotifier.notifyOnCompletion(result);
+            }
         }
     }
 
@@ -218,32 +224,13 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             prepareTabToggle(viewHolder.addTabToggle, item);
             prepareItemClick(viewHolder.itemLayout, item);
 
-            if (toDeleteList.contains(item))
-                viewHolder.delCheckBox.setChecked(true);
-            else
-                viewHolder.delCheckBox.setChecked(false);
-
-            if (item.tab)
-            {
-                viewHolder.addTabToggle.setVisibility(View.VISIBLE);
-                viewHolder.addTabToggle.setChecked(true);
-            }
-            else
-            {
-                viewHolder.addTabToggle.setChecked(false);
-                if (criteriaIdsAsTab.size() == MAX_CUSTOM_TABS)
-                    viewHolder.addTabToggle.setVisibility(View.INVISIBLE);
-                else
-                    viewHolder.addTabToggle.setVisibility(View.VISIBLE);
-            }
-
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
             if (item.lastRun > 0)
                 viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
             else
                 viewHolder.lastRun.setText("Never");
-            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) +  " times");
+            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
             return convertView;
         }
 
@@ -274,9 +261,15 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                 }
             });
+            
+            if (toDeleteList.contains(item))
+                delCheckBox.setChecked(true);
+            else
+                delCheckBox.setChecked(false);
+
         }
 
-        private void prepareTabToggle(final ToggleButton addTabToggle, final SearchCriteriaDomain domain)
+        private void prepareTabToggle(final ToggleButton addTabToggle, final SearchCriteriaDomain item)
         {
             addTabToggle.setOnCheckedChangeListener(new OnCheckedChangeListener()
             {
@@ -288,7 +281,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                         buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
                         buttonView.setTextColor(getResources().getColor(R.color.delft));
 
-                        onCheckedChangedExecute(domain, buttonView, !criteriaIdsAsTab.contains(domain.id),
+                        onCheckedChangedExecute(item, buttonView, !criteriaIdsAsTab.contains(item.id),
                                         WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB);
                     }
                     else
@@ -296,7 +289,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                         buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
                         buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
 
-                        onCheckedChangedExecute(domain, buttonView, criteriaIdsAsTab.contains(domain.id),
+                        onCheckedChangedExecute(item, buttonView, criteriaIdsAsTab.contains(item.id),
                                         WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB);
                     }
                 }
@@ -314,6 +307,21 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                 }
             });
+
+            if (item.tab)
+            {
+                addTabToggle.setVisibility(View.VISIBLE);
+                addTabToggle.setChecked(true);
+            }
+            else
+            {
+                addTabToggle.setChecked(false);
+                if (criteriaIdsAsTab.size() == MAX_CUSTOM_TABS)
+                    addTabToggle.setVisibility(View.INVISIBLE);
+                else
+                    addTabToggle.setVisibility(View.VISIBLE);
+            }
+
         }
 
         private void prepareItemClick(RelativeLayout itemLayout, final SearchCriteriaDomain item)
@@ -371,6 +379,8 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         listView = (ListView) findViewById(android.R.id.list);
         searchCriteriaArrayAdapter = new SearchCriteriaArrayAdapter(this, R.layout.search_criteria_item, R.id.itemText);
         listView.setAdapter(searchCriteriaArrayAdapter);
+        remainingSearch = (TextView) findViewById(R.id.remainingSearch);
+        emptyItemsView = (TextView) findViewById(R.id.emptyItems);
         setupSortSpinner();
     }
 
@@ -395,7 +405,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                                     .getEnum(sort), getReadCriteriaTaskCompletionNotifier()).execute();
 
                 }
-
             }
 
             @Override
@@ -441,8 +450,8 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             {
                 if (result)
                 {
-                    Log.d(TAG, "Criteria deleted");
-
+                    remainingSearch.setText(REMAINING
+                                    + (MAX_SAVED_SEARCHES - AppUtils.getNumSavedSearches(getApplicationContext())));
                     savedSearchList.removeAll(toDeleteList);
                     searchCriteriaArrayAdapter.notifyDataSetInvalidated();
                     searchCriteriaArrayAdapter.clear();
@@ -463,14 +472,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                     else
                     {
-                        if (findViewById(R.id.emptyStatus) == null)
-                        {
-                            LinearLayout.LayoutParams layoutParams =
-                                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                            layoutParams.topMargin = 10;
-                            addContentView(getEmptyView(), layoutParams);
-                        }
+                        emptyItemsView.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -502,12 +504,13 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
             {
                 Log.d(TAG, "Saved searches read from DB");
-                savedSearchList.clear();
                 searchCriteriaArrayAdapter.notifyDataSetInvalidated();
+                savedSearchList.clear();
                 searchCriteriaArrayAdapter.clear();
 
                 if (result != null && !result.isEmpty())
                 {
+                    emptyItemsView.setVisibility(View.GONE);
                     for (SearchCriteriaDomain domain : result)
                     {
                         if (domain.tab)
@@ -518,14 +521,8 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                 }
                 else
                 {
-                    if (findViewById(R.id.emptyStatus) == null)
-                    {
-                        LinearLayout.LayoutParams layoutParams =
-                                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                        layoutParams.topMargin = 10;
-                        addContentView(getEmptyView(), layoutParams);
-                    }
+                    Log.d(TAG, "No items found");
+                    emptyItemsView.setVisibility(View.VISIBLE);
                 }
 
                 searchCriteriaArrayAdapter.notifyDataSetChanged();
@@ -543,14 +540,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     protected boolean shouldSearchViewBeEnabled()
     {
         return false;
-    }
-
-    private View getEmptyView()
-    {
-        if (emptyItemsView == null)
-            emptyItemsView = AppUtils.getEmptyItemsView(SearchCriteriaListActivity.this);
-
-        return emptyItemsView;
     }
 
     private void updateSortOrderIfTabbed()

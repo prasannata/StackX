@@ -29,7 +29,27 @@
             android:drawSelectorOnTop="true"
             android:entries="@array/searchCriteriaSortArray"
             android:spinnerMode="dropdown" />
+
+        <TextView
+            android:id="@+id/remainingSearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
     </RelativeLayout>
+
+    <include
+        android:id="@+id/emptyItems"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        layout="@layout/empty_items"
+        android:visibility="gone" />
 
     <ListView
         android:id="@android:id/list"

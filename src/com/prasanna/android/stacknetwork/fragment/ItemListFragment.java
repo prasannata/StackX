@@ -229,22 +229,13 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
                 items = new ArrayList<T>();
 
             items.addAll(newItems);
-
             if (items.isEmpty())
             {
                 if (itemsContainer.findViewById(R.id.emptyStatus) == null)
-                {
-                    View noItemsFoundView = getActivity().getLayoutInflater().inflate(R.layout.empty_items, null);
-                    TextView tv = (TextView) noItemsFoundView.findViewById(R.id.emptyStatus);
-                    tv.setText("Nada");
-                    tv.setTextSize(15f);
-                    itemsContainer.addView(noItemsFoundView);
-                }
+                    itemsContainer.addView(AppUtils.getEmptyItemsView(getActivity()));
             }
             else
-            {
                 itemListAdapter.addAll(newItems);
-            }
         }
     }
 
