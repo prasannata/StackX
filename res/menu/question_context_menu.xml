@@ -30,12 +30,8 @@
             android:orderInCategory="4"
             android:title=""/>
         <item
-            android:id="@+id/q_ctx_menu_archive"
-            android:orderInCategory="5"
-            android:title="@string/archive"/>
-        <item
             android:id="@+id/q_ctx_menu_email"
-            android:orderInCategory="6"
+            android:orderInCategory="5"
             android:title="@string/email"/>
     </group>
 

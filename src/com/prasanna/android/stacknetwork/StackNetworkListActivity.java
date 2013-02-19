@@ -93,13 +93,14 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         if (SharedPreferencesUtil.isSet(getApplicationContext(), StringConstants.SITES_INIT, false))
         {
-            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", "Loading sites");
+            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
             startService(new Intent(getApplicationContext(), AccountSyncService.class));
         }
         else
         {
-            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
-                            "Loading sites, your accounts and permissions, this might take few seconds");
+            progressDialog =
+                            ProgressDialog.show(StackNetworkListActivity.this, "",
+                                            getString(R.string.loadingSitesForAuthUser));
         }
 
         registerAccountUpdateBroadcastReceiver();

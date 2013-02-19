@@ -156,7 +156,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.question_context_menu, menu);
-        menu.removeItem(R.id.q_ctx_menu_archive);
 
         MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
         menuItem.setTitle(Html.fromHtml(itemListAdapter.getItem(position).owner.displayName) + "'s profile");

@@ -28,7 +28,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -57,7 +56,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_INBOX_NOTIFICATION = "pref_newNotification";
     public static final String KEY_PREF_NOTIF_VIBRATE = "pref_vibrate";
     public static final String KEY_PREF_NOTIF_RINGTONE = "pref_notificationTone";
-    public static final String KEY_PREF_CACHE_MAX_SIZE = "pref_cacheMaxSize";
     public static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
     public static final String KEY_PREF_CLEAR_CACHE = "pref_clearCache";
     public static final String KEY_PREF_DEFAULT_SITE = "pref_defaultSite";
@@ -74,7 +72,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private ListPreference accountActionPref;
     private ListPreference defaultSitePref;
     private RingtonePreference notifRingTonePref;
-    private EditTextPreference cacheMaxSizePreference;
     private PreferenceCategory inboxPrefCategory;
 
     public static int getInboxRefreshInterval(Context context)
@@ -241,11 +238,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         setRingtoneSummary(ringtoneUri);
     }
 
-    private String getCacheSizeSummary(String currentCacheSize)
-    {
-        return cacheMaxSizePreference.getText() + getString(R.string.MB) + ". Used: " + currentCacheSize;
-    }
-
     @Override
     public void onResume()
     {
@@ -269,11 +261,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         {
             refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
             AlarmUtils.rescheduleInboxRefreshAlarm(getActivity());
-        }
-        else if (key.equals(KEY_PREF_CACHE_MAX_SIZE))
-        {
-            String cacheSize = sharedPreferences.getString(key, "");
-            findPreference(KEY_PREF_CACHE_MAX_SIZE).setSummary(getCacheSizeSummary(cacheSize));
         }
     }
 

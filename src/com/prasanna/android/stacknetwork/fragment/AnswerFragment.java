@@ -130,7 +130,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
 
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.question_context_menu, menu);
-        menu.removeItem(R.id.q_ctx_menu_archive);
         menu.removeItem(R.id.q_ctx_similar);
         menu.removeItem(R.id.q_ctx_related);
         menu.removeItem(R.id.q_ctx_menu_email);

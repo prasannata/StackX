@@ -2,21 +2,17 @@
 <resources>
 
     <string name="app_name">StackX</string>
-    <string name="stack">stack</string>
-    <string name="exchange">exchange</string>
-    <string name="apps">apps</string>
     <string name="stackExchange">Stack Exchange</string>
     <string name="userName">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="logoutMsg">All your saved preferences, archives etc. will be lost. Okay?</string>
-    <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid this problem, it is recommended that you login. Continue?</string>
+    <string name="noLoginWarn">Without logging in, stackexchange throttles access to few of their APIs. To avoid throttling, it is recommended that you login. Continue?</string>
     <string name="skipLogin">Skip login</string>
     <string name="loading">Loading</string>
-    <string name="stats">stats</string>
-    <string name="questions">Questions</string>
     <string name="question">Question</string>
+    <string name="questions">Questions</string>
     <string name="answer">Answer</string>
     <string name="answers">Answers</string>
     <string name="comments">Comments</string>
@@ -25,27 +21,21 @@
     <string name="zero">0</string>
     <string name="accounts">Accounts</string>
     <string name="lastSeen">Last seen</string>
-    <string name="noEmail">Email not found</string>
     <string name="refresh">Refresh</string>
     <string name="search">Search</string>
     <string name="profile">Profile</string>
-    <string name="options">Options</string>
     <string name="inbox">Inbox</string>
     <string name="tags">Tags</string>
-    <string name="archive">Archive</string>
     <string name="changeSite">Change site</string>
     <string name="settings">Settings</string>
     <string name="score">Score</string>
-    <string name="Enter">Enter</string>
-    <string name="site">site</string>
     <string name="by">by</string>
     <string name="badge">badge</string>
     <string name="avatar">avatar</string>
     <string name="loadingSites">Loading sites</string>
+    <string name="loadingSitesForAuthUser">Loading sites, your accounts and permissions, this might take few seconds</string>
     <string name="viewQuestion">View Question</string>
     <string name="registered">Registered</string>
-    <string name="reorder">Reorder</string>
-    <string name="done">Done</string>
     <string name="accepted">Accepted</string>
     <string name="delete">Delete</string>
     <string name="sureQuestion">"Sure ?"</string>
@@ -58,19 +48,14 @@
     <string name="about">About</string>
     <string name="vibrate">Vibrate</string>
     <string name="ringtone">Ringtone</string>
-    <string name="cacheMaxSizeInMb">Cache Max Size (MB)</string>
-    <string name="MB">MB</string>
-    <string name="storage">Storage</string>
     <string name="account">Account</string>
-    <string name="clearCache">Clear cache</string>
     <string name="email">Email</string>
-    <string name="similar">Similar</string>
     <string name="acceptRate">Accept Rate</string>
+    <string name="similar">Similar</string>
     <string name="related">Related</string>
     <string name="general">General</string>
     <string name="defaultSite">Default site</string>
     <string name="hide">Hide</string>
-    <string name="writePermissions">Write Permissions</string>
     <string name="add">add</string>
     <string name="addComment">Add comment</string>
     <string name="post">Post</string>
@@ -96,11 +81,6 @@
     <!-- Symbols -->
     <string name="plusSign">+</string>
     <string name="minusSign">-</string>
-
-    <!-- Alphabets -->
-    <string name="aCaps">A</string>
-    <string name="i">i</string>
-    <string name="x">x</string>
 
     <string-array name="searchSortArray">
         <item>relevance</item>

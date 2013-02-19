@@ -135,7 +135,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         getMenuInflater().inflate(R.menu.question_context_menu, menu);
 
         menu.removeItem(R.id.q_ctx_comments);
-        menu.removeItem(R.id.q_ctx_menu_archive);
         menu.removeItem(R.id.q_ctx_menu_email);
         menu.removeItem(R.id.q_ctx_menu_tags);
         menu.removeItem(R.id.q_ctx_similar);

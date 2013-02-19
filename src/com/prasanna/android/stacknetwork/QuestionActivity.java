@@ -19,7 +19,6 @@
 
 package com.prasanna.android.stacknetwork;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -60,7 +59,6 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
-import com.prasanna.android.task.WriteObjectAsyncTask;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
@@ -402,9 +400,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 case R.id.q_ctx_menu_user_profile:
                     viewUserProfile(question.owner.id);
                     return true;
-                case R.id.q_ctx_menu_archive:
-                    archiveQuestion();
-                    return true;
                 case R.id.q_ctx_menu_email:
                     emailQuestion();
                     return true;
@@ -638,15 +633,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         Intent emailIntent = IntentUtils.createEmailIntent(question.title, question.link);
         startActivity(Intent.createChooser(emailIntent, ""));
-    }
-
-    private void archiveQuestion()
-    {
-        File directory = new File(this.getCacheDir(), StringConstants.QUESTIONS);
-        WriteObjectAsyncTask cacheTask = new WriteObjectAsyncTask(directory, String.valueOf(question.id));
-        cacheTask.execute(question);
-
-        Toast.makeText(this, "Question saved", Toast.LENGTH_SHORT).show();
     }
 
     private int getNextPageNumber()
