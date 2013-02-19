@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -41,96 +41,96 @@ public class LoginActivity extends Activity
 
     public static Context getAppContext()
     {
-	return LoginActivity.context;
+        return LoginActivity.context;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-	Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate");
 
-	super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
 
-	context = getApplicationContext();
+        context = getApplicationContext();
 
-	if (SharedPreferencesUtil.isFirstRun(getApplicationContext()))
-	{
-	    Log.d(TAG, "Preparing for first run");
+        if (SharedPreferencesUtil.isFirstRun(getApplicationContext()))
+        {
+            Log.d(TAG, "Preparing for first run");
 
-	    setContentView(R.layout.main);
-	    setOnLogin();
-	    setOnSkipLogin();
-	}
-	else
-	{
-	    if (SharedPreferencesUtil.getDefaultSiteName(context) != null)
-	    {
-		Log.d(TAG, "Launching default site");
+            setContentView(R.layout.main);
+            setupLogin();
+            setupSkipLogin();
+        }
+        else
+        {
+            if (SharedPreferencesUtil.getDefaultSiteName(context) != null)
+            {
+                Log.d(TAG, "Launching default site");
 
-		OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(context));
-		Intent intent = new Intent(context, QuestionsActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-	    }
-	    else
-	    {
-		Log.d(TAG, "Launching site list");
+                OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(context));
+                Intent intent = new Intent(context, QuestionsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+            else
+            {
+                Log.d(TAG, "Launching site list");
 
-		Intent intent = new Intent(context, StackNetworkListActivity.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-	    }
-	}
+                Intent intent = new Intent(context, StackNetworkListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
     }
 
     @Override
     public void onResume()
     {
-	Log.d(TAG, "onResume");
+        Log.d(TAG, "onResume");
 
-	super.onResume();
+        super.onResume();
     }
 
-    private void setOnLogin()
+    private void setupLogin()
     {
-	Button loginButton = (Button) findViewById(R.id.login_button);
-	loginButton.setOnClickListener(new View.OnClickListener()
-	{
-	    public void onClick(View view)
-	    {
-		SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
-		Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
-		startActivity(oAuthIntent);
-	    }
-	});
+        Button loginButton = (Button) findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View view)
+            {
+                SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
+                Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
+                startActivity(oAuthIntent);
+            }
+        });
     }
 
-    private void setOnSkipLogin()
+    private void setupSkipLogin()
     {
-	RelativeLayout skipLoginTextView = (RelativeLayout) findViewById(R.id.skipLoginLayout);
-	skipLoginTextView.setOnClickListener(new View.OnClickListener()
-	{
-	    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
-	    {
-		@Override
-		public void onClick(DialogInterface dialog, int which)
-		{
-		    if (DialogInterface.BUTTON_POSITIVE == which)
-		    {
-			Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
-			                .show();
-			SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
-			startActivity(new Intent(context, StackNetworkListActivity.class));
-		    }
-		}
-	    };
+        RelativeLayout skipLoginTextView = (RelativeLayout) findViewById(R.id.skipLoginLayout);
+        skipLoginTextView.setOnClickListener(new View.OnClickListener()
+        {
+            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    if (DialogInterface.BUTTON_POSITIVE == which)
+                    {
+                        Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
+                                        .show();
+                        SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
+                        startActivity(new Intent(context, StackNetworkListActivity.class));
+                    }
+                }
+            };
 
-	    public void onClick(View view)
-	    {
-		DialogBuilder.yesNoDialog(LoginActivity.this, R.string.noLoginWarn, dialogClickListener).show();
-	    }
-	});
+            public void onClick(View view)
+            {
+                DialogBuilder.yesNoDialog(LoginActivity.this, R.string.noLoginWarn, dialogClickListener).show();
+            }
+        });
     }
 }
