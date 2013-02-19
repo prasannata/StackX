@@ -229,8 +229,13 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             if (item.lastRun > 0)
                 viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
             else
-                viewHolder.lastRun.setText("Never");
-            viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount) + " times");
+                viewHolder.lastRun.setText("Last Ran Never");
+
+            if (item.runCount > 0)
+                viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount)
+                                + (item.runCount > 1 ? " times" : " time"));
+            else
+                viewHolder.ran.setText("Ran 0 times");
             return convertView;
         }
 
@@ -261,7 +266,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                 }
             });
-            
+
             if (toDeleteList.contains(item))
                 delCheckBox.setChecked(true);
             else

@@ -8,5 +8,6 @@
     android:paddingLeft="2dp"
     android:paddingRight="2dp"
     android:paddingTop="0.5dp"
+    android:textIsSelectable="false"
     android:textColor="@color/black"
-    android:textSize="11sp" />
+    android:textSize="12sp" />
