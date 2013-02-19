@@ -5,6 +5,12 @@
     android:background="@color/white"
     android:orientation="vertical" >
 
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        layout="@layout/empty_items"
+        android:visibility="gone" />
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="fill_parent"

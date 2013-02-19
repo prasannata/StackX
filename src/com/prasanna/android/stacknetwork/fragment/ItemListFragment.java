@@ -62,6 +62,8 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     protected ArrayList<T> items;
     protected ItemListAdapter<T> itemListAdapter;
 
+    private TextView emptyItemsTextView;
+
     protected abstract String getReceiverExtraName();
 
     protected abstract void startIntentService();
@@ -231,11 +233,17 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
             items.addAll(newItems);
             if (items.isEmpty())
             {
-                if (itemsContainer.findViewById(R.id.emptyStatus) == null)
-                    itemsContainer.addView(AppUtils.getEmptyItemsView(getActivity()));
+                if (emptyItemsTextView == null)
+                    emptyItemsTextView = (TextView) itemsContainer.findViewById(R.id.emptyStatus);
+
+                emptyItemsTextView.setVisibility(View.VISIBLE);
             }
             else
+            {
                 itemListAdapter.addAll(newItems);
+                if (emptyItemsTextView != null && View.VISIBLE == emptyItemsTextView.getVisibility())
+                    emptyItemsTextView.setVisibility(View.GONE);
+            }
         }
     }
 

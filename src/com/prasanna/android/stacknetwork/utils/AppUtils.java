@@ -118,9 +118,9 @@ public class AppUtils
         return errorLayout;
     }
 
-    public static View getEmptyItemsView(Context context)
+    public static TextView getEmptyItemsView(Context context)
     {
-        return LayoutInflater.from(context).inflate(R.layout.empty_items, null);
+        return (TextView) LayoutInflater.from(context).inflate(R.layout.empty_items, null);
     }
 
     public static String getStackXErrorMsg(HttpException e)
