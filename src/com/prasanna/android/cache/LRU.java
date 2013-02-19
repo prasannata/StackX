@@ -20,6 +20,7 @@
 package com.prasanna.android.cache;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class LRU<K, V> extends LinkedHashMap<K, V>
 {
@@ -33,7 +34,7 @@ public class LRU<K, V> extends LinkedHashMap<K, V>
     }
 
     @Override
-    protected boolean removeEldestEntry(Entry<K, V> eldest)
+    protected boolean removeEldestEntry(Map.Entry<K, V> eldest)
     {
         return size() > capacity;
     }
