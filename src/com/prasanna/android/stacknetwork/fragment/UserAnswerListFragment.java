@@ -36,8 +36,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
@@ -55,13 +53,23 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
 {
     private static final String TAG = UserAnswerListFragment.class.getSimpleName();
-    private int page = 1;
-    private Intent intent;
     private static final int ANSWER_PREVIEW_LEN = 200;
     private static final String ANS_CONTNUES = "...";
     private static final String MULTIPLE_NEW_LINES_AT_END = "[\\n]+$";
 
     private int position;
+    private int page = 1;
+    private Intent intent;
+
+    private static class ViewHolder
+    {
+        TextView itemTitle;
+        TextView answerScore;
+        TextView answerTime;
+        TextView answerBody;
+        ImageView acceptedAnswerCue;
+        ImageView itemContextMenu;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -168,7 +176,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     public void onResume()
     {
         Log.d(getLogTag(), "onResume");
-        
+
         super.onResume();
 
         if (itemListAdapter != null && itemListAdapter.getCount() == 0)
@@ -190,28 +198,31 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public View getView(final Answer answer, int position, View convertView, ViewGroup parent)
     {
-        LinearLayout answerRow = (LinearLayout) convertView;
+        ViewHolder viewHolder;
 
         if (convertView == null)
-            answerRow = (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
+        {
+            convertView = getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
+            viewHolder = new ViewHolder();
+            viewHolder.acceptedAnswerCue = (ImageView) convertView.findViewById(R.id.acceptedAnswer);
+            viewHolder.itemTitle = (TextView) convertView.findViewById(R.id.itemTitle);
+            viewHolder.answerScore = (TextView) convertView.findViewById(R.id.answerScore);
+            viewHolder.answerTime = (TextView) convertView.findViewById(R.id.answerTime);
+            viewHolder.answerBody = (TextView) convertView.findViewById(R.id.answerBodyPreview);
+            viewHolder.itemContextMenu = (ImageView) convertView.findViewById(R.id.itemContextMenu);
+            convertView.setTag(viewHolder);
+        }
+        else
+            viewHolder = (ViewHolder) convertView.getTag();
 
         if (answer.accepted)
-            answerRow.findViewById(R.id.acceptedAnswer).setVisibility(View.VISIBLE);
+            viewHolder.acceptedAnswerCue.setVisibility(View.VISIBLE);
+        else
+            viewHolder.acceptedAnswerCue.setVisibility(View.GONE);
 
-        TextView textView = (TextView) answerRow.findViewById(R.id.itemTitle);
-        RelativeLayout.LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
-        layoutParams.addRule(RelativeLayout.RIGHT_OF, 0);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        textView.setLayoutParams(layoutParams);
-        textView.setText(Html.fromHtml(answer.title));
-
-        textView = (TextView) answerRow.findViewById(R.id.answerScore);
-        textView.setText("Answer Score: " + answer.score);
-
-        textView = (TextView) answerRow.findViewById(R.id.answerTime);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
-
-        textView = (TextView) answerRow.findViewById(R.id.answerBodyPreview);
+        viewHolder.itemTitle.setText(Html.fromHtml(answer.title));
+        viewHolder.answerScore.setText("Answer Score: " + answer.score);
+        viewHolder.answerTime.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
 
         if (answer.body != null)
         {
@@ -220,14 +231,13 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             if (answerBody.length() > ANSWER_PREVIEW_LEN)
             {
                 answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
-                textView.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
+                viewHolder.answerBody.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
             }
             else
-                textView.setText(Html.fromHtml(answerBody));
+                viewHolder.answerBody.setText(Html.fromHtml(answerBody));
         }
 
-        ImageView imageView = (ImageView) answerRow.findViewById(R.id.itemContextMenu);
-        imageView.setOnClickListener(new View.OnClickListener()
+        viewHolder.itemContextMenu.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -235,7 +245,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
                 getActivity().openContextMenu(v);
             }
         });
-        return answerRow;
+        return convertView;
     }
 
     @Override
