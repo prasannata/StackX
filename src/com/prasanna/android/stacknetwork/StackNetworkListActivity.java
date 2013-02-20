@@ -87,7 +87,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         setupSiteListRefreshOption();
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
-        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, new ArrayList<Site>());
+        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>());
         siteListAdapter.setOnSiteSelectedListener(this);
         setListAdapter(siteListAdapter);
 
@@ -98,9 +98,8 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
         else
         {
-            progressDialog =
-                            ProgressDialog.show(StackNetworkListActivity.this, "",
-                                            getString(R.string.loadingSitesForAuthUser));
+            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
+                            getString(R.string.loadingSitesForAuthUser));
         }
 
         registerAccountUpdateBroadcastReceiver();

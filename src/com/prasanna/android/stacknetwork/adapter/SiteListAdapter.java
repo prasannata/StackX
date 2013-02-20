@@ -19,6 +19,7 @@
 
 package com.prasanna.android.stacknetwork.adapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -51,6 +52,11 @@ public class SiteListAdapter extends ArrayAdapter<Site>
     public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites)
     {
         super(context, textViewResourceId, sites);
+    }
+
+    public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> arrayList)
+    {
+        super(context, layoutResourceId, textViewResourceId, arrayList);
     }
 
     static class ViewHolder
