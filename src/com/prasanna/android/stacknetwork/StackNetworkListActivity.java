@@ -209,10 +209,10 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     {
         OperatingSite.setSite(site);
 
-        if (SharedPreferencesUtil.isSet(this, CHANGE_SITE_HINT, true))
+        if (SharedPreferencesUtil.isSet(getApplicationContext(), CHANGE_SITE_HINT, true))
         {
             Toast.makeText(this, "Use options menu to change site any time.", Toast.LENGTH_LONG).show();
-            SharedPreferencesUtil.setBoolean(this, CHANGE_SITE_HINT, false);
+            SharedPreferencesUtil.setBoolean(getApplicationContext(), CHANGE_SITE_HINT, false);
         }
 
         startMyProfileService();
