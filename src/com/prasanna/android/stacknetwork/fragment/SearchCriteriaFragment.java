@@ -29,6 +29,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.SQLException;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -314,32 +315,29 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         super.onCreate(savedInstanceState);
 
-        if (criteriaLayout == null)
-        {
-            criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
+        criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
 
-            searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
-            selectedTags = (LinearLayout) criteriaLayout.findViewById(R.id.selectedTags);
-            tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
-            includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
-            sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
-            runSearch = (ImageView) criteriaLayout.findViewById(R.id.runSearch);
-            newCriteria = (ImageView) criteriaLayout.findViewById(R.id.newCriteria);
-            loadCriteria = (ImageView) criteriaLayout.findViewById(R.id.loadCriteria);
-            clearCriteria = (ImageView) criteriaLayout.findViewById(R.id.clearCriteria);
-            toggleTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleTagged);
-            toggleNotTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleNotTagged);
+        searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
+        selectedTags = (LinearLayout) criteriaLayout.findViewById(R.id.selectedTags);
+        tagEditText = (AutoCompleteTextView) criteriaLayout.findViewById(R.id.tagEditText);
+        includeAnswers = (RadioGroup) criteriaLayout.findViewById(R.id.includeAnswers);
+        sortSpinner = (Spinner) criteriaLayout.findViewById(R.id.searchSortSpinner);
+        runSearch = (ImageView) criteriaLayout.findViewById(R.id.runSearch);
+        newCriteria = (ImageView) criteriaLayout.findViewById(R.id.newCriteria);
+        loadCriteria = (ImageView) criteriaLayout.findViewById(R.id.loadCriteria);
+        clearCriteria = (ImageView) criteriaLayout.findViewById(R.id.clearCriteria);
+        toggleTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleTagged);
+        toggleNotTagged = (ToggleButton) criteriaLayout.findViewById(R.id.toggleNotTagged);
 
-            tagEditText.addTextChangedListener(this);
-            tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
-            tagEditText.setAdapter(tagArrayAdapter);
+        tagEditText.addTextChangedListener(this);
+        tagArrayAdapter = new TagListAdapter(getActivity(), R.layout.tag_include_exclude, new ArrayList<String>());
+        tagEditText.setAdapter(tagArrayAdapter);
 
-            if (savedCriteria)
-                newCriteria.setVisibility(View.VISIBLE);
+        if (savedCriteria)
+            newCriteria.setVisibility(View.VISIBLE);
 
-            prepareToggedToggleButton(toggleTagged, toggleNotTagged, true);
-            prepareToggedToggleButton(toggleNotTagged, toggleTagged, false);
-        }
+        prepareToggedToggleButton(toggleTagged, toggleNotTagged, true);
+        prepareToggedToggleButton(toggleNotTagged, toggleTagged, false);
 
         return criteriaLayout;
     }
@@ -422,9 +420,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         if (findViewWithTag == null)
         {
-            LinearLayout.LayoutParams params =
-                            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                            LinearLayout.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(3, 0, 3, 0);
             currentRow.addView(tagTextView, params);
         }
@@ -437,12 +434,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         int maxWidth = getResources().getDisplayMetrics().widthPixels - 25;
 
-        LinearLayout currentRow =
-                        (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
-                                        + currentNumRowsOfSelectedTags);
-        LinearLayout.LayoutParams layoutParams =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout currentRow = (LinearLayout) selectedTags.findViewWithTag(SELECTED_TAGS_LL_PREFIX_TAG
+                        + currentNumRowsOfSelectedTags);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, 2, 0, 2);
 
         if (currentRow == null)
@@ -472,9 +467,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         LinearLayout rowLayout = new LinearLayout(context);
         rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams layoutParams =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.topMargin = topMargin;
         rowLayout.setLayoutParams(layoutParams);
         rowLayout.setTag(SELECTED_TAGS_LL_PREFIX_TAG + currentNumRowsOfSelectedTags);
@@ -528,8 +522,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         super.onActivityCreated(savedInstanceState);
 
         getActivity().getActionBar().setTitle(getActivity().getString(R.string.advanced_search));
-        ArrayList<String> sortOptionArray =
-                        new ArrayList<String>(Arrays.asList(getResources().getStringArray(R.array.searchSortArray)));
+        ArrayList<String> sortOptionArray = new ArrayList<String>(Arrays.asList(getResources().getStringArray(
+                        R.array.searchSortArray)));
         sortSpinner.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, sortOptionArray));
         prepareRunSearch();
         prepareNewCriteria();
@@ -556,11 +550,10 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
         if (searchCriteriaDomain.searchCriteria.isAnswered())
             ((RadioButton) includeAnswers.findViewById(R.id.isAnswered)).setChecked(true);
+        else if (searchCriteriaDomain.searchCriteria.getAnswerCount() > 0)
+            ((RadioButton) includeAnswers.findViewById(R.id.hasAnswers)).setChecked(true);
         else
-        {
-            if (searchCriteriaDomain.searchCriteria.getAnswerCount() > 0)
-                ((RadioButton) includeAnswers.findViewById(R.id.hasAnswers)).setChecked(true);
-        }
+            ((RadioButton) includeAnswers.findViewById(R.id.dontCareForAns)).setChecked(true);
 
         addTags(searchCriteriaDomain.searchCriteria.getTaggedArray(), R.color.lichen, taggedSet);
         addTags(searchCriteriaDomain.searchCriteria.getNotTaggedArray(), R.color.pulp, notTaggedSet);
@@ -597,11 +590,16 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
                 switch (includeAnswers.getCheckedRadioButtonId())
                 {
+                    case R.id.dontCareForAns:
+                        searchCriteriaDomain.searchCriteria.setMinAnswers(0);
+                        searchCriteriaDomain.searchCriteria.needNotBeAnswered();
+                        break;
                     case R.id.hasAnswers:
                         searchCriteriaDomain.searchCriteria.setMinAnswers(1);
                         searchCriteriaDomain.searchCriteria.needNotBeAnswered();
                         break;
                     case R.id.isAnswered:
+                        searchCriteriaDomain.searchCriteria.setMinAnswers(0);
                         searchCriteriaDomain.searchCriteria.mustBeAnswered();
                         break;
                     default:
@@ -675,6 +673,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                     taggedSet.clear();
                     notTaggedSet.clear();
                     selectedTags.setVisibility(View.GONE);
+                    ((RadioButton) includeAnswers.findViewById(R.id.dontCareForAns)).setChecked(true);
                 }
 
                 AppUtils.hideSoftInput(getActivity(), v);
@@ -757,9 +756,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
         saveAsDailogBuilder.setTitle("Save As");
 
         final EditText input = new EditText(getActivity());
-        LinearLayout.LayoutParams lp =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
         input.setLayoutParams(lp);
         saveAsDailogBuilder.setView(input);
 
@@ -769,9 +767,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 searchCriteriaDomain.name = input.getText().toString();
                 searchCriteriaDomain.site = OperatingSite.getSite().apiSiteParameter;
-                WriteCriteriaAsyncTaskCompletionNotifierWrapper wrapperNotifier =
-                                new WriteCriteriaAsyncTaskCompletionNotifierWrapper(WriteCriteriaAsyncTask.ACTION_ADD,
-                                                asyncTaskCompletionNotifier);
+                WriteCriteriaAsyncTaskCompletionNotifierWrapper wrapperNotifier = new WriteCriteriaAsyncTaskCompletionNotifierWrapper(
+                                WriteCriteriaAsyncTask.ACTION_ADD, asyncTaskCompletionNotifier);
                 new WriteCriteriaAsyncTask(getActivity(), searchCriteriaDomain, WriteCriteriaAsyncTask.ACTION_ADD,
                                 wrapperNotifier).execute();
             }
@@ -792,4 +789,17 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     {
         return searchCriteriaDomain != null ? searchCriteriaDomain.name : null;
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        if (includeAnswers != null)
+        {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                includeAnswers.setOrientation(RadioGroup.VERTICAL);
+            else
+                includeAnswers.setOrientation(RadioGroup.HORIZONTAL);
+        }
+    }
+
 }

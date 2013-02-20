@@ -119,6 +119,8 @@ public class SearchCriteria implements Serializable
     {
         if (minAns > 0)
             criteria.put(ANSWERS, String.valueOf(minAns));
+        else
+            criteria.remove(ANSWERS);
         return this;
     }
 

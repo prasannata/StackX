@@ -66,10 +66,11 @@
     <string name="ran">Ran</string>
     <string name="updated">Updated</string>
     <string name="nada">Nada</string>
+    <string name="dontCare">Don\'t care</string>
 
-    <!-- Sites updated  -->
+    <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>
-    
+
     <!-- Search filter options -->
     <string name="search_inTitle">Search in title</string>
     <string name="search_hasAnswers">Has Answers</string>
@@ -94,7 +95,6 @@
         <item>creation</item>
         <item>frequency</item>
     </string-array>
-    
     <string-array name="pref_refreshInterval_default_values">
         <item>0</item>
         <item>30</item>
