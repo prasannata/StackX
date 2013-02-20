@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -30,18 +30,11 @@ public class BitmapCache extends LruCache<String, Bitmap>
 
     private BitmapCache()
     {
-	super(CACHE_SIZE);
+        super(CACHE_SIZE);
     }
 
     public static BitmapCache getInstance()
     {
-	return INSTANCE;
+        return INSTANCE;
     }
-
-    @Override
-    public void add(String key, Bitmap value)
-    {
-	addWeak(key, value);
-    }
-
 }
