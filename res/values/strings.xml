@@ -67,6 +67,10 @@
     <string name="updated">Updated</string>
     <string name="nada">Nada</string>
     <string name="dontCare">Don\'t care</string>
+    <string name="lastRan">Last Ran</string>
+    <string name="never">Never</string>
+    <string name="time">time</string>
+    <string name="times">times</string>
 
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>

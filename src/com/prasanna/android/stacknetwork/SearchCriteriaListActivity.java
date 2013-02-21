@@ -227,16 +227,22 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             viewHolder.itemText.setText(item.name);
             viewHolder.itemDetails.setText(getDetailsText(item));
             if (item.lastRun > 0)
-                viewHolder.lastRun.setText("Last Ran " + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
+                viewHolder.lastRun.setText(getString(R.string.lastRan) + " "
+                                + DateTimeUtils.getElapsedDurationSince(item.lastRun / 1000));
             else
-                viewHolder.lastRun.setText("Last Ran Never");
+                viewHolder.lastRun.setText(getString(R.string.lastRan) + " " + getString(R.string.never));
 
             if (item.runCount > 0)
-                viewHolder.ran.setText("Ran " + AppUtils.formatNumber(item.runCount)
-                                + (item.runCount > 1 ? " times" : " time"));
+                viewHolder.ran.setText(getRanCountText(item));
             else
-                viewHolder.ran.setText("Ran 0 times");
+                viewHolder.ran.setText(getString(R.string.ran) + " " + getString(R.string.never));
             return convertView;
+        }
+
+        public String getRanCountText(SearchCriteriaDomain item)
+        {
+            return getString(R.string.ran) + " " + AppUtils.formatNumber(item.runCount) + " "
+                            + (item.runCount > 1 ? getString(R.string.times) : getString(R.string.time));
         }
 
         private void prepareDeleteCheckBox(CheckBox delCheckBox, final SearchCriteriaDomain item)
