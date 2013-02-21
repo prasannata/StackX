@@ -395,7 +395,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         sortOptionArray =
                         new ArrayList<String>(Arrays.asList(getResources().getStringArray(
                                         R.array.searchCriteriaSortArray)));
-        sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item, sortOptionArray));
+        sortSpinner.setAdapter(new ArrayAdapter<String>(this, R.layout.spinner_item_delft_bg, sortOptionArray));
         sortSpinner.setOnItemSelectedListener(new OnItemSelectedListener()
         {
             @Override
