@@ -131,8 +131,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
-
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         super.onCreate(savedInstanceState);
@@ -148,11 +146,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         setupViewPager();
 
         if (savedInstanceState != null && savedInstanceState.getSerializable(StringConstants.QUESTION) != null)
-        {
-            Log.d(TAG, "Restoring saved question from bundle");
-
             question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
-        }
         else
             prepareIntentAndStartService();
     }
@@ -240,7 +234,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(questionViewPageAdapter);
 
-        Log.d(TAG, "current number of pages " + questionViewPageAdapter.getCount());
         titlePageIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
         titlePageIndicator.setViewPager(viewPager);
         titlePageIndicator.setOnPageChangeListener(this);
@@ -285,8 +278,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onBackPressed()
     {
-        Log.d(TAG, "onBackPressed");
-
         if (commentFragment != null && commentFragment.isVisible())
             commentFragment.onBackPressed();
 
@@ -297,8 +288,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
-
         if (question != null)
             outState.putSerializable(StringConstants.QUESTION, question);
 
@@ -317,20 +306,16 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onPageScrollStateChanged(int arg0)
     {
-        Log.v(TAG, "onPageScrollStateChanged N/A");
     }
 
     @Override
     public void onPageScrolled(int arg0, float arg1, int arg2)
     {
-        Log.v(TAG, "onPageScrolled N/A");
     }
 
     @Override
     public void onPageSelected(int position)
     {
-        Log.d(TAG, "Selected page: " + position);
-
         int numAnswersDisplayed = questionViewPageAdapter.getCount() - 1;
 
         if (commentFragment != null && commentFragment.isVisible())
@@ -345,8 +330,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         {
             if (question.answers != null && question.answers.size() == numAnswersDisplayed && !serviceRunningForAnswers)
             {
-                Log.d(TAG, "Fetch next page of answers");
-
                 setProgressBarIndeterminateVisibility(true);
                 startServiceForAnswers();
             }
@@ -358,8 +341,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         if (postCommentFragment != null)
         {
             postCommentFragment.hideSoftKeyboard();
-
-            Log.d(TAG, "Adding  " + postCommentFragment.getTag());
 
             if (!finish)
                 commentsDraft.put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
@@ -380,8 +361,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private boolean onContextItemSelectedForQuestion(MenuItem item)
     {
-        Log.d(TAG, "onContextItemSelectedForQuestion");
-
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {
             Log.d(TAG, "Context item selected: " + item.getTitle());
@@ -410,8 +389,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
         else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
         {
-            Log.d(TAG, "Tag selected: " + item.getTitle());
-
             Intent questionsIntent = new Intent(this, QuestionsActivity.class);
             questionsIntent.setAction(StringConstants.TAG);
             questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
@@ -441,12 +418,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private boolean onContextItemSelectedForAnswer(MenuItem item, int answerPosition)
     {
-        Log.d(TAG, "onContextItemSelectedForAnswer");
-
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {
-            Log.d(TAG, "Context item selected: " + item.getTitle());
-
             Answer answer = question.answers.get(answerPosition);
 
             switch (item.getItemId())
@@ -486,7 +459,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        Log.d(TAG, "ResultReceiver resultCode: " + resultCode);
         switch (resultCode)
         {
             case QuestionDetailsIntentService.RESULT_CODE_Q_CACHED:
@@ -521,7 +493,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 handleError(resultData);
                 break;
             default:
-                Log.d(TAG, "Unknown result code in receiver: " + resultCode);
                 break;
         }
     }
@@ -531,7 +502,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         setProgressBarIndeterminateVisibility(false);
 
         HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
-        Log.d(TAG, e.getErrorResponse());
         int requestCode = resultData.getInt(StringConstants.REQUEST_CODE, -1);
 
         if (requestCode == WriteIntentService.ACTION_ADD_COMMENT)
@@ -556,8 +526,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private void startServiceForAnswers()
     {
-        Log.d(TAG, "Start service to get answers");
-
         intent = new Intent(this, QuestionDetailsIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.setAction(StringConstants.ANSWERS);
@@ -585,7 +553,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
         if (commentFragment == null)
         {
-            Log.d(TAG, "Creating comment fragment");
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
             commentFragment.setResultReceiver(resultReceiver);
