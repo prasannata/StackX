@@ -91,16 +91,15 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         siteListAdapter.setOnSiteSelectedListener(this);
         setListAdapter(siteListAdapter);
 
-        if (SharedPreferencesUtil.isSet(getApplicationContext(), StringConstants.SITES_INIT, false))
+        if (AppUtils.inAuthenticatedRealm(getApplicationContext()))
         {
-            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
+            progressDialog =
+                            ProgressDialog.show(StackNetworkListActivity.this, "",
+                                            getString(R.string.loadingSitesForAuthUser));
             startService(new Intent(getApplicationContext(), AccountSyncService.class));
         }
         else
-        {
-            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
-                            getString(R.string.loadingSitesForAuthUser));
-        }
+            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
 
         registerAccountUpdateBroadcastReceiver();
         startIntentService();

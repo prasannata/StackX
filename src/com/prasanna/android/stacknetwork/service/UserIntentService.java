@@ -355,7 +355,6 @@ public class UserIntentService extends AbstractIntentService
     {
         ArrayList<Site> sites = new ArrayList<Site>(linkSitesMap.values());
         DbRequestThreadExecutor.persistSites(getApplicationContext(), sites);
-        SharedPreferencesUtil.setBoolean(getApplicationContext(), StringConstants.SITES_INIT, true);
         return sites;
     }
 
