@@ -23,14 +23,10 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 
-import android.util.Log;
-
 import com.prasanna.android.cache.LRU;
 
 public class LruCache<K, T>
 {
-    private static final String TAG = LruCache.class.getSimpleName();
-
     private final int size;
     private final LRU<K, Reference<T>> lru;
 
@@ -43,19 +39,13 @@ public class LruCache<K, T>
     public void add(K key, T value)
     {
         if (key != null && value != null)
-        {
-            Log.d(TAG, "Adding " + key);
             lru.put(key, new SoftReference<T>(value));
-        }
     }
 
     public void addWeak(K key, T value)
     {
         if (key != null && value != null)
-        {
-            Log.d(TAG, "Adding " + key);
             lru.put(key, new WeakReference<T>(value));
-        }
     }
 
     public T get(K key)
@@ -64,7 +54,6 @@ public class LruCache<K, T>
 
         if (key != null && lru.containsKey(key))
         {
-            Log.d(TAG, "Get " + key);
             value = lru.get(key).get();
             if (value == null)
                 lru.remove(key);

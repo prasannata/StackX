@@ -30,7 +30,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +54,7 @@ import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentActi
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetImageAsyncTask;
+import com.prasanna.android.utils.LogWrapper;
 
 public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver
 {
@@ -84,7 +84,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
             finally
             {
@@ -97,8 +97,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
 
         userAccountListCursor = 0;
@@ -280,7 +278,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        Log.d(TAG, "onReceiveResult");
+        LogWrapper.d(TAG, "onReceiveResult");
 
         if (progressDialog != null)
             progressDialog.dismiss();

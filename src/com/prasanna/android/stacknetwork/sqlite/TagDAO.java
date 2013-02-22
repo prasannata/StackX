@@ -28,9 +28,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Tag;
+import com.prasanna.android.utils.LogWrapper;
 
 public class TagDAO extends AbstractBaseDao
 {
@@ -59,7 +59,7 @@ public class TagDAO extends AbstractBaseDao
     {
         if (site != null && tag != null)
         {
-            Log.d(TAG, "inserting " + tag + " into DB for site " + site);
+            LogWrapper.d(TAG, "inserting " + tag + " into DB for site " + site);
 
             ContentValues values = new ContentValues();
             values.put(TagsTable.COLUMN_VALUE, tag);
@@ -73,7 +73,7 @@ public class TagDAO extends AbstractBaseDao
     {
         if (tags != null && !tags.isEmpty())
         {
-            Log.d(TAG, "inserting tags into DB for site " + site);
+            LogWrapper.d(TAG, "inserting tags into DB for site " + site);
 
             try
             {
@@ -94,7 +94,7 @@ public class TagDAO extends AbstractBaseDao
             }
             catch (SQLException e)
             {
-                Log.d(TABLE_NAME, "insert failed: " + e.getMessage());
+                LogWrapper.e(TABLE_NAME, "insert failed: " + e.getMessage());
             }
             finally
             {
@@ -117,7 +117,7 @@ public class TagDAO extends AbstractBaseDao
         if (cursor == null)
             return null;
 
-        Log.d(TAG, "Tags retrieved from DB");
+        LogWrapper.d(TAG, "Tags retrieved from DB");
 
         LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
         getTagCollection(cursor, tags);
@@ -131,7 +131,7 @@ public class TagDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "Tags retrieved from DB");
+        LogWrapper.d(TAG, "Tags retrieved from DB");
 
         ArrayList<String> tags = new ArrayList<String>();
         getTagStringCollection(cursor, tags);
@@ -174,7 +174,7 @@ public class TagDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "Tags retrieved from DB");
+        LogWrapper.d(TAG, "Tags retrieved from DB");
 
         LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
         getTagCollection(cursor, tags);
@@ -219,7 +219,7 @@ public class TagDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -235,6 +235,10 @@ public class TagDAO extends AbstractBaseDao
         {
             tagDAO.open();
             tagDAO.deleteAll();
+        }
+        catch (SQLException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

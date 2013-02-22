@@ -25,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -51,6 +50,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
 {
@@ -68,14 +68,12 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         TextView views;
         TextView owner;
         ArrayList<TextView> tagViews;
-        public TextView answerCountAnswered;
+        TextView answerCountAnswered;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
-
         registerForContextMenu(getListView());
         super.onActivityCreated(savedInstanceState);
     }
@@ -83,12 +81,10 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
-        Log.d(TAG, "onContextItemSelected");
-
         Question question = itemListAdapter.getItem(position);
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {
-            Log.d(TAG, "Context item selected: " + item.getTitle());
+            LogWrapper.d(TAG, "Context item selected: " + item.getTitle());
             switch (item.getItemId())
             {
                 case R.id.q_ctx_menu_user_profile:
@@ -104,13 +100,13 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
                     emailQuestion(question.title, question.link);
                     return true;
                 default:
-                    Log.d(TAG, "Unknown item in context menu: " + item.getTitle());
+                    LogWrapper.d(TAG, "Unknown item in context menu: " + item.getTitle());
                     return false;
             }
         }
         else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
         {
-            Log.d(TAG, "Tag selected: " + item.getTitle());
+            LogWrapper.d(TAG, "Tag selected: " + item.getTitle());
             startTagQuestionsActivity((String) item.getTitle());
             return true;
         }
@@ -147,8 +143,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(TAG, "onCreateContextMenu");
-
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
@@ -187,8 +181,9 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         {
             holder = new QuestionViewHolder();
 
-            questionRowLayout = (LinearLayout) getActivity().getLayoutInflater().inflate(
-                            R.layout.question_snippet_layout, null);
+            questionRowLayout =
+                            (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.question_snippet_layout,
+                                            null);
             holder.tagsLayout = (LinearLayout) questionRowLayout.findViewById(R.id.questionSnippetTags);
 
             holder.score = (TextView) questionRowLayout.findViewById(R.id.score);
@@ -242,7 +237,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
         if (tagsParentLayout.getChildCount() > 0)
             tagsParentLayout.removeAllViews();
-        
+
         int maxWidth = getResources().getDisplayMetrics().widthPixels - 20;
 
         LinearLayout rowLayout = createNewRowForTags(0);
@@ -251,11 +246,12 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         {
             for (int i = 0; i < question.tags.length; i++)
             {
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams params =
+                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(3, 0, 3, 0);
-                TextView tagTextView = ((TextView) getActivity().getLayoutInflater()
-                                .inflate(R.layout.tags_layout, null));
+                TextView tagTextView =
+                                ((TextView) getActivity().getLayoutInflater().inflate(R.layout.tags_layout, null));
                 tagTextView.setText(question.tags[i]);
 
                 tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -279,8 +275,9 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     {
         LinearLayout rowLayout = new LinearLayout(getActivity());
         rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams layoutParams =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.topMargin = topMargin;
         rowLayout.setLayoutParams(layoutParams);
         return rowLayout;

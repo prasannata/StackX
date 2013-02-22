@@ -61,6 +61,7 @@ import com.prasanna.android.stacknetwork.FullscreenTextActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetImageAsyncTask;
+import com.prasanna.android.utils.LogWrapper;
 
 public class MarkdownFormatter
 {
@@ -234,7 +235,7 @@ public class MarkdownFormatter
                         }
                         else if (xmlPullParser.getName().equals(Tags.IMG))
                         {
-                            Log.v(TAG, "Ignore img tag");
+                            LogWrapper.v(TAG, "Ignore img tag");
                         }
                         else
                         {
@@ -274,11 +275,11 @@ public class MarkdownFormatter
             }
             catch (XmlPullParserException e)
             {
-                Log.e(TAG, "Error parsing: " + e);
+                LogWrapper.e(TAG, "Error parsing: " + e);
             }
             catch (IOException e)
             {
-                Log.e(TAG, "Error parsing: " + e);
+                LogWrapper.e(TAG, "Error parsing: " + e);
             }
             return views;
         }

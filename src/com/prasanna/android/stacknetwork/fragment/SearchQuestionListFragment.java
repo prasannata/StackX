@@ -3,7 +3,6 @@ package com.prasanna.android.stacknetwork.fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 
 import com.prasanna.android.stacknetwork.R;
@@ -15,7 +14,6 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class SearchQuestionListFragment extends QuestionListFragment
 {
-    private static final String TAG = SearchQuestionListFragment.class.getSimpleName();
     private Intent intent;
     private SearchCriteria searchCriteria;
     private Menu menu;
@@ -31,8 +29,6 @@ public class SearchQuestionListFragment extends QuestionListFragment
     @Override
     public void onPrepareOptionsMenu(Menu menu)
     {
-        Log.d(TAG, "onPrepareOptionsMenu");
-
         this.menu = menu;
         if (saved || !AppUtils.savedSearchesMaxed(getActivity()))
             menu.findItem(R.id.menu_save).setVisible(true);
@@ -63,8 +59,6 @@ public class SearchQuestionListFragment extends QuestionListFragment
 
     public void search(SearchCriteria searchCriteria, boolean saved)
     {
-        Log.d(TAG, "Running search criteria");
-
         if (searchCriteria != null)
         {
             this.saved = saved;

@@ -34,10 +34,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.Site;
+import com.prasanna.android.utils.LogWrapper;
 
 public class SharedPreferencesUtil
 {
@@ -206,11 +206,11 @@ public class SharedPreferencesUtil
                 }
                 catch (FileNotFoundException e)
                 {
-                    Log.e(TAG, e.getMessage());
+                    LogWrapper.e(TAG, e.getMessage());
                 }
                 catch (IOException e)
                 {
-                    Log.e(TAG, e.getMessage());
+                    LogWrapper.e(TAG, e.getMessage());
                 }
             }
         }
@@ -287,8 +287,6 @@ public class SharedPreferencesUtil
 
         if (file != null && file.exists() == true && file.isFile() == true)
         {
-            Log.d(TAG, "Fetch cached objects");
-
             try
             {
                 ObjectInputStream oi = new ObjectInputStream(new FileInputStream(file));
@@ -297,19 +295,19 @@ public class SharedPreferencesUtil
             }
             catch (StreamCorruptedException e)
             {
-                Log.e(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             catch (FileNotFoundException e)
             {
-                Log.e(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             catch (IOException e)
             {
-                Log.e(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             catch (ClassNotFoundException e)
             {
-                Log.e(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
         }
 
@@ -325,7 +323,7 @@ public class SharedPreferencesUtil
     {
         if (context != null)
         {
-            Log.d(TAG, "Clearing cache");
+            LogWrapper.d(TAG, "Clearing cache");
 
             File cacheDir = context.getCacheDir();
 

@@ -31,7 +31,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -49,8 +48,8 @@ import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
-import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
+import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -59,6 +58,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
+import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractUserActionBarActivity extends Activity
 {
@@ -123,8 +123,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        Log.d(TAG, "onCreateOptionsMenu");
-
         getMenuInflater().inflate(R.menu.action_menu, menu);
 
         if (shouldSearchViewBeEnabled())
@@ -155,7 +153,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void setupActionBarForAuthenticatedUser(Menu menu)
     {
-        Log.d(TAG, "In authenticated realm");
+        LogWrapper.d(TAG, "In authenticated realm");
 
         if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
         {

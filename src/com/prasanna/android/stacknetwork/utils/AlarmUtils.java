@@ -23,11 +23,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.LoginActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.receiver.InboxRefreshAlarmBroadcastReceiver;
+import com.prasanna.android.utils.LogWrapper;
 
 public class AlarmUtils
 {
@@ -39,13 +39,13 @@ public class AlarmUtils
 
         if (interval == 0)
         {
-            Log.d(TAG, "Inbox refreshing set to manual");
+            LogWrapper.d(TAG, "Inbox refreshing set to manual");
 
             cancelInboxRefreshAlarm(context);
         }
         else
         {
-            Log.d(TAG, "Inbox refreshing set to " + interval + " minutes");
+            LogWrapper.d(TAG, "Inbox refreshing set to " + interval + " minutes");
 
             interval = interval * 60 * 1000;
             createRepeatingAlarm(LoginActivity.getAppContext(), InboxRefreshAlarmBroadcastReceiver.class, interval, 0);
@@ -54,7 +54,7 @@ public class AlarmUtils
 
     public static void cancelInboxRefreshAlarm(Context context)
     {
-        Log.d(TAG, "Cancel inbox refresh alarm");
+        LogWrapper.d(TAG, "Cancel inbox refresh alarm");
         cancelAlarm(context, InboxRefreshAlarmBroadcastReceiver.class, 0);
     }
 

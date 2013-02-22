@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 
 import android.content.Context;
 import android.database.SQLException;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
@@ -40,6 +39,7 @@ import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
+import com.prasanna.android.utils.LogWrapper;
 
 public class DbRequestThreadExecutor
 {
@@ -100,7 +100,7 @@ public class DbRequestThreadExecutor
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -141,7 +141,6 @@ public class DbRequestThreadExecutor
                                 context, site);
                 if (criteriaForCustomTabs != null)
                 {
-                    Log.d(TAG, "custom tabs found");
                     HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
                     for (SearchCriteriaDomain searchCriteriaDomain : criteriaForCustomTabs)
                         searchCriterias.put(searchCriteriaDomain.name, searchCriteriaDomain.searchCriteria);
@@ -159,11 +158,11 @@ public class DbRequestThreadExecutor
         }
         catch (InterruptedException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (ExecutionException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
 
         return null;

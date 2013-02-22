@@ -25,11 +25,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
+import com.prasanna.android.utils.LogWrapper;
 
 public class SearchCriteriaDAO extends AbstractBaseDao
 {
@@ -146,7 +146,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
             }
             catch (SQLException e)
             {
-                Log.d(TABLE_NAME, "Update failed: " + e.getMessage());
+                LogWrapper.e(TABLE_NAME, "Update failed: " + e.getMessage());
             }
             finally
             {
@@ -326,7 +326,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -345,7 +345,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -365,7 +365,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -386,7 +386,7 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

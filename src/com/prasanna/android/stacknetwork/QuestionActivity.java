@@ -31,7 +31,6 @@ import android.os.Handler;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,6 +58,7 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
+import com.prasanna.android.utils.LogWrapper;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
@@ -163,23 +163,19 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         boolean ret = super.onPrepareOptionsMenu(menu);
 
         if (menu != null)
-        {
-            menu.removeItem(R.id.menu_search);
             enableAddCommentIfPermitted(menu);
-        }
 
         return ret;
     }
 
     private void enableAddCommentIfPermitted(Menu menu)
     {
-        boolean canAddComment = WritePermissionUtil.canAdd(getApplicationContext(),
-                        OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
+        boolean canAddComment =
+                        WritePermissionUtil.canAdd(getApplicationContext(), OperatingSite.getSite().apiSiteParameter,
+                                        ObjectType.COMMENT);
 
         if (AppUtils.inAuthenticatedRealm(this) && canAddComment)
-        {
             setupAddComment(menu);
-        }
     }
 
     private void setupAddComment(Menu menu)
@@ -363,12 +359,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {
-            Log.d(TAG, "Context item selected: " + item.getTitle());
+            LogWrapper.d(TAG, "Context item selected: " + item.getTitle());
 
             switch (item.getItemId())
             {
                 case R.id.q_ctx_comments:
-                    displayQuestionComments();
+                    displayComments(question.id, question.comments);
                     return true;
                 case R.id.q_ctx_similar:
                     startSimilarQuestionsActivity();
@@ -383,7 +379,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                     emailQuestion();
                     return true;
                 default:
-                    Log.d(TAG, "Unknown item selected: " + item.getTitle());
+                    LogWrapper.d(TAG, "Unknown item selected: " + item.getTitle());
                     return false;
             }
         }
@@ -425,13 +421,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             switch (item.getItemId())
             {
                 case R.id.q_ctx_comments:
-                    displayAnswerComments(answer);
+                    displayComments(answer.id, answer.comments);
                     return true;
                 case R.id.q_ctx_menu_user_profile:
                     viewUserProfile(answer.owner.id);
                     return true;
                 default:
-                    Log.d(TAG, "Unknown item selected: " + item.getTitle());
+                    LogWrapper.d(TAG, "Unknown item selected: " + item.getTitle());
                     return false;
             }
         }
@@ -439,18 +435,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         return false;
     }
 
-    private void displayQuestionComments()
+    private void displayComments(long postId, ArrayList<Comment> comments)
     {
-        if (question.comments != null && !question.comments.isEmpty())
-            displayCommentFragment(question.id + "-" + StringConstants.COMMENTS, question.comments);
-        else
-            Toast.makeText(this, "No comments for question", Toast.LENGTH_SHORT).show();
-    }
-
-    private void displayAnswerComments(Answer answer)
-    {
-        if (answer.comments != null && !answer.comments.isEmpty())
-            displayCommentFragment(answer.id + "-" + StringConstants.COMMENTS, answer.comments);
+        if (comments != null && !comments.isEmpty())
+            displayCommentFragment(postId + "-" + StringConstants.COMMENTS, comments);
         else
             Toast.makeText(this, "No comments for answer", Toast.LENGTH_SHORT).show();
     }
@@ -556,12 +544,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment = new CommentFragment();
             commentFragment.setComments(comments);
             commentFragment.setResultReceiver(resultReceiver);
-            
-            String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
-                            + viewPager.getCurrentItem();
 
-            OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
-                            .findFragmentByTag(currentViewPagerFragmentTag);
+            String currentViewPagerFragmentTag =
+                            "android:switcher:" + R.id.viewPager + ":" + viewPager.getCurrentItem();
+
+            OnCommentChangeListener onCommentChangeListener =
+                            (OnCommentChangeListener) getFragmentManager().findFragmentByTag(
+                                            currentViewPagerFragmentTag);
 
             if (onCommentChangeListener != null)
                 commentFragment.setOnCommentChangeListener(onCommentChangeListener);

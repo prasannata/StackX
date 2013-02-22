@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -52,6 +51,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.HtmlTextView;
 
 public class AnswerFragment extends Fragment implements OnCommentChangeListener
@@ -93,8 +93,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         registerForContextMenu(answerCtxMenuImageView);
@@ -103,7 +101,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onResume");
+        LogWrapper.d(TAG, "onResume");
 
         super.onResume();
 
@@ -113,7 +111,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
+        LogWrapper.d(TAG, "onSaveInstanceState");
 
         if (answer != null)
             outState.putSerializable(StringConstants.ANSWER, answer);
@@ -124,8 +122,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(TAG, "onCreateContextMenu");
-
         super.onCreateContextMenu(menu, v, menuInfo);
 
         MenuInflater inflater = getActivity().getMenuInflater();
@@ -280,14 +276,14 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     {
         if (answer.comments != null)
         {
-            Log.d(TAG, "Removing comment: " + comment.id);
+            LogWrapper.d(TAG, "Removing comment: " + comment.id);
 
             Iterator<Comment> iterator = answer.comments.iterator();
             while (iterator.hasNext())
             {
                 if (iterator.next().id == comment.id)
                 {
-                    Log.d(TAG, "comment " + comment.id + " removed");
+                    LogWrapper.d(TAG, "comment " + comment.id + " removed");
                     removeQuestionFromCache();
                     break;
                 }
@@ -300,14 +296,14 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     {
         if (answer.comments != null)
         {
-            Log.d(TAG, "Removing comment: " + commentId);
+            LogWrapper.d(TAG, "Removing comment: " + commentId);
 
             Iterator<Comment> iterator = answer.comments.iterator();
             while (iterator.hasNext())
             {
                 if (iterator.next().id == commentId)
                 {
-                    Log.d(TAG, "comment " + commentId + " removed");
+                    LogWrapper.d(TAG, "comment " + commentId + " removed");
                     removeQuestionFromCache();
                     break;
                 }

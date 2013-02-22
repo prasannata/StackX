@@ -45,6 +45,7 @@ import com.prasanna.android.stacknetwork.service.PostIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver
 {
@@ -59,8 +60,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
-
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 
         super.onCreate(savedInstanceState);
@@ -128,8 +127,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(TAG, "onCreateContextMenu");
-
         super.onCreateContextMenu(menu, v, menuInfo);
 
         getMenuInflater().inflate(R.menu.question_context_menu, menu);
@@ -190,7 +187,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        Log.d(TAG, "ResultReceiver invoked for " + resultCode);
+        LogWrapper.d(TAG, "ResultReceiver invoked for " + resultCode);
 
         if (resultCode == PostIntentService.GET_POST)
         {
@@ -208,7 +205,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
     private void showPostDetail(StackXItem stackXItem)
     {
-        Log.d(TAG, "Showing post " + stackXItem.id);
+        LogWrapper.d(TAG, "Showing post " + stackXItem.id);
 
         setProgressBarIndeterminateVisibility(false);
 

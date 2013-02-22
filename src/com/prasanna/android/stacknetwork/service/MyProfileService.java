@@ -24,7 +24,6 @@ import android.database.SQLException;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
@@ -33,6 +32,7 @@ import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class MyProfileService extends AbstractStackxService
 {
@@ -62,7 +62,7 @@ public class MyProfileService extends AbstractStackxService
 
                 if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR)
                 {
-                    Log.d(TAG, "Get my profile");
+                    LogWrapper.d(TAG, "Get my profile");
                     StackXPage<User> userPage = UserServiceHelper.getInstance().getMe();
                     if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
                     {
@@ -73,12 +73,12 @@ public class MyProfileService extends AbstractStackxService
                 }
                 else
                 {
-                    Log.d(TAG, "Profile fetched less than an hour ago. Using it");
+                    LogWrapper.d(TAG, "Profile fetched less than an hour ago. Using it");
                 }
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
             finally
             {

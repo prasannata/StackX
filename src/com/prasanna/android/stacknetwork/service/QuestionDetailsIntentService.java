@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -34,6 +33,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionDetailsIntentService extends AbstractIntentService
 {
@@ -60,7 +60,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        Log.d(TAG, "Action: " + intent.getAction());
+        LogWrapper.d(TAG, "Action: " + intent.getAction());
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
         try
@@ -117,7 +117,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
         if (question != null)
         {
-            Log.d(TAG, "Question " + questionId + " recovered from cache.");
+            LogWrapper.d(TAG, "Question " + questionId + " recovered from cache.");
             sendSerializable(receiver, RESULT_CODE_Q_CACHED, StringConstants.QUESTION, question);
         }
         else
@@ -129,7 +129,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
             }
             else
             {
-                Log.d(TAG, "Get question for " + questionId + " in " + site);
+                LogWrapper.d(TAG, "Get question for " + questionId + " in " + site);
                 question = getQuestionMetaAndBodyAndSend(site, receiver, questionId);
             }
 

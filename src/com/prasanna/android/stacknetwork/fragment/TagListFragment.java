@@ -28,7 +28,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
@@ -51,6 +50,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetTagsAsyncTask;
+import com.prasanna.android.utils.LogWrapper;
 
 public class TagListFragment extends ListFragment
 {
@@ -104,7 +104,7 @@ public class TagListFragment extends ListFragment
         @Override
         protected FilterResults performFiltering(CharSequence constraint)
         {
-            Log.d(TAG, "performFiltering");
+            LogWrapper.d(TAG, "performFiltering");
 
             FilterResults result = new FilterResults();
 
@@ -202,8 +202,6 @@ public class TagListFragment extends ListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
-
         if (parentLayout == null)
         {
             parentLayout = (LinearLayout) inflater.inflate(R.layout.list_view_with_search, null);
@@ -274,8 +272,6 @@ public class TagListFragment extends ListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         if (!activityCreated)
@@ -293,7 +289,7 @@ public class TagListFragment extends ListFragment
 
     private void runGetTagsTask()
     {
-        Log.d(TAG, "Running get tags task");
+        LogWrapper.d(TAG, "Running get tags task");
 
         getProgressBar().setVisibility(View.VISIBLE);
 
@@ -306,7 +302,7 @@ public class TagListFragment extends ListFragment
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onResume");
+        LogWrapper.d(TAG, "onResume");
 
         super.onResume();
 
@@ -327,7 +323,7 @@ public class TagListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        Log.d(TAG, "Position clicked : " + position + ", total = " + listAdapter.getCount());
+        LogWrapper.d(TAG, "Position clicked : " + position + ", total = " + listAdapter.getCount());
 
         AppUtils.hideSoftInput(getActivity(), v);
         

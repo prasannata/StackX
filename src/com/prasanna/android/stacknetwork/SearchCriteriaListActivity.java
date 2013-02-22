@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -56,6 +55,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.utils.LogWrapper;
 
 public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
 {
@@ -499,8 +499,6 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onResume");
-
         super.onResume();
 
         if (searchCriteriaArrayAdapter == null || searchCriteriaArrayAdapter.getCount() == 0)
@@ -517,7 +515,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             @Override
             public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result)
             {
-                Log.d(TAG, "Saved searches read from DB");
+                LogWrapper.d(TAG, "Saved searches read from DB");
                 searchCriteriaArrayAdapter.notifyDataSetInvalidated();
                 savedSearchList.clear();
                 searchCriteriaArrayAdapter.clear();

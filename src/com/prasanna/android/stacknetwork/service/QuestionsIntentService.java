@@ -23,11 +23,11 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionsIntentService extends AbstractIntentService
 {
@@ -68,32 +68,32 @@ public class QuestionsIntentService extends AbstractIntentService
             switch (action)
             {
                 case GET_FRONT_PAGE:
-                    Log.d(TAG, "Get front page");
+                    LogWrapper.d(TAG, "Get front page");
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.getAllQuestions(sort, page));
                     break;
                 case GET_FAQ_FOR_TAG:
                     String tag = intent.getStringExtra(StringConstants.TAG);
-                    Log.d(TAG, "Get FAQ for " + tag);
+                    LogWrapper.d(TAG, "Get FAQ for " + tag);
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.getFaqForTag(tag, page));
                     break;
                 case GET_RELATED:
-                    Log.d(TAG, "Get related questions");
+                    LogWrapper.d(TAG, "Get related questions");
                     getRelatedQuestions(intent, page, bundle);
                     break;
                 case GET_QUESTIONS_FOR_TAG:
                     String seachTagged = intent.getStringExtra(StringConstants.TAG);
-                    Log.d(TAG, "Get questions for " + seachTagged);
+                    LogWrapper.d(TAG, "Get questions for " + seachTagged);
                     bundle.putSerializable(StringConstants.QUESTIONS,
                                     questionService.getQuestionsForTag(seachTagged, sort, page));
                     break;
                 case GET_SIMILAR:
                     String title = intent.getStringExtra(StringConstants.TITLE);
-                    Log.d(TAG, "Get questions similar to " + title);
+                    LogWrapper.d(TAG, "Get questions similar to " + title);
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.getSimilar(title, page));
                     break;
                 case SEARCH:
                     String query = intent.getStringExtra(SearchManager.QUERY);
-                    Log.d(TAG, "Received search query: " + query);
+                    LogWrapper.d(TAG, "Received search query: " + query);
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.search(query, page));
                     break;
                 case SEARCH_ADVANCED:
@@ -103,7 +103,7 @@ public class QuestionsIntentService extends AbstractIntentService
                     break;
 
                 default:
-                    Log.e(TAG, "Unknown action: " + action);
+                    LogWrapper.d(TAG, "Unknown action: " + action);
                     break;
             }
 

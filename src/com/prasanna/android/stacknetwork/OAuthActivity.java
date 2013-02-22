@@ -27,7 +27,6 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.net.http.SslError;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
@@ -39,6 +38,7 @@ import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class OAuthActivity extends Activity
 {
@@ -61,7 +61,7 @@ public class OAuthActivity extends Activity
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url)
         {
-            Log.d(TAG, url);
+            LogWrapper.d(TAG, url);
 
             if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
             {
@@ -82,8 +82,6 @@ public class OAuthActivity extends Activity
         @Override
         public void onPageFinished(WebView view, String url)
         {
-            Log.d(TAG, "onPageFinished: " + url);
-
             if (oauthUrl != null && url.startsWith(StackUri.OAUTH_DIALOG_URL) && progressDialog != null)
             {
                 progressDialog.dismiss();
@@ -97,9 +95,7 @@ public class OAuthActivity extends Activity
                  * good.
                  */
                 if (url.startsWith(YAHOO_LOGIN_URL))
-                {
                     view.getSettings().setUseWideViewPort(true);
-                }
             }
             super.onPageFinished(view, url);
         }

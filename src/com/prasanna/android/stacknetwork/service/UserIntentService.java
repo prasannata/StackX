@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Account;
@@ -46,6 +45,7 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class UserIntentService extends AbstractIntentService
 {
@@ -89,19 +89,19 @@ public class UserIntentService extends AbstractIntentService
             switch (action)
             {
                 case GET_USER_PROFILE:
-                    Log.d(TAG, "getUserDetail");
+                    LogWrapper.d(TAG, "getUserDetail");
                     boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
                     bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, refresh, page));
                     bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userId));
                     receiver.send(GET_USER_PROFILE, bundle);
                     break;
                 case GET_USER_QUESTIONS:
-                    Log.d(TAG, "getQuestions");
+                    LogWrapper.d(TAG, "getQuestions");
                     bundle.putSerializable(StringConstants.QUESTIONS, getQuestions(me, userId, page));
                     receiver.send(GET_USER_QUESTIONS, bundle);
                     break;
                 case GET_USER_ANSWERS:
-                    Log.d(TAG, "getAnswers");
+                    LogWrapper.d(TAG, "getAnswers");
                     bundle.putSerializable(StringConstants.ANSWERS, getAnswers(me, userId, page));
                     receiver.send(GET_USER_ANSWERS, bundle);
                     break;
@@ -118,7 +118,7 @@ public class UserIntentService extends AbstractIntentService
                     receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
-                    Log.d(TAG, "getQuestions");
+                    LogWrapper.d(TAG, "getQuestions");
                     bundle.putSerializable(StringConstants.QUESTIONS, getFavorites(me, userId, page));
                     receiver.send(GET_USER_FAVORITES, bundle);
                     break;
@@ -126,7 +126,7 @@ public class UserIntentService extends AbstractIntentService
                     deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));
                     break;
                 default:
-                    Log.e(TAG, "Unknown action: " + action);
+                    LogWrapper.e(TAG, "Unknown action: " + action);
                     break;
             }
 
@@ -171,7 +171,7 @@ public class UserIntentService extends AbstractIntentService
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
             finally
             {
@@ -200,7 +200,7 @@ public class UserIntentService extends AbstractIntentService
 
     private HashMap<String, Account> getMyAccounts()
     {
-        Log.d(TAG, "getMyAccounts");
+        LogWrapper.d(TAG, "getMyAccounts");
 
         UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
         try
@@ -228,7 +228,7 @@ public class UserIntentService extends AbstractIntentService
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.d(TAG, e.getMessage());
         }
         finally
         {
@@ -261,7 +261,7 @@ public class UserIntentService extends AbstractIntentService
 
         if (pageObj != null && pageObj != null && !pageObj.items.isEmpty())
         {
-            Log.d(TAG, "New unread inbox items found. Notifying reeiver");
+            LogWrapper.d(TAG, "New unread inbox items found. Notifying reeiver");
             totalNewMsgs += pageObj.items.size();
             broadcastUnreadItemsCount(totalNewMsgs, pageObj);
         }
@@ -282,7 +282,7 @@ public class UserIntentService extends AbstractIntentService
 
         if (sites != null)
         {
-            Log.d(TAG, "Returning site list from DB");
+            LogWrapper.d(TAG, "Returning site list from DB");
             return sites;
         }
 
@@ -302,7 +302,7 @@ public class UserIntentService extends AbstractIntentService
             {
                 currentAccountId = linkAccountsMap.values().iterator().next().id;
 
-                Log.d(TAG, "Setting account id in shared preferences: " + currentAccountId);
+                LogWrapper.d(TAG, "Setting account id in shared preferences: " + currentAccountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, currentAccountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNTS_LAST_UPDATED,
                                 System.currentTimeMillis());
@@ -313,7 +313,7 @@ public class UserIntentService extends AbstractIntentService
             {
                 if (linkSitesMap.containsKey(siteUrl))
                 {
-                    Log.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
+                    LogWrapper.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
 
                     Site site = linkSitesMap.get(siteUrl);
                     site.userType = linkAccountsMap.get(siteUrl).userType;
@@ -341,7 +341,7 @@ public class UserIntentService extends AbstractIntentService
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

@@ -22,11 +22,11 @@ package com.prasanna.android.stacknetwork.service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class WriteIntentService extends AbstractIntentService
 {
@@ -71,7 +71,7 @@ public class WriteIntentService extends AbstractIntentService
                     deleteComment(commentId, receiver);
                     break;
                 default:
-                    Log.d(TAG, "Unknown action: " + action);
+                    LogWrapper.d(TAG, "Unknown action: " + action);
                     break;
             }
         }

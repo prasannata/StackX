@@ -41,6 +41,7 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractBaseServiceHelper
 {
@@ -131,7 +132,7 @@ public abstract class AbstractBaseServiceHelper
                     }
                     catch (JSONException e)
                     {
-                        Log.d(getLogTag(), e.getMessage());
+                        LogWrapper.d(getLogTag(), e.getMessage());
                     }
                 }
             }

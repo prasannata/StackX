@@ -27,8 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -39,8 +37,9 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.StackUri.Order;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionServiceHelper extends AbstractBaseServiceHelper
 {
@@ -91,7 +90,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
         return answers;
@@ -170,7 +169,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -219,7 +218,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
         return commentsPage;
@@ -285,7 +284,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 

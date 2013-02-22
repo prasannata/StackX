@@ -24,14 +24,13 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.util.Log;
-
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Post;
 import com.prasanna.android.stacknetwork.model.Post.PostType;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.utils.LogWrapper;
 
 public class PostServiceHelper extends AbstractBaseServiceHelper
 {
@@ -88,7 +87,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
 
         }
@@ -129,7 +128,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
 
         }
@@ -171,7 +170,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
 
         }

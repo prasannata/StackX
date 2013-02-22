@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 import com.prasanna.android.stacknetwork.model.Account;
@@ -43,6 +42,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DbRequestThreadExecutor;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class AccountSyncService extends AbstractStackxService
 {
@@ -86,14 +86,14 @@ public class AccountSyncService extends AbstractStackxService
             boolean accountsModified = false;
             boolean accountsDeleted = false;
 
-            Log.d(TAG, "Syncing user accounts");
+            LogWrapper.d(TAG, "Syncing user accounts");
 
             long accountId = SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L);
             HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getAccounts(1);
             ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
             if (existingAccounts == null)
             {
-                Log.d(TAG, "User with no accounts has accounts");
+                LogWrapper.d(TAG, "User with no accounts has accounts");
                 addNewAccounts(sites, retrievedAccounts);
                 accountsAdded = true;
             }
@@ -131,7 +131,7 @@ public class AccountSyncService extends AbstractStackxService
             {
                 for (Account account : existingAccounts)
                 {
-                    Log.d(TAG, "Checking for change in write permission for " + account.siteUrl);
+                    LogWrapper.d(TAG, "Checking for change in write permission for " + account.siteUrl);
                     Site site = sites.get(account.siteUrl);
                     if (site != null && site.apiSiteParameter != null)
                         permissionsUpdated = getAndPersistWritePermissions(site);
@@ -152,14 +152,14 @@ public class AccountSyncService extends AbstractStackxService
 
                 if (retrievedAccounts.containsKey(existingAccount.siteUrl))
                 {
-                    Log.d(TAG, "Existing account: " + existingAccount.siteName);
+                    LogWrapper.d(TAG, "Existing account: " + existingAccount.siteName);
                     existingAccountIter.remove();
                 }
             }
 
             if (existingAccounts.size() > 0 && existingAccountsSize != existingAccounts.size())
             {
-                Log.d(TAG, "Removing accounts from DB");
+                LogWrapper.d(TAG, "Removing accounts from DB");
                 removeAccounts(existingAccounts);
                 return true;
             }
@@ -188,7 +188,7 @@ public class AccountSyncService extends AbstractStackxService
             {
                 for (String key : retrievedAccounts.keySet())
                 {
-                    Log.d(TAG, "New account : " + key);
+                    LogWrapper.d(TAG, "New account : " + key);
                     if (newAccounts == null)
                         newAccounts = new ArrayList<Account>();
 
@@ -227,7 +227,7 @@ public class AccountSyncService extends AbstractStackxService
                                 site.apiSiteParameter);
                 if (existingPermissions == null)
                 {
-                    Log.d(TAG, "Getting write permissions for " + site.apiSiteParameter);
+                    LogWrapper.d(TAG, "Getting write permissions for " + site.apiSiteParameter);
                     DbRequestThreadExecutor.persistPermissionsInCurrentThread(context, site, writePermissions);
                     return true;
                 }
@@ -253,7 +253,7 @@ public class AccountSyncService extends AbstractStackxService
 
                     if (updated)
                     {
-                        Log.d(TAG, "Updating write permission for " + writePermission.objectType + " for "
+                        LogWrapper.d(TAG, "Updating write permission for " + writePermission.objectType + " for "
                                         + site.apiSiteParameter);
                         WritePermissionDAO.update(context, existingPermission.id, site, writePermission);
                     }

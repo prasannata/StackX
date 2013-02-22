@@ -5,9 +5,8 @@ import java.io.Serializable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class StackXError implements Serializable
 {
@@ -36,7 +35,7 @@ public class StackXError implements Serializable
         }
         catch (JSONException e)
         {
-            Log.e(TAG, "Json parsing failed: " + e.getMessage());
+            LogWrapper.e(TAG, "Json parsing failed: " + e.getMessage());
         }
         
         return null;

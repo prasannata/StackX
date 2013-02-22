@@ -23,7 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
+import com.prasanna.android.utils.LogWrapper;
 
 public class JSONObjectWrapper
 {
@@ -59,7 +59,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -77,7 +77,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -96,7 +96,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -113,7 +113,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -137,7 +137,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -156,7 +156,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
 
@@ -174,7 +174,7 @@ public class JSONObjectWrapper
             }
             catch (JSONException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
         }
         return value;

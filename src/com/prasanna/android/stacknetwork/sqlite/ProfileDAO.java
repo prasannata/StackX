@@ -26,9 +26,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.utils.LogWrapper;
 
 public class ProfileDAO extends AbstractBaseDao
 {
@@ -80,7 +80,7 @@ public class ProfileDAO extends AbstractBaseDao
     {
         if (site != null && user != null)
         {
-            Log.d(TAG, "Inserting user " + user.id + " to db");
+            LogWrapper.d(TAG, "Inserting user " + user.id + " to db");
 
             ContentValues values = new ContentValues();
             values.put(ProfileTable.COLUMN_ID, user.id);
@@ -144,7 +144,7 @@ public class ProfileDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "Me retrieved from DB");
+        LogWrapper.d(TAG, "Me retrieved from DB");
 
         return getUser(cursor);
     }
@@ -159,7 +159,7 @@ public class ProfileDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "User retrieved from DB");
+        LogWrapper.d(TAG, "User retrieved from DB");
 
         return getUser(cursor);
     }

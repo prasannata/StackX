@@ -25,7 +25,6 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +40,7 @@ import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionListFragment extends AbstractQuestionListFragment
 {
@@ -82,10 +82,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     {
         QuestionListFragment newFragment = QuestionsActivity.getFragment(fragmentTag);
         if (newFragment == null)
-        {
-            Log.d(TAG, "Creating new fragment: " + fragmentTag);
             newFragment = new QuestionListFragment();
-        }
         return newFragment;
     }
 
@@ -101,8 +98,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
-
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
@@ -121,7 +116,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
+        LogWrapper.d(TAG, "onActivityCreated");
 
         super.onActivityCreated(savedInstanceState);
 
@@ -140,7 +135,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
+        LogWrapper.d(TAG, "onSaveInstanceState");
 
         outState.putInt(StringConstants.ACTION, action);
 
@@ -175,7 +170,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                         startSearchIntentService();
                     break;
                 default:
-                    Log.d(TAG, "Unknown action: " + action);
+                    LogWrapper.d(TAG, "Unknown action: " + action);
                     break;
             }
 
@@ -183,11 +178,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         }
         else
         {
-            Log.d(TAG, "Fragment " + tag + " was already created. Restoring");
+            LogWrapper.d(TAG, "Fragment " + tag + " was already created. Restoring");
 
             if (itemListAdapter != null)
             {
-                Log.d(TAG, "Notifying item list adapter");
+                LogWrapper.d(TAG, "Notifying item list adapter");
 
                 itemListAdapter.notifyDataSetChanged();
                 itemListAdapter.notifyDataSetInvalidated();

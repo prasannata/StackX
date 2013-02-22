@@ -32,6 +32,7 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
+import com.prasanna.android.utils.LogWrapper;
 
 public class WritePermissionDAO extends AbstractBaseDao
 {
@@ -66,7 +67,7 @@ public class WritePermissionDAO extends AbstractBaseDao
     {
         if (site != null && permissions != null)
         {
-            Log.d(TAG, "Storing permissions");
+            LogWrapper.d(TAG, "Storing permissions");
 
             database.beginTransaction();
             try
@@ -75,7 +76,7 @@ public class WritePermissionDAO extends AbstractBaseDao
                 {
                     if (permission.objectType != null)
                     {
-                        Log.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: "
+                        LogWrapper.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: "
                                         + permission.canEdit + ", delete: " + permission.canDelete);
                         database.insert(TABLE_NAME, null, getContentValues(site, permission));
                     }
@@ -134,7 +135,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "Permission retrieved from DB");
+        LogWrapper.d(TAG, "Permission retrieved from DB");
 
         return getPermission(cursor);
     }
@@ -172,7 +173,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        Log.d(TAG, "Permissions retrieved from DB for " + site);
+        LogWrapper.d(TAG, "Permissions retrieved from DB for " + site);
 
         return getPermissions(cursor);
     }
@@ -215,7 +216,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         {
             for (Account account : deletedAccounts)
             {
-                Log.d(TAG, "Deleting write permission for " + account.siteUrl);
+                LogWrapper.d(TAG, "Deleting write permission for " + account.siteUrl);
                 String whereClause = WritePermissionTable.COLUMN_SITE_URL + " = ?";
                 String[] whereArgs = new String[] { account.siteUrl };
                 database.delete(TABLE_NAME, whereClause, whereArgs);
@@ -238,7 +239,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -257,7 +258,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -275,6 +276,10 @@ public class WritePermissionDAO extends AbstractBaseDao
             writePermissionDAO.open();
             writePermissionDAO.deleteAll();
         }
+        catch (SQLException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }        
         finally
         {
             writePermissionDAO.close();
@@ -292,7 +297,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

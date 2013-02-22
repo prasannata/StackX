@@ -25,11 +25,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.sqlite.DatabaseHelper.AuditTable;
+import com.prasanna.android.utils.LogWrapper;
 
 public class UserAccountsDAO extends AbstractBaseDao
 {
@@ -61,7 +61,7 @@ public class UserAccountsDAO extends AbstractBaseDao
     {
         if (accounts != null && !accounts.isEmpty())
         {
-            Log.d(TAG, "Inserting accounts into DB for user");
+            LogWrapper.d(TAG, "Inserting accounts into DB for user");
 
             for (Account account : accounts)
             {
@@ -86,7 +86,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         ContentValues values = new ContentValues();
         values.put(AuditTable.COLUMN_TYPE, AUDIT_ENTRY_TYPE);
         values.put(AuditTable.COLUMN_LAST_UPDATE_TIME, System.currentTimeMillis());
-        Log.d(TAG, "Audit entry for tags: " + values.toString());
+        LogWrapper.d(TAG, "Audit entry for tags: " + values.toString());
         database.insert(DatabaseHelper.TABLE_AUDIT, null, values);
     }
 
@@ -153,7 +153,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         {
             for (Account account : deletedAccounts)
             {
-                Log.d(TAG, "User account deleted for " + account.siteUrl);
+                LogWrapper.d(TAG, "User account deleted for " + account.siteUrl);
 
                 String whereClause = UserAccountsTable.COLUMN_SITE_URL + " = ?";
                 String[] whereArgs = new String[]
@@ -173,7 +173,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -192,7 +192,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -213,7 +213,7 @@ public class UserAccountsDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

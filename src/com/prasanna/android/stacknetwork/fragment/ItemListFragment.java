@@ -26,7 +26,6 @@ import android.app.ListFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -45,6 +44,7 @@ import com.prasanna.android.stacknetwork.service.AbstractIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements OnScrollListener,
                 StackXRestQueryResultReceiver
@@ -78,7 +78,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+        LogWrapper.d(TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -95,7 +95,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
+        LogWrapper.d(TAG, "onActivityCreated");
 
         super.onActivityCreated(savedInstanceState);
 
@@ -118,7 +118,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onResume");
+        LogWrapper.d(TAG, "onResume");
 
         super.onResume();
 
@@ -225,7 +225,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         if (itemListAdapter != null && newItems != null)
         {
-            Log.d(TAG, "Updating list adpater with items");
+            LogWrapper.d(TAG, "Updating list adpater with items");
 
             if (items == null)
                 items = new ArrayList<T>();
@@ -249,7 +249,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     private void onHttpError(HttpException e)
     {
-        Log.d(TAG, "Http error " + e.getStatusCode() + " " + e.getErrorResponse());
+        LogWrapper.d(TAG, "Http error " + e.getStatusCode() + " " + e.getErrorResponse());
 
         dismissProgressBar();
 
@@ -270,7 +270,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
                         && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
         {
-            Log.v(TAG, "onScroll reached bottom threshold. Fetching more questions");
+            LogWrapper.v(TAG, "onScroll reached bottom threshold. Fetching more questions");
 
             if (currentPageObject != null && currentPageObject.hasMore)
                 startIntentService();
@@ -280,7 +280,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState)
     {
-        Log.v(TAG, "onScrollStateChanged");
+        LogWrapper.v(TAG, "onScrollStateChanged");
     }
 
     protected ProgressBar getProgressBar()

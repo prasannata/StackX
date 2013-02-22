@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,8 +39,6 @@ import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class SiteListAdapter extends ArrayAdapter<Site>
 {
-    public static final String TAG = SiteListAdapter.class.getSimpleName();
-
     private OnSiteSelectedListener onSiteSelectedListener;
 
     public interface OnSiteSelectedListener
@@ -153,8 +150,6 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         {
             public void onClick(View v)
             {
-                Log.d(TAG, "Clicking on list item " + position);
-
                 if (onSiteSelectedListener != null)
                     onSiteSelectedListener.onSiteSelected(getItem(position));
             }

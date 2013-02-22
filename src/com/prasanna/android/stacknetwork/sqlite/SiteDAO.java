@@ -26,13 +26,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
+import com.prasanna.android.utils.LogWrapper;
 
 public class SiteDAO extends AbstractBaseDao
 {
@@ -84,7 +84,7 @@ public class SiteDAO extends AbstractBaseDao
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             finally
             {
@@ -110,7 +110,7 @@ public class SiteDAO extends AbstractBaseDao
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             finally
             {
@@ -145,7 +145,7 @@ public class SiteDAO extends AbstractBaseDao
 
         if (cursor == null || cursor.getCount() == 0)
         {
-            Log.d(TAG, "No entries");
+            LogWrapper.d(TAG, "No entries");
             return null;
         }
 
@@ -179,7 +179,7 @@ public class SiteDAO extends AbstractBaseDao
 
         if (cursor == null || cursor.getCount() == 0)
         {
-            Log.d(TAG, "No entries");
+            LogWrapper.d(TAG, "No entries");
             return null;
         }
 
@@ -261,7 +261,7 @@ public class SiteDAO extends AbstractBaseDao
             else
                 values.put(SiteTable.COLUMN_USER_TYPE, "");
 
-            Log.d(TAG, "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
+            LogWrapper.d(TAG, "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
             database.update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
@@ -288,7 +288,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -307,7 +307,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -325,7 +325,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -344,7 +344,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -365,7 +365,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -386,7 +386,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -407,7 +407,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -426,7 +426,7 @@ public class SiteDAO extends AbstractBaseDao
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

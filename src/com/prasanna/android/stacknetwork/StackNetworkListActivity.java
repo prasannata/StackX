@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -49,6 +48,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver,
                 OnSiteSelectedListener
@@ -79,7 +79,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+        LogWrapper.d(TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -190,7 +190,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
                     break;
                 default:
-                    Log.d(TAG, "Unknown result code in result receiver");
                     break;
             }
         }

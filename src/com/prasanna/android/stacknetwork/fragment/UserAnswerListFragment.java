@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -49,6 +48,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
 {
@@ -74,8 +74,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "Creating answer fragment");
-
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
@@ -90,8 +88,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(TAG, "onCreateContextMenu");
-
         super.onCreateContextMenu(menu, v, menuInfo);
 
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
@@ -109,13 +105,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
-        Log.d(TAG, "onContextItemSelected");
-
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {
-
-            Log.d(TAG, "Context item selected: " + item.getTitle());
-
             switch (item.getItemId())
             {
                 case R.id.q_ctx_related:
@@ -175,7 +166,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public void onResume()
     {
-        Log.d(getLogTag(), "onResume");
+        LogWrapper.d(getLogTag(), "onResume");
 
         super.onResume();
 

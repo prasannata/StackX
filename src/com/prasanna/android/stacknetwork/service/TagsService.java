@@ -26,13 +26,13 @@ import android.database.SQLException;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.utils.LogWrapper;
 
 public class TagsService extends AbstractStackxService
 {
@@ -71,7 +71,7 @@ public class TagsService extends AbstractStackxService
             }
             catch (AbstractHttpException e)
             {
-                Log.e(TAG, "Error fetching tags: " + e.getMessage());
+                LogWrapper.e(TAG, "Error fetching tags: " + e.getMessage());
             }
 
             onHandlerComplete.onHandleMessageFinish(msg);
@@ -91,14 +91,14 @@ public class TagsService extends AbstractStackxService
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
             finally
             {
                 tagDAO.close();
             }
 
-            Log.d(TAG, "Tags last updated: " + lastUpdateTime);
+            LogWrapper.d(TAG, "Tags last updated: " + lastUpdateTime);
 
             return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
         }
@@ -112,11 +112,11 @@ public class TagsService extends AbstractStackxService
                 tagDao.open();
                 tagDao.deleteTagsFromServerForSite(OperatingSite.getSite().apiSiteParameter);
                 tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
-                Log.d(TAG, "Inserting tags into db for " + OperatingSite.getSite().apiSiteParameter);
+                LogWrapper.d(TAG, "Inserting tags into db for " + OperatingSite.getSite().apiSiteParameter);
             }
             catch (SQLException e)
             {
-                Log.e(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             finally
             {
@@ -137,7 +137,7 @@ public class TagsService extends AbstractStackxService
                 
                 notifyWaitingObjectsOnComplete();
                 
-                Log.d(TAG, "Finished executing TagsService");
+                LogWrapper.d(TAG, "Finished executing TagsService");
                 setRunning(false);
             }
         });

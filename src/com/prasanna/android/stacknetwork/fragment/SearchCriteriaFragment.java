@@ -35,7 +35,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +68,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.Validate;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.utils.LogWrapper;
 
 public class SearchCriteriaFragment extends Fragment implements TextWatcher
 {
@@ -164,7 +164,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             {
                 dao.open();
 
-                Log.d(TAG, "Search criteria DAO action: " + action);
+                LogWrapper.d(TAG, "Search criteria DAO action: " + action);
 
                 switch (action)
                 {
@@ -203,7 +203,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             }
             catch (SQLException e)
             {
-                Log.d(TAG, e.getMessage());
+                LogWrapper.d(TAG, e.getMessage());
             }
             finally
             {
@@ -298,8 +298,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     @Override
     public void onAttach(Activity activity)
     {
-        Log.d(TAG, "onAttach");
-
         super.onAttach(activity);
 
         if (!(activity instanceof OnRunSearchListener))
@@ -311,8 +309,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
-
         super.onCreate(savedInstanceState);
 
         criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
@@ -381,7 +377,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 if (!taggedSet.contains(tag))
                 {
                     taggedSet.add(tag);
-                    Log.d(TAG, tag + " tagged");
+                    LogWrapper.d(TAG, tag + " tagged");
                     addTagView(textView, R.color.lichen);
                 }
             }
@@ -390,7 +386,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 if (!notTaggedSet.contains(tag))
                 {
                     notTaggedSet.add(tag);
-                    Log.d(TAG, tag + " not tagged");
+                    LogWrapper.d(TAG, tag + " not tagged");
                     addTagView(textView, R.color.pulp);
                 }
             }
@@ -400,13 +396,13 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             if (include)
             {
                 taggedSet.remove(tag);
-                Log.d(TAG, tag + " removed from included");
+                LogWrapper.d(TAG, tag + " removed from included");
                 removeTagView(tag, include, textView);
             }
             else
             {
                 notTaggedSet.remove(tag);
-                Log.d(TAG, tag + " removed from excluded");
+                LogWrapper.d(TAG, tag + " removed from excluded");
                 removeTagView(tag, include, textView);
             }
         }
@@ -463,7 +459,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
     private LinearLayout createNewRowForTags(final Context context, int topMargin)
     {
-        Log.d(TAG, "Creating new tag row");
+        LogWrapper.d(TAG, "Creating new tag row");
 
         LinearLayout rowLayout = new LinearLayout(context);
         rowLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -517,8 +513,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         getActivity().getActionBar().setTitle(getActivity().getString(R.string.advanced_search));

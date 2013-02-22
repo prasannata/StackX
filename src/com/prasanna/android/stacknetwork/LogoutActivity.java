@@ -29,7 +29,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.widget.LinearLayout;
@@ -43,6 +42,7 @@ import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class LogoutActivity extends Activity
 {
@@ -91,7 +91,7 @@ public class LogoutActivity extends Activity
         }
         catch (IllegalArgumentException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.d(TAG, e.getMessage());
         }
     }
 
@@ -143,12 +143,12 @@ public class LogoutActivity extends Activity
         }
         else if (error != null && error.id > 0)
         {
-            Log.d(TAG, "Logout failed with " + error.message);
+            LogWrapper.d(TAG, "Logout failed with " + error.message);
             finish();
         }
         else
         {
-            Log.d(TAG, "Logout failed for unknown reason");
+            LogWrapper.d(TAG, "Logout failed for unknown reason");
             finish();
         }
     }

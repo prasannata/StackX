@@ -25,7 +25,6 @@ import java.util.Iterator;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -49,6 +48,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionFragment extends Fragment implements OnCommentChangeListener
 {
@@ -74,8 +74,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
-
         if (parentLayout == null)
             createView(inflater);
 
@@ -104,8 +102,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(TAG, "onCreateContextMenu");
-
         super.onCreateContextMenu(menu, v, menuInfo);
 
         getActivity().getMenuInflater().inflate(R.menu.question_context_menu, menu);
@@ -123,7 +119,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
         if (question != null)
         {
-            Log.d(TAG, "Setting action bar title: " + question.title);
+            LogWrapper.d(TAG, "Setting action bar title: " + question.title);
 
             getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
             displayQuestion();
@@ -135,7 +131,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onResume");
+        LogWrapper.d(TAG, "onResume");
 
         super.onResume();
 
@@ -145,7 +141,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
+        LogWrapper.d(TAG, "onSaveInstanceState");
 
         if (question != null)
             outState.putSerializable(StringConstants.QUESTION, question);
@@ -306,14 +302,14 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     {
         if (question.comments != null)
         {
-            Log.d(TAG, "Removing comment: " + comment.id);
+            LogWrapper.d(TAG, "Removing comment: " + comment.id);
 
             Iterator<Comment> iterator = question.comments.iterator();
             while (iterator.hasNext())
             {
                 if (iterator.next().id == comment.id)
                 {
-                    Log.d(TAG, "comment " + comment.id + " edited");
+                    LogWrapper.d(TAG, "comment " + comment.id + " edited");
                     removeQuestionFromCache();
                     break;
                 }
@@ -328,14 +324,14 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     {
         if (question.comments != null)
         {
-            Log.d(TAG, "Removing comment: " + commentId);
+            LogWrapper.d(TAG, "Removing comment: " + commentId);
 
             Iterator<Comment> iterator = question.comments.iterator();
             while (iterator.hasNext())
             {
                 if (iterator.next().id == commentId)
                 {
-                    Log.d(TAG, "comment " + commentId + " removed");
+                    LogWrapper.d(TAG, "comment " + commentId + " removed");
                     iterator.remove();
                     break;
                 }

@@ -37,7 +37,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.UserInboxActivity;
@@ -46,6 +45,7 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
+import com.prasanna.android.utils.LogWrapper;
 
 public class NewMsgNotificationReceiver extends BroadcastReceiver
 {
@@ -58,11 +58,11 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-	Log.d(TAG, "Received new msg notificaiton");
+        LogWrapper.d(TAG, "Received new msg notificaiton");
 
 	if (SettingsFragment.isNotificationEnabled(context))
 	{
-	    Log.d(TAG, "Notification enabled in settings");
+	    LogWrapper.d(TAG, "Notification enabled in settings");
 
 	    StackXPage<InboxItem> page = (StackXPage<InboxItem>) intent.getSerializableExtra(UserIntentAction.NEW_MSG
 		            .getAction());
@@ -73,7 +73,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 
 		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-		Log.d(TAG, "Ringer mode: " + audioManager.getRingerMode());
+		LogWrapper.d(TAG, "Ringer mode: " + audioManager.getRingerMode());
 
 		vibrateIfEnabled(context, audioManager.getRingerMode());
 
@@ -87,7 +87,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
 	if (SettingsFragment.isVibrateEnabled(context)
 	                && (ringerMode == AudioManager.RINGER_MODE_VIBRATE || ringerMode == AudioManager.RINGER_MODE_NORMAL))
 	{
-	    Log.d(TAG, "Vibrate enabled");
+	    LogWrapper.d(TAG, "Vibrate enabled");
 	    Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 	    vibrator.vibrate(VIBRATE_DURATION);
 	}

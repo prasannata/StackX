@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +43,7 @@ import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class PostCommentFragment extends Fragment
 {
@@ -185,7 +185,7 @@ public class PostCommentFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
+        LogWrapper.d(TAG, "onSaveInstanceState");
 
         if (getCurrentText() != null)
             outState.putString(TEXT, getCurrentText().toString());

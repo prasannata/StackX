@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -37,6 +36,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class UserQuestionListFragment extends AbstractQuestionListFragment
 {
@@ -62,8 +62,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
-
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
@@ -77,8 +75,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null)
@@ -97,7 +93,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
+        LogWrapper.d(TAG, "onSaveInstanceState");
 
         outState.putInt(StringConstants.ACTION, action);
 
@@ -107,8 +103,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
     {
-        Log.d(getLogTag(), "onCreateContextMenu");
-
         super.onCreateContextMenu(menu, v, menuInfo);
 
         menu.removeItem(R.id.q_ctx_comments);

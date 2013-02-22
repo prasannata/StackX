@@ -23,11 +23,11 @@ import java.util.HashMap;
 
 import android.content.Context;
 import android.database.SQLException;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
+import com.prasanna.android.utils.LogWrapper;
 
 public class WritePermissionUtil
 {
@@ -50,7 +50,7 @@ public class WritePermissionUtil
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

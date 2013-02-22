@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +56,7 @@ import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class CommentFragment extends ItemListFragment<Comment> implements ListItemView<Comment>
 {
@@ -111,8 +111,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreateView");
-
         if (itemsContainer == null)
         {
             if (comments == null)
@@ -129,8 +127,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         getListView().setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
@@ -149,7 +145,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         }
         catch (SQLException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.d(TAG, e.getMessage());
         }
         finally
         {
@@ -257,7 +253,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 selectedViewForReply = holder;
                 selectedViewForReply.replyToComment.setVisibility(View.GONE);
                 selectedViewForReply.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
-                Log.d(TAG, "Select comment for reply: " + selectedViewForReply.id);
+                LogWrapper.d(TAG, "Select comment for reply: " + selectedViewForReply.id);
 
                 displayPostCommentFragment(comment.post_id,comment.id,
                                 "@" + comment.owner.displayName.replaceAll("\\s", "") + " ", false);
@@ -366,15 +362,15 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         switch (resultCode)
         {
             case WriteIntentService.ACTION_ADD_COMMENT:
-                Log.d(TAG, "Receiver invoked for ACTION_ADD_COMMENT");
+                LogWrapper.d(TAG, "Receiver invoked for ACTION_ADD_COMMENT");
                 onAddCommentComplete(resultData);
                 break;
             case WriteIntentService.ACTION_EDIT_COMMENT:
-                Log.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
+                LogWrapper.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
                 onEditCommentComplete(resultData);
                 break;
             case WriteIntentService.ACTION_DEL_COMMENT:
-                Log.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
+                LogWrapper.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
                 onDelCommentComplete(resultData);
                 break;
             case WriteIntentService.ERROR:

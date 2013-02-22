@@ -23,9 +23,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class PostIntentService extends IntentService
 {
@@ -61,7 +61,7 @@ public class PostIntentService extends IntentService
                 getComment(intent, site, receiver);
                 break;
             default:
-                Log.d(TAG, "Unknown action:" + action);
+                LogWrapper.d(TAG, "Unknown action:" + action);
                 break;
         }
     }

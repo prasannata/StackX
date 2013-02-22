@@ -30,8 +30,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.util.Log;
-
 import com.prasanna.android.http.ClientException;
 import com.prasanna.android.http.HttpContentTypes;
 import com.prasanna.android.http.HttpHeaderParams;
@@ -42,6 +40,7 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
+import com.prasanna.android.utils.LogWrapper;
 
 public class WriteServiceHelper extends AbstractBaseServiceHelper
 {
@@ -103,7 +102,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         }
         catch (JSONException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         return null;
     }

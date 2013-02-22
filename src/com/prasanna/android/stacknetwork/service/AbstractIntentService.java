@@ -25,12 +25,12 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.util.Log;
 
 import com.prasanna.android.http.ClientException;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractIntentService extends IntentService
 {
@@ -58,7 +58,7 @@ public abstract class AbstractIntentService extends IntentService
 
     protected void broadcastHttpErrorIntent(StackXError error)
     {
-        Log.d(TAG, "broadcastHttpErrorIntent: " + error.msg);
+        LogWrapper.d(TAG, "broadcastHttpErrorIntent: " + error.msg);
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
@@ -69,7 +69,7 @@ public abstract class AbstractIntentService extends IntentService
 
     protected void broadcastSerializableExtra(String action, String extraName, Serializable extra)
     {
-        Log.d(TAG, "broadcastSerializableExtra: " + action);
+        LogWrapper.d(TAG, "broadcastSerializableExtra: " + action);
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(action);

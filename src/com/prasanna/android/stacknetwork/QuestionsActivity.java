@@ -31,7 +31,6 @@ import android.content.Intent;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -48,6 +47,7 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements OnTagSelectListener
 {
@@ -98,12 +98,12 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
             if (existingFragment == null)
             {
-                Log.d(TAG, "adding fragment: " + fragment.fragmentTag);
+                LogWrapper.d(TAG, "adding fragment: " + fragment.fragmentTag);
                 ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
             }
             else
             {
-                Log.d(TAG, "Attaching fragment: " + fragment.fragmentTag);
+                LogWrapper.d(TAG, "Attaching fragment: " + fragment.fragmentTag);
                 ft.attach(existingFragment);
             }
         }
@@ -121,7 +121,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
+        LogWrapper.d(TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
 
@@ -173,7 +173,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showSearchFragment()
     {
         String query = getIntent().getStringExtra(SearchManager.QUERY);
-        Log.d(TAG, "Launching search fragment for " + query);
+        LogWrapper.d(TAG, "Launching search fragment for " + query);
         saveSearchQuery(query);
         replaceFragment(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null), null, false);
     }
@@ -202,7 +202,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showTagQuestionListFragment()
     {
         String tag = getIntent().getStringExtra(StringConstants.TAG);
-        Log.d(TAG, "Restoring question list fragment for tag" + tag);
+        LogWrapper.d(TAG, "Restoring question list fragment for tag" + tag);
         setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
@@ -259,7 +259,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        Log.d(TAG, "onSaveInstanceState");
+        LogWrapper.d(TAG, "onSaveInstanceState");
 
         removeTagListFragment();
 
@@ -286,7 +286,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onResume()
     {
-        Log.d(TAG, "onResume");
+        LogWrapper.d(TAG, "onResume");
 
         super.onResume();
 
@@ -299,7 +299,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
             if (fragment != null)
             {
-                Log.d(TAG, "Showing last attached fragment");
+                LogWrapper.d(TAG, "Showing last attached fragment");
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.show(fragment);
                 ft.commit();
@@ -327,11 +327,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     {
         Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
 
-        Log.d(TAG, "current fragment is null " + (currentFragment == null));
+        LogWrapper.d(TAG, "current fragment is null " + (currentFragment == null));
 
         if (currentFragment instanceof TagListFragment)
         {
-            Log.d(TAG, "Tag list fragment is current fragment");
+            LogWrapper.d(TAG, "Tag list fragment is current fragment");
 
             hideTagFragment();
 
@@ -408,7 +408,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
     {
-        Log.d(TAG, "Home button clicked");
+        LogWrapper.d(TAG, "Home button clicked");
 
         if (showTagsFragment && menuItem.getItemId() == android.R.id.home)
         {
@@ -452,7 +452,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onFrontPageSelected()
     {
-        Log.d(TAG, "Front page selected");
+        LogWrapper.d(TAG, "Front page selected");
 
         hideTagFragment();
         setupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
@@ -461,7 +461,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onTagSelected(String tag)
     {
-        Log.d(TAG, tag + " selected");
+        LogWrapper.d(TAG, tag + " selected");
 
         hideTagFragment();
         setupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
@@ -469,7 +469,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void addAndHideFragment(TagListFragment fragment, String fragmentTag)
     {
-        Log.d(TAG, "Replacing current fragment with " + fragmentTag);
+        LogWrapper.d(TAG, "Replacing current fragment with " + fragmentTag);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(R.id.fragmentContainer, fragment, fragmentTag);
@@ -488,7 +488,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void showTagFragment()
     {
-        Log.d(TAG, "Showing tag list fragment");
+        LogWrapper.d(TAG, "Showing tag list fragment");
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
@@ -498,7 +498,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void hideTagFragment()
     {
-        Log.d(TAG, "Hiding tag list fragment");
+        LogWrapper.d(TAG, "Hiding tag list fragment");
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.hide(tagListFragment);
@@ -507,7 +507,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
     {
-        Log.d(TAG, "Replacing current fragment with " + fragmentTag);
+        LogWrapper.d(TAG, "Replacing current fragment with " + fragmentTag);
 
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);

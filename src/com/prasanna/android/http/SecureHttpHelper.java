@@ -57,10 +57,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.Uri.Builder;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.Validate;
+import com.prasanna.android.utils.LogWrapper;
 
 public final class SecureHttpHelper
 {
@@ -118,7 +118,7 @@ public final class SecureHttpHelper
         {
             if (absoluteUrl != null)
             {
-                Log.d(TAG, "Get image: " + absoluteUrl);
+                LogWrapper.d(TAG, "Get image: " + absoluteUrl);
 
                 DefaultHttpClient client = createHttpClient();
                 HttpGet request = new HttpGet(absoluteUrl);
@@ -129,31 +129,31 @@ public final class SecureHttpHelper
         }
         catch (ClientProtocolException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (IOException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (KeyManagementException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (UnrecoverableKeyException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (KeyStoreException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (NoSuchAlgorithmException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (CertificateException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         return bitmap;
     }
@@ -177,35 +177,35 @@ public final class SecureHttpHelper
         }
         catch (ClientProtocolException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (IOException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (JSONException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (KeyManagementException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (UnrecoverableKeyException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (KeyStoreException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (NoSuchAlgorithmException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (CertificateException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
 
         return null;
@@ -223,35 +223,35 @@ public final class SecureHttpHelper
         }
         catch (ClientProtocolException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (IOException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (JSONException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (KeyManagementException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (UnrecoverableKeyException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (KeyStoreException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (NoSuchAlgorithmException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         catch (CertificateException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
 
         return null;
@@ -262,7 +262,7 @@ public final class SecureHttpHelper
     {
         JSONObjectWrapper jsonObject = null;
 
-        Log.d(TAG, "HTTP request to: " + request.getURI().toString());
+        LogWrapper.d(TAG, "HTTP request to: " + request.getURI().toString());
         HttpResponse httpResponse = client.execute(request);
         HttpEntity entity = httpResponse.getEntity();
         String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
@@ -270,13 +270,13 @@ public final class SecureHttpHelper
 
         if (statusCode == HttpStatus.SC_OK)
         {
-            Log.d(TAG, request + " was successful");
+            LogWrapper.d(TAG, request + " was successful");
             jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
         }
         else
         {
-            Log.d(TAG, "Http request failed: " + statusCode);
-            Log.d(TAG, "Http request failure message: " + jsonText);
+            LogWrapper.d(TAG, "Http request failed: " + statusCode);
+            LogWrapper.d(TAG, "Http request failure message: " + jsonText);
             String statusDescription = httpResponse.getStatusLine().getReasonPhrase();
 
             if (statusCode >= HttpErrorFamily.SERVER_ERROR)

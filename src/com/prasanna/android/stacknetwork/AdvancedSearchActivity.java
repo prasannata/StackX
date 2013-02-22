@@ -22,7 +22,6 @@ package com.prasanna.android.stacknetwork;
 import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -35,6 +34,7 @@ import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.utils.LogWrapper;
 
 public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener
 {
@@ -45,8 +45,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        Log.d(TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.advanced_search);
@@ -105,8 +103,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        Log.d(TAG, "onPrepareOptionsMenu");
-
         boolean ret = super.onPrepareOptionsMenu(menu);
 
         menu.removeItem(R.id.menu_refresh);
@@ -118,7 +114,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     protected void onStart()
     {
-        Log.d(TAG, "onStart");
+        LogWrapper.d(TAG, "onStart");
 
         super.onStart();
 
@@ -128,8 +124,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     public void onConfigurationChanged(Configuration newConfig)
     {
-        Log.d(TAG, "onConfigurationChanged");
-
         super.onConfigurationChanged(newConfig);
 
         showOrHideQuestionListFragment(newConfig);
@@ -187,8 +181,6 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     @Override
     protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
     {
-        Log.d(TAG, "Home button clicked");
-
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                         && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible())
         {

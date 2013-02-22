@@ -23,7 +23,6 @@ import java.util.LinkedHashSet;
 
 import android.database.SQLException;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Tag;
@@ -31,6 +30,7 @@ import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
+import com.prasanna.android.utils.LogWrapper;
 
 public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
 {
@@ -76,7 +76,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         }
         catch (AbstractHttpException e)
         {
-            Log.e(TAG, "Error fetching tags: " + e.getMessage());
+            LogWrapper.e(TAG, "Error fetching tags: " + e.getMessage());
         }
         return tags;
     }
@@ -85,7 +85,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
     {
         TagsService.registerForCompleteNotification(this);
 
-        Log.d(TAG, "Waiting for service to complete");
+        LogWrapper.d(TAG, "Waiting for service to complete");
 
         try
         {
@@ -96,10 +96,10 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         }
         catch (InterruptedException e)
         {
-            Log.d(TAG, e.getMessage());
+            LogWrapper.d(TAG, e.getMessage());
         }
 
-        Log.d(TAG, "Service done");
+        LogWrapper.d(TAG, "Service done");
     }
 
     @Override
@@ -120,7 +120,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
 
             if (tagsOlderThanDay(lastUpdateTime))
             {
-                Log.d(TAG, "Tags older than day, deleting...");
+                LogWrapper.d(TAG, "Tags older than day, deleting...");
                 tagDao.deleteTagsFromServerForSite(site);
             }
             else
@@ -129,7 +129,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
@@ -143,7 +143,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
     {
         long MILLISECONDS_IN_DAY = 86400000L;
 
-        Log.d(TAG, "Tags last updated: " + lastUpdateTime);
+        LogWrapper.d(TAG, "Tags last updated: " + lastUpdateTime);
 
         return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
     }
@@ -159,7 +159,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         }
         catch (SQLException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {

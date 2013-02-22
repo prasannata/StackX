@@ -16,6 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.prasanna.android.stacknetwork.fragment;
 
 import android.app.AlertDialog;
@@ -36,7 +37,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.util.Log;
 
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
@@ -46,6 +46,7 @@ import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
+import com.prasanna.android.utils.LogWrapper;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
 {
@@ -201,8 +202,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             {
                 accountActionPref.getDialog().dismiss();
 
-                AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg,
-                                dialogClickListener);
+                AlertDialog yesNoDialog =
+                                DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener);
                 yesNoDialog.show();
 
                 return true;
@@ -233,8 +234,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             }
         });
 
-        Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
-                        DEFAULT_RINGTONE));
+        Uri ringtoneUri =
+                        Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
+                                        DEFAULT_RINGTONE));
         setRingtoneSummary(ringtoneUri);
     }
 
@@ -255,7 +257,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
-        Log.d(TAG, "Preference changed for " + key);
+        LogWrapper.d(TAG, "Preference changed for " + key);
 
         if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
         {

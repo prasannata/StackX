@@ -29,8 +29,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -53,6 +51,7 @@ import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.Order;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 
 public class UserServiceHelper extends AbstractBaseServiceHelper
 {
@@ -97,7 +96,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         }
         catch (JSONException e)
         {
-            Log.d(getLogTag(), e.getMessage());
+            LogWrapper.d(getLogTag(), e.getMessage());
         }
         return sites;
     }
@@ -237,7 +236,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                 }
                 catch (JSONException e)
                 {
-                    Log.d(getLogTag(), e.getMessage());
+                    LogWrapper.d(getLogTag(), e.getMessage());
                 }
             }
         }
@@ -311,7 +310,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                 }
                 catch (JSONException e)
                 {
-                    Log.d(getLogTag(), e.getMessage());
+                    LogWrapper.d(getLogTag(), e.getMessage());
                 }
             }
         }
@@ -371,7 +370,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                     }
                     catch (JSONException e)
                     {
-                        Log.d(getLogTag(), e.getMessage());
+                        LogWrapper.d(getLogTag(), e.getMessage());
                     }
 
                 }
@@ -446,7 +445,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                     }
                     catch (JSONException e)
                     {
-                        Log.d(getLogTag(), e.getMessage());
+                        LogWrapper.d(getLogTag(), e.getMessage());
                     }
                 }
             }
@@ -509,7 +508,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                         }
                         catch (JSONException e)
                         {
-                            Log.d(getLogTag(), e.getMessage());
+                            LogWrapper.d(getLogTag(), e.getMessage());
                         }
                     }
                 }
@@ -536,7 +535,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         }
         catch (InterruptedException e)
         {
-            Log.e(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
     }
 }
