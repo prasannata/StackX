@@ -109,7 +109,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
             switch (action)
             {
                 case WriteCriteriaAsyncTask.ACTION_DEL:
-                    toastMsg += " deleted";
+                    toastMsg += " delete";
                     if (result)
                     {
                         if (domain.tab)
@@ -118,31 +118,28 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     }
                     break;
                 case WriteCriteriaAsyncTask.ACTION_ADD_AS_TAB:
-                    toastMsg += " tab added";
-                    if (result)
-                    {
-                        domain.tab = true;
-                        updateTabbedListAndRefreshView(true);
-                    }
-                    else
-                        ((ToggleButton) view).setChecked(false);
+                    toastMsg += " tab add";
+                    onTabActionComplete(result, true);
                     break;
                 case WriteCriteriaAsyncTask.ACTION_REMOVE_AS_TAB:
-                    toastMsg += " tab removed";
-                    if (result)
-                    {
-                        domain.tab = false;
-                        updateTabbedListAndRefreshView(false);
-                    }
-                    else
-                        ((ToggleButton) view).setChecked(false);
+                    toastMsg += " tab remove";
+                    onTabActionComplete(result, false);
                     break;
             }
 
+            toastMsg += result ? " succeeded" : " failed";
+            Toast.makeText(SearchCriteriaListActivity.this, toastMsg, Toast.LENGTH_LONG).show();
+        }
+
+        private void onTabActionComplete(Boolean result, boolean add)
+        {
             if (result)
-                Toast.makeText(SearchCriteriaListActivity.this, toastMsg, Toast.LENGTH_LONG).show();
+            {
+                domain.tab = add;
+                updateTabbedListAndRefreshView(add);
+            }
             else
-                Toast.makeText(SearchCriteriaListActivity.this, toastMsg + " (fail)", Toast.LENGTH_LONG).show();
+                ((ToggleButton) view).setChecked(false);
         }
 
         private void updateTabbedListAndRefreshView(boolean add)
@@ -394,7 +391,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         getActionBar().setTitle(ACTION_BAR_TITLE);
         remainingSearch = (TextView) findViewById(R.id.remainingSearch);
         emptyItemsView = (TextView) findViewById(R.id.emptyItems);
-        
+
         setupListView();
         setupSortSpinner();
     }
