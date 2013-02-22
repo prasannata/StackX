@@ -21,9 +21,9 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -81,8 +81,8 @@ public class SearchCriteria implements Serializable
     private static final int DEFAULT_SIZE = 15;
     private static SoftReference<SearchCriteria> self;
     private final HashMap<String, String> criteria;
-    private ArrayList<String> includeTags;
-    private ArrayList<String> excludeTags;
+    private HashSet<String> includeTags;
+    private HashSet<String> excludeTags;
     private int page = 1;
 
     public static SearchCriteria newCriteria(String query)
@@ -152,7 +152,7 @@ public class SearchCriteria implements Serializable
     public SearchCriteria includeTag(String tag)
     {
         if (includeTags == null)
-            includeTags = new ArrayList<String>();
+            includeTags = new HashSet<String>();
 
         if (!Validate.isEmptyString(tag))
             includeTags.add(tag);
@@ -165,7 +165,7 @@ public class SearchCriteria implements Serializable
         if (tags != null)
         {
             if (includeTags == null)
-                includeTags = new ArrayList<String>();
+                includeTags = new HashSet<String>();
 
             includeTags.addAll(tags);
         }
@@ -175,7 +175,7 @@ public class SearchCriteria implements Serializable
     public SearchCriteria excludeTag(String tag)
     {
         if (excludeTags == null)
-            excludeTags = new ArrayList<String>();
+            excludeTags = new HashSet<String>();
 
         if (!Validate.isEmptyString(tag))
             excludeTags.add(tag);
@@ -188,7 +188,7 @@ public class SearchCriteria implements Serializable
         if (tags != null)
         {
             if (excludeTags == null)
-                excludeTags = new ArrayList<String>();
+                excludeTags = new HashSet<String>();
 
             excludeTags.addAll(tags);
         }
@@ -253,7 +253,7 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    private String getAsDelimitedString(ArrayList<String> tags, String delim)
+    private String getAsDelimitedString(HashSet<String> tags, String delim)
     {
         StringBuilder sb = new StringBuilder();
         Iterator<String> iterator = tags.iterator();
