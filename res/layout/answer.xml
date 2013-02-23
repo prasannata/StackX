@@ -47,8 +47,9 @@
                 android:layout_toLeftOf="@id/answerOptionsContextMenu"
                 android:layout_toRightOf="@id/answerScore"
                 android:textIsSelectable="false"
+                android:layout_centerVertical="true"
                 android:textColor="@color/black"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/answerCommentsCount"
