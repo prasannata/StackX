@@ -47,6 +47,11 @@ public abstract class AbstractBaseServiceHelper
 {
     protected abstract String getLogTag();
 
+    protected SecureHttpHelper getHttpHelper()
+    {
+        return SecureHttpHelper.getInstance();
+    }
+
     protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper, StackXPage<? extends StackXItem> page)
     {
         if (jsonObjectWrapper != null && page != null)
@@ -246,9 +251,8 @@ public abstract class AbstractBaseServiceHelper
 
     protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
     {
-        return SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
+        return getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
                 queryParams);
-
     }
 
     protected JSONObjectWrapper executeHttpPostequest(String restEndPoint,
@@ -256,7 +260,7 @@ public abstract class AbstractBaseServiceHelper
             Map<String, String> queryParams,
             HttpEntity httpEntity)
     {
-        return SecureHttpHelper.getInstance().executePostForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
+        return getHttpHelper().executePostForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
                 requestHeaders, queryParams, httpEntity);
 
     }
