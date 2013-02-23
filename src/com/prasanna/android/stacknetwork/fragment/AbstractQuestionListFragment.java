@@ -133,11 +133,14 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        Intent displayQuestionIntent = new Intent(getActivity(), QuestionActivity.class);
-        displayQuestionIntent.setAction(StringConstants.QUESTION);
-        displayQuestionIntent.putExtra(StringConstants.QUESTION, itemListAdapter.getItem(position));
-        displayQuestionIntent.putExtra(StringConstants.CACHED, false);
-        startActivity(displayQuestionIntent);
+        if (itemListAdapter != null && itemListAdapter.getCount() > position)
+        {
+            Intent displayQuestionIntent = new Intent(getActivity(), QuestionActivity.class);
+            displayQuestionIntent.setAction(StringConstants.QUESTION);
+            displayQuestionIntent.putExtra(StringConstants.QUESTION, itemListAdapter.getItem(position));
+            displayQuestionIntent.putExtra(StringConstants.CACHED, false);
+            startActivity(displayQuestionIntent);
+        }
     }
 
     @Override
