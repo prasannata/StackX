@@ -193,6 +193,7 @@ public class AccountSyncService extends AbstractStackxService
                         newAccounts = new ArrayList<Account>();
 
                     newAccounts.add(retrievedAccounts.get(key));
+                    getAndPersistWritePermissions(sites.get(key));
                 }
 
                 if (newAccounts != null)
