@@ -36,7 +36,7 @@
         android:layout_toLeftOf="@id/itemContextMenu"
         android:layout_toRightOf="@id/scoreAndAns"
         android:textColor="@color/black"
-        android:textIsSelectable="true"
+        android:textIsSelectable="false"
         android:textSize="12sp" />
 
 </RelativeLayout>
