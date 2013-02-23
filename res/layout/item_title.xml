@@ -7,10 +7,16 @@
     android:layout_marginRight="2dp"
     android:background="@color/white" >
 
-    <include
+    <LinearLayout
         android:id="@+id/scoreAndAns"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        layout="@layout/score_answer_count" />
+        android:layout_marginRight="3dp"
+        android:layout_marginTop="3dp" >
+
+        <include layout="@layout/score_answer_count" />
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/itemContextMenu"
@@ -25,12 +31,12 @@
         android:id="@+id/itemTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
+        android:layout_alignTop="@id/scoreAndAns"
         android:layout_marginRight="2dp"
-        android:layout_marginTop="2dp"
         android:layout_toLeftOf="@id/itemContextMenu"
         android:layout_toRightOf="@id/scoreAndAns"
         android:textColor="@color/black"
+        android:textIsSelectable="true"
         android:textSize="12sp" />
 
 </RelativeLayout>
