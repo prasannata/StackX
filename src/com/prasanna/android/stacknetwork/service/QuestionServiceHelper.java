@@ -47,9 +47,48 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     private static final QuestionServiceHelper questionService = new QuestionServiceHelper();
 
+    protected QuestionServiceHelper()
+    {
+    }
+    
     public static QuestionServiceHelper getInstance()
     {
         return questionService;
+    }
+
+    public String getQuestionBodyForId(long id, String site)
+    {
+        String restEndPoint = "questions/" + id;
+        String questionBody = null;
+        Map<String, String> queryParams = getDefaultQueryParams();
+        if (site != null)
+            queryParams.put(StackUri.QueryParams.SITE, site);
+
+        JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
+        if (questionJsonResponse != null)
+        {
+            try
+            {
+                JSONArray jsonArray = questionJsonResponse.getJSONArray(JsonFields.ITEMS);
+
+                if (jsonArray != null && jsonArray.length() == 1)
+                {
+                    JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+                    questionBody = jsonObject.getString(JsonFields.Question.BODY);
+                }
+            }
+            catch (JSONException e)
+            {
+                LogWrapper.d(TAG, e.getMessage());
+            }
+        }
+
+        return questionBody;
+    }
+
+    public String getQuestionBodyForId(long id)
+    {
+        return getQuestionBodyForId(id, null);
     }
 
     public ArrayList<Answer> getAnswersForQuestion(long id, String site, int page)
@@ -96,11 +135,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return answers;
     }
 
-    public ArrayList<Answer> getAnswersForQuestion(long id, int page)
-    {
-        return getAnswersForQuestion(id, null, page);
-    }
-
     private void getCommentsForAnswers(ArrayList<Answer> answers)
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -144,41 +178,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                 hasMore = false;
 
         }
-    }
-
-    public String getQuestionBodyForId(long id, String site)
-    {
-        String restEndPoint = "questions/" + id;
-        String questionBody = null;
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
-
-        JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-        if (questionJsonResponse != null)
-        {
-            try
-            {
-                JSONArray jsonArray = questionJsonResponse.getJSONArray(JsonFields.ITEMS);
-
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
-                    JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
-                    questionBody = jsonObject.getString(JsonFields.Question.BODY);
-                }
-            }
-            catch (JSONException e)
-            {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
-
-        return questionBody;
-    }
-
-    public String getQuestionBodyForId(long id)
-    {
-        return getQuestionBodyForId(id, null);
     }
 
     public StackXPage<Comment> getComments(String parent, String site, String parentId, int page)
