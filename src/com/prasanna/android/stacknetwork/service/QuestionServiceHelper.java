@@ -50,7 +50,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
     protected QuestionServiceHelper()
     {
     }
-    
+
     public static QuestionServiceHelper getInstance()
     {
         return questionService;
@@ -180,11 +180,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         }
     }
 
-    public StackXPage<Comment> getComments(String parent, String site, String parentId, int page)
+    public StackXPage<Comment> getComments(String parent, String site, String parentIds, int page)
     {
         StackXPage<Comment> commentsPage = null;
 
-        String restEndPoint = parent + "/" + parentId + "/comments";
+        String restEndPoint = parent + "/" + parentIds + "/comments";
         Map<String, String> queryParams = getDefaultQueryParams();
         if (site != null)
             queryParams.put(StackUri.QueryParams.SITE, site);
@@ -213,7 +213,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
                     commentsPage.items.add(getSerializedCommentObject(JSONObjectWrapper.wrap(jsonObject)));
                 }
-
             }
             catch (JSONException e)
             {
@@ -223,9 +222,9 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return commentsPage;
     }
 
-    public StackXPage<Comment> getComments(String parent, String parentId, int page)
+    public StackXPage<Comment> getComments(String parent, String parentIds, int page)
     {
-        return getComments(parent, null, parentId, page);
+        return getComments(parent, null, parentIds, page);
     }
 
     public StackXPage<Question> search(String query, int page)

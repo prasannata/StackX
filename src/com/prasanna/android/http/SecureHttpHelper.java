@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -62,7 +62,7 @@ import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.Validate;
 import com.prasanna.android.utils.LogWrapper;
 
-public final class SecureHttpHelper
+public class SecureHttpHelper
 {
     private final String TAG = SecureHttpHelper.class.getSimpleName();
 

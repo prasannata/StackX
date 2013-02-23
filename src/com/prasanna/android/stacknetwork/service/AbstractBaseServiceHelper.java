@@ -161,9 +161,7 @@ public abstract class AbstractBaseServiceHelper
         question.link = jsonObject.getString(JsonFields.Question.LINK);
 
         if (jsonObject.has(JsonFields.Question.ACCEPTED_ANSWER_ID))
-        {
             question.hasAcceptedAnswer = true;
-        }
 
         question.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Question.OWNER));
         return question;
