@@ -4,11 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.prasanna.android</groupId>
     <artifactId>stackx</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>apk</packaging>
     <name>StackX</name>
     <description>Android application for Stack Exchange</description>
-
 
     <properties>
         <android.platform>17</android.platform>
@@ -34,6 +33,7 @@
             <version>${htmlcleaner.version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
@@ -45,18 +45,121 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
-                <artifactId>android-maven-plugin</artifactId>
-                <version>3.5.0</version>
-                <configuration>
-                    <sdk>
-                        <path>${android.sdk.path}</path>
-                        <platform>${android.platform}</platform>
-                    </sdk>
-                </configuration>
-                <extensions>true</extensions>
-            </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                        <artifactId>android-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <configuration>
+                            <sdk>
+                                <path>${android.sdk.path}</path>
+                                <platform>${android.platform}</platform>
+                            </sdk>
+                        </configuration>
+                        <extensions>true</extensions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>rel</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>1.2</version>
+                        <executions>
+                            <execution>
+                                <id>signing</id>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <inherited>true</inherited>
+                                <configuration>
+                                    <archiveDirectory></archiveDirectory>
+                                    <includes>
+                                        <include>${project.build.outputDirctory}/${project.artifactId}-${project.version}.apk</include>
+                                    </includes>
+                                    <keystore>${keystore.path}</keystore>
+                                    <storepass>${keystore.store.password}</storepass>
+                                    <keypass>${keystore.key.password}</keypass>
+                                    <alias>${keystore.alias}</alias>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.pyx4me</groupId>
+                        <artifactId>proguard-maven-plugin</artifactId>
+                        <version>2.0.4</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>proguard</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <zipalign>
+                                <skip>false</skip>
+                            </zipalign>
+                            <injars>android-classes</injars>
+                            <options>
+                                <option>@proguard.cfg</option>
+                            </options>
+                            <libs>
+                                <lib>${java.home}/../classes/classes.jar</lib>
+                                <lib>${java.home}/../classes/jsse.jar</lib>
+                            </libs>
+                            <skip>false</skip>
+                            <obfuscate>true</obfuscate>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                        <artifactId>android-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <configuration>
+                            <sdk>
+                                <path>${android.sdk.path}</path>
+                                <platform>${android.platform}</platform>
+                            </sdk>
+                            <zipalign>
+                                <skip>false</skip>
+                            </zipalign>
+                            <sign>
+                                <debug>false</debug>
+                            </sign>
+                        </configuration>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>alignApk</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>zipalign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
