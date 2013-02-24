@@ -116,9 +116,6 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <zipalign>
-                                <skip>false</skip>
-                            </zipalign>
                             <injars>android-classes</injars>
                             <options>
                                 <option>@proguard.cfg</option>
@@ -135,6 +132,15 @@
                         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                         <artifactId>android-maven-plugin</artifactId>
                         <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>alignApk</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>zipalign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                         <configuration>
                             <sdk>
                                 <path>${android.sdk.path}</path>
@@ -148,15 +154,6 @@
                             </sign>
                         </configuration>
                         <extensions>true</extensions>
-                        <executions>
-                            <execution>
-                                <id>alignApk</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>zipalign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
