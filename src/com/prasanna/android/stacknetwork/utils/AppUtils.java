@@ -47,7 +47,8 @@ import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 public class AppUtils
 {
     private static String userAccessToken;
-
+    public static final boolean DEBUG = false;
+    
     public static void setAccessToken(Context context, String accessToken)
     {
         if (userAccessToken == null && accessToken != null)

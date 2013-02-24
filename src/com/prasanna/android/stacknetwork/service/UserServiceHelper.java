@@ -464,12 +464,10 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
         JSONObjectWrapper jsonObject =
-                        SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
-                                        restEndPoint, null);
-        boolean success =
-                        jsonObject != null && jsonObject.getJSONArray(JsonFields.ITEMS) != null
-                                        && jsonObject.getJSONArray(JsonFields.ITEMS).length() == 0;
-        if (success == false)
+                        getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint, null);
+
+        String deauthenticatedAccessToken = jsonObject.getString(JsonFields.AccessToken.ACCESS_TOKEN);
+        if (deauthenticatedAccessToken == null || !accessToken.equals(deauthenticatedAccessToken))
         {
             error.id = jsonObject.getInt(JsonFields.Error.ERROR_ID);
             error.name = jsonObject.getString(JsonFields.Error.ERROR_NAME);

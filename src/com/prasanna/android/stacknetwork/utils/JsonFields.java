@@ -141,4 +141,12 @@ public class JsonFields
     {
         public static final String NAME = "name";
     }
+
+    public static class AccessToken
+    {
+        public static final String ACCESS_TOKEN = "access_token";
+        public static final String EXPIRES_ON_DATE = "expires_on_date";
+        public static final String ACCOUNT_ID = "account_id";
+    }
+
 }

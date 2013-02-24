@@ -42,12 +42,15 @@ public class TagsService extends AbstractStackxService
     {
         private OnHandlerComplete onHandlerComplete;
         private Context context;
+        private UserServiceHelper userServiceHelper;
 
-        public ServiceHandler(Looper looper, Context context, OnHandlerComplete onHandlerComplete)
+        public ServiceHandler(Looper looper, Context context, UserServiceHelper userServiceHelper,
+                        OnHandlerComplete onHandlerComplete)
         {
             super(looper);
             this.context = context;
             this.onHandlerComplete = onHandlerComplete;
+            this.userServiceHelper = userServiceHelper;
         }
 
         @Override
@@ -59,12 +62,14 @@ public class TagsService extends AbstractStackxService
                 if (tagsOlderThanDay())
                 {
                     boolean registeredUser = AppUtils.inAuthenticatedRealm(context);
-                    tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
-                                    registeredUser);
+                    tags = userServiceHelper.getTags(OperatingSite.getSite().apiSiteParameter, 1, 100, registeredUser);
 
                     if (tags == null || tags.isEmpty())
-                        tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1,
-                                        100, !registeredUser);
+                    {
+                        tags =
+                                        userServiceHelper.getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
+                                                        !registeredUser);
+                    }
 
                     persistTags(tags);
                 }
@@ -128,18 +133,19 @@ public class TagsService extends AbstractStackxService
     @Override
     protected Handler getServiceHandler(Looper looper)
     {
-        return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete()
-        {
-            @Override
-            public void onHandleMessageFinish(Message message, Object... args)
-            {
-                TagsService.this.stopSelf(message.arg1);
-                
-                notifyWaitingObjectsOnComplete();
-                
-                LogWrapper.d(TAG, "Finished executing TagsService");
-                setRunning(false);
-            }
-        });
+        return new ServiceHandler(looper, getApplicationContext(), UserServiceHelper.getInstance(),
+                        new OnHandlerComplete()
+                        {
+                            @Override
+                            public void onHandleMessageFinish(Message message, Object... args)
+                            {
+                                TagsService.this.stopSelf(message.arg1);
+
+                                notifyWaitingObjectsOnComplete();
+
+                                LogWrapper.d(TAG, "Finished executing TagsService");
+                                setRunning(false);
+                            }
+                        });
     }
 }
