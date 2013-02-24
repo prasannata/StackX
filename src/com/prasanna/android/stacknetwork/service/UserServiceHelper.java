@@ -74,32 +74,53 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = StringConstants.SITES;
         LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
-        JSONObjectWrapper jsonObject =
-                        getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                                        AppUtils.getDefaultQueryParams());
-        try
-        {
-            if (jsonObject != null)
-            {
-                JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
+        boolean hasMore = true;
+        int page = 1;
+        final int PAGE_SIZE = 100;
+        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(PAGE_SIZE));
 
-                if (jsonArray != null)
-                {
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
-                        JSONObject siteJsonObject = jsonArray.getJSONObject(i);
-                        Site site = getSerializedSiteObject(new JSONObjectWrapper(siteJsonObject));
-                        if (site != null)
-                            sites.put(site.link, site);
-                    }
-                }
+        while (hasMore)
+        {
+            queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
+
+            JSONObjectWrapper jsonObject =
+                            getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
+                                            queryParams);
+            try
+            {
+                hasMore = addSites(sites, jsonObject);
+            }
+            catch (JSONException e)
+            {
+                LogWrapper.d(getLogTag(), e.getMessage());
+                hasMore = false;
             }
         }
-        catch (JSONException e)
-        {
-            LogWrapper.d(getLogTag(), e.getMessage());
-        }
         return sites;
+    }
+
+    private boolean addSites(LinkedHashMap<String, Site> sites, JSONObjectWrapper jsonObject) throws JSONException
+    {
+        if (jsonObject != null)
+        {
+            JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
+
+            if (jsonArray != null)
+            {
+                for (int i = 0; i < jsonArray.length(); i++)
+                {
+                    JSONObject siteJsonObject = jsonArray.getJSONObject(i);
+                    Site site = getSerializedSiteObject(new JSONObjectWrapper(siteJsonObject));
+                    if (site != null)
+                        sites.put(site.link, site);
+                }
+            }
+
+            return jsonObject.getBoolean(JsonFields.HAS_MORE);
+        }
+
+        return false;
     }
 
     private Site getSerializedSiteObject(JSONObjectWrapper siteJsonObject)
@@ -400,40 +421,39 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
     public HashMap<String, Account> getAccounts(int page)
     {
-        String restEndPoint = "/me/associated";
-        int pageSize = 100;
-
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.NETWORK_USER_TYPE_FILTER);
-        queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
-
-        return getAccounts(restEndPoint, queryParams);
+        return getAccounts("/me/associated", page, queryParams);
     }
 
     public HashMap<String, Account> getAccounts(long userId, int page)
     {
-        String restEndPoint = "/users/" + userId + "/associated";
-        int pageSize = 100;
-
-        Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
-
-        return getAccounts(restEndPoint, queryParams);
+        return getAccounts("/users/" + userId + "/associated", page, AppUtils.getDefaultQueryParams());
     }
 
-    private HashMap<String, Account> getAccounts(String restEndPoint, Map<String, String> queryParams)
+    private HashMap<String, Account> getAccounts(String restEndPoint, int page, Map<String, String> queryParams)
     {
-        HashMap<String, Account> accounts = null;
-        JSONObjectWrapper accountsJsonObject = executeHttpGetRequest(restEndPoint, queryParams);
+        final int PAGE_SIZE = 100;
+        boolean hasMore = true;
+        HashMap<String, Account> accounts = new HashMap<String, Account>();
+
+        queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(PAGE_SIZE));
+
+        while (hasMore)
+        {
+            queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
+            hasMore = addToMap(accounts, executeHttpGetRequest(restEndPoint, queryParams));
+        }
+        return accounts;
+    }
+
+    private boolean addToMap(HashMap<String, Account> accounts, JSONObjectWrapper accountsJsonObject)
+    {
         if (accountsJsonObject != null)
         {
             JSONArray jsonArray = accountsJsonObject.getJSONArray(JsonFields.ITEMS);
             if (jsonArray != null)
             {
-                accounts = new HashMap<String, Account>();
-
                 for (int i = 0; i < jsonArray.length(); i++)
                 {
                     try
@@ -453,8 +473,11 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                     }
                 }
             }
+
+            return accountsJsonObject.getBoolean(JsonFields.HAS_MORE);
         }
-        return accounts;
+
+        return false;
     }
 
     public StackExchangeHttpError logout(String accessToken)

@@ -33,7 +33,7 @@
     <string name="badge">badge</string>
     <string name="avatar">avatar</string>
     <string name="loadingSites">Loading sites</string>
-    <string name="loadingSitesForAuthUser">Loading sites, your accounts and permissions, this might take few seconds</string>
+    <string name="loadingSitesForAuthUser">Loading sites, accounts and permissions. This will take few seconds first time.</string>
     <string name="viewQuestion">View Question</string>
     <string name="registered">Registered</string>
     <string name="accepted">Accepted</string>

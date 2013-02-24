@@ -20,7 +20,7 @@
             android:layout_margin="5dp"
             android:layout_weight="0.9"
             android:cursorVisible="true"
-            android:hint="@string/searchForTag"
+            android:hint="@string/search"
             android:inputType="text"
             android:padding="5dp"
             android:textColor="@color/black"

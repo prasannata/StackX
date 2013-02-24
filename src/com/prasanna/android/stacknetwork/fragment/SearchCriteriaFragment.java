@@ -242,7 +242,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
                     for (String tag : tags)
                     {
-                        if (tag.startsWith((String) constraint) && !filteredTags.contains(tag))
+                        if (tag.startsWith(constraint.toString().toLowerCase()) && !filteredTags.contains(tag))
                             filteredTags.add(tag);
                     }
 

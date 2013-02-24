@@ -29,7 +29,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -51,12 +55,13 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
 public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver,
-                OnSiteSelectedListener
+                OnSiteSelectedListener, TextWatcher
 {
     private static final String TAG = StackNetworkListActivity.class.getSimpleName();
     private final String CHANGE_SITE_HINT = "change_site_hint";
     public static final String ACCOUNT_UPDATE_INTENT_FILTER = "com.prasanna.android.stacknetwork.sites.update";
 
+    private Object filterLock = new Object();
     private ProgressDialog progressDialog;
     private Intent intent = null;
     private ArrayList<Site> sites = new ArrayList<Site>();
@@ -65,6 +70,58 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     private RelativeLayout refreshOnUpdateOption;
     private ImageView refreshSites;
     private ImageView cancelRefreshSites;
+    private ImageView searchSite;
+    private EditText searchText;
+
+    public class SiteFilter extends Filter
+    {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint)
+        {
+            FilterResults result = new FilterResults();
+
+            if (constraint != null && constraint.length() > 0)
+            {
+                synchronized (filterLock)
+                {
+                    ArrayList<Site> filteredSites = new ArrayList<Site>();
+
+                    for (Site site : sites)
+                    {
+                        if (site.name.regionMatches(true, 0, constraint.toString(), 0, constraint.length()))
+                            filteredSites.add(site);
+                    }
+
+                    result.count = filteredSites.size();
+                    result.values = filteredSites;
+                }
+            }
+            else
+            {
+                synchronized (filterLock)
+                {
+                    result.count = sites.size();
+                    result.values = sites;
+                }
+            }
+            return result;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        protected void publishResults(CharSequence constraint, FilterResults results)
+        {
+            ArrayList<Site> filteredSites = (ArrayList<Site>) results.values;
+
+            siteListAdapter.notifyDataSetInvalidated();
+            siteListAdapter.clear();
+
+            siteListAdapter.addAll(filteredSites);
+            siteListAdapter.notifyDataSetChanged();
+
+        }
+
+    }
 
     private BroadcastReceiver accountUpdateReceiver = new BroadcastReceiver()
     {
@@ -85,9 +142,13 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         setContentView(R.layout.sitelist);
         setupSiteListRefreshOption();
+        setupSearch();
+
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
-        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>());
+        siteListAdapter =
+                        new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(),
+                                        new SiteFilter());
         siteListAdapter.setOnSiteSelectedListener(this);
         setListAdapter(siteListAdapter);
 
@@ -103,6 +164,29 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         registerAccountUpdateBroadcastReceiver();
         startIntentService();
+    }
+
+    private void setupSearch()
+    {
+        searchSite = (ImageView) findViewById(R.id.searchSite);
+        searchText = (EditText) findViewById(R.id.searchText);
+        searchText.setVisibility(View.GONE);
+        searchText.addTextChangedListener(this);
+        searchSite.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (searchText.getVisibility() == View.GONE)
+                {
+                    searchText.setVisibility(View.VISIBLE);
+                    searchText.requestFocus();
+                    AppUtils.showSoftInput(StackNetworkListActivity.this, searchText);
+                }
+                else
+                    searchText.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void registerAccountUpdateBroadcastReceiver()
@@ -236,5 +320,25 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startQuestionActivityIntent);
+    }
+
+    @Override
+    public void afterTextChanged(Editable s)
+    {
+        siteListAdapter.getFilter().filter(s);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count)
+    {
+        // TODO Auto-generated method stub
+
     }
 }

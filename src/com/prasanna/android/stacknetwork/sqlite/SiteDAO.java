@@ -32,6 +32,7 @@ import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.utils.LogWrapper;
 
 public class SiteDAO extends AbstractBaseDao
@@ -163,11 +164,26 @@ public class SiteDAO extends AbstractBaseDao
             cursor.moveToNext();
         }
 
+        Site defaultSite = AppUtils.getDefaultSite(context);
+        if (defaultSite != null && sites.indexOf(defaultSite) > 0)
+            sites.remove(defaultSite);
+
         if (registerdSites.isEmpty())
+        {
+            if (defaultSite != null && !sites.contains(defaultSite))
+                sites.add(defaultSite);
             return sites;
+        }
         else
         {
-            ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>(registerdSites);
+            ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>();
+            if (defaultSite != null)
+                sitesWithRegisteredFirst.add(defaultSite);
+            
+            if(registerdSites.contains(defaultSite))
+                registerdSites.remove(defaultSite);
+            
+            sitesWithRegisteredFirst.addAll(registerdSites);
             sitesWithRegisteredFirst.addAll(sites);
             return sitesWithRegisteredFirst;
         }
@@ -241,8 +257,7 @@ public class SiteDAO extends AbstractBaseDao
     public void update(Site site)
     {
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
-        String[] whereArgs = new String[]
-        { site.apiSiteParameter };
+        String[] whereArgs = new String[] { site.apiSiteParameter };
         getDatabase().update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
@@ -251,8 +266,7 @@ public class SiteDAO extends AbstractBaseDao
         for (Account account : newAccounts)
         {
             String whereClause = SiteTable.COLUMN_SITE_URL + "= ?";
-            String[] whereArgs = new String[]
-            { account.siteUrl };
+            String[] whereArgs = new String[] { account.siteUrl };
 
             ContentValues values = new ContentValues();
 
@@ -261,7 +275,8 @@ public class SiteDAO extends AbstractBaseDao
             else
                 values.put(SiteTable.COLUMN_USER_TYPE, "");
 
-            LogWrapper.d(TAG, "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
+            LogWrapper.d(TAG,
+                            "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
             getDatabase().update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
@@ -273,10 +288,10 @@ public class SiteDAO extends AbstractBaseDao
         String[] selectionArgs = { site, UserType.REGISTERED.getValue() };
 
         Cursor cursor = getDatabase().query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
-        
+
         return cursor != null && cursor.getCount() > 0;
     }
-    
+
     public static void insert(Context context, Site site)
     {
         SiteDAO dao = new SiteDAO(context);

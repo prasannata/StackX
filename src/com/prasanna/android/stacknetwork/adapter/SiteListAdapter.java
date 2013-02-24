@@ -20,13 +20,13 @@
 package com.prasanna.android.stacknetwork.adapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,20 +40,17 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 public class SiteListAdapter extends ArrayAdapter<Site>
 {
     private OnSiteSelectedListener onSiteSelectedListener;
+    private Filter filter;
 
     public interface OnSiteSelectedListener
     {
         void onSiteSelected(Site site);
     }
 
-    public SiteListAdapter(Context context, int textViewResourceId, List<Site> sites)
+    public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> sites, Filter filter)
     {
-        super(context, textViewResourceId, sites);
-    }
-
-    public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> arrayList)
-    {
-        super(context, layoutResourceId, textViewResourceId, arrayList);
+        super(context, layoutResourceId, textViewResourceId, sites);
+        this.filter = filter;
     }
 
     static class ViewHolder
@@ -154,6 +151,12 @@ public class SiteListAdapter extends ArrayAdapter<Site>
                     onSiteSelectedListener.onSiteSelected(getItem(position));
             }
         });
+    }
+
+    @Override
+    public Filter getFilter()
+    {
+        return filter;
     }
 
     public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener)
