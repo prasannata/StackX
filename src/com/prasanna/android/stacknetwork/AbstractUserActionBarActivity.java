@@ -19,8 +19,6 @@
 
 package com.prasanna.android.stacknetwork;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -47,14 +45,10 @@ import android.widget.SearchView;
 import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
-import com.prasanna.android.stacknetwork.model.InboxItem;
-import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
-import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
@@ -306,21 +300,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
             case R.id.menu_discard:
                 if (discardOptionListener != null)
                     discardOptionListener.onDiscardOptionClick();
-                return true;
-            case R.id.menu_option_test_gen_notify:
-                Intent notifyIntent = new Intent(UserIntentAction.NEW_MSG.getAction());
-                ArrayList<InboxItem> unreadInboxItems = new ArrayList<InboxItem>();
-                InboxItem inboxItem = new InboxItem();
-                inboxItem.itemType = ItemType.NEW_ANSWER;
-                inboxItem.title = "Python unit testing functions by using mocks";
-                inboxItem.body = "You can use mock library by Michael Foord, which is part Python 3. It makes this kind of mocking ...";
-                unreadInboxItems.add(inboxItem);
-
-                StackXPage<InboxItem> inboxItems = new StackXPage<InboxItem>();
-                inboxItems.items = unreadInboxItems;
-                inboxItems.hasMore = false;
-                notifyIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), inboxItems);
-                sendBroadcast(notifyIntent);
                 return true;
         }
 

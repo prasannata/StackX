@@ -78,11 +78,4 @@
         android:orderInCategory="6"
         android:showAsAction="never"
         android:title="@string/settings"/>
-    <item
-        android:id="@+id/menu_option_test_gen_notify"
-        android:icon="@drawable/new_msg_notify"
-        android:orderInCategory="8"
-        android:showAsAction="never"
-        android:title="Notify Test"/>
-
 </menu>
