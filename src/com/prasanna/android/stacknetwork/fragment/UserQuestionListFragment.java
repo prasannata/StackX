@@ -34,7 +34,6 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -112,7 +111,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     protected void startIntentService()
     {
-        intent = getIntentForService(UserIntentService.class, UserIntentAction.QUESTIONS_BY_USER.getAction());
+        intent = getIntentForService(UserIntentService.class, null);
         if (intent != null)
         {
             showProgressBar();
@@ -132,5 +131,11 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     public String getLogTag()
     {
         return TAG;
+    }
+
+    @Override
+    protected void loadNextPage()
+    {
+        startIntentService();
     }
 }

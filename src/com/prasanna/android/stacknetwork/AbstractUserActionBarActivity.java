@@ -51,6 +51,7 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User.UserType;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
@@ -104,14 +105,14 @@ public abstract class AbstractUserActionBarActivity extends Activity
     {
         super.onResume();
 
-        SharedPreferencesUtil.loadAccessToken(getApplicationContext());
+        AppUtils.loadAccessToken(getApplicationContext());
         refreshOperationSite();
     }
 
     public void refreshOperationSite()
     {
         if (OperatingSite.getSite() == null)
-            OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(this));
+            OperatingSite.setSite(AppUtils.getDefaultSite(this));
 
         if (OperatingSite.getSite() == null)
         {

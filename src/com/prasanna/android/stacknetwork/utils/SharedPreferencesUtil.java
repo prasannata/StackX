@@ -31,18 +31,14 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
-import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
-import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.utils.LogWrapper;
 
 public class SharedPreferencesUtil
 {
     private static final String TAG = SharedPreferencesUtil.class.getSimpleName();
-    private static String userAccessToken;
 
     public static void setBoolean(Context context, String key, boolean on)
     {
@@ -108,73 +104,6 @@ public class SharedPreferencesUtil
         }
     }
 
-    public static boolean isFirstRun(Context context)
-    {
-        return isSet(context, StringConstants.IS_FIRST_RUN, true);
-    }
-
-    public static void setFirstRunComplete(Context context)
-    {
-        setBoolean(context, StringConstants.IS_FIRST_RUN, false);
-    }
-
-    public static void clearDefaultSite(Context context)
-    {
-        SharedPreferencesUtil.setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
-        SharedPreferencesUtil.removeDefaultSite(context);
-    }
-
-    public static String getDefaultSiteName(Context context)
-    {
-        return getString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
-    }
-
-    public static void setDefaultSite(Context context, Site site)
-    {
-        if (site != null && context != null)
-        {
-            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-            writeObject(site, dir, StringConstants.SITE);
-
-            setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, site.name);
-        }
-    }
-
-    public static Site getDefaultSite(Context context)
-    {
-        if (context != null)
-        {
-            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-            if (dir.exists() && dir.isDirectory())
-            {
-                File file = new File(dir, StringConstants.SITE);
-                if (file.exists() && file.isFile())
-                {
-                    return (Site) readObject(file);
-                }
-
-            }
-        }
-
-        return null;
-    }
-
-    public static void removeDefaultSite(Context context)
-    {
-        if (context != null)
-        {
-            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-            if (dir.exists() && dir.isDirectory())
-            {
-                File file = new File(dir, StringConstants.SITE);
-                if (file.exists() && file.isFile())
-                {
-                    deleteFile(file);
-                }
-            }
-        }
-    }
-
     /**
      * Writes the given object to specified filename under specified directory.
      * 
@@ -190,9 +119,7 @@ public class SharedPreferencesUtil
         if (object != null && directory != null && fileName != null)
         {
             if (directory.exists() == false)
-            {
                 directory.mkdir();
-            }
 
             File cacheFile = new File(directory, fileName);
 
@@ -339,7 +266,6 @@ public class SharedPreferencesUtil
         Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         prefEditor.clear();
         prefEditor.commit();
-        userAccessToken = null;
     }
 
     public static boolean deleteFile(File file)
@@ -347,9 +273,7 @@ public class SharedPreferencesUtil
         boolean deleted = false;
 
         if (file != null && file.exists() == true && file.isFile())
-        {
             deleted = file.delete();
-        }
 
         return deleted;
     }
@@ -360,44 +284,9 @@ public class SharedPreferencesUtil
         {
             String[] children = dir.list();
             for (int i = 0; i < children.length; i++)
-            {
                 deleteDir(new File(dir, children[i]));
-            }
         }
         return dir.delete();
-    }
-
-    public static void cacheAccessToken(Context context, String accessToken)
-    {
-        if (accessToken != null)
-        {
-            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-            prefEditor.putString(StringConstants.ACCESS_TOKEN, accessToken);
-            prefEditor.commit();
-            userAccessToken = accessToken;
-        }
-    }
-
-    /**
-     * Returns the access token for current logged in user.
-     * 
-     * @param context
-     * @return access token
-     */
-    public static String getAccessToken(Context context)
-    {
-        if (userAccessToken == null && context != null)
-        {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            userAccessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-        }
-
-        return userAccessToken;
-    }
-
-    public static void loadAccessToken(Context context)
-    {
-        getAccessToken(context);
     }
 
     /**
@@ -417,15 +306,11 @@ public class SharedPreferencesUtil
             for (File file : files)
             {
                 if (file.isFile())
-                {
                     size += file.length();
-                }
                 else
                 {
                     if (file.isDirectory())
-                    {
                         size += size(file);
-                    }
                 }
             }
         }
@@ -446,9 +331,7 @@ public class SharedPreferencesUtil
         long size = size(cacheDir);
 
         if (size < BYTE_UNIT)
-        {
             return size + " B";
-        }
 
         int exp = (int) (Math.log(size) / Math.log(BYTE_UNIT));
 

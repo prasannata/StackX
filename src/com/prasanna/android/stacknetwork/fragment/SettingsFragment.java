@@ -45,7 +45,6 @@ import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.utils.LogWrapper;
 
 public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
@@ -162,7 +161,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 accountActionPref.getDialog().dismiss();
 
                 Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
-                SharedPreferencesUtil.clearDefaultSite(getActivity());
+                AppUtils.clearDefaultSite(getActivity());
                 SiteDAO.deleteAll(SettingsFragment.this.getActivity());
                 startActivity(oAuthIntent);
                 return true;
@@ -184,7 +183,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                     {
                         case DialogInterface.BUTTON_POSITIVE:
                             Intent logoutIntent = new Intent(getActivity(), LogoutActivity.class);
-                            SharedPreferencesUtil.clearDefaultSite(getActivity());
+                            AppUtils.clearDefaultSite(getActivity());
                             logoutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             logoutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(logoutIntent);

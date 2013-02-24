@@ -46,7 +46,6 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -133,7 +132,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     {
         showProgressBar();
 
-        intent = getIntentForService(UserIntentService.class, UserIntentAction.ANSWERS_BY_USER.getAction());
+        intent = getIntentForService(UserIntentService.class, null);
         if (intent != null)
         {
             intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
@@ -246,5 +245,11 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         intent.setAction(StringConstants.QUESTION_ID);
         intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
         startActivity(intent);
+    }
+
+    @Override
+    protected void loadNextPage()
+    {
+        startIntentService();
     }
 }

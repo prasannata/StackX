@@ -29,9 +29,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.utils.LogWrapper;
 
 public class LoginActivity extends Activity
@@ -51,7 +51,7 @@ public class LoginActivity extends Activity
 
         context = getApplicationContext();
 
-        if (SharedPreferencesUtil.isFirstRun(getApplicationContext()))
+        if (AppUtils.isFirstRun(getApplicationContext()))
         {
             LogWrapper.d(TAG, "Preparing for first run");
 
@@ -61,11 +61,11 @@ public class LoginActivity extends Activity
         }
         else
         {
-            if (SharedPreferencesUtil.getDefaultSiteName(context) != null)
+            if (AppUtils.getDefaultSiteName(context) != null)
             {
                 LogWrapper.d(TAG, "Launching default site");
 
-                OperatingSite.setSite(SharedPreferencesUtil.getDefaultSite(context));
+                OperatingSite.setSite(AppUtils.getDefaultSite(context));
                 Intent intent = new Intent(context, QuestionsActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -98,7 +98,7 @@ public class LoginActivity extends Activity
         {
             public void onClick(View view)
             {
-                SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
+                AppUtils.setFirstRunComplete(LoginActivity.this);
                 Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
                 startActivity(oAuthIntent);
             }
@@ -119,7 +119,7 @@ public class LoginActivity extends Activity
                     {
                         Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
                                         .show();
-                        SharedPreferencesUtil.setFirstRunComplete(LoginActivity.this);
+                        AppUtils.setFirstRunComplete(LoginActivity.this);
                         startActivity(new Intent(context, StackNetworkListActivity.class));
                     }
                 }

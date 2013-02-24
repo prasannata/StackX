@@ -35,7 +35,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 
 public class SiteListAdapter extends ArrayAdapter<Site>
 {
@@ -110,7 +110,7 @@ public class SiteListAdapter extends ArrayAdapter<Site>
 
     private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder)
     {
-        String currentDefaultSite = SharedPreferencesUtil.getDefaultSiteName(getContext());
+        String currentDefaultSite = AppUtils.getDefaultSiteName(getContext());
         if (isDefaultSite(currentDefaultSite, position))
             holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
         else
@@ -121,16 +121,16 @@ public class SiteListAdapter extends ArrayAdapter<Site>
             @Override
             public void onClick(View v)
             {
-                String currentDefaultSite = SharedPreferencesUtil.getDefaultSiteName(getContext());
+                String currentDefaultSite = AppUtils.getDefaultSiteName(getContext());
                 if (isDefaultSite(currentDefaultSite, position))
                 {
                     holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
-                    SharedPreferencesUtil.clearDefaultSite(getContext());
+                    AppUtils.clearDefaultSite(getContext());
                 }
                 else
                 {
                     holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
-                    SharedPreferencesUtil.setDefaultSite(getContext(), getItem(position));
+                    AppUtils.setDefaultSite(getContext(), getItem(position));
                     notifyDataSetChanged();
                     Toast.makeText(getContext(), getItem(position).name + " set as default site.", Toast.LENGTH_LONG)
                                     .show();

@@ -39,6 +39,16 @@ public abstract class AbstractBaseDao
         databaseHelper = new DatabaseHelper(context);
     }
 
+    protected SQLiteDatabase getDatabase()
+    {
+        return database;
+    }
+
+    protected DatabaseHelper getDatabaseHelper()
+    {
+        return databaseHelper;
+    }
+
     public boolean isOpen()
     {
         return database != null && database.isOpen();
@@ -47,17 +57,17 @@ public abstract class AbstractBaseDao
     public void open() throws SQLException
     {
         if (!isOpen())
-            database = databaseHelper.getWritableDatabase();
+            database = getDatabaseHelper().getWritableDatabase();
     }
 
     public void openReadOnly() throws SQLException
     {
-        database = databaseHelper.getReadableDatabase();
+        database = getDatabaseHelper().getReadableDatabase();
     }
 
     public void close()
     {
-        databaseHelper.close();
+        getDatabaseHelper().close();
     }
 
     protected void insertAuditEntry(String type, String site)
@@ -122,5 +132,4 @@ public abstract class AbstractBaseDao
 
         return cursor.getLong(0);
     }
-
 }

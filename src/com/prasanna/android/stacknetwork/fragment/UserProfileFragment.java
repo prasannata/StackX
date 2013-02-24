@@ -50,7 +50,6 @@ import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetImageAsyncTask;
@@ -158,7 +157,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         userProfileIntent = new Intent(getActivity(), UserIntentService.class);
         userProfileIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_PROFILE);
-        userProfileIntent.setAction(UserIntentAction.USER_DETAIL.getAction());
         userProfileIntent.putExtra(StringConstants.ME, me);
         userProfileIntent.putExtra(StringConstants.USER_ID, userId);
         userProfileIntent.putExtra(StringConstants.REFRESH, forceRefresh);

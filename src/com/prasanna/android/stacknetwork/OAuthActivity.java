@@ -35,7 +35,7 @@ import android.webkit.WebViewClient;
 
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
@@ -119,7 +119,7 @@ public class OAuthActivity extends Activity
             if (nameValuePair != null && nameValuePair.length == 2
                             && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
             {
-                SharedPreferencesUtil.cacheAccessToken(getApplicationContext(), nameValuePair[1]);
+                AppUtils.setAccessToken(getApplicationContext(), nameValuePair[1]);
             }
         }
     }
@@ -156,7 +156,7 @@ public class OAuthActivity extends Activity
 
         oauthUrl = uriBuilder.build().toString();
 
-        SharedPreferencesUtil.clearDefaultSite(getApplicationContext());
+        AppUtils.clearDefaultSite(getApplicationContext());
         webview.loadUrl(oauthUrl);
     }
 

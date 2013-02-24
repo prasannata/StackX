@@ -39,6 +39,7 @@ import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -130,7 +131,7 @@ public class LogoutActivity extends Activity
             editor.commit();
 
             SharedPreferencesUtil.clear(getApplicationContext());
-            SharedPreferencesUtil.setFirstRunComplete(getApplicationContext());
+            AppUtils.setFirstRunComplete(getApplicationContext());
             SiteDAO.deleteAll(getApplicationContext());
             TagDAO.purge(getApplicationContext());
             WritePermissionDAO.deleteAll(getApplicationContext());

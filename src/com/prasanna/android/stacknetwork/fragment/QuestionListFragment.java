@@ -38,7 +38,6 @@ import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -101,8 +100,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                            new ArrayList<Question>(), this);
+            itemListAdapter =
+                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                                            new ArrayList<Question>(), this);
         }
 
         if (savedInstanceState != null)
@@ -232,7 +232,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getFrontPage()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, null);
 
         if (intent != null)
         {
@@ -243,7 +243,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getSimilarQuestions()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
 
@@ -256,7 +256,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getRelatedQuestions()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
 
@@ -269,7 +269,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getFaqsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
 
@@ -282,7 +282,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void getQuestionsForTag()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.TAGS_FAQ.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
 
@@ -308,7 +308,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void startSearchIntentService()
     {
-        intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTION_SEARCH.getAction());
+        intent = getIntentForService(QuestionsIntentService.class, null);
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
         intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
 
@@ -329,5 +329,11 @@ public class QuestionListFragment extends AbstractQuestionListFragment
             criteria = criteria.mustBeAnswered();
 
         criteria = criteria.sortBy(SearchSort.RELEVANCE).build();
+    }
+
+    @Override
+    protected void loadNextPage()
+    {
+        startIntentService();
     }
 }

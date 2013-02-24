@@ -9,7 +9,6 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.StackXIntentAction.QuestionIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class SearchQuestionListFragment extends QuestionListFragment
@@ -86,16 +85,25 @@ public class SearchQuestionListFragment extends QuestionListFragment
     {
         if (intent == null)
         {
-            intent = getIntentForService(QuestionsIntentService.class, QuestionIntentAction.QUESTIONS.getAction());
+            intent = getIntentForService(QuestionsIntentService.class, null);
             if (intent != null)
             {
-
                 intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
                 intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
                 intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
             }
         }
         else
-            intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria.nextPage());
+            intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
     }
+
+    @Override
+    protected void loadNextPage()
+    {
+        if (searchCriteria != null)
+            searchCriteria = searchCriteria.nextPage();
+
+        startIntentService();
+    }
+
 }

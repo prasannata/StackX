@@ -78,9 +78,9 @@ public class SiteDAO extends AbstractBaseDao
             database.beginTransaction();
             try
             {
-                id = database.insert(TABLE_NAME, null, getContentValues(site));
+                id = getDatabase().insert(TABLE_NAME, null, getContentValues(site));
                 insertAuditEntry(AUDIT_ENTRY_TYPE, null);
-                database.setTransactionSuccessful();
+                getDatabase().setTransactionSuccessful();
             }
             catch (SQLException e)
             {
@@ -99,14 +99,14 @@ public class SiteDAO extends AbstractBaseDao
     {
         if (sites != null)
         {
-            database.beginTransaction();
+            getDatabase().beginTransaction();
             try
             {
                 for (Site site : sites)
-                    database.insert(TABLE_NAME, null, getContentValues(site));
+                    getDatabase().insert(TABLE_NAME, null, getContentValues(site));
 
                 insertAuditEntry(AUDIT_ENTRY_TYPE, null);
-                database.setTransactionSuccessful();
+                getDatabase().setTransactionSuccessful();
             }
             catch (SQLException e)
             {
@@ -114,7 +114,7 @@ public class SiteDAO extends AbstractBaseDao
             }
             finally
             {
-                database.endTransaction();
+                getDatabase().endTransaction();
             }
         }
     }
@@ -141,7 +141,7 @@ public class SiteDAO extends AbstractBaseDao
 
     public ArrayList<Site> getSites()
     {
-        Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = getDatabase().query(TABLE_NAME, null, null, null, null, null, null);
 
         if (cursor == null || cursor.getCount() == 0)
         {
@@ -175,7 +175,7 @@ public class SiteDAO extends AbstractBaseDao
 
     public HashMap<String, Site> getLinkSitesMap()
     {
-        Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, null);
+        Cursor cursor = getDatabase().query(TABLE_NAME, null, null, null, null, null, null);
 
         if (cursor == null || cursor.getCount() == 0)
         {
@@ -234,7 +234,7 @@ public class SiteDAO extends AbstractBaseDao
 
     public void deleteAll()
     {
-        database.delete(TABLE_NAME, null, null);
+        getDatabase().delete(TABLE_NAME, null, null);
         deleteAuditEntry(AUDIT_ENTRY_TYPE, null);
     }
 
@@ -243,7 +243,7 @@ public class SiteDAO extends AbstractBaseDao
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
         String[] whereArgs = new String[]
         { site.apiSiteParameter };
-        database.update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
+        getDatabase().update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
     public void updateRegistrationInfo(ArrayList<Account> newAccounts, boolean allRegistered)
@@ -262,7 +262,7 @@ public class SiteDAO extends AbstractBaseDao
                 values.put(SiteTable.COLUMN_USER_TYPE, "");
 
             LogWrapper.d(TAG, "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
-            database.update(TABLE_NAME, values, whereClause, whereArgs);
+            getDatabase().update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
 
@@ -272,7 +272,7 @@ public class SiteDAO extends AbstractBaseDao
         String selection = SiteTable.COLUMN_API_SITE_PARAMTETER + " = ? and " + SiteTable.COLUMN_USER_TYPE + " = ?";
         String[] selectionArgs = { site, UserType.REGISTERED.getValue() };
 
-        Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
+        Cursor cursor = getDatabase().query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
         
         return cursor != null && cursor.getCount() > 0;
     }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -296,11 +296,9 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     public StackXPage<Question> getAllQuestions(String sort, int page)
     {
-        StackXPage<Question> questions = null;
         if (sort == null)
             sort = StackUri.Sort.ACTIVITY;
 
-        String restEndPoint = "questions";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
         queryParams.put(StackUri.QueryParams.SORT, sort);
@@ -308,19 +306,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-        if (questionsJsonResponse != null)
-        {
-            questions = getQuestionModel(questionsJsonResponse);
-        }
-
-        return questions;
+        return getQuestionPage(StringConstants.QUESTIONS, queryParams);
     }
 
     public StackXPage<Question> getRelatedQuestions(long questionId, int page)
     {
-        StackXPage<Question> questions = null;
-
         String restEndPoint = "questions/" + questionId + "/related";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
@@ -329,19 +319,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-        if (questionsJsonResponse != null)
-        {
-            questions = getQuestionModel(questionsJsonResponse);
-        }
-
-        return questions;
+        return getQuestionPage(restEndPoint, queryParams);
     }
 
     public StackXPage<Question> getFaqForTag(String tag, int page)
     {
-        StackXPage<Question> questions = null;
-
         if (tag != null)
         {
             String restEndPoint = "tags/" + tag + "/faq";
@@ -351,20 +333,14 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
             queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-            JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-
-            if (questionsJsonResponse != null)
-            {
-                questions = getQuestionModel(questionsJsonResponse);
-            }
+            return getQuestionPage(restEndPoint, queryParams);
         }
 
-        return questions;
+        return null;
     }
 
     public StackXPage<Question> getQuestionsForTag(String tag, String sort, int page)
     {
-        StackXPage<Question> questions = null;
         if (sort == null)
             sort = StackUri.Sort.ACTIVITY;
         if (tag != null)
@@ -380,21 +356,14 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
             queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-            JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-
-            if (questionsJsonResponse != null)
-            {
-                questions = getQuestionModel(questionsJsonResponse);
-            }
+            return getQuestionPage(restEndPoint, queryParams);
         }
 
-        return questions;
+        return null;
     }
 
     public StackXPage<Question> getSimilar(String title, int page)
     {
-        StackXPage<Question> questions = null;
-
         if (title != null)
         {
             String restEndPoint = "similar";
@@ -406,15 +375,20 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
             queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
 
-            JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-
-            if (questionsJsonResponse != null)
-            {
-                questions = getQuestionModel(questionsJsonResponse);
-            }
+            return getQuestionPage(restEndPoint, queryParams);
         }
 
-        return questions;
+        return null;
+    }
+
+    private StackXPage<Question> getQuestionPage(String restEndPoint, Map<String, String> queryParams)
+    {
+        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
+
+        if (questionsJsonResponse != null)
+            return getQuestionModel(questionsJsonResponse);
+        
+        return null;
     }
 
 }

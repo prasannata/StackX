@@ -26,41 +26,12 @@ public class StackXIntentAction
         String getAction();
     }
 
-    public enum QuestionIntentAction implements IntentAction
-    {
-        QUESTIONS("com.prasanna.stacknetwork.questions"),
-        QUESTION_BODY("com.prasanna.stacknetwork.questionBody"),
-        QUESTION_FULL_DETAILS("com.prasanna.stacknetwork.questionFullDetails"),
-        QUESTION_ANSWERS("com.prasanna.stacknetwork.questionAnswers"),
-        QUESTION_COMMENTS("com.prasanna.stacknetwork.questionComments"),
-        QUESTION_SEARCH("com.prasanna.stacknetwork.questionSearch"),
-        ANSWER_COMMENTS("com.prasanna.stacknetwork.answerComments"),
-        TAGS_FAQ("com.prasanna.stacknetwork.tagsFaq");
-        private final String action;
-
-        private QuestionIntentAction(String action)
-        {
-            this.action = action;
-        }
-
-        public String getAction()
-        {
-            return action;
-        }
-    }
-
     public enum UserIntentAction implements IntentAction
     {
-        INBOX("com.prasanna.stacknetwork.inbox"),
-        ALL_USERS("com.prasanna.stacknetwork.users"),
-        USER_DETAIL("com.prasanna.stacknetwork.userDetail"),
-        USER_ACCOUNTS("com.prasanna.stacknetwork.userAccounts"),
-        QUESTIONS_BY_USER("com.prasanna.stacknetwork.questionsByUser"),
-        ANSWERS_BY_USER("com.prasanna.stacknetwork.answersByUser"),
         LOGOUT("com.prasanna.stacknetwork.logout"),
-        SITES("com.prasanna.stacknetwork.userSites"),
         NEW_MSG("com.prasanna.stacknetwork.newMsg"),
         TOTAL_NEW_MSGS("com.prasanna.stacknetwork.newMsgTotal");
+        
         private final String action;
 
         private UserIntentAction(String action)

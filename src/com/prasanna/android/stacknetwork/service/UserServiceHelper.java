@@ -74,8 +74,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = StringConstants.SITES;
         LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
-                        StackUri.STACKX_API_HOST, restEndPoint, AppUtils.getDefaultQueryParams());
+        JSONObjectWrapper jsonObject =
+                        getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
+                                        AppUtils.getDefaultQueryParams());
         try
         {
             if (jsonObject != null)
@@ -188,8 +189,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
-                        StackUri.STACKX_API_HOST, "/me", queryParams);
+        JSONObjectWrapper jsonObject =
+                        SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST, "/me",
+                                        queryParams);
 
         return getSerializedUserObject(jsonObject);
     }
@@ -203,8 +205,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
         if (userId != -1)
         {
-            JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
-                            StackUri.STACKX_API_HOST, "/users/" + userId, queryParams);
+            JSONObjectWrapper jsonObject =
+                            SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
+                                            "/users/" + userId, queryParams);
 
             page = getSerializedUserObject(jsonObject);
         }
@@ -298,12 +301,13 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                         permission.canAdd = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_ADD);
                         permission.canDelete = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_DELETE);
                         permission.canEdit = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_EDIT);
-                        permission.maxDailyActions = permissionJsonObject
-                                        .getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
-                        permission.minSecondsBetweenActions = permissionJsonObject
-                                        .getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
-                        permission.objectType = ObjectType.getEnum(permissionJsonObject
-                                        .getString(JsonFields.Permission.OBJECT_TYPE));
+                        permission.maxDailyActions =
+                                        permissionJsonObject.getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
+                        permission.minSecondsBetweenActions =
+                                        permissionJsonObject.getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
+                        permission.objectType =
+                                        ObjectType.getEnum(permissionJsonObject
+                                                        .getString(JsonFields.Permission.OBJECT_TYPE));
                         permission.userId = permissionJsonObject.getLong(JsonFields.Permission.USER_ID);
                         permissions.add(permission);
                     }
@@ -459,10 +463,12 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         error.id = -1;
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
-        JSONObjectWrapper jsonObject = SecureHttpHelper.getInstance().executeGetForGzipResponse(
-                        StackUri.STACKX_API_HOST, restEndPoint, null);
-        boolean success = jsonObject != null && jsonObject.getJSONArray(JsonFields.ITEMS) != null
-                        && jsonObject.getJSONArray(JsonFields.ITEMS).length() == 0;
+        JSONObjectWrapper jsonObject =
+                        SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
+                                        restEndPoint, null);
+        boolean success =
+                        jsonObject != null && jsonObject.getJSONArray(JsonFields.ITEMS) != null
+                                        && jsonObject.getJSONArray(JsonFields.ITEMS).length() == 0;
         if (success == false)
         {
             error.id = jsonObject.getInt(JsonFields.Error.ERROR_ID);

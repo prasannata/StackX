@@ -486,4 +486,10 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         transaction.commit();
     }
 
+    @Override
+    protected void loadNextPage()
+    {
+        
+    }
+
 }

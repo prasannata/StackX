@@ -19,6 +19,7 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
+import java.io.File;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,12 +39,110 @@ import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.SearchCriteriaListActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 
 public class AppUtils
 {
+    private static String userAccessToken;
+
+    public static void setAccessToken(Context context, String accessToken)
+    {
+        if (userAccessToken == null && accessToken != null)
+        {
+            SharedPreferencesUtil.setString(context, StringConstants.ACCESS_TOKEN, accessToken);
+            userAccessToken = accessToken;
+        }
+    }
+
+    public static String getAccessToken(Context context)
+    {
+        if (userAccessToken == null)
+            userAccessToken = SharedPreferencesUtil.getString(context, StringConstants.ACCESS_TOKEN, null);
+
+        return userAccessToken;
+    }
+
+    public static void loadAccessToken(Context context)
+    {
+        getAccessToken(context);
+    }
+
+    public static void clearSharedPreferences(Context context)
+    {
+        SharedPreferencesUtil.clearSharedPreferences(context);
+        userAccessToken = null;
+    }
+
+    public static boolean isFirstRun(Context context)
+    {
+        return SharedPreferencesUtil.isSet(context, StringConstants.IS_FIRST_RUN, true);
+    }
+
+    public static void setFirstRunComplete(Context context)
+    {
+        SharedPreferencesUtil.setBoolean(context, StringConstants.IS_FIRST_RUN, false);
+    }
+
+    public static void clearDefaultSite(Context context)
+    {
+        SharedPreferencesUtil.setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
+        removeDefaultSite(context);
+    }
+
+    public static String getDefaultSiteName(Context context)
+    {
+        return SharedPreferencesUtil.getString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
+    }
+
+    public static void setDefaultSite(Context context, Site site)
+    {
+        if (site != null && context != null)
+        {
+            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+            SharedPreferencesUtil.writeObject(site, dir, StringConstants.SITE);
+
+            SharedPreferencesUtil.setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, site.name);
+        }
+    }
+
+    public static Site getDefaultSite(Context context)
+    {
+        if (context != null)
+        {
+            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+            if (dir.exists() && dir.isDirectory())
+            {
+                File file = new File(dir, StringConstants.SITE);
+                if (file.exists() && file.isFile())
+                {
+                    return (Site) SharedPreferencesUtil.readObject(file);
+                }
+
+            }
+        }
+
+        return null;
+    }
+
+    public static void removeDefaultSite(Context context)
+    {
+        if (context != null)
+        {
+            File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
+            if (dir.exists() && dir.isDirectory())
+            {
+                File file = new File(dir, StringConstants.SITE);
+                if (file.exists() && file.isFile())
+                {
+                    SharedPreferencesUtil.deleteFile(file);
+                }
+            }
+        }
+    }
+
     public static String formatReputation(int reputation)
     {
         if (reputation > 0)
@@ -66,7 +165,7 @@ public class AppUtils
 
     public static boolean inAuthenticatedRealm(Context context)
     {
-        return SharedPreferencesUtil.getAccessToken(context) == null ? false : true;
+        return getAccessToken(context) == null ? false : true;
     }
 
     public static boolean inRegisteredSite(Context context)
@@ -80,7 +179,7 @@ public class AppUtils
         Map<String, String> queryParams = new HashMap<String, String>();
         queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
 
-        String accessToken = SharedPreferencesUtil.getAccessToken(null);
+        String accessToken = getAccessToken(null);
         if (accessToken != null)
         {
             queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);

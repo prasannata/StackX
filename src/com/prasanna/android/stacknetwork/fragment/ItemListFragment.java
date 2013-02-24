@@ -66,6 +66,8 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
     protected abstract String getReceiverExtraName();
 
+    protected abstract void loadNextPage();
+    
     protected abstract void startIntentService();
 
     protected abstract String getLogTag();
@@ -149,7 +151,8 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         if (!serviceRunning)
         {
             Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
-            intentForService.setAction(action);
+            if (action != null)
+                intentForService.setAction(action);
             return intentForService;
         }
 
