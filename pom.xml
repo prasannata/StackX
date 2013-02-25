@@ -104,39 +104,15 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>com.pyx4me</groupId>
-                        <artifactId>proguard-maven-plugin</artifactId>
-                        <version>2.0.4</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>proguard</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <injars>android-classes</injars>
-                            <options>
-                                <option>@proguard.cfg</option>
-                            </options>
-                            <libs>
-                                <lib>${java.home}/../classes/classes.jar</lib>
-                                <lib>${java.home}/../classes/jsse.jar</lib>
-                            </libs>
-                            <skip>false</skip>
-                            <obfuscate>true</obfuscate>
-                        </configuration>
-                    </plugin>
-                    <plugin>
                         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                         <artifactId>android-maven-plugin</artifactId>
                         <version>3.5.0</version>
                         <executions>
                             <execution>
-                                <id>alignApk</id>
+                                <id>optimizeAndAlign</id>
                                 <phase>package</phase>
                                 <goals>
+                                    <goal>proguard</goal>
                                     <goal>zipalign</goal>
                                 </goals>
                             </execution>
@@ -147,6 +123,10 @@
                                 <path>${android.sdk.path}</path>
                                 <platform>${android.platform}</platform>
                             </sdk>
+                            <proguard>
+                                <skip>false</skip>
+                                <config>proguard.cfg</config>
+                            </proguard>
                             <zipalign>
                                 <skip>false</skip>
                             </zipalign>
