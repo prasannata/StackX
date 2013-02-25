@@ -140,6 +140,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "/comments/" + id;
         Map<String, String> queryParams = getDefaultQueryParams();
+        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
         if (site != null)
             queryParams.put(StackUri.QueryParams.SITE, site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
@@ -160,10 +161,12 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
                         comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
                         comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
                         comment.body = jsonObject.getString(JsonFields.Post.BODY);
-                        comment.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
-                        comment.score = jsonObject.getInt(JsonFields.Post.SCORE);
-                        comment.owner = getSerializableUserSnippetObject(jsonObject
-                                        .getJSONObject(JsonFields.Post.OWNER));
+                        comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
+                        comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
+                        comment.owner =
+                                        getSerializableUserSnippetObject(jsonObject
+                                                        .getJSONObject(JsonFields.Post.OWNER));
+                        comment.type = PostType.getEnum(jsonObject.getString(JsonFields.Comment.POST_TYPE));
                         return comment;
                     }
                 }

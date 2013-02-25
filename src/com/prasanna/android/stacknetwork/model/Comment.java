@@ -21,11 +21,15 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
+import com.prasanna.android.stacknetwork.model.Post.PostType;
+
 public class Comment extends StackXItem implements Serializable
 {
     private static final long serialVersionUID = 4507419037482371574L;
 
     public long post_id;
+
+    public PostType type;
 
     @Override
     public int hashCode()

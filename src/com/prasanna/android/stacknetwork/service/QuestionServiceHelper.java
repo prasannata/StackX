@@ -191,6 +191,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.CREATION);
         queryParams.put(StackUri.QueryParams.ORDER, Order.ASC);
+        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
 
         JSONObjectWrapper commentsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
