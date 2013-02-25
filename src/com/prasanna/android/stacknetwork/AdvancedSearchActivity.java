@@ -184,7 +184,14 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                         && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible())
         {
-            getFragmentManager().popBackStackImmediate();
+            if (!getFragmentManager().popBackStackImmediate())
+            {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.show(searchCriteriaFragment);
+                ft.hide(questionListFragment);
+                ft.commit();
+            }
+
             return true;
         }
 
@@ -203,7 +210,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         }
         else
             searchCriteriaFragment.updateViewForDualPane(getResources().getConfiguration().orientation);
-        
+
         ft.commit();
 
         questionListFragment.search(searchCriteria, savedCriteria);
