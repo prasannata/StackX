@@ -184,8 +184,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
         getActionBar().setTitle(getString(R.string.similar) + " to " + title);
 
-        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null,
-                        null);
+        QuestionListFragment newFragment =
+                        QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null, null);
         newFragment.getBundle().putString(StringConstants.TITLE, title);
         replaceFragment(newFragment, StringConstants.SIMILAR + "-" + title.hashCode(), false);
     }
@@ -193,8 +193,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showRelatedQuestionListFragment()
     {
         long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
-        QuestionListFragment newFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null,
-                        null);
+        QuestionListFragment newFragment =
+                        QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null, null);
         newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
         replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, false);
     }
@@ -231,8 +231,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         }
         else
         {
-            HashMap<String, SearchCriteria> customTabs = DbRequestThreadExecutor.getSearchesMarkedForTab(
-                            getApplicationContext(), OperatingSite.getSite().apiSiteParameter);
+            HashMap<String, SearchCriteria> customTabs =
+                            DbRequestThreadExecutor.getSearchesMarkedForTab(getApplicationContext(),
+                                            OperatingSite.getSite().apiSiteParameter);
 
             if (customTabs != null)
             {
@@ -251,8 +252,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void saveSearchQuery(String query)
     {
-        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
-                        RecentQueriesProvider.MODE);
+        SearchRecentSuggestions suggestions =
+                        new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY, RecentQueriesProvider.MODE);
         suggestions.saveRecentQuery(query, null);
     }
 
@@ -394,8 +395,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void refresh()
     {
-        QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
-                        R.id.fragmentContainer);
+        QuestionListFragment questionsFragment =
+                        (QuestionListFragment) getFragmentManager().findFragmentById(R.id.fragmentContainer);
         questionsFragment.refresh();
     }
 
@@ -429,7 +430,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             return true;
         }
 
-        return false;
+        return super.onActionBarHomeButtonClick(menuItem);
     }
 
     private void toggleDisplayForTags(boolean forTags)
