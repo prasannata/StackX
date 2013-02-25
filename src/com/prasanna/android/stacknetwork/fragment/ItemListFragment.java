@@ -273,17 +273,14 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
                         && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
         {
-            LogWrapper.v(TAG, "onScroll reached bottom threshold. Fetching more questions");
-
             if (currentPageObject != null && currentPageObject.hasMore)
-                startIntentService();
+                loadNextPage();
         }
     }
 
     @Override
     public void onScrollStateChanged(AbsListView view, int scrollState)
     {
-        LogWrapper.v(TAG, "onScrollStateChanged");
     }
 
     protected ProgressBar getProgressBar()

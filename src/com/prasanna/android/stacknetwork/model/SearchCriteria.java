@@ -275,7 +275,7 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria nextPage()
     {
-        criteria.put(PAGE, String.valueOf(page++));
+        criteria.put(PAGE, String.valueOf(++page));
         return this;
     }
 
@@ -324,6 +324,7 @@ public class SearchCriteria implements Serializable
         if (excludeTags != null)
             excludeTags.clear();
 
+        page = 1;
         return this;
     }
 
