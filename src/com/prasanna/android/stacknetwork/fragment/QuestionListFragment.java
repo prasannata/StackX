@@ -108,8 +108,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (savedInstanceState != null)
             action = savedInstanceState.getInt(StringConstants.ACTION);
 
-        created = false;
-
         return itemsContainer;
     }
 
