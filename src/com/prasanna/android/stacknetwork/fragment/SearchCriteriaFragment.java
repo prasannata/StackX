@@ -590,11 +590,11 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
                 {
                     case R.id.dontCareForAns:
                         searchCriteriaDomain.searchCriteria.setMinAnswers(0);
-                        searchCriteriaDomain.searchCriteria.needNotBeAnswered();
+                        searchCriteriaDomain.searchCriteria.clearAnswered();
                         break;
                     case R.id.hasAnswers:
                         searchCriteriaDomain.searchCriteria.setMinAnswers(1);
-                        searchCriteriaDomain.searchCriteria.needNotBeAnswered();
+                        searchCriteriaDomain.searchCriteria.clearAnswered();
                         break;
                     case R.id.isAnswered:
                         searchCriteriaDomain.searchCriteria.setMinAnswers(0);

@@ -124,9 +124,9 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria needNotBeAnswered()
+    public SearchCriteria clearAnswered()
     {
-        criteria.put(ACCEPTED, String.valueOf(false));
+        criteria.remove(ACCEPTED);
         return this;
     }
 
