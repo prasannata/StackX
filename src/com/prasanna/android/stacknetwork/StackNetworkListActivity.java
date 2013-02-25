@@ -52,12 +52,10 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 
 public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver,
                 OnSiteSelectedListener, TextWatcher
 {
-    private static final String TAG = StackNetworkListActivity.class.getSimpleName();
     private final String CHANGE_SITE_HINT = "change_site_hint";
     public static final String ACCOUNT_UPDATE_INTENT_FILTER = "com.prasanna.android.stacknetwork.sites.update";
 
@@ -118,9 +116,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
             siteListAdapter.addAll(filteredSites);
             siteListAdapter.notifyDataSetChanged();
-
         }
-
     }
 
     private BroadcastReceiver accountUpdateReceiver = new BroadcastReceiver()
@@ -136,8 +132,6 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        LogWrapper.d(TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.sitelist);
@@ -331,14 +325,10 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after)
     {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count)
     {
-        // TODO Auto-generated method stub
-
     }
 }
