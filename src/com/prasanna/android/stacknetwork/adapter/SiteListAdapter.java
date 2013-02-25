@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.adapter;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +80,7 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.siteNameView.setText(getItem(position).name);
+        holder.siteNameView.setText(Html.fromHtml(getItem(position).name));
 
         if (getItem(position).userType != null && getItem(position).userType.equals(UserType.REGISTERED))
             holder.registeredView.setVisibility(View.VISIBLE);

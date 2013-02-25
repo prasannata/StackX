@@ -145,7 +145,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
             TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
             textView.setText(AppUtils.formatNumber(answer.score));
             if (answer.accepted)
-                textView.setBackgroundColor(getResources().getColor(R.color.lichen));
+                textView.setBackgroundResource(R.drawable.ans_score_answered_padded);
 
             String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
             textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
