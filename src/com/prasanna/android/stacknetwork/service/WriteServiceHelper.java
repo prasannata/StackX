@@ -65,25 +65,21 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
 
     public Comment addComment(long postId, String body)
     {
-        String restEndPoint = "/posts/" + postId + "/comments/add";
-
-        return writeComment(body, restEndPoint);
-
+        return writeComment("/posts/" + postId + "/comments/add", body);
     }
 
-    private Comment writeComment(String body, String restEndPoint)
+    public Comment editComment(long commentId, String editedText)
     {
-        List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+        return writeComment("/comments/" + commentId + "/edit", editedText);
+    }
 
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.getAccessToken(null)));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
+    private Comment writeComment(String restEndPoint, String body)
+    {
+        List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER, QueryParamDefaultValues.ITEM_DETAIL_FILTER));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.BODY, body));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
 
         Map<String, String> requestHeaders = new HashMap<String, String>();
-
         requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
         requestHeaders.put(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
 
@@ -107,19 +103,23 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public void deleteComment(long commentId)
+    private List<BasicNameValuePair> getBasicNameValuePartListForWriteComment()
     {
-        String restEndPoint = "/comments/" + commentId + "/delete";
-
         List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.getAccessToken(null)));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
         parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
+        return parameters;
+    }
+
+    public void deleteComment(long commentId)
+    {
+        String restEndPoint = "/comments/" + commentId + "/delete";
+
+        List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
 
         Map<String, String> requestHeaders = new HashMap<String, String>();
-
         requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
 
         try
@@ -130,12 +130,5 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
         {
             throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
         }
-    }
-
-    public Comment editComment(long commentId, String editedText)
-    {
-        String restEndPoint = "/comments/" + commentId + "/edit";
-
-        return writeComment(editedText, restEndPoint);
     }
 }

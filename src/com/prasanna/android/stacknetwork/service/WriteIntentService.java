@@ -51,6 +51,7 @@ public class WriteIntentService extends AbstractIntentService
     {
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final long postId = intent.getLongExtra(StringConstants.POST_ID, -1);
+        final int viewPagerPosition = intent.getIntExtra(StringConstants.VIEW_PAGER_POSITION, -1);
         final long commentId = intent.getLongExtra(StringConstants.COMMENT_ID, -1);
         final String body = intent.getStringExtra(StringConstants.BODY);
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
@@ -62,7 +63,7 @@ public class WriteIntentService extends AbstractIntentService
             switch (action)
             {
                 case ACTION_ADD_COMMENT:
-                    sendComment(postId, body, receiver);
+                    sendComment(postId, viewPagerPosition, body, receiver);
                     break;
                 case ACTION_EDIT_COMMENT:
                     editComment(commentId, body, receiver);
@@ -84,10 +85,13 @@ public class WriteIntentService extends AbstractIntentService
         }
     }
 
-    private void sendComment(final long postId, final String body, final ResultReceiver receiver)
+    private void sendComment(final long postId, final int viewPagerPosition, final String body,
+                    final ResultReceiver receiver)
     {
         Bundle resultData = new Bundle();
         Comment comment = WriteServiceHelper.getInstance().addComment(postId, body);
+        resultData.putLong(StringConstants.POST_ID, postId);
+        resultData.putInt(StringConstants.VIEW_PAGER_POSITION, viewPagerPosition);
         resultData.putSerializable(StringConstants.COMMENT, comment);
         receiver.send(ACTION_ADD_COMMENT, resultData);
     }

@@ -20,6 +20,8 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import android.app.Fragment;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,6 +43,7 @@ import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
@@ -65,6 +68,7 @@ public class PostCommentFragment extends Fragment
     private ProgressBar sendProgressBar;
     private boolean myEdit = false;
     private long commentId;
+    private int viewPagerPosition;
 
     private class CommentTextWatcher implements TextWatcher
     {
@@ -111,6 +115,11 @@ public class PostCommentFragment extends Fragment
         this.postId = id;
     }
 
+    public void setViewPagerPosition(int viewPagerPosition)
+    {
+        this.viewPagerPosition = viewPagerPosition;
+    }
+
     public void setCommentId(long commentId)
     {
         this.commentId = commentId;
@@ -142,6 +151,14 @@ public class PostCommentFragment extends Fragment
             sendStatus.setText(error != null ? error.name : failureText);
             sendStatus.setTextColor(Color.RED);
             sendStatus.setVisibility(View.VISIBLE);
+            DialogBuilder.okDialog(getActivity(), error.msg, new OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            }).show();
         }
 
         editText.setFocusableInTouchMode(true);
@@ -282,8 +299,9 @@ public class PostCommentFragment extends Fragment
             }
             else
             {
-                long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(getActivity(),
-                                WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+                long minSecondsBetweenWrite =
+                                SharedPreferencesUtil.getLong(getActivity(),
+                                                WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
                 Toast.makeText(getActivity(),
                                 "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
                                 Toast.LENGTH_LONG).show();
@@ -304,6 +322,7 @@ public class PostCommentFragment extends Fragment
         }
         else
             intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+        intent.putExtra(StringConstants.VIEW_PAGER_POSITION, viewPagerPosition);
         intent.putExtra(StringConstants.POST_ID, postId);
         intent.putExtra(StringConstants.BODY, body);
         getActivity().startService(intent);

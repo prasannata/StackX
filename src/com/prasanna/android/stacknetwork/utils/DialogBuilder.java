@@ -27,15 +27,20 @@ public class DialogBuilder
 {
     public static AlertDialog yesNoDialog(Context context, int msgStringResId, DialogInterface.OnClickListener listener)
     {
-	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-	return alertDialogBuilder.setMessage(msgStringResId).setPositiveButton(android.R.string.yes, listener)
-	                .setNegativeButton(android.R.string.no, listener).create();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        return alertDialogBuilder.setMessage(msgStringResId).setPositiveButton(android.R.string.yes, listener)
+                        .setNegativeButton(android.R.string.no, listener).create();
     }
 
     public static AlertDialog okDialog(Context context, int msgStringResId, DialogInterface.OnClickListener listener)
     {
-	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-	return alertDialogBuilder.setMessage(msgStringResId).setPositiveButton(android.R.string.ok, listener).create();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        return alertDialogBuilder.setMessage(msgStringResId).setPositiveButton(android.R.string.ok, listener).create();
     }
 
+    public static AlertDialog okDialog(Context context, String msg, DialogInterface.OnClickListener listener)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        return alertDialogBuilder.setMessage(msg).setPositiveButton(android.R.string.ok, listener).create();
+    }
 }

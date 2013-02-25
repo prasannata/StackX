@@ -21,6 +21,7 @@ package com.prasanna.android.stacknetwork.receiver;
 
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -60,90 +61,103 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     {
         LogWrapper.d(TAG, "Received new msg notificaiton");
 
-	if (SettingsFragment.isNotificationEnabled(context))
-	{
-	    LogWrapper.d(TAG, "Notification enabled in settings");
+        if (SettingsFragment.isNotificationEnabled(context))
+        {
+            LogWrapper.d(TAG, "Notification enabled in settings");
 
-	    StackXPage<InboxItem> page = (StackXPage<InboxItem>) intent.getSerializableExtra(UserIntentAction.NEW_MSG
-		            .getAction());
+            StackXPage<InboxItem> page =
+                            (StackXPage<InboxItem>) intent.getSerializableExtra(UserIntentAction.NEW_MSG.getAction());
 
-	    if (page != null && page.items != null && !page.items.isEmpty())
-	    {
-		sendNotification(context, page.items);
+            if (page != null && page.items != null && !page.items.isEmpty())
+            {
+                sendNotification(context, page.items);
 
-		AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
-		LogWrapper.d(TAG, "Ringer mode: " + audioManager.getRingerMode());
+                LogWrapper.d(TAG, "Ringer mode: " + audioManager.getRingerMode());
 
-		vibrateIfEnabled(context, audioManager.getRingerMode());
+                vibrateIfEnabled(context, audioManager.getRingerMode());
 
-		playNotificationTone(context, audioManager.getRingerMode());
-	    }
-	}
+                playNotificationTone(context, audioManager.getRingerMode());
+            }
+        }
     }
 
     private void vibrateIfEnabled(Context context, int ringerMode)
     {
-	if (SettingsFragment.isVibrateEnabled(context)
-	                && (ringerMode == AudioManager.RINGER_MODE_VIBRATE || ringerMode == AudioManager.RINGER_MODE_NORMAL))
-	{
-	    LogWrapper.d(TAG, "Vibrate enabled");
-	    Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-	    vibrator.vibrate(VIBRATE_DURATION);
-	}
+        if (SettingsFragment.isVibrateEnabled(context)
+                        && (ringerMode == AudioManager.RINGER_MODE_VIBRATE || ringerMode == AudioManager.RINGER_MODE_NORMAL))
+        {
+            LogWrapper.d(TAG, "Vibrate enabled");
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(VIBRATE_DURATION);
+        }
     }
 
     private void playNotificationTone(Context context, int ringerMode)
     {
-	if (ringerMode == AudioManager.RINGER_MODE_NORMAL)
-	{
-	    Uri uri = SettingsFragment.getRingtone(context);
-	    if (uri != null)
-	    {
-		Ringtone ringtone = RingtoneManager.getRingtone(context, uri);
-		ringtone.play();
-	    }
-	}
+        if (ringerMode == AudioManager.RINGER_MODE_NORMAL)
+        {
+            Uri uri = SettingsFragment.getRingtone(context);
+            if (uri != null)
+            {
+                Ringtone ringtone = RingtoneManager.getRingtone(context, uri);
+                ringtone.play();
+            }
+        }
     }
 
     @SuppressLint("NewApi")
     private void sendNotification(Context context, ArrayList<InboxItem> unreadItemsInInbox)
     {
-	int totalNewMsgs = unreadItemsInInbox.size();
-	Intent resultIntent = new Intent(context, UserInboxActivity.class);
-	resultIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadItemsInInbox);
+        int totalNewMsgs = unreadItemsInInbox.size();
+        Intent resultIntent = new Intent(context, UserInboxActivity.class);
+        resultIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), unreadItemsInInbox);
 
-	TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-	stackBuilder.addParentStack(UserInboxActivity.class);
-	stackBuilder.addNextIntent(resultIntent);
-	PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(UserInboxActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-	SoftReference<Bitmap> bitmapSoftReference = AppUtils.getBitmap(context.getResources(),
-	                R.drawable.new_msg_notify);
+        SoftReference<Bitmap> bitmapSoftReference =
+                        AppUtils.getBitmap(context.getResources(), R.drawable.new_msg_notify);
 
-	Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
+        Notification.InboxStyle inboxStyle = new Notification.InboxStyle();
 
-	Builder notificationBuilder = new Notification.Builder(context)
-	                .setContentText(context.getString(R.string.questions)).setSmallIcon(R.drawable.new_msg_notify)
-	                .setLargeIcon(bitmapSoftReference.get()).setContentIntent(resultPendingIntent);
+        Builder notificationBuilder =
+                        new Notification.Builder(context).setContentText(context.getString(R.string.questions))
+                                        .setSmallIcon(R.drawable.new_msg_notify)
+                                        .setLargeIcon(bitmapSoftReference.get()).setContentIntent(resultPendingIntent);
 
-	if (unreadItemsInInbox.size() == 1)
-	{
-	    notificationBuilder.setContentTitle(unreadItemsInInbox.get(0).title);
-	    inboxStyle.addLine(unreadItemsInInbox.get(0).body);
-	}
-	else
-	{
-	    notificationBuilder.setContentTitle(String.format(NEW_MSG_NOTIF_TITLE, totalNewMsgs));
-	    for (InboxItem inboxItem : unreadItemsInInbox)
-		inboxStyle.addLine(inboxItem.itemType.getNotificationTitle(totalNewMsgs));
-	}
+        if (unreadItemsInInbox.size() == 1)
+        {
+            notificationBuilder.setContentTitle(unreadItemsInInbox.get(0).title);
+            inboxStyle.addLine(unreadItemsInInbox.get(0).body);
+        }
+        else
+        {
+            notificationBuilder.setContentTitle(String.format(NEW_MSG_NOTIF_TITLE, totalNewMsgs));
+            HashMap<InboxItem.ItemType, Integer> itemTypeCount = new HashMap<InboxItem.ItemType, Integer>();
 
-	notificationBuilder = notificationBuilder.setStyle(inboxStyle).setContentIntent(resultPendingIntent);
-	Notification notification = notificationBuilder.build();
-	NotificationManager notificationManager = (NotificationManager) context
-	                .getSystemService(Context.NOTIFICATION_SERVICE);
-	notification.flags |= Notification.FLAG_AUTO_CANCEL;
-	notificationManager.notify(0, notification);
+            for (InboxItem inboxItem : unreadItemsInInbox)
+            {
+                Integer count = itemTypeCount.get(inboxItem.itemType);
+
+                if (count == null)
+                    itemTypeCount.put(inboxItem.itemType, 1);
+                else
+                    itemTypeCount.put(inboxItem.itemType, ++count);
+            }
+            
+            for (InboxItem.ItemType itemType : itemTypeCount.keySet())
+                inboxStyle.addLine(itemType.getNotificationTitle(itemTypeCount.get(itemType)));
+        }
+
+        notificationBuilder = notificationBuilder.setStyle(inboxStyle).setContentIntent(resultPendingIntent);
+        Notification notification = notificationBuilder.build();
+        NotificationManager notificationManager =
+                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notificationManager.notify(0, notification);
     }
 }

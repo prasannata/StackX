@@ -290,8 +290,11 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         // One reply to comments come here, add new comment is directly handled
         // by QuestionAcitivy. So no need to initialize comments if nul because
         // it can never be null here.
-        if (comment != null && question.comments != null)
+        if (comment != null)
         {
+            if(question.comments == null)
+                question.comments = new ArrayList<Comment>();
+            
             question.comments.add(comment);
             updateCacheWithNewCommentIfExists(comment);
         }
@@ -348,8 +351,15 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         if (QuestionsCache.getInstance().containsKey(question.id))
         {
             Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
-            cachedQuestion.comments.add(comment);
-            QuestionsCache.getInstance().add(question.id, cachedQuestion);
+            
+            if(cachedQuestion.comments == null)
+                cachedQuestion.comments = new ArrayList<Comment>();
+
+            if (!cachedQuestion.comments.contains(comment))
+            {
+                cachedQuestion.comments.add(comment);
+                QuestionsCache.getInstance().add(question.id, cachedQuestion);
+            }
         }
     }
 

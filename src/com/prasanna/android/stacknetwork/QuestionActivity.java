@@ -107,7 +107,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 else
                     return QuestionActivity.this.getString(R.string.answer) + " " + position;
             }
-
         }
 
         @Override
@@ -117,11 +116,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 return QuestionActivity.this.questionFragment;
             else
             {
-                String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":" + (position + 1);
-                Fragment fragment = getFragmentManager().findFragmentByTag(currentViewPagerFragmentTag);
+                Fragment fragment = getFragmentManager().findFragmentByTag(getViewPagerFragmentTag(position));
 
                 if (fragment == null)
-                    return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
+                    return AnswerFragment.newFragment(question.answers.get(position - 1), position,
+                                    QuestionActivity.this);
 
                 return fragment;
             }
@@ -196,21 +195,23 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         if (viewPager.getCurrentItem() == 0)
         {
-            displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id, question.id
-                            + "-comment", defaultText);
+            displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id, 0,
+                            question.id + "-comment", defaultText);
         }
         else
         {
             Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
-            displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id, answer.id
-                            + "-comment", defaultText);
+            displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id,
+                            viewPager.getCurrentItem(), answer.id + "-comment", defaultText);
         }
     }
 
-    private void displayPostCommentFragment(String title, long id, String fragmentTag, String defaultText)
+    private void displayPostCommentFragment(String title, long id, int viewPagerPosition, String fragmentTag,
+                    String defaultText)
     {
         postCommentFragment = new PostCommentFragment();
         postCommentFragment.setPostId(id);
+        postCommentFragment.setViewPagerPosition(viewPagerPosition);
         postCommentFragment.setTitle(title);
         postCommentFragment.setResultReceiver(resultReceiver);
 
@@ -278,7 +279,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment.onBackPressed();
 
         super.onBackPressed();
-        discardPostCommentFragmentIfVisible(false);
+        dismissPostCommentFragmentIfVisible(false);
     }
 
     @Override
@@ -320,7 +321,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment = null;
         }
 
-        discardPostCommentFragmentIfVisible(false);
+        dismissPostCommentFragmentIfVisible(false);
 
         if (numAnswersDisplayed < question.answerCount && numAnswersDisplayed - position < 2)
         {
@@ -332,7 +333,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
     }
 
-    private void discardPostCommentFragmentIfVisible(boolean finish)
+    private void dismissPostCommentFragmentIfVisible(boolean finish)
     {
         if (postCommentFragment != null)
         {
@@ -474,8 +475,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                 displayAnswers((ArrayList<Answer>) resultData.getSerializable(StringConstants.ANSWERS), true);
                 break;
             case WriteIntentService.ACTION_ADD_COMMENT:
-                discardPostCommentFragmentIfVisible(true);
-                addMyComment(resultData);
+                dismissPostCommentFragmentIfVisible(true);
+                addMyCommentToPost(resultData);
                 break;
             case QuestionDetailsIntentService.ERROR:
                 handleError(resultData);
@@ -501,15 +502,27 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             AppUtils.getErrorView(this, e);
     }
 
-    protected void addMyComment(Bundle resultData)
+    protected void addMyCommentToPost(Bundle resultData)
     {
         SharedPreferencesUtil.setLong(this, WritePermission.PREF_LAST_COMMENT_WRITE, System.currentTimeMillis());
+        Comment comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
+        int viewPagerPosition = resultData.getInt(StringConstants.VIEW_PAGER_POSITION, -1);
+        if (viewPagerPosition == 0)
+        {
+            if (question.comments == null)
+                question.comments = new ArrayList<Comment>();
 
-        if (question.comments == null)
-            question.comments = new ArrayList<Comment>();
-
-        question.comments.add((Comment) resultData.getSerializable(StringConstants.COMMENT));
-        questionFragment.setComments(question.comments);
+            question.comments.add(comment);
+            questionFragment.setComments(question.comments);
+        }
+        else
+        {
+            LogWrapper.d(TAG, "View pager position : " + viewPagerPosition);
+            AnswerFragment answerFragment =
+                            (AnswerFragment) getFragmentManager().findFragmentByTag(
+                                            getViewPagerFragmentTag(viewPagerPosition));
+            answerFragment.onCommentAdd(comment);
+        }
     }
 
     private void startServiceForAnswers()
@@ -615,5 +628,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
             viewPager.setCurrentItem(0);
         }
+    }
+
+    private String getViewPagerFragmentTag(int position)
+    {
+        String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":" + position;
+        return currentViewPagerFragmentTag;
     }
 }

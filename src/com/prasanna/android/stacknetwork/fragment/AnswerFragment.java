@@ -19,6 +19,7 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.app.Fragment;
@@ -64,7 +65,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     private ImageView answerCtxMenuImageView;
     private PageSelectAdapter pageSelectAdapter;
 
-    public static AnswerFragment newFragment(Answer answer, PageSelectAdapter pageSelectAdapter)
+    public static AnswerFragment newFragment(Answer answer, int viewPageNumber, PageSelectAdapter pageSelectAdapter)
     {
         AnswerFragment answerFragment = new AnswerFragment();
         answerFragment.setRetainInstance(true);
@@ -251,8 +252,9 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
 
     private String getAutherDisplayText(String acceptRate)
     {
-        Spanned authorName = answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
-                        : new SpannableString("");
+        Spanned authorName =
+                        answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
+                                        : new SpannableString("");
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
                         + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
@@ -323,13 +325,18 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     public void onCommentAdd(Comment comment)
     {
         // One reply to comments come here, add new comment is directly handled
-        // by QuestionAcitivy. So no need to initialize comments if nul because
+        // by QuestionAcitivy. So no need to initialize comments if null because
         // it can never be null here.
-        if (comment != null && answer.comments != null)
+        if (comment != null)
         {
+            if(answer.comments == null)
+                answer.comments = new ArrayList<Comment>();
+            
             answer.comments.add(comment);
             updateCacheWithNewCommentIfExists(comment);
         }
+
+        displayNumComments();
     }
 
     private void updateCacheWithNewCommentIfExists(Comment comment)
@@ -341,12 +348,18 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
             {
                 if (answer.id == comment.post_id)
                 {
-                    answer.comments.add(comment);
+                    if(answer.comments == null)
+                        answer.comments = new ArrayList<Comment>();
+                    
+                    if (!answer.comments.contains(comment))
+                    {
+                        answer.comments.add(comment);
+                        QuestionsCache.getInstance().add(answer.questionId, cachedQuestion);
+                    }
                     break;
                 }
 
             }
-            QuestionsCache.getInstance().add(answer.questionId, cachedQuestion);
         }
     }
 }
