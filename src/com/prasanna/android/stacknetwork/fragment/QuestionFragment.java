@@ -54,13 +54,12 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 {
     private static final String TAG = QuestionFragment.class.getSimpleName();
 
+    private boolean ctxMenuSetup = false;
+
     private FrameLayout parentLayout;
     private Question question;
     private ContextMenu menu;
-    private boolean ctxMenuSetup = false;
-
     private ImageView backIv;
-
     private ImageView ctxMenuImage;
 
     public static QuestionFragment newFragment()
@@ -188,11 +187,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             TextView textView = (TextView) parentLayout.findViewById(R.id.score);
             textView.setText(AppUtils.formatNumber(question.score));
 
-            textView = (TextView) parentLayout.findViewById(R.id.answerCount);
-            textView.setText(AppUtils.formatNumber(question.answerCount));
-
-            if (question.hasAcceptedAnswer)
-                textView.setBackgroundColor(getResources().getColor(R.color.lichen));
+            setupTextViewForAnswerCount();
 
             textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
             textView.setText(Html.fromHtml(question.title));
@@ -208,6 +203,29 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
             if (question.body != null)
                 displayBody(question.body);
+        }
+    }
+
+    private void setupTextViewForAnswerCount()
+    {
+        TextView answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
+        TextView answerCountAnsweredView = (TextView) parentLayout.findViewById(R.id.answerCountAnswered);
+
+        if (question.hasAcceptedAnswer)
+        {
+            answerCountAnsweredView.setVisibility(View.VISIBLE);
+            answerCountAnsweredView.setText(AppUtils.formatNumber(question.answerCount));
+
+            answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
+            answerCountView.setVisibility(View.GONE);
+        }
+        else
+        {
+            answerCountView.setVisibility(View.VISIBLE);
+            answerCountView.setText(AppUtils.formatNumber(question.answerCount));
+
+            answerCountAnsweredView = (TextView) parentLayout.findViewById(R.id.answerCountAnswered);
+            answerCountAnsweredView.setVisibility(View.GONE);
         }
     }
 
@@ -292,9 +310,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         // it can never be null here.
         if (comment != null)
         {
-            if(question.comments == null)
+            if (question.comments == null)
                 question.comments = new ArrayList<Comment>();
-            
+
             question.comments.add(comment);
             updateCacheWithNewCommentIfExists(comment);
         }
@@ -351,8 +369,8 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         if (QuestionsCache.getInstance().containsKey(question.id))
         {
             Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
-            
-            if(cachedQuestion.comments == null)
+
+            if (cachedQuestion.comments == null)
                 cachedQuestion.comments = new ArrayList<Comment>();
 
             if (!cachedQuestion.comments.contains(comment))

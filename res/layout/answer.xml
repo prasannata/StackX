@@ -22,12 +22,12 @@
 
             <TextView
                 android:id="@+id/answerScore"
-                android:textIsSelectable="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:background="@drawable/rounded_border_delft"
                 android:textColor="@color/black"
+                android:textIsSelectable="false"
                 android:textSize="12sp" />
 
             <ImageView
@@ -43,23 +43,25 @@
                 android:id="@+id/answerAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/answerScore"
+                android:layout_alignTop="@id/answerScore"
                 android:layout_marginLeft="4dp"
                 android:layout_toLeftOf="@id/answerOptionsContextMenu"
                 android:layout_toRightOf="@id/answerScore"
-                android:textIsSelectable="false"
-                android:layout_centerVertical="true"
+                android:gravity="center"
                 android:textColor="@color/black"
-                android:textSize="12sp" />
+                android:textIsSelectable="false"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/answerCommentsCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@id/answerScore"
-                android:textIsSelectable="false"
                 android:layout_below="@id/answerScore"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="3dp"
                 android:textColor="@color/black"
+                android:textIsSelectable="false"
                 android:textSize="9sp" />
         </RelativeLayout>
 
@@ -69,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
-            android:layout_marginTop="2dp" >
+            android:layout_marginTop="4dp" >
 
             <LinearLayout
                 android:id="@+id/answerBody"
