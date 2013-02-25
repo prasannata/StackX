@@ -178,7 +178,10 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                     AppUtils.showSoftInput(StackNetworkListActivity.this, searchText);
                 }
                 else
+                {
                     searchText.setVisibility(View.GONE);
+                    AppUtils.hideSoftInput(StackNetworkListActivity.this, v);
+                }
             }
         });
     }
