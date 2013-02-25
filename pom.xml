@@ -142,6 +142,7 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <release>true</release>
                             <sdk>
                                 <path>${android.sdk.path}</path>
                                 <platform>${android.platform}</platform>
