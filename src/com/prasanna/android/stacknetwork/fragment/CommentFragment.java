@@ -37,14 +37,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.prasanna.android.http.AbstractHttpException;
+import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Comment;
-import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
@@ -65,7 +63,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private HashMap<ObjectType, WritePermission> writePermissions;
     private ProgressDialog progressDialog;
     private OnCommentChangeListener onCommentChangeListener;
-    private RestQueryResultReceiver resultReceiver;
+    private RestQueryResultReceiver addCommentResultReceiver;
     private LinearLayout postCommentFragmentContainer;
     private PostCommentFragment postCommentFragment;
     private CommentViewHolder selectedViewForReply;
@@ -105,7 +103,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     public void setResultReceiver(RestQueryResultReceiver resultReceiver)
     {
-        this.resultReceiver = resultReceiver;
+        this.addCommentResultReceiver = resultReceiver;
     }
 
     @Override
@@ -116,8 +114,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             if (comments == null)
                 comments = new ArrayList<Comment>();
             itemsContainer = (ViewGroup) inflater.inflate(R.layout.comment_list_view, container, false);
-            postCommentFragmentContainer = (LinearLayout) itemsContainer
-                            .findViewById(R.id.post_comment_fragment_container);
+            postCommentFragmentContainer =
+                            (LinearLayout) itemsContainer.findViewById(R.id.post_comment_fragment_container);
             itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment, comments, this);
         }
 
@@ -255,8 +253,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 selectedViewForReply.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
                 LogWrapper.d(TAG, "Select comment for reply: " + selectedViewForReply.id);
 
-                displayPostCommentFragment(comment.post_id,comment.id,
-                                "@" + comment.owner.displayName.replaceAll("\\s", "") + " ", false);
+                displayPostCommentFragment(comment.post_id, comment.id,
+                                "@" + comment.owner.displayName.replaceAll("\\s", "") + " ", false,
+                                addCommentResultReceiver);
                 getListView().smoothScrollToPositionFromTop(position, 0);
             }
         });
@@ -281,7 +280,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             @Override
             public void onClick(View v)
             {
-                displayPostCommentFragment(comment.post_id, comment.id, comment.body, true);
+                displayPostCommentFragment(comment.post_id, comment.id, comment.body, true, resultReceiver);
                 getListView().smoothScrollToPositionFromTop(position, 0);
                 AppUtils.showSoftInput(getActivity(), holder.title);
             }
@@ -347,7 +346,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         progressDialog.show();
 
         Intent intent = new Intent(getActivity(), WriteIntentService.class);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, addCommentResultReceiver);
         intent.putExtra(StringConstants.COMMENT_ID, commentId);
         intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_DEL_COMMENT);
         startService(intent);
@@ -357,7 +356,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         serviceRunning = false;
-        progressDialog.dismiss();
+        if (progressDialog != null && progressDialog.isShowing())
+            progressDialog.dismiss();
 
         switch (resultCode)
         {
@@ -374,22 +374,19 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
                 onDelCommentComplete(resultData);
                 break;
             case WriteIntentService.ERROR:
-                displayErrorToast(resultData);
+                displayError(resultData);
                 break;
         }
     }
 
-    private void displayErrorToast(Bundle resultData)
+    private void displayError(Bundle resultData)
     {
-        AbstractHttpException e = (AbstractHttpException) resultData.getSerializable(StringConstants.EXCEPTION);
+        HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
         String errorMsg = "Request failed for unknown reason";
         if (e != null)
-        {
-            StackXError stackXError = StackXError.deserialize(e.getMessage());
-            if (stackXError != null && stackXError.msg != null)
-                errorMsg = stackXError.msg;
-        }
-        Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
+            postCommentFragment.setSendError(e.getErrorResponse());
+        else
+            postCommentFragment.setSendError(errorMsg);
     }
 
     private void onAddCommentComplete(Bundle resultData)
@@ -453,7 +450,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         }
     }
 
-    private void displayPostCommentFragment(long postId, long commenId, String draftText, boolean myEdit)
+    private void displayPostCommentFragment(long postId, long commenId, String draftText, boolean myEdit,
+                    RestQueryResultReceiver receiver)
     {
         postCommentFragment = (PostCommentFragment) getFragmentManager().findFragmentByTag("postCommentFragment");
 
@@ -463,16 +461,16 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         postCommentFragment.setPostId(postId);
         postCommentFragment.setCommentId(commenId);
         postCommentFragment.setDraftText(draftText);
-        postCommentFragment.setResultReceiver(resultReceiver);
+        postCommentFragment.setResultReceiver(receiver);
         postCommentFragment.setMyEdit(myEdit);
-        if(myEdit)
+        if (myEdit)
             postCommentFragment.setTitle("Editing");
         else
             postCommentFragment.setTitle("Replying to comment");
 
         if (postCommentFragment.isVisible())
             postCommentFragment.refreshView();
-        
+
         postCommentFragmentContainer.setVisibility(View.VISIBLE);
     }
 
@@ -489,7 +487,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     @Override
     protected void loadNextPage()
     {
-        
+
     }
 
 }
