@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.animation.AnimationUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -275,9 +276,17 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
             public void onClick(View v)
             {
                 if (postContextLayout.getVisibility() == View.VISIBLE)
+                {
+                    postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
+                                    android.R.anim.slide_out_right));
                     postContextLayout.setVisibility(View.GONE);
+                }
                 else
+                {
+                    postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
+                                    android.R.anim.slide_in_left));
                     postContextLayout.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
