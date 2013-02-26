@@ -217,6 +217,7 @@ public class SiteDAO extends AbstractBaseDao
         Site site = new Site();
         site.dbId = cursor.getLong(cursor.getColumnIndex(SiteTable.COLUMN_ID));
         site.name = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_NAME));
+        site.audience = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_AUDIENCE));
         site.apiSiteParameter = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_API_SITE_PARAMTETER));
         site.link = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_SITE_URL));
         site.iconUrl = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_ICON_URL));

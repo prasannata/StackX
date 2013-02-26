@@ -10,8 +10,8 @@
         android:id="@+id/isDefaultSite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
         android:layout_marginTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
@@ -20,20 +20,20 @@
 
     <TextView
         android:id="@+id/siteName"
+        android:layout_alignParentTop="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_height="30dp"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/isDefaultSite"
         android:gravity="left|center_vertical"
         android:textColor="@color/black"
-        android:textSize="15sp" />
+        android:textIsSelectable="false"
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="2dp"
         android:layout_marginTop="5dp" >
@@ -48,6 +48,7 @@
             android:gravity="right|center_vertical"
             android:text="@string/registered"
             android:textColor="@color/darkGreen"
+            android:textIsSelectable="false"
             android:textSize="8sp"
             android:visibility="gone" />
 
@@ -56,8 +57,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="2dp"
-            android:src="@drawable/dark_32x32_edit"
+            android:src="@drawable/dark_24x24_edit"
             android:visibility="gone" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/siteAudience"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/siteName"
+        android:layout_below="@id/siteName"
+        android:gravity="left|center_vertical"
+        android:textColor="@color/delft"
+        android:textIsSelectable="false"
+        android:textSize="12sp" />
 
 </RelativeLayout>

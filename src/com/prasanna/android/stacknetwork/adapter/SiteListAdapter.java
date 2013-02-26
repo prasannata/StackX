@@ -48,7 +48,8 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         void onSiteSelected(Site site);
     }
 
-    public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> sites, Filter filter)
+    public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> sites,
+                    Filter filter)
     {
         super(context, layoutResourceId, textViewResourceId, sites);
         this.filter = filter;
@@ -57,6 +58,7 @@ public class SiteListAdapter extends ArrayAdapter<Site>
     static class ViewHolder
     {
         TextView siteNameView;
+        TextView siteAudience;
         TextView registeredView;
         ImageView writePermissionView;
         ImageView defaultSiteOpt;
@@ -72,6 +74,7 @@ public class SiteListAdapter extends ArrayAdapter<Site>
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
             holder = new ViewHolder();
             holder.siteNameView = (TextView) convertView.findViewById(R.id.siteName);
+            holder.siteAudience = (TextView) convertView.findViewById(R.id.siteAudience);
             holder.registeredView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
             holder.writePermissionView = (ImageView) convertView.findViewById(R.id.writePermissionEnabled);
             holder.defaultSiteOpt = (ImageView) convertView.findViewById(R.id.isDefaultSite);
@@ -80,18 +83,21 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         else
             holder = (ViewHolder) convertView.getTag();
 
-        holder.siteNameView.setText(Html.fromHtml(getItem(position).name));
+        Site site = getItem(position);
+        holder.siteNameView.setText(Html.fromHtml(site.name));
+        if (site.audience != null)
+            holder.siteAudience.setText(Html.fromHtml(site.audience));
 
-        if (getItem(position).userType != null && getItem(position).userType.equals(UserType.REGISTERED))
+        if (site.userType != null && site.userType.equals(UserType.REGISTERED))
             holder.registeredView.setVisibility(View.VISIBLE);
         else
             holder.registeredView.setVisibility(View.GONE);
 
         holder.writePermissionView.setVisibility(View.GONE);
 
-        if (getItem(position).writePermissions != null)
+        if (site.writePermissions != null)
         {
-            for (WritePermission permission : getItem(position).writePermissions)
+            for (WritePermission permission : site.writePermissions)
             {
                 if (permission.canAdd & permission.canDelete & permission.canEdit)
                 {
