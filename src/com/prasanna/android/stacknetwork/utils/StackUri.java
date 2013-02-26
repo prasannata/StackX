@@ -52,7 +52,7 @@ public class StackUri
         public static final String ITEM_DETAIL_FILTER = "!3vWTEWZ2QQ3pULbNz";
         public static final String USER_DETAIL_FILTER = "!-q2RdWJy";
         public static final String USER_INBOX_FILTER = "!-q2RaosI";
-        public static final String COMMENT_FILTER = "!9hnGt*UtS";
+        public static final String COMMENT_FILTER = "!-.mgWN4RPTQu";
         public static final String NETWORK_USER_TYPE_FILTER = "!-q2RbCAp";
         public static final String CLIENT_ID = "202";
         public static final String KEY = "Nt8I5NbbbzXXPPVwE0ujRg((";

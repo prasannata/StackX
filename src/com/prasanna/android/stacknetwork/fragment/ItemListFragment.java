@@ -67,7 +67,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     protected abstract String getReceiverExtraName();
 
     protected abstract void loadNextPage();
-    
+
     protected abstract void startIntentService();
 
     protected abstract String getLogTag();
@@ -208,9 +208,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
         serviceRunning = false;
 
         if (resultCode == AbstractIntentService.ERROR)
-        {
             onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
-        }
         else
         {
             currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
@@ -228,8 +226,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         if (itemListAdapter != null && newItems != null)
         {
-            LogWrapper.d(TAG, "Updating list adpater with items");
-
             if (items == null)
                 items = new ArrayList<T>();
 
@@ -237,7 +233,7 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
             if (items.isEmpty())
             {
                 if (emptyItemsTextView == null)
-                    emptyItemsTextView = (TextView) itemsContainer.findViewById(R.id.emptyStatus);
+                    emptyItemsTextView = (TextView) itemsContainer.findViewById(R.id.emptyItems);
 
                 emptyItemsTextView.setVisibility(View.VISIBLE);
             }

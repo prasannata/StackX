@@ -392,7 +392,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public Answer getAnswer(int id)
+    public Answer getAnswer(long id)
     {
         String restEndPoint = "answers/" + id;
 

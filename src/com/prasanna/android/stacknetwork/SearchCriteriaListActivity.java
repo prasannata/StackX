@@ -485,9 +485,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                         searchCriteriaArrayAdapter.notifyDataSetChanged();
                     }
                     else
-                    {
                         emptyItemsView.setVisibility(View.VISIBLE);
-                    }
                 }
             }
         };

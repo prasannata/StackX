@@ -206,11 +206,12 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                     if (commentOnAnswer)
                     {
                         Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
+                        getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
                         getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
                         getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
                         startService(getAnswerIntent);
+                        setProgressBarIndeterminateVisibility(true);
                     }
-                    setProgressBarIndeterminateVisibility(true);
                 }
                 break;
             case AnswersIntentService.GET_ANSWER:
@@ -237,12 +238,12 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView = (TextView) findViewById(R.id.postSite);
         textView.setText("Asked in " + item.site.name);
 
-        setupOnClickForViewQuestion(disableViewQuestion);
-
         textView = (TextView) findViewById(R.id.responseItemScore);
         textView.setVisibility(View.VISIBLE);
         textView.setText(String.valueOf(stackXItem.score));
 
+        LogWrapper.d(TAG, "Setting on click view question");
+        setupOnClickForViewQuestion(item.questionId, disableViewQuestion);
         setuOnClickForContextMenu();
 
         LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
@@ -292,10 +293,10 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
             }
         });
 
-        setupOnClickForViewQuestion(true);
+        setupOnClickForViewQuestion(answer.questionId, false);
     }
 
-    private void setupOnClickForViewQuestion(boolean disableViewQuestion)
+    private void setupOnClickForViewQuestion(final long questionId, boolean disableViewQuestion)
     {
         if (disableViewQuestion)
         {
@@ -313,17 +314,17 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 @Override
                 public void onClick(View v)
                 {
-                    startQuestionDetailActivity();
+                    startQuestionDetailActivity(questionId);
                 }
             });
         }
     }
 
-    private void startQuestionDetailActivity()
+    private void startQuestionDetailActivity(long questionId)
     {
         Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
         displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
-        displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, item.questionId);
+        displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, questionId);
         displayQuestionIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
         startActivity(displayQuestionIntent);
     }

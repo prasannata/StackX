@@ -42,9 +42,11 @@
             android:layout_below="@id/postTitle"
             android:layout_marginRight="2dp"
             android:background="@drawable/rounded_border_delft"
+            android:clickable="false"
+            android:enabled="false"
             android:gravity="left"
             android:text="@string/goToQuestion"
-            android:textColor="@color/black"
+            android:textColor="@color/lightGrey"
             android:textIsSelectable="false"
             android:textSize="12sp" />
 
@@ -139,8 +141,10 @@
 
             <LinearLayout
                 android:id="@+id/postContext"
+                android:background="@drawable/rounded_border_delft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
                 android:orientation="vertical"
                 android:visibility="gone" />
         </LinearLayout>
