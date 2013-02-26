@@ -28,7 +28,7 @@
         android:gravity="left|center_vertical"
         android:textColor="@color/black"
         android:textIsSelectable="false"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <ImageView
         android:id="@+id/writePermissionEnabled"
