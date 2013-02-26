@@ -19,6 +19,7 @@
             android:layout_alignParentLeft="true"
             android:layout_margin="3dp"
             android:textColor="@color/black"
+            android:textIsSelectable="true"
             android:textSize="15sp" />
 
         <TextView
@@ -30,7 +31,8 @@
             android:layout_margin="3dp"
             android:gravity="left"
             android:textColor="@color/black"
-            android:textSize="11sp" />
+            android:textIsSelectable="false"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/viewQuestion"
@@ -41,9 +43,25 @@
             android:layout_marginRight="2dp"
             android:background="@drawable/rounded_border_delft"
             android:gravity="left"
-            android:text="@string/viewQuestion"
+            android:text="@string/goToQuestion"
             android:textColor="@color/black"
-            android:textSize="11sp" />
+            android:textIsSelectable="false"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/viewAnswer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/postTitle"
+            android:layout_marginRight="2dp"
+            android:layout_toLeftOf="@id/viewQuestion"
+            android:background="@drawable/rounded_border_delft"
+            android:gravity="left"
+            android:text="@string/viewAnswer"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:textSize="12sp"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <TextView
@@ -57,8 +75,9 @@
         android:layout_marginRight="3dp"
         android:background="@drawable/rounded_border_delft"
         android:textColor="@color/black"
-        android:visibility="gone"
-        android:textSize="10sp" />
+        android:textIsSelectable="false"
+        android:textSize="12sp"
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/responseContextMenu"
@@ -67,10 +86,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/postTitleLayout"
         android:layout_centerVertical="true"
-        android:paddingBottom="5dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="-5dp"
-        android:paddingTop="5dp"
+        android:padding="6dp"
         android:src="@drawable/control_bottom_right" />
 
     <TextView
@@ -80,11 +96,13 @@
         android:layout_alignBottom="@id/responseItemScore"
         android:layout_alignTop="@id/responseItemScore"
         android:layout_below="@id/postTitleLayout"
+        android:layout_centerVertical="true"
         android:layout_margin="3dp"
         android:layout_toLeftOf="@id/responseContextMenu"
         android:gravity="center"
         android:textColor="@color/black"
-        android:textSize="11sp" />
+        android:textIsSelectable="true"
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/postType"
@@ -97,7 +115,8 @@
         android:layout_toRightOf="@id/responseItemScore"
         android:gravity="center"
         android:textColor="@color/black"
-        android:textSize="11sp"
+        android:textIsSelectable="false"
+        android:textSize="12sp"
         android:textStyle="bold" />
 
     <ScrollView
@@ -117,6 +136,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/postContext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 

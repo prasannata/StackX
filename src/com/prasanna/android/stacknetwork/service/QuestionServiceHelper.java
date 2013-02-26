@@ -388,8 +388,34 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
         if (questionsJsonResponse != null)
             return getQuestionModel(questionsJsonResponse);
-        
+
         return null;
     }
 
+    public Answer getAnswer(int id)
+    {
+        String restEndPoint = "answers/" + id;
+
+        JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, getDefaultQueryParams());
+        if (jsonObjectWrapper != null)
+        {
+            try
+            {
+                JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+
+                if (jsonArray != null && jsonArray.length() == 1)
+                {
+                    JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+                    Answer answer = getSerializedAnswerObject(jsonObject);
+                    answer.body = jsonObject.getString(JsonFields.Question.BODY);
+                    return answer;
+                }
+            }
+            catch (JSONException e)
+            {
+                LogWrapper.d(TAG, e.getMessage());
+            }
+        }
+        return null;
+    }
 }

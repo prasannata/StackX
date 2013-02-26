@@ -35,6 +35,7 @@
     <string name="loadingSites">Loading sites</string>
     <string name="loadingSitesForAuthUser">Loading sites, accounts and permissions. This will take few seconds first time.</string>
     <string name="viewQuestion">View Question</string>
+    <string name="viewAnswer">View Answer</string>
     <string name="registered">Registered</string>
     <string name="accepted">Accepted</string>
     <string name="delete">Delete</string>
@@ -71,6 +72,7 @@
     <string name="never">Never</string>
     <string name="time">time</string>
     <string name="times">times</string>
+    <string name="goToQuestion">Go To Quesiton</string>
 
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>

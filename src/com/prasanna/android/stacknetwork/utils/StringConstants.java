@@ -41,6 +41,7 @@ public class StringConstants
     public static final String QUESTIONS = "questions";
 
     public static final String ANSWER = "answer";
+    public static final String ANSWER_ID = "answer_id";
     public static final String ANSWERS = "answers";
     public static final String ANSWER_COUNT = "answer_count";
 
@@ -96,6 +97,7 @@ public class StringConstants
     public static final String REQUEST_CODE = "request_code";
 
     public static final String VIEW_PAGER_POSITION = "view_pager_position";
+    
 
     public static final class HttpError
     {

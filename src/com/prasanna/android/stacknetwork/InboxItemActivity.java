@@ -33,13 +33,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.Post;
+import com.prasanna.android.stacknetwork.model.Post.PostType;
 import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
+import com.prasanna.android.stacknetwork.service.AnswersIntentService;
 import com.prasanna.android.stacknetwork.service.PostIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
@@ -69,12 +72,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         receiver.setReceiver(this);
 
         showInboxItem();
-
-        if (post == null && comment == null)
-            getPostDetail();
-        else
-            showPostDetail(post == null ? comment : post);
-
+        getPostDetail();
     }
 
     private void getPostDetail()
@@ -116,7 +114,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     public boolean onCreateOptionsMenu(Menu menu)
     {
         boolean ret = super.onCreateOptionsMenu(menu);
-        
+
         if (menu != null)
             menu.removeItem(R.id.menu_refresh);
 
@@ -187,26 +185,47 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         LogWrapper.d(TAG, "ResultReceiver invoked for " + resultCode);
+        setProgressBarIndeterminateVisibility(false);
 
-        if (resultCode == PostIntentService.GET_POST)
+        switch (resultCode)
         {
-            post = (Post) resultData.getSerializable(StringConstants.POST);
-            if (post != null)
-                showPostDetail(post);
-        }
-        else
-        {
-            comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
-            if (comment != null)
-                showPostDetail(comment);
+            case PostIntentService.GET_POST:
+                post = (Post) resultData.getSerializable(StringConstants.POST);
+                if (post != null)
+                    showPostDetail(post, false);
+                break;
+            case PostIntentService.GET_POST_COMMENT:
+                comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
+                if (comment != null)
+                {
+                    boolean commentOnAnswer = isCommentOnAnswer();
+                    showPostDetail(comment, commentOnAnswer);
+                    if (commentOnAnswer)
+                    {
+                        Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
+                        getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
+                        getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+                        startService(getAnswerIntent);
+                    }
+                    setProgressBarIndeterminateVisibility(true);
+                }
+                break;
+            case AnswersIntentService.GET_ANSWER:
+                Answer answer = (Answer) resultData.getSerializable(StringConstants.ANSWER);
+                setupOnClickForViewMyPost(answer);
+                break;
+
         }
     }
 
-    private void showPostDetail(StackXItem stackXItem)
+    private boolean isCommentOnAnswer()
+    {
+        return comment.type != null && comment.type.equals(PostType.ANSWER);
+    }
+
+    private void showPostDetail(StackXItem stackXItem, boolean disableViewQuestion)
     {
         LogWrapper.d(TAG, "Showing post " + stackXItem.id);
-
-        setProgressBarIndeterminateVisibility(false);
 
         TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
@@ -215,7 +234,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView = (TextView) findViewById(R.id.postSite);
         textView.setText("Asked in " + item.site.name);
 
-        setupOnClickForViewQuestion();
+        setupOnClickForViewQuestion(disableViewQuestion);
 
         textView = (TextView) findViewById(R.id.responseItemScore);
         textView.setVisibility(View.VISIBLE);
@@ -242,10 +261,37 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         });
     }
 
-    private void setupOnClickForViewQuestion()
+    private void setupOnClickForViewMyPost(Answer answer)
     {
-        TextView textView;
-        textView = (TextView) findViewById(R.id.viewQuestion);
+        final LinearLayout postContextLayout = (LinearLayout) findViewById(R.id.postContext);
+        for (View view : MarkdownFormatter.parse(this, answer.body))
+            postContextLayout.addView(view);
+
+        TextView textView = (TextView) findViewById(R.id.viewAnswer);
+        textView.setVisibility(View.VISIBLE);
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (postContextLayout.getVisibility() == View.VISIBLE)
+                    postContextLayout.setVisibility(View.GONE);
+                else
+                    postContextLayout.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void setupOnClickForViewQuestion(boolean disableViewQuestion)
+    {
+        TextView textView = (TextView) findViewById(R.id.viewQuestion);
+
+        if (disableViewQuestion)
+        {
+            textView.setClickable(false);
+            textView.setEnabled(false);
+        }
+
         textView.setOnClickListener(new View.OnClickListener()
         {
             @Override
