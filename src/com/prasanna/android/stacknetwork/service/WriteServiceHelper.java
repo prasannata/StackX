@@ -48,7 +48,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper
 
     private static final WriteServiceHelper INSTANCE = new WriteServiceHelper();
 
-    private WriteServiceHelper()
+    protected WriteServiceHelper()
     {
     }
 
