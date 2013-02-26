@@ -91,13 +91,19 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         startIntentService();
     }
 
+    @Override
+    protected void setActionBarHomeIcon()
+    {
+        getActionBar().setIcon(R.drawable.ic_launcher1);
+        getActionBar().setHomeButtonEnabled(true);
+    }
+
     private void setupListView()
     {
         listView = (ListView) findViewById(android.R.id.list);
         listView.addFooterView(progressBar);
-        itemListAdapter =
-                        new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
-                                        new ArrayList<InboxItem>(), this);
+        itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
+                        new ArrayList<InboxItem>(), this);
         listView.setAdapter(itemListAdapter);
         listView.setOnScrollListener(this);
         listView.setOnItemClickListener(new OnItemClickListener()
@@ -109,9 +115,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
                 if (item.itemType != null)
                 {
-                    boolean isSupportedItem =
-                                    item.itemType.equals(InboxItem.ItemType.COMMENT)
-                                                    || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER);
+                    boolean isSupportedItem = item.itemType.equals(InboxItem.ItemType.COMMENT)
+                                    || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER);
 
                     if (isSupportedItem)
                     {
@@ -142,8 +147,8 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     {
         if (!serviceRunning)
         {
-            SharedPreferences sharedPreferences =
-                            PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences sharedPreferences = PreferenceManager
+                            .getDefaultSharedPreferences(getApplicationContext());
             if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
             {
                 intent = new Intent(getApplicationContext(), UserIntentService.class);
