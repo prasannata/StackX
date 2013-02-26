@@ -127,7 +127,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
                     break;
             }
 
-            toastMsg += result ? " succeeded. Reload front page by selecting the home button." : " failed";
+            toastMsg += result ? " succeeded. Reload front page by selecting the home button (site logo)." : " failed";
             Toast.makeText(SearchCriteriaListActivity.this, toastMsg, Toast.LENGTH_LONG).show();
         }
 
