@@ -114,8 +114,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             if (comments == null)
                 comments = new ArrayList<Comment>();
             itemsContainer = (ViewGroup) inflater.inflate(R.layout.comment_list_view, container, false);
-            postCommentFragmentContainer =
-                            (LinearLayout) itemsContainer.findViewById(R.id.post_comment_fragment_container);
+            postCommentFragmentContainer = (LinearLayout) itemsContainer
+                            .findViewById(R.id.post_comment_fragment_container);
             itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment, comments, this);
         }
 
@@ -346,7 +346,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         progressDialog.show();
 
         Intent intent = new Intent(getActivity(), WriteIntentService.class);
-        intent.putExtra(StringConstants.RESULT_RECEIVER, addCommentResultReceiver);
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.putExtra(StringConstants.COMMENT_ID, commentId);
         intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_DEL_COMMENT);
         startService(intent);
@@ -368,6 +368,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             case WriteIntentService.ACTION_EDIT_COMMENT:
                 LogWrapper.d(TAG, "Receiver invoked for ACTION_EDIT_COMMENT");
                 onEditCommentComplete(resultData);
+                dismissPostCommentFragment();
                 break;
             case WriteIntentService.ACTION_DEL_COMMENT:
                 LogWrapper.d(TAG, "Receiver invoked for ACTION_DEL_COMMENT");
@@ -482,6 +483,16 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    private void dismissPostCommentFragment()
+    {
+        if (postCommentFragment != null)
+        {
+            postCommentFragment.hideSoftKeyboard();
+            getFragmentManager().popBackStackImmediate();
+            postCommentFragment = null;
+        }
     }
 
     @Override
