@@ -252,9 +252,8 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
 
     private String getAutherDisplayText(String acceptRate)
     {
-        Spanned authorName =
-                        answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
-                                        : new SpannableString("");
+        Spanned authorName = answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName)
+                        : new SpannableString("");
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
                         + AppUtils.formatReputation(answer.owner.reputation) + "]";
     }
@@ -307,6 +306,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
                 {
                     LogWrapper.d(TAG, "comment " + commentId + " removed");
                     removeQuestionFromCache();
+                    iterator.remove();
                     break;
                 }
             }
@@ -329,9 +329,9 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
         // it can never be null here.
         if (comment != null)
         {
-            if(answer.comments == null)
+            if (answer.comments == null)
                 answer.comments = new ArrayList<Comment>();
-            
+
             answer.comments.add(comment);
             updateCacheWithNewCommentIfExists(comment);
         }
@@ -348,9 +348,9 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
             {
                 if (answer.id == comment.post_id)
                 {
-                    if(answer.comments == null)
+                    if (answer.comments == null)
                         answer.comments = new ArrayList<Comment>();
-                    
+
                     if (!answer.comments.contains(comment))
                     {
                         answer.comments.add(comment);

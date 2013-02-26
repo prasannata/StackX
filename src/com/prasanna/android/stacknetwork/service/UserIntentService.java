@@ -316,6 +316,7 @@ public class UserIntentService extends AbstractIntentService
                     LogWrapper.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
 
                     Site site = linkSitesMap.get(siteUrl);
+                    site.userId = linkAccountsMap.get(siteUrl).userId;
                     site.userType = linkAccountsMap.get(siteUrl).userType;
                     site.writePermissions = userService.getWritePermissions(site.apiSiteParameter);
                     DbRequestThreadExecutor.persistPermissions(getApplicationContext(), site, site.writePermissions);

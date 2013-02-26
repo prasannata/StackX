@@ -386,8 +386,13 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         if (QuestionsCache.getInstance().containsKey(question.id))
         {
             Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
-            cachedQuestion.comments = question.comments;
-            QuestionsCache.getInstance().add(question.id, cachedQuestion);
+            if (cachedQuestion != null)
+            {
+                cachedQuestion.comments = question.comments;
+                QuestionsCache.getInstance().add(question.id, cachedQuestion);
+            }
+            else
+                QuestionsCache.getInstance().remove(question.id);
         }
     }
 

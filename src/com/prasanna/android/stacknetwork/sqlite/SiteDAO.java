@@ -53,14 +53,15 @@ public class SiteDAO extends AbstractBaseDao
         public static final String COLUMN_ICON_URL = "icon_url";
         public static final String COLUMN_LOGO_URL = "logo_url";
         public static final String COLUMN_USER_TYPE = "user_type";
+        public static final String COLUMN_USER_ID = "user_id";
         public static final String COLUMN_LAST_UPDATE = "last_update";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
                         + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, "
                         + COLUMN_API_SITE_PARAMTETER + " text not null unique, " + COLUMN_AUDIENCE + " text not null, "
                         + COLUMN_SITE_URL + " text not null, " + COLUMN_ICON_URL + " text not null, " + COLUMN_LOGO_URL
-                        + " text not null, " + COLUMN_USER_TYPE + " text not null, " + COLUMN_LAST_UPDATE
-                        + " long not null);";
+                        + " text not null, " + COLUMN_USER_TYPE + " text not null, " + COLUMN_USER_ID + " long, "
+                        + COLUMN_LAST_UPDATE + " long not null);";
 
     }
 
@@ -131,6 +132,8 @@ public class SiteDAO extends AbstractBaseDao
         values.put(SiteTable.COLUMN_LOGO_URL, site.logoUrl);
         if (site.userType != null)
             values.put(SiteTable.COLUMN_USER_TYPE, site.userType.getValue());
+
+        values.put(SiteTable.COLUMN_USER_ID, site.userId);
         values.put(SiteTable.COLUMN_LAST_UPDATE, System.currentTimeMillis());
         return values;
     }
@@ -179,10 +182,10 @@ public class SiteDAO extends AbstractBaseDao
             ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>();
             if (defaultSite != null)
                 sitesWithRegisteredFirst.add(defaultSite);
-            
-            if(registerdSites.contains(defaultSite))
+
+            if (registerdSites.contains(defaultSite))
                 registerdSites.remove(defaultSite);
-            
+
             sitesWithRegisteredFirst.addAll(registerdSites);
             sitesWithRegisteredFirst.addAll(sites);
             return sitesWithRegisteredFirst;
@@ -227,6 +230,7 @@ public class SiteDAO extends AbstractBaseDao
             String userType = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_USER_TYPE));
             site.userType = UserType.getEnum(userType);
         }
+        site.userId = cursor.getLong(cursor.getColumnIndex(SiteTable.COLUMN_USER_ID));
         site.writePermissions = getWritePermission(site.apiSiteParameter);
         return site;
     }
@@ -258,7 +262,8 @@ public class SiteDAO extends AbstractBaseDao
     public void update(Site site)
     {
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
-        String[] whereArgs = new String[] { site.apiSiteParameter };
+        String[] whereArgs = new String[]
+        { site.apiSiteParameter };
         getDatabase().update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
@@ -267,7 +272,8 @@ public class SiteDAO extends AbstractBaseDao
         for (Account account : newAccounts)
         {
             String whereClause = SiteTable.COLUMN_SITE_URL + "= ?";
-            String[] whereArgs = new String[] { account.siteUrl };
+            String[] whereArgs = new String[]
+            { account.siteUrl };
 
             ContentValues values = new ContentValues();
 
@@ -284,9 +290,11 @@ public class SiteDAO extends AbstractBaseDao
 
     public boolean isRegistered(String site)
     {
-        String[] cols = new String[] { SiteTable.COLUMN_API_SITE_PARAMTETER };
+        String[] cols = new String[]
+        { SiteTable.COLUMN_API_SITE_PARAMTETER };
         String selection = SiteTable.COLUMN_API_SITE_PARAMTETER + " = ? and " + SiteTable.COLUMN_USER_TYPE + " = ?";
-        String[] selectionArgs = { site, UserType.REGISTERED.getValue() };
+        String[] selectionArgs =
+        { site, UserType.REGISTERED.getValue() };
 
         Cursor cursor = getDatabase().query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
 

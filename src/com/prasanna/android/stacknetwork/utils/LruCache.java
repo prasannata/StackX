@@ -72,9 +72,10 @@ public class LruCache<K, T>
         if (key != null)
         {
             Reference<T> ref = lru.remove(key);
-            return ref.get();
+            if (ref != null)
+                return ref.get();
         }
-        
+
         return null;
     }
 

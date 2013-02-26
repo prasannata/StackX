@@ -52,7 +52,6 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -234,8 +233,11 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     private boolean isMyComment(Comment comment)
     {
-        long myId = SharedPreferencesUtil.getLong(getActivity(), StringConstants.USER_ID, -1);
-        return (comment.owner != null && comment.owner.id == myId);
+        long userId = OperatingSite.getSite().userId;
+        if (userId > 0)
+            return (comment.owner != null && comment.owner.id == userId);
+
+        return false;
     }
 
     private void setupReplyToComment(final Comment comment, final int position, final CommentViewHolder holder)

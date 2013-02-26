@@ -29,13 +29,13 @@ public class Site implements Serializable
     private static final long serialVersionUID = 7057957647981597410L;
 
     public long dbId;
-    
+
     public String name;
 
     public String apiSiteParameter;
 
     public String audience;
-    
+
     public String link;
 
     public int headerResId;
@@ -49,6 +49,8 @@ public class Site implements Serializable
     public UserType userType = UserType.DOES_NOT_EXIST;
 
     public ArrayList<WritePermission> writePermissions;
+
+    public long userId = -1;
 
     @Override
     public int hashCode()
@@ -94,6 +96,5 @@ public class Site implements Serializable
             return false;
         return true;
     }
-    
-    
+
 }
