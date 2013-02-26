@@ -59,6 +59,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private InboxItem item;
     private Comment comment;
     private ContextMenu menu;
+    private TextView viewQuestion;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
@@ -71,6 +72,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
+        viewQuestion = (TextView) findViewById(R.id.viewQuestion);
 
         showInboxItem();
         getPostDetail();
@@ -289,29 +291,40 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 }
             }
         });
+
+        setupOnClickForViewQuestion(true);
     }
 
     private void setupOnClickForViewQuestion(boolean disableViewQuestion)
     {
-        TextView textView = (TextView) findViewById(R.id.viewQuestion);
-
         if (disableViewQuestion)
         {
-            textView.setClickable(false);
-            textView.setEnabled(false);
+            viewQuestion.setClickable(false);
+            viewQuestion.setEnabled(false);
+            viewQuestion.setTextColor(getResources().getColor(R.color.lightGrey));
         }
-
-        textView.setOnClickListener(new View.OnClickListener()
+        else
         {
-            @Override
-            public void onClick(View v)
+            viewQuestion.setClickable(true);
+            viewQuestion.setEnabled(true);
+            viewQuestion.setTextColor(getResources().getColor(R.color.delft));
+            viewQuestion.setOnClickListener(new View.OnClickListener()
             {
-                Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
-                displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
-                displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, item.questionId);
-                displayQuestionIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
-                startActivity(displayQuestionIntent);
-            }
-        });
+                @Override
+                public void onClick(View v)
+                {
+                    startQuestionDetailActivity();
+                }
+            });
+        }
+    }
+
+    private void startQuestionDetailActivity()
+    {
+        Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
+        displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
+        displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, item.questionId);
+        displayQuestionIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
+        startActivity(displayQuestionIntent);
     }
 }
