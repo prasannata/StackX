@@ -49,6 +49,7 @@ import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
+import com.prasanna.android.utils.TagsViewBuilder;
 
 public class QuestionFragment extends Fragment implements OnCommentChangeListener
 {
@@ -203,6 +204,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
             if (question.body != null)
                 displayBody(question.body);
+
+            TagsViewBuilder.buildView(getActivity(), (LinearLayout) parentLayout.findViewById(R.id.questionTags),
+                            question.tags);
         }
     }
 

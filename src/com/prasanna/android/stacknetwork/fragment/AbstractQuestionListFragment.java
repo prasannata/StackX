@@ -37,7 +37,6 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
@@ -51,6 +50,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
+import com.prasanna.android.utils.TagsViewBuilder;
 
 public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
 {
@@ -201,7 +201,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             holder = (QuestionViewHolder) questionRowLayout.getTag();
 
         setupViewForQuestionMetadata(holder, question);
-        setupViewForTags(holder, question);
+        TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags);
 
         questionRowLayout.setId((int) question.id);
         return questionRowLayout;
@@ -232,58 +232,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             holder.owner.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
                             + Html.fromHtml(question.owner.displayName));
         }
-    }
-
-    private void setupViewForTags(QuestionViewHolder holder, final Question question)
-    {
-        LinearLayout tagsParentLayout = (LinearLayout) holder.tagsLayout;
-
-        if (tagsParentLayout.getChildCount() > 0)
-            tagsParentLayout.removeAllViews();
-
-        int maxWidth = getResources().getDisplayMetrics().widthPixels - 20;
-
-        LinearLayout rowLayout = createNewRowForTags(0);
-
-        if (question.tags != null && question.tags.length > 0)
-        {
-            for (int i = 0; i < question.tags.length; i++)
-            {
-                LinearLayout.LayoutParams params =
-                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(3, 0, 3, 0);
-                TextView tagTextView =
-                                ((TextView) getActivity().getLayoutInflater().inflate(R.layout.tags_layout, null));
-                tagTextView.setText(question.tags[i]);
-
-                tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                rowLayout.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-                if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > maxWidth)
-                {
-                    tagsParentLayout.addView(rowLayout);
-                    rowLayout = createNewRowForTags(3);
-                }
-
-                rowLayout.addView(tagTextView, params);
-            }
-
-            tagsParentLayout.addView(rowLayout);
-        }
-
-    }
-
-    private LinearLayout createNewRowForTags(int topMargin)
-    {
-        LinearLayout rowLayout = new LinearLayout(getActivity());
-        rowLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams layoutParams =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.topMargin = topMargin;
-        rowLayout.setLayoutParams(layoutParams);
-        return rowLayout;
     }
 
     public Bundle getBundle()
