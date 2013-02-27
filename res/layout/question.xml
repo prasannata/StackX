@@ -86,7 +86,19 @@
                 android:layout_alignTop="@id/questionViews"
                 android:gravity="center"
                 android:textColor="@color/black"
+                android:textIsSelectable="false"
                 android:textSize="9.5sp" />
+
+            <LinearLayout
+                android:id="@+id/questionTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/questionViews"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="3dp"
+                android:orientation="vertical" />
         </RelativeLayout>
 
         <ScrollView
