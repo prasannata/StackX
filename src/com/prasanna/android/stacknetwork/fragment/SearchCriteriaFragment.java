@@ -578,28 +578,22 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
             public void onClick(View v)
             {
                 if (searchCriteriaDomain == null)
-                {
                     searchCriteriaDomain = new SearchCriteriaDomain();
+
+                if (searchCriteriaDomain.searchCriteria == null)
                     searchCriteriaDomain.searchCriteria = SearchCriteria.newCriteria();
-                }
+                else
+                    searchCriteriaDomain.searchCriteria.clear();
 
                 if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
                     searchCriteriaDomain.searchCriteria.setQuery(searchQuery.getText().toString().trim());
-                else
-                    searchCriteriaDomain.searchCriteria.removeQuery();
 
                 switch (includeAnswers.getCheckedRadioButtonId())
                 {
-                    case R.id.dontCareForAns:
-                        searchCriteriaDomain.searchCriteria.setMinAnswers(0);
-                        searchCriteriaDomain.searchCriteria.clearAnswered();
-                        break;
                     case R.id.hasAnswers:
                         searchCriteriaDomain.searchCriteria.setMinAnswers(1);
-                        searchCriteriaDomain.searchCriteria.clearAnswered();
                         break;
                     case R.id.isAnswered:
-                        searchCriteriaDomain.searchCriteria.setMinAnswers(0);
                         searchCriteriaDomain.searchCriteria.mustBeAnswered();
                         break;
                     default:

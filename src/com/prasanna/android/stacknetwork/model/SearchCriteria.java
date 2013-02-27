@@ -123,10 +123,13 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria setMinAnswers(int minAns)
     {
-        if (minAns > 0)
-            criteria.put(ANSWERS, String.valueOf(minAns));
-        else
-            criteria.remove(ANSWERS);
+        criteria.put(ANSWERS, String.valueOf(minAns));
+        return this;
+    }
+
+    public SearchCriteria removeMinAnswers()
+    {
+        criteria.remove(ANSWERS);
         return this;
     }
 
@@ -256,8 +259,8 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria build()
     {
-        if (page == 1)
-            criteria.put(PAGE, String.valueOf(page));
+        page = 1;
+        criteria.put(PAGE, String.valueOf(page));
 
         if (!criteria.containsKey(PAGESIZE))
             setPageSize(DEFAULT_SIZE);
