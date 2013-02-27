@@ -585,6 +585,8 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher
 
                 if (searchQuery.getText() != null && !Validate.isEmptyString(searchQuery.getText().toString()))
                     searchCriteriaDomain.searchCriteria.setQuery(searchQuery.getText().toString().trim());
+                else
+                    searchCriteriaDomain.searchCriteria.removeQuery();
 
                 switch (includeAnswers.getCheckedRadioButtonId())
                 {

@@ -115,6 +115,12 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
+    public SearchCriteria removeQuery()
+    {
+        criteria.remove(Q);
+        return this;
+    }
+
     public SearchCriteria setMinAnswers(int minAns)
     {
         if (minAns > 0)
@@ -167,7 +173,13 @@ public class SearchCriteria implements Serializable
             if (includeTags == null)
                 includeTags = new HashSet<String>();
 
-            includeTags.addAll(tags);
+            if (tags.isEmpty())
+            {
+                includeTags.clear();
+                criteria.remove(TAGGED);
+            }
+            else
+                includeTags.addAll(tags);
         }
         return this;
     }
@@ -190,7 +202,13 @@ public class SearchCriteria implements Serializable
             if (excludeTags == null)
                 excludeTags = new HashSet<String>();
 
-            excludeTags.addAll(tags);
+            if (tags.isEmpty())
+            {
+                excludeTags.clear();
+                criteria.remove(NOT_TAGGED);
+            }
+            else
+                excludeTags.addAll(tags);
         }
         return this;
     }
