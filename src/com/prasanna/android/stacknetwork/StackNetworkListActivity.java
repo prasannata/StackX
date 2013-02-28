@@ -140,17 +140,15 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
-        siteListAdapter =
-                        new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(),
-                                        new SiteFilter());
+        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(),
+                        new SiteFilter());
         siteListAdapter.setOnSiteSelectedListener(this);
         setListAdapter(siteListAdapter);
 
         if (AppUtils.inAuthenticatedRealm(getApplicationContext()))
         {
-            progressDialog =
-                            ProgressDialog.show(StackNetworkListActivity.this, "",
-                                            getString(R.string.loadingSitesForAuthUser));
+            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
+                            getString(R.string.loadingSitesForAuthUser));
             startService(new Intent(getApplicationContext(), AccountSyncService.class));
         }
         else
@@ -312,11 +310,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
     private void startQuestionsActivity()
     {
-        Intent startQuestionActivityIntent = new Intent(this, QuestionsActivity.class);
-        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startQuestionActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startQuestionActivityIntent);
+        startActivity(new Intent(this, QuestionsActivity.class));
     }
 
     @Override
