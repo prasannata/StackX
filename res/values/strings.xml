@@ -15,6 +15,7 @@
     <string name="questions">Questions</string>
     <string name="answer">Answer</string>
     <string name="answers">Answers</string>
+    <string name="comment">Comment</string>
     <string name="comments">Comments</string>
     <string name="upvotes">Upvotes</string>
     <string name="downvotes">Downvotes</string>
@@ -73,7 +74,12 @@
     <string name="time">time</string>
     <string name="times">times</string>
     <string name="goToQuestion">Go To Quesiton</string>
-
+    <string name="writePermissions">Write Permissions</string>
+    <string name="writePermissionsInfo">Stack Exchange provides APIs only for writing, editing or deleting a comment, not for question or answer.</string>
+    <string name="actionsPerDay">Actions per day</string>
+    <string name="Add">Add</string>
+    <string name="Edit">Edit</string>
+    <string name="Delete">Delete</string>
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>
 

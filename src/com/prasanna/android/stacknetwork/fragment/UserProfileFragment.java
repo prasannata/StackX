@@ -43,10 +43,13 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
+import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -142,6 +145,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             displayUserDetail();
             displayUserAccounts();
+            displayWritePermissions();
         }
     }
 
@@ -185,6 +189,43 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
 
             getAndDisplayUserAvatar();
+        }
+    }
+
+    private void displayWritePermissions()
+    {
+        if (me && user != null && profileHomeLayout != null)
+        {
+            TextView textView;
+            profileHomeLayout.findViewById(R.id.writePermissions).setVisibility(View.VISIBLE);
+
+            HashMap<ObjectType, WritePermission> permissions = WritePermissionDAO.getPermissions(getActivity(),
+                            OperatingSite.getSite().apiSiteParameter);
+            WritePermission writePermission = permissions.get(ObjectType.COMMENT);
+
+            if (writePermission != null)
+            {
+                if (writePermission.canAdd)
+                {
+                    textView = (TextView) profileHomeLayout.findViewById(R.id.canAddComment);
+                    textView.setText(getString(R.string.yes));
+                }
+
+                if (writePermission.canEdit)
+                {
+                    textView = (TextView) profileHomeLayout.findViewById(R.id.canEditComment);
+                    textView.setText(getString(R.string.yes));
+                }
+
+                if (writePermission.canDelete)
+                {
+                    textView = (TextView) profileHomeLayout.findViewById(R.id.canDelComment);
+                    textView.setText(getString(R.string.yes));
+                }
+
+                textView = (TextView) profileHomeLayout.findViewById(R.id.numCommentActionsPerDay);
+                textView.setText(String.valueOf(writePermission.maxDailyActions));
+            }
         }
     }
 
@@ -251,7 +292,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
         else
             textView.setVisibility(View.GONE);
-            
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
         textView.setText(getString(R.string.lastSeen) + " "
@@ -297,6 +337,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                 user.accounts.addAll(accounts.values());
                 displayUserAccounts();
             }
+
+            displayWritePermissions();
         }
     }
 
