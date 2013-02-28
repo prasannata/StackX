@@ -36,7 +36,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
@@ -61,7 +61,7 @@ import com.prasanna.android.utils.LogWrapper;
 public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver
 {
     private static final String TAG = UserProfileFragment.class.getSimpleName();
-    private RelativeLayout profileHomeLayout;
+    private ScrollView profileHomeLayout;
     private LinearLayout userAccountList;
     private ProgressDialog progressDialog;
     private Intent userProfileIntent;
@@ -124,7 +124,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (profileHomeLayout == null)
         {
-            profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
+            profileHomeLayout = (ScrollView) inflater.inflate(R.layout.user_proile_layout, container, false);
             progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
             progressDialog.show();
 
