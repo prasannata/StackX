@@ -36,6 +36,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
+import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 
 public class SiteListAdapter extends ArrayAdapter<Site>
@@ -99,10 +100,13 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         {
             for (WritePermission permission : site.writePermissions)
             {
-                if (permission.canAdd & permission.canDelete & permission.canEdit)
+                if (permission.objectType != null && ObjectType.COMMENT.equals(permission.objectType))
                 {
-                    holder.writePermissionView.setVisibility(View.VISIBLE);
-                    break;
+                    if (permission.canAdd & permission.canDelete & permission.canEdit)
+                    {
+                        holder.writePermissionView.setVisibility(View.VISIBLE);
+                        break;
+                    }
                 }
             }
         }
