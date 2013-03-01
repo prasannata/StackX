@@ -236,7 +236,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         Uri ringtoneUri =
                         Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
                                         DEFAULT_RINGTONE));
-        setRingtoneSummary(ringtoneUri);
+        if (ringtoneUri != null)
+            setRingtoneSummary(ringtoneUri);
     }
 
     @Override
@@ -271,6 +272,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         if (ringtone != null)
             notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
         else
-            notifRingTonePref.setSummary("Unknown");
+            notifRingTonePref.setSummary("");
     }
 }
