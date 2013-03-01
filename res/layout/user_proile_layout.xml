@@ -370,7 +370,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_weight="1"
                         android:gravity="left"
-                        android:text="@string/actionsPerDay"
+                        android:text="@string/maxActionsPerDay"
                         android:textColor="@color/black"
                         android:textIsSelectable="false"
                         android:textSize="12sp" />
