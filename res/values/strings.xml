@@ -75,7 +75,7 @@
     <string name="times">times</string>
     <string name="goToQuestion">Go To Quesiton</string>
     <string name="writePermissions">Write Permissions</string>
-    <string name="writePermissionsInfo">Stack Exchange provides APIs only for writing, editing or deleting a comment, not for question or answer.</string>
+    <string name="writePermissionsInfo">Stack Exchange provides APIs only for writing, editing or deleting a comment, not for question or answer.&lt;br/&gt; As you increase your reputation. the comment permissions will change accordingly</string>
     <string name="actionsPerDay">Actions per day</string>
     <string name="Add">Add</string>
     <string name="Edit">Edit</string>

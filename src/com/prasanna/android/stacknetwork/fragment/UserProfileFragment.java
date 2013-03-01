@@ -30,6 +30,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -196,8 +197,10 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     {
         if (me && user != null && profileHomeLayout != null)
         {
-            TextView textView;
             profileHomeLayout.findViewById(R.id.writePermissions).setVisibility(View.VISIBLE);
+
+            TextView textView = (TextView) profileHomeLayout.findViewById(R.id.writePermissionsInfo);
+            textView.setText(Html.fromHtml(getString(R.string.writePermissionsInfo)));
 
             HashMap<ObjectType, WritePermission> permissions = WritePermissionDAO.getPermissions(getActivity(),
                             OperatingSite.getSite().apiSiteParameter);
