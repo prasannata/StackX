@@ -140,15 +140,17 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
-        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(),
-                        new SiteFilter());
+        siteListAdapter =
+                        new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(),
+                                        new SiteFilter());
         siteListAdapter.setOnSiteSelectedListener(this);
         setListAdapter(siteListAdapter);
 
         if (AppUtils.inAuthenticatedRealm(getApplicationContext()))
         {
-            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
-                            getString(R.string.loadingSitesForAuthUser));
+            progressDialog =
+                            ProgressDialog.show(StackNetworkListActivity.this, "",
+                                            getString(R.string.loadingSitesForAuthUser));
             startService(new Intent(getApplicationContext(), AccountSyncService.class));
         }
         else
@@ -248,9 +250,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
             progressDialog.dismiss();
 
         if (resultCode == UserIntentService.ERROR)
-        {
             showError();
-        }
         else
         {
             switch (resultCode)
@@ -264,6 +264,9 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                         siteListAdapter.clear();
                         sites.addAll(result);
                         siteListAdapter.addAll(sites);
+
+                        if (sites.isEmpty())
+                            showEmptyItemsView();
                     }
 
                     break;
@@ -271,6 +274,11 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                     break;
             }
         }
+    }
+
+    private void showEmptyItemsView()
+    {
+        findViewById(R.id.emptyItems).setVisibility(View.VISIBLE);
     }
 
     private void showError()

@@ -203,7 +203,7 @@
             android:layout_below="@id/statsUnderline"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:background="@color/white" >
 
             <TextView
@@ -237,7 +237,7 @@
                 android:layout_alignLeft="@id/questionCount"
                 android:layout_below="@id/questionCount"
                 android:layout_gravity="left"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="5dp"
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:textIsSelectable="false"
@@ -262,6 +262,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/userStats"
+            android:layout_marginTop="5dp"
             android:visibility="gone" >
 
             <TextView
@@ -270,7 +271,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="5dp"
                 android:gravity="left"
                 android:text="@string/writePermissions"
                 android:textColor="@color/black"
@@ -291,7 +292,7 @@
                 android:layout_below="@id/writePermissionsUnderline"
                 android:layout_gravity="left"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="5dp"
                 android:gravity="left"
                 android:textColor="@color/black"
                 android:textIsSelectable="false"
