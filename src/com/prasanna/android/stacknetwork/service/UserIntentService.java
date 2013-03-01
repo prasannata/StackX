@@ -280,7 +280,7 @@ public class UserIntentService extends AbstractIntentService
     {
         ArrayList<Site> sites = getSites();
 
-        if (sites != null)
+        if (sites != null && !sites.isEmpty())
         {
             LogWrapper.d(TAG, "Returning site list from DB");
             return sites;

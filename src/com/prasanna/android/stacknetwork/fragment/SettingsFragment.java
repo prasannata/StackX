@@ -268,6 +268,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private void setRingtoneSummary(Uri uri)
     {
         Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), uri);
-        notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
+        if (ringtone != null)
+            notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
+        else
+            notifRingTonePref.setSummary("Unknown");
     }
 }

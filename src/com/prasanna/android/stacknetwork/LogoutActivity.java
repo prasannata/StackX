@@ -130,7 +130,7 @@ public class LogoutActivity extends Activity
             editor.remove(StringConstants.ACCESS_TOKEN);
             editor.commit();
 
-            SharedPreferencesUtil.clear(getApplicationContext());
+            AppUtils.clearSharedPreferences(getApplicationContext());
             AppUtils.setFirstRunComplete(getApplicationContext());
             SiteDAO.deleteAll(getApplicationContext());
             TagDAO.purge(getApplicationContext());
