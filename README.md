@@ -29,5 +29,5 @@ Screenshots
 ![Context Menu](http://i.stack.imgur.com/n9lPU.png)
 ![Comments](http://i.stack.imgur.com/2GK27.png)
 ![Profile](http://i.stack.imgur.com/foMmb.png)
-![Saved Searches](http://i.stack.imgur.com/ZWjzo.png)
+![Saved Searches](http://i.stack.imgur.com/ZWjzo.png)  
 ![Advanced Search](http://i.stack.imgur.com/x2Zyn.png)
