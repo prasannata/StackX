@@ -33,6 +33,8 @@ public class SearchCriteria implements Serializable
 {
     private static final long serialVersionUID = -2988724752735247609L;
 
+    public static final int DEFAULT_PAGE_SIZE = 15;
+    
     public static final String Q = "q";
     public static final String TITLE = "title";
     public static final String TAGGED = "tagged";
@@ -78,7 +80,6 @@ public class SearchCriteria implements Serializable
         }
     }
 
-    private static final int DEFAULT_SIZE = 15;
     private static SoftReference<SearchCriteria> self;
     private final HashMap<String, String> criteria;
     private HashSet<String> includeTags;
@@ -263,7 +264,7 @@ public class SearchCriteria implements Serializable
         criteria.put(PAGE, String.valueOf(page));
 
         if (!criteria.containsKey(PAGESIZE))
-            setPageSize(DEFAULT_SIZE);
+            setPageSize(DEFAULT_PAGE_SIZE);
 
         if (includeTags != null && !includeTags.isEmpty())
             addCriteria(TAGGED, getAsDelimitedString(includeTags, ";"));
