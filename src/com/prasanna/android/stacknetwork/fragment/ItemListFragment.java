@@ -80,8 +80,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        LogWrapper.d(TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
 
         if (resultReceiver == null)
@@ -97,8 +95,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        LogWrapper.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         if (!activityCreated)
@@ -120,8 +116,6 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     @Override
     public void onResume()
     {
-        LogWrapper.d(TAG, "onResume");
-
         super.onResume();
 
         if (itemListAdapter != null)

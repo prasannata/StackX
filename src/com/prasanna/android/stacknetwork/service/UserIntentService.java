@@ -57,7 +57,6 @@ public class UserIntentService extends AbstractIntentService
     public static final int GET_USER_UNREAD_INBOX = 0x5;
     public static final int GET_USER_SITES = 0x6;
     public static final int GET_USER_FAVORITES = 0x7;
-    public static final int CHECK_WRITE_PERMISSION = 0x101;
     public static final int DEAUTH_APP = 0x201;
 
     private UserServiceHelper userService = UserServiceHelper.getInstance();
@@ -80,7 +79,7 @@ public class UserIntentService extends AbstractIntentService
         final int page = intent.getIntExtra(StringConstants.PAGE, 1);
         final boolean me = intent.getBooleanExtra(StringConstants.ME, false);
         final long userId = intent.getLongExtra(StringConstants.USER_ID, -1);
-        Bundle bundle = new Bundle();
+        final Bundle bundle = new Bundle();
 
         try
         {
@@ -89,19 +88,16 @@ public class UserIntentService extends AbstractIntentService
             switch (action)
             {
                 case GET_USER_PROFILE:
-                    LogWrapper.d(TAG, "getUserDetail");
                     boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
                     bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, refresh, page));
                     bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userId));
                     receiver.send(GET_USER_PROFILE, bundle);
-                    break;
+                    break;  
                 case GET_USER_QUESTIONS:
-                    LogWrapper.d(TAG, "getQuestions");
                     bundle.putSerializable(StringConstants.QUESTIONS, getQuestions(me, userId, page));
                     receiver.send(GET_USER_QUESTIONS, bundle);
                     break;
                 case GET_USER_ANSWERS:
-                    LogWrapper.d(TAG, "getAnswers");
                     bundle.putSerializable(StringConstants.ANSWERS, getAnswers(me, userId, page));
                     receiver.send(GET_USER_ANSWERS, bundle);
                     break;
@@ -118,7 +114,6 @@ public class UserIntentService extends AbstractIntentService
                     receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
-                    LogWrapper.d(TAG, "getQuestions");
                     bundle.putSerializable(StringConstants.QUESTIONS, getFavorites(me, userId, page));
                     receiver.send(GET_USER_FAVORITES, bundle);
                     break;
@@ -200,8 +195,6 @@ public class UserIntentService extends AbstractIntentService
 
     private HashMap<String, Account> getMyAccounts()
     {
-        LogWrapper.d(TAG, "getMyAccounts");
-
         UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
         try
         {
