@@ -52,25 +52,19 @@ public class LoginActivity extends Activity
         }
         else
         {
+            Intent intent;
+
             if (AppUtils.getDefaultSiteName(getApplicationContext()) != null)
             {
-                LogWrapper.d(TAG, "Launching default site");
-
                 OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
-                Intent intent = new Intent(this, QuestionsActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                intent = new Intent(this, QuestionsActivity.class);
             }
             else
-            {
-                LogWrapper.d(TAG, "Launching site list");
+                intent = new Intent(this, StackNetworkListActivity.class);
 
-                Intent intent = new Intent(this, StackNetworkListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
     }
 
