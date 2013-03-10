@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -24,7 +24,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import com.prasanna.android.stacknetwork.LoginActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.receiver.InboxRefreshAlarmBroadcastReceiver;
 import com.prasanna.android.utils.LogWrapper;
@@ -37,18 +36,16 @@ public class AlarmUtils
     {
         int interval = SettingsFragment.getInboxRefreshInterval(context);
 
-        if (interval == 0)
+        if (interval <= 0)
         {
             LogWrapper.d(TAG, "Inbox refreshing set to manual");
-
             cancelInboxRefreshAlarm(context);
         }
         else
         {
             LogWrapper.d(TAG, "Inbox refreshing set to " + interval + " minutes");
-
             interval = interval * 60 * 1000;
-            createRepeatingAlarm(LoginActivity.getAppContext(), InboxRefreshAlarmBroadcastReceiver.class, interval, 0);
+            createRepeatingAlarm(context, InboxRefreshAlarmBroadcastReceiver.class, interval, 0);
         }
     }
 
@@ -77,8 +74,8 @@ public class AlarmUtils
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, clazz);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, flags);
-        pendingIntent.cancel();
         alarmManager.cancel(pendingIntent);
+        pendingIntent.cancel();
     }
 
     public static void rescheduleRepeatingAlarm(Context context, Class<?> clazz, int newIntervalInMs, int flags)

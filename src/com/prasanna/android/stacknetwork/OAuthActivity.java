@@ -66,7 +66,7 @@ public class OAuthActivity extends Activity
             if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
             {
                 deleteStoredTags();
-                AlarmUtils.setInboxRefreshAlarm(OAuthActivity.this);
+                AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
 
                 cacheAccessToken(url);
                 startSiteListActivity(view);

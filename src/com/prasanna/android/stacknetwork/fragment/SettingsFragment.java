@@ -141,13 +141,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         accountActionPref.setEntries(new String[0]);
 
         if (AppUtils.inAuthenticatedRealm(getActivity()))
-        {
             setupLogoutPreference();
-        }
         else
-        {
             setupLoginPreference();
-        }
     }
 
     private void setupLoginPreference()
@@ -262,7 +258,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
         {
             refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
-            AlarmUtils.rescheduleInboxRefreshAlarm(getActivity());
+            AlarmUtils.rescheduleInboxRefreshAlarm(getActivity().getApplicationContext());
         }
     }
 

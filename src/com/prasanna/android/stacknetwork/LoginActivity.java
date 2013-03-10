@@ -39,17 +39,10 @@ public class LoginActivity extends Activity
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static Context context;
 
-    public static Context getAppContext()
-    {
-        return LoginActivity.context;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        context = getApplicationContext();
 
         if (AppUtils.isFirstRun(getApplicationContext()))
         {
