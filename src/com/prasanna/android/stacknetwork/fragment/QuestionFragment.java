@@ -269,9 +269,17 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             question.body = text;
 
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
-            questionBodyLayout.removeAllViews();
-            for (final View questionBodyTextView : MarkdownFormatter.parse(getActivity(), question.body))
-                questionBodyLayout.addView(questionBodyTextView);
+            if (isVisible() && questionBodyLayout != null)
+            {
+                questionBodyLayout.removeAllViews();
+                ArrayList<View> views = MarkdownFormatter.parse(getActivity(), question.body);
+
+                if (views != null)
+                {
+                    for (final View questionBodyTextView : views)
+                        questionBodyLayout.addView(questionBodyTextView);
+                }
+            }
         }
     }
 
@@ -282,9 +290,12 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
     public void setComments(ArrayList<Comment> comments)
     {
-        question.comments = comments;
-        if (parentLayout != null)
-            displayNumComments();
+        if (question != null)
+        {
+            question.comments = comments;
+            if (parentLayout != null)
+                displayNumComments();
+        }
     }
 
     public void setAndDisplay(Question question)
