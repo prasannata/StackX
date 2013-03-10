@@ -20,7 +20,6 @@
 package com.prasanna.android.stacknetwork;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,7 +36,6 @@ import com.prasanna.android.utils.LogWrapper;
 public class LoginActivity extends Activity
 {
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private static Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -54,12 +52,12 @@ public class LoginActivity extends Activity
         }
         else
         {
-            if (AppUtils.getDefaultSiteName(context) != null)
+            if (AppUtils.getDefaultSiteName(getApplicationContext()) != null)
             {
                 LogWrapper.d(TAG, "Launching default site");
 
-                OperatingSite.setSite(AppUtils.getDefaultSite(context));
-                Intent intent = new Intent(context, QuestionsActivity.class);
+                OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+                Intent intent = new Intent(this, QuestionsActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -68,7 +66,7 @@ public class LoginActivity extends Activity
             {
                 LogWrapper.d(TAG, "Launching site list");
 
-                Intent intent = new Intent(context, StackNetworkListActivity.class);
+                Intent intent = new Intent(this, StackNetworkListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -113,7 +111,7 @@ public class LoginActivity extends Activity
                         Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
                                         .show();
                         AppUtils.setFirstRunComplete(LoginActivity.this);
-                        startActivity(new Intent(context, StackNetworkListActivity.class));
+                        startActivity(new Intent(LoginActivity.this, StackNetworkListActivity.class));
                     }
                 }
             };
