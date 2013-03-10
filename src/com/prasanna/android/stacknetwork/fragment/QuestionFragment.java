@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -131,8 +131,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onResume()
     {
-        LogWrapper.d(TAG, "onResume");
-
         super.onResume();
 
         displayQuestion();
@@ -141,8 +139,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        LogWrapper.d(TAG, "onSaveInstanceState");
-
         if (question != null)
             outState.putSerializable(StringConstants.QUESTION, question);
 
@@ -321,7 +317,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     public void onCommentAdd(Comment comment)
     {
         // One reply to comments come here, add new comment is directly handled
-        // by QuestionAcitivy. So no need to initialize comments if nul because
+        // by QuestionAcitivy. So no need to initialize comments if null because
         // it can never be null here.
         if (comment != null)
         {
