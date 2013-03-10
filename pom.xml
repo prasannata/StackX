@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.prasanna.android</groupId>
     <artifactId>stackx</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>apk</packaging>
     <name>StackX</name>
     <description>Android application for Stack Exchange</description>
