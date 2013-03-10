@@ -92,7 +92,7 @@ public class UserIntentService extends AbstractIntentService
                     bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, refresh, page));
                     bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userId));
                     receiver.send(GET_USER_PROFILE, bundle);
-                    break;  
+                    break;
                 case GET_USER_QUESTIONS:
                     bundle.putSerializable(StringConstants.QUESTIONS, getQuestions(me, userId, page));
                     receiver.send(GET_USER_QUESTIONS, bundle);
@@ -128,8 +128,11 @@ public class UserIntentService extends AbstractIntentService
         }
         catch (AbstractHttpException e)
         {
-            bundle.putSerializable(StringConstants.EXCEPTION, e);
-            receiver.send(ERROR, bundle);
+            if (receiver != null)
+            {
+                bundle.putSerializable(StringConstants.EXCEPTION, e);
+                receiver.send(ERROR, bundle);
+            }
         }
     }
 
@@ -198,8 +201,8 @@ public class UserIntentService extends AbstractIntentService
         UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
         try
         {
-            long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
-                            -1);
+            long currentAccountId =
+                            SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
             if (currentAccountId != -1)
             {
                 userAccountsDao.open();
@@ -289,8 +292,8 @@ public class UserIntentService extends AbstractIntentService
 
         if (linkAccountsMap != null && linkSitesMap != null)
         {
-            long currentAccountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID,
-                            -1);
+            long currentAccountId =
+                            SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
             if (currentAccountId == -1 && !linkAccountsMap.isEmpty())
             {
                 currentAccountId = linkAccountsMap.values().iterator().next().id;
@@ -299,7 +302,8 @@ public class UserIntentService extends AbstractIntentService
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, currentAccountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNTS_LAST_UPDATED,
                                 System.currentTimeMillis());
-                DbRequestThreadExecutor.persistAccounts(getApplicationContext(), new ArrayList<Account>(linkAccountsMap.values()));
+                DbRequestThreadExecutor.persistAccounts(getApplicationContext(),
+                                new ArrayList<Account>(linkAccountsMap.values()));
             }
 
             for (String siteUrl : linkAccountsMap.keySet())
