@@ -62,6 +62,8 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     private ContextMenu menu;
     private ImageView backIv;
     private ImageView ctxMenuImage;
+    private String STR_VIEWS;
+    private String STR_COMMENTS;
 
     public static QuestionFragment newFragment()
     {
@@ -116,6 +118,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     public void onActivityCreated(Bundle savedInstanceState)
     {
         super.onActivityCreated(savedInstanceState);
+
+        STR_VIEWS = getString(R.string.views);
+        STR_COMMENTS = getString(R.string.comments);
 
         if (question != null)
         {
@@ -194,7 +199,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             textView.setText(getTimeAndOwnerDisplay(acceptRate));
 
             textView = (TextView) parentLayout.findViewById(R.id.questionViews);
-            textView.setText(getString(R.string.views) + ":" + AppUtils.formatNumber(question.viewCount));
+            textView.setText(STR_VIEWS + ":" + AppUtils.formatNumber(question.viewCount));
 
             displayNumComments();
 
@@ -241,7 +246,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         if (question.comments != null)
         {
             TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
-            textView.setText(getString(R.string.comments) + ":" + String.valueOf(question.comments.size()));
+            textView.setText(STR_COMMENTS + ":" + String.valueOf(question.comments.size()));
             textView.setVisibility(question.comments.isEmpty() ? View.GONE : View.VISIBLE);
 
             enableCommentsInContextMenu();
