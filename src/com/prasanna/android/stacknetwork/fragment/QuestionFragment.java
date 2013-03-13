@@ -124,8 +124,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
         if (question != null)
         {
-            LogWrapper.d(TAG, "Setting action bar title: " + question.title);
-
             getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
             displayQuestion();
         }
