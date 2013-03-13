@@ -201,15 +201,18 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     {
         serviceRunning = false;
 
-        if (resultCode == AbstractIntentService.ERROR)
-            onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
-        else
+        if (isVisible())
         {
-            currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
-            if (currentPageObject != null)
+            if (resultCode == AbstractIntentService.ERROR)
+                onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+            else
             {
-                pages.add(currentPageObject);
-                displayItems(currentPageObject.items);
+                currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
+                if (currentPageObject != null)
+                {
+                    pages.add(currentPageObject);
+                    displayItems(currentPageObject.items);
+                }
             }
         }
     }
@@ -246,7 +249,9 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
 
         dismissProgressBar();
 
-        getListView().setVisibility(View.GONE);
+        if (activityCreated)
+            getListView().setVisibility(View.GONE);
+        
         View errorLayout = getParentLayout().findViewById(R.id.errorLayout);
         if (errorLayout == null)
             getParentLayout().addView(AppUtils.getErrorView(getActivity(), e));
