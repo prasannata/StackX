@@ -61,22 +61,13 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
     protected ViewGroup itemsContainer;
     protected ArrayList<T> items;
     protected ItemListAdapter<T> itemListAdapter;
-
     private TextView emptyItemsTextView;
 
     protected abstract String getReceiverExtraName();
-
     protected abstract void loadNextPage();
-
     protected abstract void startIntentService();
-
     protected abstract String getLogTag();
-
-    protected boolean isServiceRunning()
-    {
-        return serviceRunning;
-    }
-
+    
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -128,6 +119,11 @@ public abstract class ItemListFragment<T extends StackXItem> extends ListFragmen
                     itemListAdapter.addAll(items);
             }
         }
+    }
+
+    protected boolean isServiceRunning()
+    {
+        return serviceRunning;
     }
 
     protected void showProgressBar()
