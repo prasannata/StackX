@@ -249,9 +249,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.putAll(searchCriteria.getMap());
 
-        JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-
-        return getQuestionModel(questionsJsonResponse);
+        return getQuestionModel(executeHttpGetRequest(restEndPoint, queryParams));
     }
 
     @Override

@@ -34,7 +34,7 @@ public class SearchCriteria implements Serializable
     private static final long serialVersionUID = -2988724752735247609L;
 
     public static final int DEFAULT_PAGE_SIZE = 15;
-    
+
     public static final String Q = "q";
     public static final String TITLE = "title";
     public static final String TAGGED = "tagged";
@@ -124,7 +124,8 @@ public class SearchCriteria implements Serializable
 
     public SearchCriteria setMinAnswers(int minAns)
     {
-        criteria.put(ANSWERS, String.valueOf(minAns));
+        if (minAns > 0)
+            criteria.put(ANSWERS, String.valueOf(minAns));
         return this;
     }
 
