@@ -325,7 +325,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             progressDialog.dismiss();
 
         StackXPage<User> userPage = (StackXPage<User>) resultData.getSerializable(StringConstants.USER);
-        if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
+        if (isVisible() && userPage != null && userPage.items != null && !userPage.items.isEmpty())
         {
             user = userPage.items.get(0);
             displayUserDetail();
