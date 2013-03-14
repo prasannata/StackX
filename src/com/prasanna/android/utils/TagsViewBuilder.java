@@ -20,12 +20,16 @@
 package com.prasanna.android.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class TagsViewBuilder
 {
@@ -34,13 +38,12 @@ public class TagsViewBuilder
         return new TagsViewBuilder().build(context, parentLayout, tags);
     }
 
-    private LinearLayout build(Context context, LinearLayout parentLayout, String[] tags)
+    private LinearLayout build(final Context context, final LinearLayout parentLayout, final String[] tags)
     {
         if (parentLayout.getChildCount() > 0)
             parentLayout.removeAllViews();
 
         int maxWidth = context.getResources().getDisplayMetrics().widthPixels - 20;
-
         LinearLayout rowLayout = createNewRowForTags(context, 0);
 
         if (tags != null && tags.length > 0)
@@ -63,6 +66,7 @@ public class TagsViewBuilder
                     rowLayout = createNewRowForTags(context, 3);
                 }
 
+                setOnClickListenerForTextView(context, tagTextView, tags[i]);
                 rowLayout.addView(tagTextView, params);
             }
 
@@ -70,6 +74,26 @@ public class TagsViewBuilder
         }
 
         return parentLayout;
+    }
+
+    private void setOnClickListenerForTextView(final Context context, final TextView tagTextView, final String tag)
+    {
+        tagTextView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startQuestionsActivityForTag(context, tag);
+            }
+        });
+    }
+
+    private void startQuestionsActivityForTag(final Context context, final String tag)
+    {
+        Intent questionsIntent = new Intent(context, QuestionsActivity.class);
+        questionsIntent.setAction(StringConstants.TAG);
+        questionsIntent.putExtra(StringConstants.TAG, tag);
+        context.startActivity(questionsIntent);
     }
 
     private LinearLayout createNewRowForTags(Context context, int topMargin)
