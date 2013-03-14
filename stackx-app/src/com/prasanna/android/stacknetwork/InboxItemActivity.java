@@ -19,6 +19,8 @@
 
 package com.prasanna.android.stacknetwork;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -235,20 +237,28 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
                         + Html.fromHtml(stackXItem.owner.displayName));
 
-        textView = (TextView) findViewById(R.id.postSite);
-        textView.setText("Asked in " + item.site.name);
+        if (item.site != null)
+        {
+            textView = (TextView) findViewById(R.id.postSite);
+            textView.setText("Asked in " + item.site.name);
+        }
 
         textView = (TextView) findViewById(R.id.responseItemScore);
         textView.setVisibility(View.VISIBLE);
         textView.setText(String.valueOf(stackXItem.score));
 
-        LogWrapper.d(TAG, "Setting on click view question");
         setupOnClickForViewQuestion(item.questionId, disableViewQuestion);
         setuOnClickForContextMenu();
 
-        LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
-        for (View view : MarkdownFormatter.parse(this, stackXItem.body))
-            postBodyLayout.addView(view);
+        ArrayList<View> views = MarkdownFormatter.parse(this, stackXItem.body);
+
+        if (views != null)
+        {
+            LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
+            for (final View view : views)
+                postBodyLayout.addView(view);
+        }
+
     }
 
     private void setuOnClickForContextMenu()
@@ -268,8 +278,13 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private void setupOnClickForViewMyPost(Answer answer)
     {
         final LinearLayout postContextLayout = (LinearLayout) findViewById(R.id.postContext);
-        for (View view : MarkdownFormatter.parse(this, answer.body))
-            postContextLayout.addView(view);
+        ArrayList<View> views = MarkdownFormatter.parse(this, answer.body);
+
+        if (views != null)
+        {
+            for (final View view : views)
+                postContextLayout.addView(view);
+        }
 
         TextView textView = (TextView) findViewById(R.id.viewAnswer);
         textView.setVisibility(View.VISIBLE);
