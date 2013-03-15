@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/userAccountScroll"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white" >
+
+    <RelativeLayout
+        android:id="@+id/userProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:id="@+id/profileUserInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:weightSum="1.0" >
+
+            <LinearLayout
+                android:id="@+id/profileImageAndNumbers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:orientation="vertical" >
+
+                <include
+                    android:id="@+id/getAvatarProgressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    layout="@layout/progress_bar" />
+
+                <ImageView
+                    android:id="@+id/profileUserImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/avatar"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/profileUserReputation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="false"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/profileBadges"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/profileUserGoldBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:contentDescription="@string/badge"
+                        android:src="@drawable/circle_gold" />
+
+                    <TextView
+                        android:id="@+id/profileUserGoldNum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:gravity="center"
+                        android:text="@string/zero"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/profileUserSilverBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:contentDescription="@string/badge"
+                        android:src="@drawable/circle_silver" />
+
+                    <TextView
+                        android:id="@+id/profileUserSilverNum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:gravity="center"
+                        android:text="@string/zero"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/profileUserBronzeBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:contentDescription="@string/badge"
+                        android:src="@drawable/circle_bronze" />
+
+                    <TextView
+                        android:id="@+id/profileUserBronzeNum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:gravity="center"
+                        android:text="@string/zero"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/profilePersonalInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/profileDisplayName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="false"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/registerDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/profileAcceptRate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/profileViews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/profileUserLastSeen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textColor="@color/black"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/statsUnderline"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dip"
+            android:layout_below="@id/profileUserInfo"
+            android:layout_marginTop="2dp"
+            android:background="@color/lightGrey" />
+
+        <RelativeLayout
+            android:id="@+id/userStats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/statsUnderline"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@color/white" >
+
+            <TextView
+                android:id="@+id/questionCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="left"
+                android:gravity="left"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/upvoteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/statsUnderline"
+                android:layout_gravity="right"
+                android:layout_toRightOf="@id/questionCount"
+                android:gravity="right"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/answerCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/questionCount"
+                android:layout_below="@id/questionCount"
+                android:layout_gravity="left"
+                android:layout_marginTop="5dp"
+                android:gravity="left"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/downvoteCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignTop="@id/answerCount"
+                android:layout_below="@id/upvoteCount"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/writePermissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/userStats"
+            android:layout_marginTop="5dp"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/writePermissionsLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:gravity="left"
+                android:text="@string/writePermissions"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <View
+                android:id="@+id/writePermissionsUnderline"
+                android:layout_width="match_parent"
+                android:layout_height="0.1dip"
+                android:layout_below="@id/writePermissionsLabel"
+                android:layout_marginTop="2dp"
+                android:background="@color/lightGrey" />
+
+            <TextView
+                android:id="@+id/writePermissionsInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/writePermissionsUnderline"
+                android:layout_gravity="left"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                android:gravity="left"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="12sp" />
+
+            <TableLayout
+                android:id="@+id/permisstionsTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/writePermissionsInfo"
+                android:layout_marginTop="7dp" >
+
+                <TableRow
+                    android:id="@+id/tableHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp" >
+
+                    <TextView
+                        android:id="@+id/objectType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/Add"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canEdit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/Edit"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canDel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/Delete"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/numActionsPerDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/maxActionsPerDay"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/commentPermission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp" >
+
+                    <TextView
+                        android:id="@+id/commentObjectType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/comment"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canAddComment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canEditComment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canDelComment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/numCommentActionsPerDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/zero"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/questionPermission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp" >
+
+                    <TextView
+                        android:id="@+id/questionObjectType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/question"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canAddQuestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canEditQuestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canDelQuestion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/numQuestionstActionsPerDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/zero"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/answerPermission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp" >
+
+                    <TextView
+                        android:id="@+id/answerObjectType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/answer"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canAddAnswer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canEditAnswer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/canDelAnswer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/no"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/numAnswertActionsPerDay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:text="@string/zero"
+                        android:textColor="@color/black"
+                        android:textIsSelectable="false"
+                        android:textSize="15sp" />
+                </TableRow>
+            </TableLayout>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/accountsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/writePermissions"
+            android:layout_gravity="left"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="15dp"
+            android:gravity="left"
+            android:text="@string/accounts"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
+
+        <View
+            android:id="@+id/accountsUnderline"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dip"
+            android:layout_below="@id/accountsLabel"
+            android:layout_marginTop="2dp"
+            android:background="@color/lightGrey" />
+
+        <LinearLayout
+            android:id="@+id/accountsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accountsUnderline"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </RelativeLayout>
+
+</ScrollView>
