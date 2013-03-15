@@ -37,6 +37,6 @@
         android:layout_toRightOf="@id/scoreAndAns"
         android:textColor="@color/black"
         android:textIsSelectable="false"
-        android:textSize="12sp" />
+        android:textSize="18sp" />
 
 </RelativeLayout>
