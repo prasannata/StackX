@@ -39,6 +39,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import android.graphics.Bitmap;
 
+import com.prasanna.android.stacknetwork.matchers.ClientExceptionMatcher;
+import com.prasanna.android.stacknetwork.matchers.ServerExceptionMatcher;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
@@ -229,7 +231,8 @@ public class SecureHttpHelperTest
     public void executeHttpGetThrowsServerException() throws ClientProtocolException, IOException
     {
         expectedException.expect(ServerException.class);
-        expectedException.expectMessage("{'error' : 'server'}");
+        expectedException.expect(new ServerExceptionMatcher(new ServerException(HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                        "Server Error", "{'error' : 'server'}")));
 
         when(httpClient.execute(httpGet)).thenReturn(httpResponse);
         when(httpResponse.getStatusLine()).thenReturn(
@@ -243,7 +246,8 @@ public class SecureHttpHelperTest
     public void executeHttpGetThrowsClientException() throws ClientProtocolException, IOException
     {
         expectedException.expect(ClientException.class);
-        expectedException.expectMessage("{'error' : 'client'}");
+        expectedException.expect(new ClientExceptionMatcher(new ClientException(HttpStatus.SC_BAD_REQUEST,
+                        "Bad Request", "{'error' : 'client'}")));
 
         when(httpClient.execute(httpGet)).thenReturn(httpResponse);
         when(httpResponse.getStatusLine()).thenReturn(getStatusLine(HttpStatus.SC_BAD_REQUEST, "Bad Request"));
