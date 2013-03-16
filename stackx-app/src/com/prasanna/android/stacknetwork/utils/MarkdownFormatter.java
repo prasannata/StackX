@@ -38,6 +38,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipData.Item;
+import android.content.res.Configuration;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -187,8 +188,9 @@ public class MarkdownFormatter
                 boolean codeFound = false;
                 boolean oneLineCode = false;
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams params =
+                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                                LinearLayout.LayoutParams.WRAP_CONTENT);
                 while (eventType != XmlPullParser.END_DOCUMENT)
                 {
                     if (eventType == XmlPullParser.START_DOCUMENT)
@@ -303,7 +305,7 @@ public class MarkdownFormatter
         textView.setTextColor(Color.BLUE);
         textView.setLayoutParams(params);
         textView.setText("View image");
-        textView.setTextSize(12f);
+        textView.setTextSize(getTextSize(context));
         textView.setPadding(3, 3, 3, 3);
         textView.setTag(url);
         textView.setClickable(true);
@@ -334,9 +336,20 @@ public class MarkdownFormatter
         textView.setTextColor(Color.BLACK);
         textView.setLayoutParams(params);
         textView.setMovementMethod(LinkMovementMethod.getInstance());
-        textView.setTextSize(12f);
+        textView.setTextSize(getTextSize(context));
         textView.setText(Html.fromHtml(buffer.toString()));
         return textView;
+    }
+
+    private static float getTextSize(Context context)
+    {
+        float textSize = 12f;
+        int screentLayoutSize =
+                        context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        if (screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_LARGE
+                        || screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_XLARGE)
+            textSize = 15f;
+        return textSize;
     }
 
     private static RelativeLayout getTextViewForCode(final Context context, final String text)
@@ -345,6 +358,7 @@ public class MarkdownFormatter
         final RelativeLayout codeLayout = (RelativeLayout) inflater.inflate(R.layout.code, null);
         final TextView textView = (TextView) codeLayout.findViewById(R.id.code);
         textView.setText(text);
+        textView.setTextSize(getTextSize(context));
 
         ImageView imageView = (ImageView) codeLayout.findViewById(R.id.emailCode);
         imageView.setOnClickListener(new View.OnClickListener()
@@ -364,8 +378,8 @@ public class MarkdownFormatter
             public void onClick(View v)
             {
                 ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipDescription clipDescription = new ClipDescription("Stackx code", new String[]
-                { ClipDescription.MIMETYPE_TEXT_PLAIN });
+                ClipDescription clipDescription =
+                                new ClipDescription("Stackx code", new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN });
                 clipboard.setPrimaryClip(new ClipData(clipDescription, new Item(text)));
                 Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show();
             }
