@@ -29,7 +29,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
@@ -83,10 +82,8 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         while (hasMore)
         {
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
+            JSONObjectWrapper jsonObject = executeHttpGetRequest(restEndPoint, queryParams);
 
-            JSONObjectWrapper jsonObject =
-                            getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                                            queryParams);
             try
             {
                 hasMore = addSites(sites, jsonObject);
@@ -209,12 +206,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
-
-        JSONObjectWrapper jsonObject =
-                        SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST, "/me",
-                                        queryParams);
-
-        return getSerializedUserObject(jsonObject);
+        return getSerializedUserObject(executeHttpGetRequest("/me", queryParams));
     }
 
     public StackXPage<User> getUserById(long userId)
@@ -225,13 +217,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
         if (userId != -1)
-        {
-            JSONObjectWrapper jsonObject =
-                            SecureHttpHelper.getInstance().executeGetForGzipResponse(StackUri.STACKX_API_HOST,
-                                            "/users/" + userId, queryParams);
-
-            page = getSerializedUserObject(jsonObject);
-        }
+            page = getSerializedUserObject(executeHttpGetRequest("/users/" + userId, queryParams));
 
         return page;
     }
@@ -426,9 +412,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getAccounts("/me/associated", page, queryParams);
     }
 
-    public HashMap<String, Account> getAccounts(long userId, int page)
+    public HashMap<String, Account> getAccounts(long accountId)
     {
-        return getAccounts("/users/" + userId + "/associated", page, AppUtils.getDefaultQueryParams());
+        return getAccounts("/users/" + accountId + "/associated", 1, AppUtils.getDefaultQueryParams());
     }
 
     private HashMap<String, Account> getAccounts(String restEndPoint, int page, Map<String, String> queryParams)
@@ -486,9 +472,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         error.id = -1;
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
-        JSONObjectWrapper jsonObject =
-                        getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint, null);
-
+        JSONObjectWrapper jsonObject = executeHttpGetRequest(restEndPoint, null);
         String deauthenticatedAccessToken = jsonObject.getString(JsonFields.AccessToken.ACCESS_TOKEN);
         if (deauthenticatedAccessToken == null || !accessToken.equals(deauthenticatedAccessToken))
         {

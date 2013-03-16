@@ -89,8 +89,9 @@ public class UserIntentService extends AbstractIntentService
             {
                 case GET_USER_PROFILE:
                     boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
-                    bundle.putSerializable(StringConstants.USER, getUserDetail(me, userId, refresh, page));
-                    bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userId));
+                    StackXPage<User> userDetail = getUserDetail(me, userId, refresh, page);
+                    bundle.putSerializable(StringConstants.USER, userDetail);
+                    bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userDetail));
                     receiver.send(GET_USER_PROFILE, bundle);
                     break;
                 case GET_USER_QUESTIONS:
@@ -188,12 +189,15 @@ public class UserIntentService extends AbstractIntentService
                         || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
     }
 
-    private HashMap<String, Account> getUserAccounts(boolean me, long userId)
+    private HashMap<String, Account> getUserAccounts(boolean me, StackXPage<User> userDetail)
     {
         if (me)
             return getMyAccounts();
 
-        return userService.getAccounts(userId, 1);
+        if (userDetail != null && userDetail.items != null && !userDetail.items.isEmpty())
+            return userService.getAccounts(userDetail.items.get(0).accountId);
+        
+        return null;
     }
 
     private HashMap<String, Account> getMyAccounts()

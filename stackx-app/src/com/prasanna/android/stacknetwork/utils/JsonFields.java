@@ -80,7 +80,7 @@ public class JsonFields
     public static class User extends CommonFields
     {
         public static final String USER_ID = "user_id";
-        public static final String ACCOUNT_ID = "user_id";
+        public static final String ACCOUNT_ID = "account_id";
         public static final String DISPLAY_NAME = "display_name";
         public static final String REPUTATION = "reputation";
         public static final String PROFILE_IMAGE = "profile_image";
