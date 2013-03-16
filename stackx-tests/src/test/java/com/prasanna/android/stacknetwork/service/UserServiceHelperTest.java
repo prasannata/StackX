@@ -149,7 +149,7 @@ public class UserServiceHelperTest extends AbstractBaseServiceHelperTest
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(100));
 
         mockRestCall("/users/" + USER_ID + "/associated", queryParams, jsonObjectWrapper);
-        HashMap<String, Account> accounts = userServiceHelper.getAccounts(USER_ID, PAGE);
+        HashMap<String, Account> accounts = userServiceHelper.getAccounts(USER_ID);
         assertNotNull(accounts);
         assertEquals(expectedAccounts.size(), accounts.size());
         for (Account expectedAccount : expectedAccounts)
