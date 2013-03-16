@@ -32,9 +32,11 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -58,6 +60,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.Uri.Builder;
 
+import com.prasanna.android.http.ClientException.ClientErrorCode;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.Validate;
 import com.prasanna.android.utils.LogWrapper;
@@ -65,14 +68,14 @@ import com.prasanna.android.utils.LogWrapper;
 public class SecureHttpHelper
 {
     private final String TAG = SecureHttpHelper.class.getSimpleName();
-
     private static final int HTTP_PORT = 80;
     private static final int HTTPS_PORT = 443;
     private static final String SCHEME_HTTP = "http";
     private static final String SCHEME_HTTPS = "https";
     private static final String GZIP = "gzip";
-    private static final HttpGzipResponseInterceptor gzipHttpInterceptor = new HttpGzipResponseInterceptor(GZIP,
-                    GzipDecompressingEntity.class);
+    private static final SecureHttpHelper httpHelper = new SecureHttpHelper();
+    public static final HttpGzipResponseInterceptor HTTP_GZIP_RESPONSE_INTERCEPTOR = new HttpGzipResponseInterceptor(
+                    GZIP, GzipDecompressingEntity.class);
 
     public static class HttpErrorFamily
     {
@@ -80,7 +83,7 @@ public class SecureHttpHelper
         public static final int SERVER_ERROR = 500;
     }
 
-    private static class GzipDecompressingEntity extends HttpEntityWrapper
+    public static class GzipDecompressingEntity extends HttpEntityWrapper
     {
         public GzipDecompressingEntity(final HttpEntity entity)
         {
@@ -100,9 +103,7 @@ public class SecureHttpHelper
         }
     }
 
-    private static SecureHttpHelper httpHelper = new SecureHttpHelper();
-
-    private SecureHttpHelper()
+    protected SecureHttpHelper()
     {
     }
 
@@ -111,224 +112,175 @@ public class SecureHttpHelper
         return httpHelper;
     }
 
-    public Bitmap fetchImage(String absoluteUrl)
+    public Bitmap getImage(String absoluteUrl)
     {
-        Bitmap bitmap = null;
-        try
+        if (absoluteUrl != null)
         {
-            if (absoluteUrl != null)
+            try
             {
-                LogWrapper.d(TAG, "Get image: " + absoluteUrl);
-
-                DefaultHttpClient client = createHttpClient();
-                HttpGet request = new HttpGet(absoluteUrl);
-
-                HttpResponse response = client.execute(request);
-                bitmap = BitmapFactory.decodeStream(response.getEntity().getContent());
+                HttpResponse response = createSecureHttpClient().execute(getHttpGetObject(absoluteUrl));
+                return getBitmap(response);
             }
-        }
-        catch (ClientProtocolException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (IOException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (KeyManagementException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (UnrecoverableKeyException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (KeyStoreException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (CertificateException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        return bitmap;
-    }
-
-    public JSONObjectWrapper executePostForGzipResponse(String host, String path, Map<String, String> requestHeaders,
-                    Map<String, String> queryParams, HttpEntity httpEntity)
-    {
-        try
-        {
-            DefaultHttpClient client = getClientForGzipResponse();
-            HttpPost request = new HttpPost(buildUri(host, path, queryParams));
-
-            if (requestHeaders != null)
+            catch (ClientProtocolException e)
             {
-                for (Map.Entry<String, String> entry : requestHeaders.entrySet())
-                    request.setHeader(entry.getKey(), entry.getValue());
+                LogWrapper.e(TAG, e.getMessage());
             }
-            request.setEntity(httpEntity);
-
-            return executeRequest(client, request);
-        }
-        catch (ClientProtocolException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (IOException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (JSONException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (KeyManagementException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (UnrecoverableKeyException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (KeyStoreException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (CertificateException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
+            catch (IOException e)
+            {
+                LogWrapper.e(TAG, e.getMessage());
+            }
+            
+            throw new ClientException(ClientErrorCode.HTTP_REQ_ERROR);
         }
 
         return null;
     }
 
-    public JSONObjectWrapper executeGetForGzipResponse(String host, String path, Map<String, String> queryParams)
+    public JSONObjectWrapper executeHttpPost(String host, String path, Map<String, String> requestHeaders,
+                    Map<String, String> queryParams, HttpEntity httpEntity,
+                    HttpResponseInterceptor httpResponseInterceptor)
     {
-        try
-        {
-            DefaultHttpClient client = getClientForGzipResponse();
-            HttpGet request = new HttpGet(buildUri(host, path, queryParams));
-            request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+        HttpPost request = getHttpPostObject(buildUri(host, path, queryParams));
 
-            return executeRequest(client, request);
-        }
-        catch (ClientProtocolException e)
+        if (requestHeaders != null)
         {
-            LogWrapper.e(TAG, e.getMessage());
+            for (Map.Entry<String, String> entry : requestHeaders.entrySet())
+                request.setHeader(entry.getKey(), entry.getValue());
         }
-        catch (IOException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (JSONException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (KeyManagementException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (UnrecoverableKeyException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (KeyStoreException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (CertificateException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-
-        return null;
+        request.setEntity(httpEntity);
+        return executeRequest(getHttpClient(httpResponseInterceptor), request);
     }
 
-    private JSONObjectWrapper executeRequest(DefaultHttpClient client, HttpRequestBase request) throws IOException,
-                    ClientProtocolException, JSONException
+    public JSONObjectWrapper executeHttpGet(String host, String path, Map<String, String> queryParams,
+                    HttpResponseInterceptor httpResponseInterceptor)
     {
-        JSONObjectWrapper jsonObject = null;
+        HttpGet request = getHttpGetObject(buildUri(host, path, queryParams));
+        request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+        return executeRequest(getHttpClient(httpResponseInterceptor), request);
+    }
 
+    private JSONObjectWrapper executeRequest(HttpClient client, HttpRequestBase request)
+    {
         LogWrapper.d(TAG, "HTTP request to: " + request.getURI().toString());
-        HttpResponse httpResponse = client.execute(request);
-        HttpEntity entity = httpResponse.getEntity();
-        String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-        if (statusCode == HttpStatus.SC_OK)
+        try
         {
-            LogWrapper.d(TAG, request + " was successful");
-            jsonObject = new JSONObjectWrapper(new JSONObject(jsonText));
+            HttpResponse httpResponse = client.execute(request);
+            HttpEntity entity = httpResponse.getEntity();
+            String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+
+            if (statusCode == HttpStatus.SC_OK)
+                return new JSONObjectWrapper(new JSONObject(jsonText));
+            else
+            {
+                LogWrapper.d(TAG, "Http request failed: " + statusCode + ", " + jsonText);
+
+                if (statusCode >= HttpErrorFamily.SERVER_ERROR)
+                    throw new ServerException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), jsonText);
+                else if (statusCode >= HttpErrorFamily.CLIENT_ERROR)
+                    throw new ClientException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), jsonText);
+            }
         }
-        else
+        catch (ClientProtocolException e)
         {
-            LogWrapper.d(TAG, "Http request failed: " + statusCode);
-            LogWrapper.d(TAG, "Http request failure message: " + jsonText);
-            String statusDescription = httpResponse.getStatusLine().getReasonPhrase();
-
-            if (statusCode >= HttpErrorFamily.SERVER_ERROR)
-                throw new ServerException(statusCode, statusDescription, jsonText);
-            else if (statusCode >= HttpErrorFamily.CLIENT_ERROR)
-                throw new ClientException(statusCode, statusDescription, jsonText);
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (IOException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (JSONException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
         }
 
-        return jsonObject;
+        return null;
     }
 
-    private DefaultHttpClient getClientForGzipResponse() throws KeyStoreException, NoSuchAlgorithmException,
-                    CertificateException, IOException, KeyManagementException, UnrecoverableKeyException
+    private HttpClient getHttpClient(HttpResponseInterceptor httpResponseInterceptor)
     {
-        DefaultHttpClient client = createHttpClient();
-        client.addResponseInterceptor(gzipHttpInterceptor);
+        HttpClient client = createSecureHttpClient();
+        if (httpResponseInterceptor != null)
+            ((DefaultHttpClient)client).addResponseInterceptor(httpResponseInterceptor);
         return client;
     }
 
-    private DefaultHttpClient createHttpClient() throws KeyStoreException, IOException, NoSuchAlgorithmException,
-                    CertificateException, KeyManagementException, UnrecoverableKeyException
+    protected HttpClient createSecureHttpClient()
     {
-        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        trustStore.load(null, null);
+        try
+        {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(null, null);
 
-        SSLSocketFactory sf = new SSLSocketFactoryX509(trustStore);
-        sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            SSLSocketFactory sf = new SSLSocketFactoryX509(trustStore);
+            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
-        HttpParams params = new BasicHttpParams();
-        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme(SCHEME_HTTPS, sf, HTTPS_PORT));
-        schemeRegistry.register(new Scheme(SCHEME_HTTP, PlainSocketFactory.getSocketFactory(), HTTP_PORT));
+            HttpParams params = new BasicHttpParams();
+            HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+            HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+            SchemeRegistry schemeRegistry = new SchemeRegistry();
+            schemeRegistry.register(new Scheme(SCHEME_HTTPS, sf, HTTPS_PORT));
+            schemeRegistry.register(new Scheme(SCHEME_HTTP, PlainSocketFactory.getSocketFactory(), HTTP_PORT));
 
-        SingleClientConnManager mgr = new SingleClientConnManager(params, schemeRegistry);
-        return new DefaultHttpClient(mgr, params);
+            return new DefaultHttpClient(new SingleClientConnManager(params, schemeRegistry), params);
+        }
+        catch (KeyManagementException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (UnrecoverableKeyException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (KeyStoreException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (CertificateException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        catch (IOException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+
+        throw new ClientException(ClientErrorCode.HTTP_REQ_ERROR);
     }
 
-    public static String buildUri(String host, String path, Map<String, String> queryParams)
+    protected String buildUri(String host, String path, Map<String, String> queryParams)
     {
         Validate.notNull(host, path);
 
         Builder uriBuilder = Uri.parse(host).buildUpon().appendPath(path);
+        
         if (queryParams != null)
         {
             for (Map.Entry<String, String> entrySet : queryParams.entrySet())
-            {
                 uriBuilder.appendQueryParameter(entrySet.getKey(), entrySet.getValue());
-            }
         }
 
         return uriBuilder.build().toString();
     }
+    
+    protected Bitmap getBitmap(HttpResponse response) throws IOException
+    {
+        return BitmapFactory.decodeStream(response.getEntity().getContent());
+    }
+
+    protected HttpGet getHttpGetObject(String absoluteUrl)
+    {
+        return new HttpGet(absoluteUrl);
+    }
+
+    protected HttpPost getHttpPostObject(String absoluteUrl)
+    {
+        return new HttpPost(absoluteUrl);
+    }
+
 }

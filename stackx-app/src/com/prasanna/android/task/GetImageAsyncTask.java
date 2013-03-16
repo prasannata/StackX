@@ -49,7 +49,7 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 
             if (bitmap == null)
             {
-                bitmap = SecureHttpHelper.getInstance().fetchImage((String) urls[0]);
+                bitmap = SecureHttpHelper.getInstance().getImage((String) urls[0]);
                 BitmapCache.getInstance().add(urls[0], bitmap);
             }
 

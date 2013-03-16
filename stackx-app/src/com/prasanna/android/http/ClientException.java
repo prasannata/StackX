@@ -28,7 +28,8 @@ public class ClientException extends AbstractHttpException implements Serializab
     public enum ClientErrorCode implements Code
     {
         NO_NETWORK(1, "No network available"),
-        INVALID_ENCODING(2, "Invalid encoding");
+        INVALID_ENCODING(2, "Invalid encoding"),
+        HTTP_REQ_ERROR(3, "Failed to create http request");
 
         private final int statusCode;
         private final String description;
@@ -57,7 +58,7 @@ public class ClientException extends AbstractHttpException implements Serializab
     public ClientException(ClientErrorCode code)
     {
         super();
-        
+
         this.code = code;
     }
 
@@ -65,7 +66,7 @@ public class ClientException extends AbstractHttpException implements Serializab
     {
         super(statusCode, statusDescription, errorResponse);
     }
-    
+
     public ClientException(ClientErrorCode code, String errorResponse)
     {
         super(errorResponse);
@@ -77,11 +78,11 @@ public class ClientException extends AbstractHttpException implements Serializab
     {
         return code;
     }
-    
+
     @Override
     public String getErrorResponse()
     {
-        if(code != null)
+        if (code != null)
             return code.getDescription();
         else
             return super.getErrorResponse();
@@ -90,7 +91,7 @@ public class ClientException extends AbstractHttpException implements Serializab
     @Override
     public int getStatusCode()
     {
-        if(code != null)
+        if (code != null)
             return code.getStatusCode();
         else
             return super.getStatusCode();

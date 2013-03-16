@@ -213,7 +213,7 @@ public abstract class AbstractBaseServiceHelperTest
         assertEquals(expectedAccount.userId, account.userId);
         assertEquals(expectedAccount.userType, account.userType);
     }
-    
+
     protected void assertQuestionsEquals(ArrayList<Question> expectedQuestions, ArrayList<Question> questions)
     {
         assertNotNull(questions);
@@ -288,8 +288,10 @@ public abstract class AbstractBaseServiceHelperTest
     protected void mockRestCall(String expectedRestEndpoint, HashMap<String, String> expectedQueryParams,
                     JSONObjectWrapper returnJsonObjectWrapper)
     {
-        when(httpHelper.executeGetForGzipResponse(StackUri.STACKX_API_HOST, expectedRestEndpoint, expectedQueryParams))
-                        .thenReturn(returnJsonObjectWrapper);
+        when(
+                        httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, expectedRestEndpoint, expectedQueryParams,
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenReturn(
+                        returnJsonObjectWrapper);
     }
 
 }

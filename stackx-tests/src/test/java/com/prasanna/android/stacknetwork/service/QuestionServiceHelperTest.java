@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import com.prasanna.android.http.HttpGzipResponseInterceptor;
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.http.ServerException;
 import com.prasanna.android.json.JsonUtil;
@@ -65,8 +67,9 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
         HashMap<String, String> expectedQueryParams = getMinimumExpectedQueryParams();
         expectedQueryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
 
-        when(httpHelper.executeGetForGzipResponse(StackUri.STACKX_API_HOST, "questions/" + 1, expectedQueryParams))
-                        .thenReturn(jsonObjectWrapper);
+        when(
+                        httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, "questions/" + 1, expectedQueryParams,
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenReturn(jsonObjectWrapper);
 
         assertEquals(BODY, questionServiceHelper.getQuestionBodyForId(1, site.apiSiteParameter));
     }
@@ -83,8 +86,9 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
     @Test
     public void getQuestionBodyForIdReturnsNull()
     {
-        when(httpHelper.executeGetForGzipResponse(anyString(), anyString(), (Map<String, String>) anyMap()))
-                        .thenReturn(null);
+        when(
+                        httpHelper.executeHttpGet(anyString(), anyString(), (Map<String, String>) anyMap(),
+                                        (HttpGzipResponseInterceptor) anyObject())).thenReturn(null);
         assertNull(questionServiceHelper.getQuestionBodyForId(1, "stackoverflow"));
     }
 
@@ -96,8 +100,9 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
 
         HashMap<String, String> expectedQueryParams = getMinimumExpectedQueryParams();
         expectedQueryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
-        when(httpHelper.executeGetForGzipResponse(StackUri.STACKX_API_HOST, "questions/" + 1, expectedQueryParams))
-                        .thenReturn(jsonObjectWrapper);
+        when(
+                        httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, "questions/" + 1, expectedQueryParams,
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenReturn(jsonObjectWrapper);
 
         Question question = questionServiceHelper.getQuestionFullDetails(1, site.apiSiteParameter);
         assertQuestionEquals(expectedQuestion, question);
@@ -314,8 +319,10 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
 
         String expectedRestEndpoint = StringConstants.TAGS + "/" + TAG + "/faq";
 
-        when(httpHelper.executeGetForGzipResponse(StackUri.STACKX_API_HOST, expectedRestEndpoint, expectedQueryParams))
-                        .thenThrow(new ServerException(404, "Not found", null));
+        when(
+                        httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, expectedRestEndpoint, expectedQueryParams,
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenThrow(
+                        new ServerException(404, "Not found", null));
 
         questionServiceHelper.getFaqForTag(TAG, PAGE);
 

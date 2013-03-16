@@ -71,8 +71,8 @@ public abstract class AbstractBaseServiceHelper
         if (jsonObject != null)
         {
             JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
-            JSONObjectWrapper userJsonObject = JSONObjectWrapper
-                    .wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
+            JSONObjectWrapper userJsonObject =
+                            JSONObjectWrapper.wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
 
             page.items = new ArrayList<User>();
 
@@ -104,8 +104,7 @@ public abstract class AbstractBaseServiceHelper
 
     protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject)
     {
-        int[] badgeCounts =
-        { 0, 0, 0 };
+        int[] badgeCounts = { 0, 0, 0 };
 
         if (badgeCountJsonObject != null)
         {
@@ -249,17 +248,15 @@ public abstract class AbstractBaseServiceHelper
 
     protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
     {
-        return getHttpHelper().executeGetForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                queryParams);
+        return getHttpHelper().executeHttpGet(StackUri.STACKX_API_HOST, restEndPoint, queryParams,
+                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR);
     }
 
-    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint,
-            Map<String, String> requestHeaders,
-            Map<String, String> queryParams,
-            HttpEntity httpEntity)
+    protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
+                    Map<String, String> queryParams, HttpEntity httpEntity)
     {
-        return getHttpHelper().executePostForGzipResponse(StackUri.STACKX_API_HOST, restEndPoint,
-                requestHeaders, queryParams, httpEntity);
+        return getHttpHelper().executeHttpPost(StackUri.STACKX_API_HOST, restEndPoint, requestHeaders, queryParams,
+                        httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR);
 
     }
 
