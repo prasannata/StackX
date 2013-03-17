@@ -7,7 +7,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
@@ -26,6 +28,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
 
 public abstract class AbstractBaseServiceHelperTest
 {
@@ -68,6 +71,16 @@ public abstract class AbstractBaseServiceHelperTest
         expectedQueryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
 
         return expectedQueryParams;
+    }
+
+    protected List<BasicNameValuePair> getBasicNameValuePartListForWriteComment()
+    {
+        List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.getAccessToken(null)));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
+        parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
+        return parameters;
     }
 
     protected ArrayList<Site> getSites(int num)

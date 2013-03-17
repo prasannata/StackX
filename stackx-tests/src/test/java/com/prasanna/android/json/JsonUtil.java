@@ -139,7 +139,7 @@ public class JsonUtil
         return wrapObject(itemArrayList);
     }
 
-    private static JSONObject toJSONObject(Comment comment) throws JSONException
+    public static JSONObject toJSONObject(Comment comment) throws JSONException
     {
         JSONObject item = new JSONObject();
         item.put(JsonFields.Comment.COMMENT_ID, comment.id);
@@ -149,6 +149,11 @@ public class JsonUtil
         item.put(JsonFields.Comment.CREATION_DATE, comment.creationDate);
         item.put(JsonFields.Comment.OWNER, toJSONObject(comment.owner));
         return item;
+    }
+
+    public static JSONObjectWrapper commentToJsonObjectWrapper(Comment comment) throws JSONException
+    {
+        return addItemToArrayAndGetJSONObjectWrapper(toJSONObject(comment));
     }
 
     public static JSONObjectWrapper toJsonObjectWrapper(User user) throws JSONException
