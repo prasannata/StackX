@@ -63,7 +63,7 @@
             android:background="@drawable/rounded_border_delft"
             android:gravity="left"
             android:text="@string/viewAnswer"
-            android:textColor="@color/black"
+            android:textColor="@color/delft"
             android:textIsSelectable="false"
             android:textSize="12sp"
             android:visibility="gone" />
