@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
 import com.prasanna.android.cache.BitmapCache;
+import com.prasanna.android.http.ClientException;
 import com.prasanna.android.http.SecureHttpHelper;
 
 public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
@@ -49,8 +50,14 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
 
             if (bitmap == null)
             {
-                bitmap = SecureHttpHelper.getInstance().getImage((String) urls[0]);
-                BitmapCache.getInstance().add(urls[0], bitmap);
+                try
+                {
+                    bitmap = SecureHttpHelper.getInstance().getImage((String) urls[0]);
+                    BitmapCache.getInstance().add(urls[0], bitmap);
+                }
+                catch (ClientException e)
+                {
+                }
             }
 
             return bitmap;
