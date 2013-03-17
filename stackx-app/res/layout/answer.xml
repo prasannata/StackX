@@ -62,7 +62,7 @@
                 android:layout_marginTop="3dp"
                 android:textColor="@color/black"
                 android:textIsSelectable="false"
-                android:textSize="9sp" />
+                android:textSize="9.5sp" />
         </RelativeLayout>
 
         <View
