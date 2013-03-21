@@ -62,7 +62,6 @@ public class MyProfileService extends AbstractStackxService
 
                 if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR)
                 {
-                    LogWrapper.d(TAG, "Get my profile");
                     StackXPage<User> userPage = UserServiceHelper.getInstance().getMe();
                     if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
                     {
@@ -70,10 +69,6 @@ public class MyProfileService extends AbstractStackxService
                         profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
                         SharedPreferencesUtil.setLong(context, StringConstants.USER_ID, userPage.items.get(0).id);
                     }
-                }
-                else
-                {
-                    LogWrapper.d(TAG, "Profile fetched less than an hour ago. Using it");
                 }
             }
             catch (SQLException e)
