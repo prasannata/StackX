@@ -27,7 +27,6 @@ import android.os.AsyncTask;
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.service.TagsService;
-import com.prasanna.android.stacknetwork.service.UserServiceHelper;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.utils.LogWrapper;
@@ -37,55 +36,37 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
     private final String TAG = GetTagsAsyncTask.class.getSimpleName();
 
     private final AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier;
-    private final boolean registeredUser;
     private final TagDAO tagDao;
 
-    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier,
-                    TagDAO tagsDbAdapter, boolean registeredUser)
+    public GetTagsAsyncTask(AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier, TagDAO tagsDbAdapter)
     {
         super();
 
         this.taskCompletionNotifier = taskCompletionNotifier;
         this.tagDao = tagsDbAdapter;
-        this.registeredUser = registeredUser;
     }
 
     @Override
     protected LinkedHashSet<Tag> doInBackground(Void... params)
     {
-        LinkedHashSet<Tag> tags = null;
-
         if (TagsService.isRunning())
             waitForServiceToComplete();
 
         try
         {
-            tags = getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
-
-            if (tags == null || tags.isEmpty())
-            {
-                tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
-                                registeredUser);
-
-                if (tags == null || tags.isEmpty())
-                    tags = UserServiceHelper.getInstance().getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
-                                    !registeredUser);
-
-                persistTags(tags);
-            }
+            return getTagsFromDb(OperatingSite.getSite().apiSiteParameter);
         }
         catch (AbstractHttpException e)
         {
             LogWrapper.e(TAG, "Error fetching tags: " + e.getMessage());
         }
-        return tags;
+
+        return null;
     }
 
     private void waitForServiceToComplete()
     {
         TagsService.registerForCompleteNotification(this);
-
-        LogWrapper.d(TAG, "Waiting for service to complete");
 
         try
         {
@@ -98,8 +79,6 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         {
             LogWrapper.d(TAG, e.getMessage());
         }
-
-        LogWrapper.d(TAG, "Service done");
     }
 
     @Override
@@ -116,15 +95,7 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         try
         {
             tagDao.open();
-            long lastUpdateTime = tagDao.getLastUpdateTime(site);
-
-            if (tagsOlderThanDay(lastUpdateTime))
-            {
-                LogWrapper.d(TAG, "Tags older than day, deleting...");
-                tagDao.deleteTagsFromServerForSite(site);
-            }
-            else
-                return tagDao.getTagSet(site);
+            return tagDao.getTagSet(site);
 
         }
         catch (SQLException e)
@@ -137,33 +108,5 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
         }
 
         return null;
-    }
-
-    private boolean tagsOlderThanDay(long lastUpdateTime)
-    {
-        long MILLISECONDS_IN_DAY = 86400000L;
-
-        LogWrapper.d(TAG, "Tags last updated: " + lastUpdateTime);
-
-        return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
-    }
-
-    private void persistTags(LinkedHashSet<Tag> result)
-    {
-        try
-        {
-            tagDao.open();
-            tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
-            result.clear();
-            result.addAll(tagDao.getTagSet(OperatingSite.getSite().apiSiteParameter));
-        }
-        catch (SQLException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        finally
-        {
-            tagDao.close();
-        }
     }
 }

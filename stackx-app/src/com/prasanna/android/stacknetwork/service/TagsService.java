@@ -62,14 +62,11 @@ public class TagsService extends AbstractStackxService
                 if (tagsOlderThanDay())
                 {
                     boolean registeredUser = AppUtils.inAuthenticatedRealm(context);
-                    tags = userServiceHelper.getTags(OperatingSite.getSite().apiSiteParameter, 1, 100, registeredUser);
+                    String apiSiteParameter = OperatingSite.getSite().apiSiteParameter;
+                    tags = userServiceHelper.getTags(apiSiteParameter, 1, 100, registeredUser);
 
                     if (tags == null || tags.isEmpty())
-                    {
-                        tags =
-                                        userServiceHelper.getTags(OperatingSite.getSite().apiSiteParameter, 1, 100,
-                                                        !registeredUser);
-                    }
+                        tags = userServiceHelper.getTags(apiSiteParameter, 1, 100, !registeredUser);
 
                     persistTags(tags);
                 }

@@ -25,6 +25,7 @@ import java.util.List;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -43,6 +44,7 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Tag;
+import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -50,13 +52,11 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetTagsAsyncTask;
-import com.prasanna.android.utils.LogWrapper;
 
 public class TagListFragment extends ListFragment
 {
     public static final String TAGS_DIRTY = "dirty";
 
-    private static final String TAG = TagListFragment.class.getSimpleName();
     private final ArrayList<Tag> tags = new ArrayList<Tag>();
 
     private boolean activityCreated = false;
@@ -104,8 +104,6 @@ public class TagListFragment extends ListFragment
         @Override
         protected FilterResults performFiltering(CharSequence constraint)
         {
-            LogWrapper.d(TAG, "performFiltering");
-
             FilterResults result = new FilterResults();
 
             if (constraint != null && constraint.length() > 0)
@@ -165,8 +163,8 @@ public class TagListFragment extends ListFragment
         {
             if (convertView == null)
             {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
-                        Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater =
+                                (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.tag_list_item, null);
             }
 
@@ -175,7 +173,7 @@ public class TagListFragment extends ListFragment
 
             if (adapter.getItem(position).local)
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0,
-                        R.drawable.dark_32x32_make_available_offline, 0);
+                                R.drawable.dark_32x32_make_available_offline, 0);
             else
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 
@@ -228,9 +226,7 @@ public class TagListFragment extends ListFragment
                     clearFilterInputText.setVisibility(View.VISIBLE);
                 }
                 else
-                {
                     clearFilterInputText.setVisibility(View.GONE);
-                }
             }
         });
 
@@ -289,12 +285,10 @@ public class TagListFragment extends ListFragment
 
     private void runGetTagsTask()
     {
-        LogWrapper.d(TAG, "Running get tags task");
-
         getProgressBar().setVisibility(View.VISIBLE);
 
-        GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(
-                getActivity()), AppUtils.inRegisteredSite(getActivity()));
+        GetTagsAsyncTask fetchUserAsyncTask =
+                        new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(getActivity()));
 
         AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
     }
@@ -302,9 +296,9 @@ public class TagListFragment extends ListFragment
     @Override
     public void onResume()
     {
-        LogWrapper.d(TAG, "onResume");
-
         super.onResume();
+
+        getActivity().startService(new Intent(getActivity(), TagsService.class));
 
         if (SharedPreferencesUtil.isSet(getActivity(), TAGS_DIRTY, false))
         {
@@ -323,10 +317,8 @@ public class TagListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id)
     {
-        LogWrapper.d(TAG, "Position clicked : " + position + ", total = " + listAdapter.getCount());
-
         AppUtils.hideSoftInput(getActivity(), v);
-        
+
         if (position >= 0 && position < listAdapter.getCount() && onTagSelectListener != null)
         {
             if (listAdapter.getItem(position).name.equals(StringConstants.FRONT_PAGE))
