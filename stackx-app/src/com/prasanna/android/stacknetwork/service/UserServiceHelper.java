@@ -405,14 +405,14 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return inboxItem;
     }
 
-    public HashMap<String, Account> getAccounts(int page)
+    public HashMap<String, Account> getMyAccount()
     {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.NETWORK_USER_TYPE_FILTER);
-        return getAccounts("/me/associated", page, queryParams);
+        return getAccounts("/me/associated", 1, queryParams);
     }
 
-    public HashMap<String, Account> getAccounts(long accountId)
+    public HashMap<String, Account> getAccount(long accountId)
     {
         return getAccounts("/users/" + accountId + "/associated", 1, AppUtils.getDefaultQueryParams());
     }
@@ -428,12 +428,12 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         while (hasMore)
         {
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
-            hasMore = addToMap(accounts, executeHttpGetRequest(restEndPoint, queryParams));
+            hasMore = addAccountsToMap(accounts, executeHttpGetRequest(restEndPoint, queryParams));
         }
         return accounts;
     }
 
-    private boolean addToMap(HashMap<String, Account> accounts, JSONObjectWrapper accountsJsonObject)
+    private boolean addAccountsToMap(HashMap<String, Account> accounts, JSONObjectWrapper accountsJsonObject)
     {
         if (accountsJsonObject != null)
         {

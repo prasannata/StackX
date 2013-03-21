@@ -89,7 +89,7 @@ public class AccountSyncService extends AbstractStackxService
             LogWrapper.d(TAG, "Syncing user accounts");
 
             long accountId = SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNT_ID, 0L);
-            HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getAccounts(1);
+            HashMap<String, Account> retrievedAccounts = UserServiceHelper.getInstance().getMyAccount();
             ArrayList<Account> existingAccounts = UserAccountsDAO.get(context, accountId);
             if (existingAccounts == null)
             {

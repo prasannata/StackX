@@ -39,8 +39,8 @@ import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DbRequestThreadExecutor;
-import com.prasanna.android.stacknetwork.utils.IntegerConstants;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
@@ -141,7 +141,7 @@ public class UserIntentService extends AbstractIntentService
     {
         if (me)
         {
-            ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
+            final ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
             StackXPage<User> userPage = null;
             try
             {
@@ -150,19 +150,13 @@ public class UserIntentService extends AbstractIntentService
                 if (!refresh)
                     myProfile = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
 
-                if (profileOlderThanThirtyMinutes(myProfile))
-                {
-                    userPage = userService.getMe();
-                    if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
-                    {
-                        profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
-                        profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
-                        SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID,
-                                        userPage.items.get(0).id);
-                    }
-                }
+                if (myProfile == null)
+                    userPage = getUserProfile(profileDAO);
                 else
                 {
+                    if (AppUtils.aHalfAnHourSince(myProfile.lastUpdateTime))
+                        syncUserProfile();
+
                     userPage = new StackXPage<User>();
                     userPage.items = new ArrayList<User>();
                     userPage.items.add(myProfile);
@@ -170,7 +164,7 @@ public class UserIntentService extends AbstractIntentService
             }
             catch (SQLException e)
             {
-                LogWrapper.d(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             finally
             {
@@ -183,10 +177,29 @@ public class UserIntentService extends AbstractIntentService
             return userService.getUserById(userId);
     }
 
-    private boolean profileOlderThanThirtyMinutes(User myProfile)
+    private void syncUserProfile()
     {
-        return myProfile == null
-                        || System.currentTimeMillis() - myProfile.lastUpdateTime > IntegerConstants.MS_IN_HALF_AN_HOUR;
+        AppUtils.runOnBackgroundThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
+                try
+                {
+                    profileDAO.open();
+                    getUserProfile(profileDAO);
+                }
+                catch (SQLException e)
+                {
+                    LogWrapper.e(TAG, e.getMessage());
+                }
+                finally
+                {
+                    profileDAO.close();
+                }
+            }
+        });
     }
 
     private HashMap<String, Account> getUserAccounts(boolean me, StackXPage<User> userDetail)
@@ -195,8 +208,8 @@ public class UserIntentService extends AbstractIntentService
             return getMyAccounts();
 
         if (userDetail != null && userDetail.items != null && !userDetail.items.isEmpty())
-            return userService.getAccounts(userDetail.items.get(0).accountId);
-        
+            return userService.getAccount(userDetail.items.get(0).accountId);
+
         return null;
     }
 
@@ -210,9 +223,9 @@ public class UserIntentService extends AbstractIntentService
             if (currentAccountId != -1)
             {
                 userAccountsDao.open();
-                long lastUpdateTime = userAccountsDao.getLastUpdateTime();
-
-                if (System.currentTimeMillis() - lastUpdateTime <= IntegerConstants.MS_IN_A_DAY)
+                if (AppUtils.aHalfAnHourSince(userAccountsDao.getLastUpdateTime()))
+                    return userService.getMyAccount();
+                else
                 {
                     ArrayList<Account> accounts = userAccountsDao.getAccounts(currentAccountId);
                     HashMap<String, Account> accountsMap = new HashMap<String, Account>();
@@ -228,14 +241,14 @@ public class UserIntentService extends AbstractIntentService
         }
         catch (SQLException e)
         {
-            LogWrapper.d(TAG, e.getMessage());
+            LogWrapper.e(TAG, e.getMessage());
         }
         finally
         {
             userAccountsDao.close();
         }
 
-        return userService.getAccounts(1);
+        return null;
     }
 
     private StackXPage<Question> getQuestions(boolean me, long userId, int page)
@@ -281,10 +294,7 @@ public class UserIntentService extends AbstractIntentService
         ArrayList<Site> sites = getSites();
 
         if (sites != null && !sites.isEmpty())
-        {
-            LogWrapper.d(TAG, "Returning site list from DB");
             return sites;
-        }
 
         LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
@@ -292,7 +302,7 @@ public class UserIntentService extends AbstractIntentService
             return persistAndGetList(linkSitesMap);
 
         LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
-        HashMap<String, Account> linkAccountsMap = userService.getAccounts(1);
+        HashMap<String, Account> linkAccountsMap = userService.getMyAccount();
 
         if (linkAccountsMap != null && linkSitesMap != null)
         {
@@ -367,5 +377,18 @@ public class UserIntentService extends AbstractIntentService
         broadcastIntent.putExtra(UserIntentAction.LOGOUT.getAction(), userService.logout(accessToken));
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
         sendBroadcast(broadcastIntent);
+    }
+
+    protected StackXPage<User> getUserProfile(final ProfileDAO profileDAO)
+    {
+        StackXPage<User> userPage = userService.getMe();
+        if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
+        {
+            profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
+            profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
+            SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID, userPage.items.get(0).id);
+        }
+
+        return userPage;
     }
 }
