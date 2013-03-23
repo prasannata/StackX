@@ -122,6 +122,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
     private Site getSerializedSiteObject(JSONObjectWrapper siteJsonObject)
     {
+        if (siteJsonObject == null)
+            return null;
+
         Site site = new Site();
         site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
         site.logoUrl = siteJsonObject.getString(JsonFields.Site.LOGO_URL);
