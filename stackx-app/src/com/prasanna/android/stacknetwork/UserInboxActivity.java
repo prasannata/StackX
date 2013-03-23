@@ -224,12 +224,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         textView = (TextView) itemRow.findViewById(R.id.itemType);
         textView.setText(item.itemType.getRepr());
 
+        textView = (TextView) itemRow.findViewById(R.id.itemSite);
+        
         if (item.site != null)
-        {
-            textView = (TextView) itemRow.findViewById(R.id.itemSite);
             textView.setText(item.site.name);
-        }
-
+        else
+            textView.setVisibility(View.GONE);
+        
         return itemRow;
     }
 
