@@ -48,7 +48,7 @@ public class AppUtils
 {
     private static String userAccessToken;
     public static final boolean DEBUG = false;
-    
+
     public static void setAccessToken(Context context, String accessToken)
     {
         if (userAccessToken == null && accessToken != null)
@@ -118,10 +118,7 @@ public class AppUtils
             {
                 File file = new File(dir, StringConstants.SITE);
                 if (file.exists() && file.isFile())
-                {
                     return (Site) SharedPreferencesUtil.readObject(file);
-                }
-
             }
         }
 
@@ -137,9 +134,7 @@ public class AppUtils
             {
                 File file = new File(dir, StringConstants.SITE);
                 if (file.exists() && file.isFile())
-                {
                     SharedPreferencesUtil.deleteFile(file);
-                }
             }
         }
     }
