@@ -23,12 +23,9 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -43,7 +40,6 @@ import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import com.prasanna.android.cache.BitmapCache;
-import com.prasanna.android.listener.OnDiscardOptionListener;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -53,19 +49,13 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
-import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractUserActionBarActivity extends Activity
 {
-    private static final String TAG = AbstractUserActionBarActivity.class.getSimpleName();
-
-    private String accessToken;
-    protected SearchView searchView;
-    private BitmapCache iconCache = BitmapCache.getInstance();
-    private OnDiscardOptionListener discardOptionListener;
     private boolean showingSearchFilters = false;
     private PopupWindow popupWindow;
-
+    private SearchView searchView;
+    
     protected Menu actionBarMenu;
 
     protected abstract void refresh();
@@ -77,8 +67,22 @@ public abstract class AbstractUserActionBarActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        refreshOperationSite();
+        refreshOperatingSite();
         initializeActionBar();
+    }
+
+    private void refreshOperatingSite()
+    {
+        if (OperatingSite.getSite() == null)
+        {
+            OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+
+            if (OperatingSite.getSite() == null)
+            {
+                startSiteListActivity();
+                finish();
+            }
+        }
     }
 
     private void initializeActionBar()
@@ -93,8 +97,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     protected void setActionBarHomeIcon()
     {
-        if (iconCache.containsKey(OperatingSite.getSite().name))
-            setActionBarHomeIcon(iconCache.get(OperatingSite.getSite().name));
+        if (BitmapCache.getInstance().containsKey(OperatingSite.getSite().name))
+            setActionBarHomeIcon(BitmapCache.getInstance().get(OperatingSite.getSite().name));
         else
             loadIcon();
     }
@@ -111,19 +115,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
         super.onResume();
 
         AppUtils.loadAccessToken(getApplicationContext());
-        refreshOperationSite();
-    }
-
-    public void refreshOperationSite()
-    {
-        if (OperatingSite.getSite() == null)
-            OperatingSite.setSite(AppUtils.getDefaultSite(this));
-
-        if (OperatingSite.getSite() == null)
-        {
-            startSiteListActivity();
-            finish();
-        }
+        refreshOperatingSite();
     }
 
     @Override
@@ -139,13 +131,12 @@ public abstract class AbstractUserActionBarActivity extends Activity
             menu.removeItem(R.id.menu_search_filter);
         }
 
-        if (isAuthenticatedRealm())
+        if (AppUtils.inAuthenticatedRealm(getApplicationContext()))
             setupActionBarForAuthenticatedUser(menu);
         else
             setupActionBarForAnyUser(menu);
 
         this.actionBarMenu = menu;
-
         getActionBar().setHomeButtonEnabled(true);
 
         return true;
@@ -159,8 +150,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void setupActionBarForAuthenticatedUser(Menu menu)
     {
-        LogWrapper.d(TAG, "In authenticated realm");
-
         if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
         {
             menu.removeItem(R.id.menu_my_profile);
@@ -227,8 +216,9 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private void setupPopupForSearchOptions()
     {
         RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
-        popupWindow = new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow =
+                        new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
 
         setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
                         SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
@@ -262,7 +252,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
             public void notifyOnCompletion(Bitmap result)
             {
                 setActionBarHomeIcon(result);
-                iconCache.add(OperatingSite.getSite().name, result);
+                BitmapCache.getInstance().add(OperatingSite.getSite().name, result);
             }
         });
 
@@ -292,19 +282,14 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 return true;
             case R.id.menu_my_inbox:
                 Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
-                userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, getAccessToken());
+                userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, AppUtils.getAccessToken(getApplicationContext()));
                 startActivity(userInboxIntent);
                 return true;
             case R.id.menu_option_change_site:
                 startSiteListActivity();
                 return true;
             case R.id.menu_option_settings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                return true;
-            case R.id.menu_discard:
-                if (discardOptionListener != null)
-                    discardOptionListener.onDiscardOptionClick();
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
         }
 
@@ -336,13 +321,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
             showingSearchFilters = true;
             searchView.clearFocus();
         }
-
-    }
-
-    protected boolean isOnline()
-    {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 
     protected boolean onActionBarHomeButtonClick(MenuItem item)
@@ -355,23 +333,5 @@ public abstract class AbstractUserActionBarActivity extends Activity
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         return true;
-    }
-
-    public boolean isAuthenticatedRealm()
-    {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-
-        return (accessToken != null);
-    }
-
-    protected void setOnDiscardOptionClick(OnDiscardOptionListener discardOptionListener)
-    {
-        this.discardOptionListener = discardOptionListener;
-    }
-
-    public String getAccessToken()
-    {
-        return accessToken;
     }
 }
