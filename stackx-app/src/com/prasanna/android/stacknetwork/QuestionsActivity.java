@@ -121,8 +121,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        LogWrapper.d(TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
 
         self = this;
@@ -173,7 +171,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showSearchFragment()
     {
         String query = getIntent().getStringExtra(SearchManager.QUERY);
-        LogWrapper.d(TAG, "Launching search fragment for " + query);
         saveSearchQuery(query);
         replaceFragment(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null), null, false);
     }
@@ -202,7 +199,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showTagQuestionListFragment()
     {
         String tag = getIntent().getStringExtra(StringConstants.TAG);
-        LogWrapper.d(TAG, "Restoring question list fragment for tag" + tag);
         setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
@@ -260,8 +256,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        LogWrapper.d(TAG, "onSaveInstanceState");
-
         removeTagListFragment();
 
         if (getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
@@ -287,20 +281,15 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onResume()
     {
-        LogWrapper.d(TAG, "onResume");
-
         super.onResume();
 
         if (getActionBar().getTabCount() == 0)
-        {
             showFragmentForIntentAction();
-        }
         else
         {
             Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
             if (fragment != null)
             {
-                LogWrapper.d(TAG, "Showing last attached fragment");
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.show(fragment);
                 ft.commit();
@@ -328,16 +317,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     {
         Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
 
-        LogWrapper.d(TAG, "current fragment is null " + (currentFragment == null));
-
         if (currentFragment instanceof TagListFragment)
         {
-            LogWrapper.d(TAG, "Tag list fragment is current fragment");
-
             hideTagFragment();
-
             toggleDisplayForTags(false);
-
             return true;
         }
 
@@ -409,8 +392,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
     {
-        LogWrapper.d(TAG, "Home button clicked");
-
         if (showTagsFragment && menuItem.getItemId() == android.R.id.home)
         {
             tagListFragment = (TagListFragment) getFragmentManager().findFragmentByTag(StringConstants.TAGS);
@@ -443,9 +424,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             getActionBar().setTitle(StringConstants.TAGS);
         }
         else
-        {
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        }
+        
         actionBarMenu.findItem(R.id.menu_search).setVisible(!forTags);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(!forTags);
     }
@@ -453,8 +433,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onFrontPageSelected()
     {
-        LogWrapper.d(TAG, "Front page selected");
-
         hideTagFragment();
         setupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
     }
@@ -462,16 +440,12 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onTagSelected(String tag)
     {
-        LogWrapper.d(TAG, tag + " selected");
-
         hideTagFragment();
         setupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
     private void addAndHideFragment(TagListFragment fragment, String fragmentTag)
     {
-        LogWrapper.d(TAG, "Replacing current fragment with " + fragmentTag);
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(R.id.fragmentContainer, fragment, fragmentTag);
         ft.hide(fragment);
@@ -489,8 +463,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void showTagFragment()
     {
-        LogWrapper.d(TAG, "Showing tag list fragment");
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.show(tagListFragment);
@@ -499,8 +471,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void hideTagFragment()
     {
-        LogWrapper.d(TAG, "Hiding tag list fragment");
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.hide(tagListFragment);
         ft.commit();
@@ -508,8 +478,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
     {
-        LogWrapper.d(TAG, "Replacing current fragment with " + fragmentTag);
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
         ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
