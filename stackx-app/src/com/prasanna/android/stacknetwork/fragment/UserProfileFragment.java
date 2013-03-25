@@ -87,7 +87,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             }
             catch (SQLException e)
             {
-                LogWrapper.d(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
             }
             finally
             {
@@ -175,14 +175,55 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             if (isAdded())
                 getActivity().getActionBar().setTitle(user.displayName + "'s profile");
-            
+
             profileHomeLayout.setVisibility(View.VISIBLE);
-            
+
             displayProfileInfo();
-
             displayItemsCount();
-
             getAndDisplayUserAvatar();
+        }
+    }
+
+    private void displayProfileInfo()
+    {
+        TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
+        textView.setText(user.displayName);
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
+        textView.setText(getString(R.string.registered) + " "
+                        + DateTimeUtils.getElapsedDurationSince(user.creationDate));
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
+        textView.setText(AppUtils.formatReputation(user.reputation));
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
+        textView.setText(getString(R.string.views) + " " + user.profileViews);
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
+        if (user.acceptRate > -1)
+            textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
+        else
+            textView.setVisibility(View.GONE);
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
+        textView.setText(getString(R.string.lastSeen) + " "
+                        + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
+
+        displayBadgesCount();
+    }
+
+    private void displayBadgesCount()
+    {
+        if (user.badgeCounts != null && user.badgeCounts.length == 3)
+        {
+            TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserGoldNum);
+            textView.setText(String.valueOf(user.badgeCounts[0]));
+
+            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserSilverNum);
+            textView.setText(String.valueOf(user.badgeCounts[1]));
+
+            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserBronzeNum);
+            textView.setText(String.valueOf(user.badgeCounts[2]));
         }
     }
 
@@ -207,35 +248,26 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             profileHomeLayout.findViewById(R.id.writePermissions).setVisibility(View.VISIBLE);
 
-            TextView textView = (TextView) profileHomeLayout.findViewById(R.id.writePermissionsInfo);
-            textView.setText(Html.fromHtml(getString(R.string.writePermissionsInfo)));
+            ((TextView) profileHomeLayout.findViewById(R.id.writePermissionsInfo)).setText(Html
+                            .fromHtml(getString(R.string.writePermissionsInfo)));
 
-            HashMap<ObjectType, WritePermission> permissions = WritePermissionDAO.getPermissions(getActivity(),
-                            OperatingSite.getSite().apiSiteParameter);
+            HashMap<ObjectType, WritePermission> permissions =
+                            WritePermissionDAO.getPermissions(getActivity(), OperatingSite.getSite().apiSiteParameter);
             WritePermission writePermission = permissions.get(ObjectType.COMMENT);
 
             if (writePermission != null)
             {
                 if (writePermission.canAdd)
-                {
-                    textView = (TextView) profileHomeLayout.findViewById(R.id.canAddComment);
-                    textView.setText(getString(R.string.yes));
-                }
+                    ((TextView) profileHomeLayout.findViewById(R.id.canAddComment)).setText(getString(R.string.yes));
 
                 if (writePermission.canEdit)
-                {
-                    textView = (TextView) profileHomeLayout.findViewById(R.id.canEditComment);
-                    textView.setText(getString(R.string.yes));
-                }
+                    ((TextView) profileHomeLayout.findViewById(R.id.canEditComment)).setText(getString(R.string.yes));
 
                 if (writePermission.canDelete)
-                {
-                    textView = (TextView) profileHomeLayout.findViewById(R.id.canDelComment);
-                    textView.setText(getString(R.string.yes));
-                }
+                    ((TextView) profileHomeLayout.findViewById(R.id.canDelComment)).setText(getString(R.string.yes));
 
-                textView = (TextView) profileHomeLayout.findViewById(R.id.numCommentActionsPerDay);
-                textView.setText(String.valueOf(writePermission.maxDailyActions));
+                ((TextView) profileHomeLayout.findViewById(R.id.numCommentActionsPerDay)).setText(String
+                                .valueOf(writePermission.maxDailyActions));
             }
         }
     }
@@ -253,60 +285,23 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         final ProgressBar avatarProgressBar = (ProgressBar) profileHomeLayout.findViewById(R.id.getAvatarProgressBar);
         avatarProgressBar.setVisibility(View.VISIBLE);
 
-        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
-        {
-            @Override
-            public void notifyOnCompletion(Bitmap result)
-            {
-                displayAvatar(result);
-                avatarProgressBar.setVisibility(View.GONE);
+        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl =
+                        new AsyncTaskCompletionNotifier<Bitmap>()
+                        {
+                            @Override
+                            public void notifyOnCompletion(Bitmap result)
+                            {
+                                displayAvatar(result);
+                                avatarProgressBar.setVisibility(View.GONE);
 
-                if (me)
-                    new PersistMyAvatarAsyncTask().execute(result);
-            }
+                                if (me)
+                                    new PersistMyAvatarAsyncTask().execute(result);
+                            }
 
-        };
+                        };
 
         GetImageAsyncTask imageAsyncTask = new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl);
         imageAsyncTask.execute(user.profileImageLink);
-    }
-
-    private void displayProfileInfo()
-    {
-        TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
-        textView.setText(user.displayName);
-
-        textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
-        textView.setText(getString(R.string.registered) + " "
-                        + DateTimeUtils.getElapsedDurationSince(user.creationDate));
-
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserReputation);
-        textView.setText(AppUtils.formatReputation(user.reputation));
-
-        if (user.badgeCounts != null && user.badgeCounts.length == 3)
-        {
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserGoldNum);
-            textView.setText(String.valueOf(user.badgeCounts[0]));
-
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserSilverNum);
-            textView.setText(String.valueOf(user.badgeCounts[1]));
-
-            textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserBronzeNum);
-            textView.setText(String.valueOf(user.badgeCounts[2]));
-        }
-
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileViews);
-        textView.setText(getString(R.string.views) + " " + user.profileViews);
-
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
-        if (user.acceptRate > -1)
-            textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
-        else
-            textView.setVisibility(View.GONE);
-
-        textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
-        textView.setText(getString(R.string.lastSeen) + " "
-                        + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
     }
 
     private void displayUserAccounts()
@@ -315,20 +310,26 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
-                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                                R.layout.textview_black_textcolor, null);
+                TextView textView =
+                                (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor,
+                                                null);
                 textView.setText(user.accounts.get(userAccountListCursor).siteName);
                 userAccountList.addView(textView);
             }
         }
     }
 
+    private void displayAvatar(Bitmap result)
+    {
+        ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
+        userProfileImage.setVisibility(View.VISIBLE);
+        userProfileImage.setImageBitmap(result);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        LogWrapper.d(TAG, "onReceiveResult");
-
         if (progressDialog != null)
             progressDialog.dismiss();
 
@@ -338,8 +339,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             user = userPage.items.get(0);
             displayUserDetail();
 
-            HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
-                            .getSerializable(StringConstants.USER_ACCOUNTS);
+            HashMap<String, Account> accounts =
+                            (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
             if (accounts != null)
             {
                 if (user.accounts == null)
@@ -351,12 +352,5 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
             displayWritePermissions();
         }
-    }
-
-    private void displayAvatar(Bitmap result)
-    {
-        ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
-        userProfileImage.setVisibility(View.VISIBLE);
-        userProfileImage.setImageBitmap(result);
     }
 }
