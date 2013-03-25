@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -20,7 +20,6 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.HashMap;
-import java.util.Observable;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -47,11 +46,9 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements OnTagSelectListener
 {
-    private static final String TAG = QuestionsActivity.class.getSimpleName();
     private static final String TAB_TITLE_ACTIVE = "Active";
     private static final String TAB_TITLE_NEW = "New";
     private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
@@ -65,15 +62,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private String intentAction;
     private String tag;
     private int action;
-
-    public class CustomTabsObservable extends Observable
-    {
-        public void notifyOnCustomTabsFound(HashMap<String, SearchCriteria> searchCriterias)
-        {
-            setChanged();
-            notifyObservers(searchCriterias);
-        }
-    }
 
     public static QuestionListFragment getFragment(String fragmentTag)
     {
@@ -97,15 +85,9 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             Fragment existingFragment = getFragmentManager().findFragmentByTag(fragment.fragmentTag);
 
             if (existingFragment == null)
-            {
-                LogWrapper.d(TAG, "adding fragment: " + fragment.fragmentTag);
                 ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
-            }
             else
-            {
-                LogWrapper.d(TAG, "Attaching fragment: " + fragment.fragmentTag);
                 ft.attach(existingFragment);
-            }
         }
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
@@ -216,14 +198,14 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         this.action = action;
         this.tag = tag;
 
-        createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY));
-        createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION));
-        createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES));
+        createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY), true);
+        createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION), false);
+        createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES), false);
 
         if (!frontPage)
         {
             createTab(TAB_TITLE_FAQ,
-                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null));
+                            QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null), false);
         }
         else
         {
@@ -234,16 +216,16 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
             if (customTabs != null)
             {
                 for (String key : customTabs.keySet())
-                    createTab(key, QuestionListFragment.newFragment(key, customTabs.get(key)));
+                    createTab(key, QuestionListFragment.newFragment(key, customTabs.get(key)), false);
             }
         }
     }
 
-    private void createTab(String title, QuestionListFragment fragment)
+    private void createTab(String title, QuestionListFragment fragment, boolean setSelected)
     {
         Tab tab = getActionBar().newTab();
         tab.setText(title).setTabListener(new TabListener(fragment));
-        getActionBar().addTab(tab);
+        getActionBar().addTab(tab, setSelected);
     }
 
     private void saveSearchQuery(String query)
@@ -405,9 +387,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
                 tagListFragment.setOnTagSelectListener(this);
 
             toggleDisplayForTags(true);
-
             showTagFragment();
-
             return true;
         }
 
@@ -425,7 +405,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         }
         else
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        
+
         actionBarMenu.findItem(R.id.menu_search).setVisible(!forTags);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(!forTags);
     }
