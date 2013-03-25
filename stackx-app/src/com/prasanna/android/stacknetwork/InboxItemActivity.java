@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -27,11 +27,11 @@ import android.os.Handler;
 import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.animation.AnimationUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,11 +50,9 @@ import com.prasanna.android.stacknetwork.service.PostIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 
 public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver
 {
-    private static final String TAG = InboxItemActivity.class.getSimpleName();
     private Post post;
     private Intent intent;
     private RestQueryResultReceiver receiver;
@@ -62,6 +60,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private Comment comment;
     private ContextMenu menu;
     private TextView viewQuestion;
+    private String VIEW_ANSWER;
+    private String HIDE_ANSWER;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
@@ -72,6 +72,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
         setContentView(R.layout.inbox_item_detail);
 
+        VIEW_ANSWER = getString(R.string.viewAnswer);
+        HIDE_ANSWER = getString(R.string.hideAnswer);
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
         viewQuestion = (TextView) findViewById(R.id.viewQuestion);
@@ -189,7 +191,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
-        LogWrapper.d(TAG, "ResultReceiver invoked for " + resultCode);
         setProgressBarIndeterminateVisibility(false);
 
         switch (resultCode)
@@ -231,8 +232,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
     private void showPostDetail(StackXItem stackXItem, boolean disableViewQuestion)
     {
-        LogWrapper.d(TAG, "Showing post " + stackXItem.id);
-
         TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
                         + Html.fromHtml(stackXItem.owner.displayName));
@@ -286,7 +285,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 postContextLayout.addView(view);
         }
 
-        TextView textView = (TextView) findViewById(R.id.viewAnswer);
+        final TextView textView = (TextView) findViewById(R.id.viewAnswer);
         textView.setVisibility(View.VISIBLE);
         textView.setOnClickListener(new View.OnClickListener()
         {
@@ -298,12 +297,14 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                     postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
                                     android.R.anim.slide_out_right));
                     postContextLayout.setVisibility(View.GONE);
+                    textView.setText(VIEW_ANSWER);
                 }
                 else
                 {
                     postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
                                     android.R.anim.slide_in_left));
                     postContextLayout.setVisibility(View.VISIBLE);
+                    textView.setText(HIDE_ANSWER);
                 }
             }
         });

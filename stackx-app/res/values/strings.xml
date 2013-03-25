@@ -37,6 +37,7 @@
     <string name="loadingSitesForAuthUser">Loading sites, accounts and permissions. This will take few seconds first time.</string>
     <string name="viewQuestion">View Question</string>
     <string name="viewAnswer">View Answer</string>
+    <string name="hideAnswer">Hide Answer</string>
     <string name="registered">Registered</string>
     <string name="accepted">Accepted</string>
     <string name="delete">Delete</string>
