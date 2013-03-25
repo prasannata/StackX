@@ -175,22 +175,30 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             if (isAdded())
                 getActivity().getActionBar().setTitle(user.displayName + "'s profile");
-            updateProfileInfo();
+            
+            profileHomeLayout.setVisibility(View.VISIBLE);
+            
+            displayProfileInfo();
 
-            TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
-            textView.setText(getString(R.string.questions) + " " + String.valueOf(user.questionCount));
-
-            textView = (TextView) profileHomeLayout.findViewById(R.id.answerCount);
-            textView.setText(getString(R.string.answers) + " " + String.valueOf(user.answerCount));
-
-            textView = (TextView) profileHomeLayout.findViewById(R.id.upvoteCount);
-            textView.setText(getString(R.string.upvotes) + " " + String.valueOf(user.upvoteCount));
-
-            textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
-            textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
+            displayItemsCount();
 
             getAndDisplayUserAvatar();
         }
+    }
+
+    private void displayItemsCount()
+    {
+        TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
+        textView.setText(getString(R.string.questions) + " " + String.valueOf(user.questionCount));
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.answerCount);
+        textView.setText(getString(R.string.answers) + " " + String.valueOf(user.answerCount));
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.upvoteCount);
+        textView.setText(getString(R.string.upvotes) + " " + String.valueOf(user.upvoteCount));
+
+        textView = (TextView) profileHomeLayout.findViewById(R.id.downvoteCount);
+        textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
     }
 
     private void displayWritePermissions()
@@ -263,7 +271,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         imageAsyncTask.execute(user.profileImageLink);
     }
 
-    private void updateProfileInfo()
+    private void displayProfileInfo()
     {
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(user.displayName);
