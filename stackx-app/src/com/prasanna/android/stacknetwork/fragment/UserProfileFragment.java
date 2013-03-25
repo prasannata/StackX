@@ -176,7 +176,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             if (isAdded())
                 getActivity().getActionBar().setTitle(user.displayName + "'s profile");
 
-            profileHomeLayout.setVisibility(View.VISIBLE);
+            profileHomeLayout.findViewById(R.id.userProfile).setVisibility(View.VISIBLE);
 
             displayProfileInfo();
             displayItemsCount();
