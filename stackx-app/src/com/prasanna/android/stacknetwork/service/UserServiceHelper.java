@@ -487,8 +487,9 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return error;
     }
 
-    public LinkedHashSet<Tag> getTags(String site, int page, int pageSize, boolean meTags)
+    public LinkedHashSet<Tag> getTags(String site, int pageSize, boolean meTags)
     {
+        int page = 1;
         LinkedHashSet<Tag> tags = null;
         String restEndPoint = meTags ? "/me/tags" : "/tags";
         boolean hasMore = true;

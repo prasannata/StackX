@@ -56,17 +56,16 @@ public class TagsService extends AbstractStackxService
         @Override
         public void handleMessage(Message msg)
         {
-            LinkedHashSet<Tag> tags = null;
             try
             {
-                if (tagsOlderThanDay())
+                if (AppUtils.isNetworkAvailable(context) && tagsOlderThanDay())
                 {
                     boolean registeredUser = AppUtils.inAuthenticatedRealm(context);
                     String apiSiteParameter = OperatingSite.getSite().apiSiteParameter;
-                    tags = userServiceHelper.getTags(apiSiteParameter, 1, 100, registeredUser);
+                    LinkedHashSet<Tag> tags = userServiceHelper.getTags(apiSiteParameter, 100, registeredUser);
 
                     if (tags == null || tags.isEmpty())
-                        tags = userServiceHelper.getTags(apiSiteParameter, 1, 100, !registeredUser);
+                        tags = userServiceHelper.getTags(apiSiteParameter, 100, !registeredUser);
 
                     persistTags(tags);
                 }
@@ -82,7 +81,6 @@ public class TagsService extends AbstractStackxService
         private boolean tagsOlderThanDay()
         {
             long MILLISECONDS_IN_DAY = 86400000L;
-
             long lastUpdateTime = 0L;
 
             TagDAO tagDAO = new TagDAO(context);
@@ -100,8 +98,6 @@ public class TagsService extends AbstractStackxService
                 tagDAO.close();
             }
 
-            LogWrapper.d(TAG, "Tags last updated: " + lastUpdateTime);
-
             return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
         }
 
@@ -114,7 +110,6 @@ public class TagsService extends AbstractStackxService
                 tagDao.open();
                 tagDao.deleteTagsFromServerForSite(OperatingSite.getSite().apiSiteParameter);
                 tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
-                LogWrapper.d(TAG, "Inserting tags into db for " + OperatingSite.getSite().apiSiteParameter);
             }
             catch (SQLException e)
             {
@@ -137,10 +132,7 @@ public class TagsService extends AbstractStackxService
                             public void onHandleMessageFinish(Message message, Object... args)
                             {
                                 TagsService.this.stopSelf(message.arg1);
-
                                 notifyWaitingObjectsOnComplete();
-
-                                LogWrapper.d(TAG, "Finished executing TagsService");
                                 setRunning(false);
                             }
                         });

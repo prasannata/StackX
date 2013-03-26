@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -320,5 +321,14 @@ public class AppUtils
     public static boolean aHalfAnHourSince(long ms)
     {
         return System.currentTimeMillis() - ms > IntegerConstants.MS_IN_HALF_AN_HOUR;
+    }
+
+    public static boolean isNetworkAvailable(Context context)
+    {
+        if(context == null)
+            return false;
+        
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
 }
