@@ -65,7 +65,7 @@ public class AccountSyncService extends AbstractStackxService
         {
             boolean newThingsFound = false;
             HashMap<String, Site> sites = SiteDAO.getAll(context);
-            if (sites != null)
+            if (sites != null && AppUtils.isNetworkAvailable(context))
             {
                 long sitesLastUpdated = SiteDAO.getLastUpdateTime(context);
                 if (AppUtils.aDaySince(sitesLastUpdated))

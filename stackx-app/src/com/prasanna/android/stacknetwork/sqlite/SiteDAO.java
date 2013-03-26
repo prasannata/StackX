@@ -378,6 +378,27 @@ public class SiteDAO extends AbstractBaseDao
         return null;
     }
 
+    public static ArrayList<Site> getSiteList(final Context context)
+    {
+        SiteDAO siteDAO = new SiteDAO(context);
+
+        try
+        {
+            siteDAO.open();
+            return siteDAO.getSites();
+        }
+        catch (SQLException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            siteDAO.close();
+        }
+
+        return null;
+    }
+
     public static long getLastUpdateTime(final Context context)
     {
         SiteDAO siteDAO = new SiteDAO(context);

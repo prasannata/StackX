@@ -22,20 +22,16 @@ package com.prasanna.android.stacknetwork.service;
 import java.io.Serializable;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
 
 import com.prasanna.android.http.ClientException;
 import com.prasanna.android.stacknetwork.model.StackXError;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractIntentService extends IntentService
 {
-    private static final String TAG = AbstractIntentService.class.getSimpleName();
-
     public static final int ERROR = -1;
 
     public AbstractIntentService(String name)
@@ -43,23 +39,15 @@ public abstract class AbstractIntentService extends IntentService
         super(name);
     }
 
-    protected boolean helloWorld()
-    {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-    }
-
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        if (!helloWorld())
+        if (!AppUtils.isNetworkAvailable(getApplicationContext()))
             throw new ClientException(ClientException.ClientErrorCode.NO_NETWORK);
     }
 
     protected void broadcastHttpErrorIntent(StackXError error)
     {
-        LogWrapper.d(TAG, "broadcastHttpErrorIntent: " + error.msg);
-
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -69,8 +57,6 @@ public abstract class AbstractIntentService extends IntentService
 
     protected void broadcastSerializableExtra(String action, String extraName, Serializable extra)
     {
-        LogWrapper.d(TAG, "broadcastSerializableExtra: " + action);
-
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(action);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

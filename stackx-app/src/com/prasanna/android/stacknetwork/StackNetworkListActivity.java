@@ -48,6 +48,7 @@ import com.prasanna.android.stacknetwork.service.AccountSyncService;
 import com.prasanna.android.stacknetwork.service.MyProfileService;
 import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -249,31 +250,32 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         if (progressDialog != null)
             progressDialog.dismiss();
 
-        if (resultCode == UserIntentService.ERROR)
-            showError();
-        else
+        switch (resultCode)
         {
-            switch (resultCode)
-            {
-                case UserIntentService.GET_USER_SITES:
-                    ArrayList<Site> result = (ArrayList<Site>) resultData.getSerializable(StringConstants.SITES);
-
-                    if (sites != null)
-                    {
-                        sites.clear();
-                        siteListAdapter.clear();
-                        sites.addAll(result);
-                        siteListAdapter.addAll(sites);
-
-                        if (sites.isEmpty())
-                            showEmptyItemsView();
-                    }
-
-                    break;
-                default:
-                    break;
-            }
+            case UserIntentService.GET_USER_SITES:
+                showSiteList((ArrayList<Site>) resultData.getSerializable(StringConstants.SITES));
+                break;
+            case UserIntentService.ERROR:
+                ArrayList<Site> lastSavedSites = SiteDAO.getSiteList(getApplicationContext());
+                if (lastSavedSites != null)
+                    showSiteList(lastSavedSites);
+                else
+                    showError();
+                break;
+            default:
+                break;
         }
+    }
+
+    private void showSiteList(ArrayList<Site> result)
+    {
+        sites.clear();
+        siteListAdapter.clear();
+        sites.addAll(result);
+        siteListAdapter.addAll(sites);
+
+        if (sites.isEmpty())
+            showEmptyItemsView();
     }
 
     private void showEmptyItemsView()
