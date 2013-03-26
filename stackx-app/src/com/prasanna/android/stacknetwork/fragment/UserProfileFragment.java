@@ -174,7 +174,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         if (user != null && profileHomeLayout != null)
         {
             if (isAdded())
-                getActivity().getActionBar().setTitle(user.displayName + "'s profile");
+                getActivity().getActionBar().setTitle(Html.fromHtml(user.displayName) + "'s profile");
 
             profileHomeLayout.findViewById(R.id.userProfile).setVisibility(View.VISIBLE);
 
