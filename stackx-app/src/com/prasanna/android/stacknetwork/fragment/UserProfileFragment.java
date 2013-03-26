@@ -187,7 +187,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private void displayProfileInfo()
     {
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
-        textView.setText(user.displayName);
+        textView.setText(Html.fromHtml(user.displayName));
 
         textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
         textView.setText(getString(R.string.registered) + " "
