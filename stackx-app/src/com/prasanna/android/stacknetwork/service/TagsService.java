@@ -132,8 +132,8 @@ public class TagsService extends AbstractStackxService
                             public void onHandleMessageFinish(Message message, Object... args)
                             {
                                 TagsService.this.stopSelf(message.arg1);
-                                notifyWaitingObjectsOnComplete();
                                 setRunning(false);
+                                notifyWaitingObjectsOnComplete();
                             }
                         });
     }

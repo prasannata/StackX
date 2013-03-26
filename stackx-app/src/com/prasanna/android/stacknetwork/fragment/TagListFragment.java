@@ -92,9 +92,7 @@ public class TagListFragment extends ListFragment
                 listAdapter.addAll(tags);
             }
             else
-            {
                 showError();
-            }
         }
     }
 

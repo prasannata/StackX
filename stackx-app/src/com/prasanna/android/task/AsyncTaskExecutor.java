@@ -20,7 +20,6 @@
 package com.prasanna.android.task;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 
 public class AsyncTaskExecutor
@@ -36,18 +35,9 @@ public class AsyncTaskExecutor
         return INSTANCE;
     }
 
-    private boolean isOnline(Context context)
-    {
-        if (context == null)
-            return false;
-
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
-    }
-
     public <P, S, R> void executeAsyncTask(Context context, AsyncTask<P, S, R> task, P... args)
     {
-        if (task != null && isOnline(context))
+        if (task != null)
             task.execute(args);
     }
 }

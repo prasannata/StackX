@@ -221,6 +221,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 Answer answer = (Answer) resultData.getSerializable(StringConstants.ANSWER);
                 setupOnClickForViewMyPost(answer);
                 break;
+            case AnswersIntentService.ERROR:
+                break;
 
         }
     }

@@ -40,6 +40,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.StackXPage;
@@ -144,9 +145,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             startUserProfileService();
         else
         {
-            displayUserDetail();
-            displayUserAccounts();
-            displayWritePermissions();
+            showUserDetail();
+            showUserAccounts();
+            showWritePermissions();
         }
     }
 
@@ -169,7 +170,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         getActivity().startService(userProfileIntent);
     }
 
-    private void displayUserDetail()
+    private void showUserDetail()
     {
         if (user != null && profileHomeLayout != null)
         {
@@ -178,13 +179,13 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
             profileHomeLayout.findViewById(R.id.userProfile).setVisibility(View.VISIBLE);
 
-            displayProfileInfo();
-            displayItemsCount();
+            showProfileInfo();
+            showItemsCount();
             getAndDisplayUserAvatar();
         }
     }
 
-    private void displayProfileInfo()
+    private void showProfileInfo()
     {
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
         textView.setText(Html.fromHtml(user.displayName));
@@ -209,10 +210,10 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         textView.setText(getString(R.string.lastSeen) + " "
                         + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
 
-        displayBadgesCount();
+        showBadgesCount();
     }
 
-    private void displayBadgesCount()
+    private void showBadgesCount()
     {
         if (user.badgeCounts != null && user.badgeCounts.length == 3)
         {
@@ -227,7 +228,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         }
     }
 
-    private void displayItemsCount()
+    private void showItemsCount()
     {
         TextView textView = (TextView) profileHomeLayout.findViewById(R.id.questionCount);
         textView.setText(getString(R.string.questions) + " " + String.valueOf(user.questionCount));
@@ -242,7 +243,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
     }
 
-    private void displayWritePermissions()
+    private void showWritePermissions()
     {
         if (me && user != null && profileHomeLayout != null)
         {
@@ -304,7 +305,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         imageAsyncTask.execute(user.profileImageLink);
     }
 
-    private void displayUserAccounts()
+    private void showUserAccounts()
     {
         if (user != null && user.accounts != null)
         {
@@ -326,18 +327,34 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         userProfileImage.setImageBitmap(result);
     }
 
-    @SuppressWarnings("unchecked")
+    
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
     {
         if (progressDialog != null)
             progressDialog.dismiss();
 
+        switch(resultCode)
+        {
+            case UserIntentService.GET_USER_PROFILE:
+                showUserProfile(resultData);
+                break;
+            case UserIntentService.ERROR:
+                ViewGroup errorView = AppUtils.getErrorView(getActivity(), (HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+                profileHomeLayout.removeAllViews();
+                profileHomeLayout.addView(errorView); 
+                break;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void showUserProfile(Bundle resultData)
+    {
         StackXPage<User> userPage = (StackXPage<User>) resultData.getSerializable(StringConstants.USER);
         if (isVisible() && userPage != null && userPage.items != null && !userPage.items.isEmpty())
         {
             user = userPage.items.get(0);
-            displayUserDetail();
+            showUserDetail();
 
             HashMap<String, Account> accounts =
                             (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
@@ -347,10 +364,10 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                     user.accounts = new ArrayList<Account>();
 
                 user.accounts.addAll(accounts.values());
-                displayUserAccounts();
+                showUserAccounts();
             }
 
-            displayWritePermissions();
+            showWritePermissions();
         }
     }
 }

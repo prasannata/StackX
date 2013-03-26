@@ -86,8 +86,6 @@ public class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
     {
         if (taskCompletionNotifier != null)
             taskCompletionNotifier.notifyOnCompletion(result);
-
-        super.onPostExecute(result);
     }
 
     private LinkedHashSet<Tag> getTagsFromDb(String site)

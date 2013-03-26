@@ -71,9 +71,7 @@ public abstract class AbstractStackxService extends Service
         if (object != null)
         {
             if (isRunning)
-            {
                 toNotifyObjects.add(object);
-            }
             else
             {
                 synchronized (object)
