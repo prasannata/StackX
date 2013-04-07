@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:button="@drawable/checkbox"
-        android:padding="5dp" />
+        android:padding="10dp" />
 
     <TextView
         android:id="@+id/searchInTitle"
@@ -28,7 +28,7 @@
         android:paddingRight="5dp"
         android:text="@string/search_inTitle"
         android:textColor="@color/black"
-        android:textSize="15sp" />
+        android:textSize="20sp" />
 
     <CheckBox
         android:id="@+id/searchOnlyAnsweredCB"
@@ -38,7 +38,7 @@
         android:layout_below="@id/searchInTitleCB"
         android:layout_centerVertical="true"
         android:button="@drawable/checkbox"
-        android:padding="5dp" />
+        android:padding="10dp" />
 
     <TextView
         android:id="@+id/searchOnlyAnswered"
@@ -54,7 +54,7 @@
         android:paddingRight="5dp"
         android:text="@string/search_answered"
         android:textColor="@color/black"
-        android:textSize="15sp" />
+        android:textSize="20sp" />
 
     <CheckBox
         android:id="@+id/searchOnlyWithAnswersCB"
@@ -64,7 +64,7 @@
         android:layout_below="@id/searchOnlyAnsweredCB"
         android:layout_centerVertical="true"
         android:button="@drawable/checkbox"
-        android:padding="5dp" />
+        android:padding="10dp" />
 
     <TextView
         android:id="@+id/searchOnlyWithAnswers"
@@ -80,6 +80,6 @@
         android:paddingRight="5dp"
         android:text="@string/search_hasAnswers"
         android:textColor="@color/black"
-        android:textSize="15sp" />
+        android:textSize="20sp" />
 
 </RelativeLayout>
