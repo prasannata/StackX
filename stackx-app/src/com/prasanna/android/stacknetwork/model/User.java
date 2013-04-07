@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 
-public class User extends StackXItem implements Serializable
+public class User extends IdentifiableItem implements Serializable
 {
     public static enum UserType
     {

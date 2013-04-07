@@ -42,7 +42,6 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
 import com.prasanna.android.stacknetwork.model.Post;
 import com.prasanna.android.stacknetwork.model.Post.PostType;
-import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.AnswersIntentService;
@@ -54,7 +53,6 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver
 {
     private Post post;
-    private Intent intent;
     private RestQueryResultReceiver receiver;
     private InboxItem item;
     private Comment comment;
@@ -86,7 +84,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     {
         setProgressBarIndeterminateVisibility(true);
 
-        intent = new Intent(this, PostIntentService.class);
+        Intent intent = new Intent(this, PostIntentService.class);
         intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
         if (item.itemType.equals(ItemType.NEW_ANSWER))
         {
@@ -152,15 +150,14 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         switch (item.getItemId())
         {
             case R.id.q_ctx_menu_user_profile:
-                viewUserProfile();
+                startUserProfileActivity();
                 return true;
-
         }
 
         return false;
     }
 
-    private void viewUserProfile()
+    private void startUserProfileActivity()
     {
         long userId = post != null ? post.owner.id : comment.owner.id;
         Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
@@ -196,9 +193,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         switch (resultCode)
         {
             case PostIntentService.GET_POST:
-                post = (Post) resultData.getSerializable(StringConstants.POST);
-                if (post != null)
-                    showPostDetail(post, false);
+                showPostDetail((Post) resultData.getSerializable(StringConstants.POST), false);
                 break;
             case PostIntentService.GET_POST_COMMENT:
                 comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
@@ -207,19 +202,11 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                     boolean commentOnAnswer = isCommentOnAnswer();
                     showPostDetail(comment, commentOnAnswer);
                     if (commentOnAnswer)
-                    {
-                        Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
-                        getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
-                        getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
-                        getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
-                        startService(getAnswerIntent);
-                        setProgressBarIndeterminateVisibility(true);
-                    }
+                        getAnswer();
                 }
                 break;
             case AnswersIntentService.GET_ANSWER:
-                Answer answer = (Answer) resultData.getSerializable(StringConstants.ANSWER);
-                setupOnClickForViewMyPost(answer);
+                setupOnClickForViewMyPost((Answer) resultData.getSerializable(StringConstants.ANSWER));
                 break;
             case AnswersIntentService.ERROR:
                 break;
@@ -227,12 +214,22 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         }
     }
 
+    private void getAnswer()
+    {
+        Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
+        getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
+        getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
+        getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+        startService(getAnswerIntent);
+        setProgressBarIndeterminateVisibility(true);
+    }
+
     private boolean isCommentOnAnswer()
     {
         return comment.type != null && comment.type.equals(PostType.ANSWER);
     }
 
-    private void showPostDetail(StackXItem stackXItem, boolean disableViewQuestion)
+    private void showPostDetail(Post stackXItem, boolean disableViewQuestion)
     {
         TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "

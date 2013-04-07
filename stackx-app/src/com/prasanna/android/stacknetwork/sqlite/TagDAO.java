@@ -228,6 +228,25 @@ public class TagDAO extends AbstractBaseDao
         return null;
     }
 
+    public static LinkedHashSet<Tag> getTagSet(Context context, String site)
+    {
+        TagDAO tagDao = new TagDAO(context);
+        try
+        {
+            tagDao.open();
+            return tagDao.getTagSet(site);
+        }
+        catch (SQLException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
+        finally
+        {
+            tagDao.close();
+        }
+        return null;
+    }
+
     public static void purge(Context context)
     {
         TagDAO tagDAO = new TagDAO(context);

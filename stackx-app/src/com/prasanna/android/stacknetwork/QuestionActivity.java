@@ -66,14 +66,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 {
     private static final String TAG = QuestionActivity.class.getSimpleName();
 
+    private boolean serviceRunningForAnswers = false;
     private Question question;
-    private Intent intent;
-    private QuestionFragment questionFragment;
     private QuestionViewPageAdapter questionViewPageAdapter;
     private ViewPager viewPager;
     private TitlePageIndicator titlePageIndicator;
     private RestQueryResultReceiver resultReceiver;
-    private boolean serviceRunningForAnswers = false;
+    private QuestionFragment questionFragment;
     private CommentFragment commentFragment;
     private PostCommentFragment postCommentFragment;
     private HashMap<String, String> commentsDraft = new HashMap<String, String>();
@@ -238,7 +237,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private void prepareIntentAndStartService()
     {
-        intent = new Intent(this, QuestionDetailsIntentService.class);
+        Intent intent = new Intent(this, QuestionDetailsIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
         setProgressBarIndeterminateVisibility(true);
@@ -517,7 +516,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
         else
         {
-            LogWrapper.d(TAG, "View pager position : " + viewPagerPosition);
             AnswerFragment answerFragment =
                             (AnswerFragment) getFragmentManager().findFragmentByTag(
                                             getViewPagerFragmentTag(viewPagerPosition));
@@ -527,7 +525,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private void startServiceForAnswers()
     {
-        intent = new Intent(this, QuestionDetailsIntentService.class);
+        Intent intent = new Intent(this, QuestionDetailsIntentService.class);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.setAction(StringConstants.ANSWERS);
         intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));

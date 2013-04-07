@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -26,14 +26,14 @@ public class Tag implements Serializable
     private static final long serialVersionUID = -3081057353160392392L;
 
     public final String name;
+
+    public boolean local = false;
     
     public Tag(String name)
     {
         this.name = name;
     }
     
-    public boolean local = false;
-
     @Override
     public int hashCode()
     {

@@ -26,6 +26,7 @@ import java.util.List;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -42,23 +43,24 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.stacknetwork.service.TagsService;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
-import com.prasanna.android.task.GetTagsAsyncTask;
+import com.prasanna.android.utils.LogWrapper;
 
 public class TagListFragment extends ListFragment
 {
     public static final String TAGS_DIRTY = "dirty";
 
     private final ArrayList<Tag> tags = new ArrayList<Tag>();
-
     private boolean activityCreated = false;
     private OnTagSelectListener onTagSelectListener;
     private ArrayAdapter<Tag> listAdapter;
@@ -67,13 +69,68 @@ public class TagListFragment extends ListFragment
     private EditText filterListInputText;
     private Button clearFilterInputText;
     private CharSequence defaultHint;
-    private Object tagFilterLock = new Object();
 
     public interface OnTagSelectListener
     {
         void onFrontPageSelected();
 
         void onTagSelected(String tag);
+    }
+
+    public static class GetTagsAsyncTask extends AsyncTask<Void, Void, LinkedHashSet<Tag>>
+    {
+        private final String TAG = GetTagsAsyncTask.class.getSimpleName();
+        private final AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier;
+        private final Context context;
+
+        public GetTagsAsyncTask(Context context, AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier)
+        {
+            super();
+            this.context = context;
+            this.taskCompletionNotifier = taskCompletionNotifier;
+        }
+
+        @Override
+        protected LinkedHashSet<Tag> doInBackground(Void... params)
+        {
+            if (TagsService.isRunning())
+                waitForServiceToComplete();
+
+            try
+            {
+                return TagDAO.getTagSet(context, OperatingSite.getSite().apiSiteParameter);
+            }
+            catch (AbstractHttpException e)
+            {
+                LogWrapper.e(TAG, "Error fetching tags: " + e.getMessage());
+            }
+
+            return null;
+        }
+
+        private void waitForServiceToComplete()
+        {
+            TagsService.registerForCompleteNotification(this);
+
+            try
+            {
+                synchronized (this)
+                {
+                    wait();
+                }
+            }
+            catch (InterruptedException e)
+            {
+                LogWrapper.e(TAG, e.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPostExecute(LinkedHashSet<Tag> result)
+        {
+            if (taskCompletionNotifier != null)
+                taskCompletionNotifier.notifyOnCompletion(result);
+        }
     }
 
     public class GetTagListCompletionNotifier implements AsyncTaskCompletionNotifier<LinkedHashSet<Tag>>
@@ -98,7 +155,12 @@ public class TagListFragment extends ListFragment
 
     public class TagFilter extends Filter
     {
-
+        private Object tagFilterLock = new Object();
+        
+        public TagFilter()
+        {
+            
+        }
         @Override
         protected FilterResults performFiltering(CharSequence constraint)
         {
@@ -166,10 +228,11 @@ public class TagListFragment extends ListFragment
                 convertView = inflater.inflate(R.layout.tag_list_item, null);
             }
 
-            TagArrayAdapter adapter = (TagArrayAdapter) getListAdapter();
-            ((TextView) convertView).setText(adapter.getItem(position).name);
+            Tag tag = getItem(position);
+            
+            ((TextView) convertView).setText(tag.name);
 
-            if (adapter.getItem(position).local)
+            if (tag.local)
                 ((TextView) convertView).setCompoundDrawablesWithIntrinsicBounds(0, 0,
                                 R.drawable.dark_32x32_make_available_offline, 0);
             else
@@ -274,9 +337,7 @@ public class TagListFragment extends ListFragment
             getListView().setTextFilterEnabled(true);
             getListView().addFooterView(getProgressBar());
             setListAdapter(listAdapter);
-
             runGetTagsTask();
-
             activityCreated = true;
         }
     }
@@ -286,7 +347,7 @@ public class TagListFragment extends ListFragment
         getProgressBar().setVisibility(View.VISIBLE);
 
         GetTagsAsyncTask fetchUserAsyncTask =
-                        new GetTagsAsyncTask(new GetTagListCompletionNotifier(), new TagDAO(getActivity()));
+                        new GetTagsAsyncTask(getActivity().getApplicationContext(), new GetTagListCompletionNotifier());
 
         AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
     }

@@ -200,9 +200,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             textView.setText(STR_VIEWS + ":" + AppUtils.formatNumber(question.viewCount));
 
             displayNumComments();
-
-            if (question.body != null)
-                displayBody(question.body);
+            displayBody(question.body);
 
             TagsViewBuilder.buildView(getActivity(), (LinearLayout) parentLayout.findViewById(R.id.questionTags),
                             question.tags);
@@ -263,18 +261,25 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
     public void displayBody(String text)
     {
+        LogWrapper.d(TAG, "displayBody");
         if (text != null && parentLayout != null)
         {
+            LogWrapper.d(TAG, "Question body is not null");
             question.body = text;
 
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
+
+            LogWrapper.d(TAG, "Fragment is visible: " + isVisible());
+
             if (isVisible() && questionBodyLayout != null)
             {
+                LogWrapper.d(TAG, "Fragment is visible");
                 questionBodyLayout.removeAllViews();
                 ArrayList<View> views = MarkdownFormatter.parse(getActivity(), question.body);
 
                 if (views != null)
                 {
+                    LogWrapper.d(TAG, "Adding body text views");
                     for (final View questionBodyTextView : views)
                         questionBodyLayout.addView(questionBodyTextView);
                 }

@@ -32,8 +32,8 @@ import android.util.Log;
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.model.IdentifiableItem;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.model.StackXItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -52,7 +52,7 @@ public abstract class AbstractBaseServiceHelper
         return SecureHttpHelper.getInstance();
     }
 
-    protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper, StackXPage<? extends StackXItem> page)
+    protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper, StackXPage<? extends IdentifiableItem> page)
     {
         if (jsonObjectWrapper != null && page != null)
         {

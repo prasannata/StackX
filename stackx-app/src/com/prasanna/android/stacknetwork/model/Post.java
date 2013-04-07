@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -21,9 +21,9 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class Post extends StackXItem implements Serializable
+public class Post extends IdentifiableItem implements Serializable
 {
-    private static final long serialVersionUID = 9203303671049335445L;
+    private static final long serialVersionUID = -7850382261881073395L;
 
     public enum PostType
     {
@@ -35,7 +35,6 @@ public class Post extends StackXItem implements Serializable
         PostType(String value)
         {
             this.value = value;
-
         }
 
         public static PostType getEnum(String string)
@@ -64,4 +63,12 @@ public class Post extends StackXItem implements Serializable
     }
 
     public PostType postType;
+    
+    public int score = 0;
+
+    public String title;
+
+    public String body;
+    
+    public User owner;
 }

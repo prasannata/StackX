@@ -314,7 +314,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                 TextView textView =
                                 (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor,
                                                 null);
-                textView.setText(user.accounts.get(userAccountListCursor).siteName);
+                textView.setText(Html.fromHtml(user.accounts.get(userAccountListCursor).siteName));
                 userAccountList.addView(textView);
             }
         }

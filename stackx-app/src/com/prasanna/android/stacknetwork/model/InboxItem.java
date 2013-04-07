@@ -21,7 +21,7 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class InboxItem extends StackXItem implements Serializable
+public class InboxItem extends Post implements Serializable
 {
     public static enum ItemType
     {

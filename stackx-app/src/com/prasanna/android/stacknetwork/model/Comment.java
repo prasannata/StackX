@@ -21,9 +21,7 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-import com.prasanna.android.stacknetwork.model.Post.PostType;
-
-public class Comment extends StackXItem implements Serializable
+public class Comment extends Post implements Serializable
 {
     private static final long serialVersionUID = 4507419037482371574L;
 

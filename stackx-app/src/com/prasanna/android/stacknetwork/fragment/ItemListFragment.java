@@ -36,7 +36,7 @@ import android.widget.TextView;
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
-import com.prasanna.android.stacknetwork.model.StackXItem;
+import com.prasanna.android.stacknetwork.model.Post;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
@@ -46,7 +46,7 @@ import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public abstract class ItemListFragment<T extends StackXItem> extends ListFragment implements OnScrollListener,
+public abstract class ItemListFragment<T extends Post> extends ListFragment implements OnScrollListener,
                 StackXRestQueryResultReceiver
 {
     private static final String TAG = ItemListFragment.class.getSimpleName();

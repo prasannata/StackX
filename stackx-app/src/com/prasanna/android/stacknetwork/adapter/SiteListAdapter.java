@@ -118,8 +118,8 @@ public class SiteListAdapter extends ArrayAdapter<Site>
 
     private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder)
     {
-        String currentDefaultSite = AppUtils.getDefaultSiteName(getContext());
-        if (isDefaultSite(currentDefaultSite, position))
+        final Site defaultSite = AppUtils.getDefaultSite(getContext());
+        if (isDefaultSite(defaultSite, position))
             holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
         else
             holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
@@ -129,8 +129,9 @@ public class SiteListAdapter extends ArrayAdapter<Site>
             @Override
             public void onClick(View v)
             {
-                String currentDefaultSite = AppUtils.getDefaultSiteName(getContext());
-                if (isDefaultSite(currentDefaultSite, position))
+                Site item = getItem(position);
+
+                if (isDefaultSite(defaultSite, position))
                 {
                     holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
                     AppUtils.clearDefaultSite(getContext());
@@ -138,18 +139,17 @@ public class SiteListAdapter extends ArrayAdapter<Site>
                 else
                 {
                     holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
-                    AppUtils.setDefaultSite(getContext(), getItem(position));
+                    AppUtils.setDefaultSite(getContext(), item);
                     notifyDataSetChanged();
-                    Toast.makeText(getContext(), getItem(position).name + " set as default site.", Toast.LENGTH_LONG)
-                                    .show();
+                    Toast.makeText(getContext(), item.name + " set as default site.", Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    private boolean isDefaultSite(String currentDefaultSite, final int position)
+    private boolean isDefaultSite(Site defaultSite, final int position)
     {
-        return currentDefaultSite != null && currentDefaultSite.equals(getItem(position).name);
+        return defaultSite != null && defaultSite.name != null && defaultSite.name.equals(getItem(position).name);
     }
 
     private void setOnClickForSite(final int position, View layoutForSites)

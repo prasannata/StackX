@@ -22,7 +22,7 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Question extends StackXItem implements Serializable
+public class Question extends Post implements Serializable
 {
     private static final long serialVersionUID = -4722553914475051236L;
 
@@ -70,6 +70,8 @@ public class Question extends StackXItem implements Serializable
     public boolean answered;
 
     public boolean hasAcceptedAnswer = false;
+    
+    public final PostType postType = PostType.QUESTION;
     
     @Override
     public int hashCode()

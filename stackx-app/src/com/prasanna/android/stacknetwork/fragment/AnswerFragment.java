@@ -112,8 +112,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        LogWrapper.d(TAG, "onSaveInstanceState");
-
         if (answer != null)
             outState.putSerializable(StringConstants.ANSWER, answer);
 

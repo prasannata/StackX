@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.Menu;
 import android.view.View;
@@ -37,7 +35,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,16 +45,14 @@ import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 
 public class UserInboxActivity extends AbstractUserActionBarActivity implements OnScrollListener,
                 StackXRestQueryResultReceiver, ListItemView<InboxItem>
 {
-    private static final String TAG = UserInboxActivity.class.getSimpleName();
-
     private ProgressBar progressBar;
     private ListView listView;
     private Intent intent = null;
@@ -68,6 +63,15 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     protected List<StackXPage<InboxItem>> pages;
     private StackXPage<InboxItem> currentPageObject;
 
+    static class InboxItemViewHolder
+    {
+        TextView title;
+        TextView body;
+        TextView creationTime;
+        TextView itemType;
+        TextView itemSite;
+    }
+    
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -85,9 +89,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
             pages = new ArrayList<StackXPage<InboxItem>>();
 
         setContentView(R.layout.list_view);
-
         setupListView();
-
         startIntentService();
     }
 
@@ -102,8 +104,9 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     {
         listView = (ListView) findViewById(android.R.id.list);
         listView.addFooterView(progressBar);
-        itemListAdapter = new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
-                        new ArrayList<InboxItem>(), this);
+        itemListAdapter =
+                        new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item,
+                                        new ArrayList<InboxItem>(), this);
         listView.setAdapter(itemListAdapter);
         listView.setOnScrollListener(this);
         listView.setOnItemClickListener(new OnItemClickListener()
@@ -115,8 +118,9 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
                 if (item.itemType != null)
                 {
-                    boolean isSupportedItem = item.itemType.equals(InboxItem.ItemType.COMMENT)
-                                    || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER);
+                    boolean isSupportedItem =
+                                    item.itemType.equals(InboxItem.ItemType.COMMENT)
+                                                    || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER);
 
                     if (isSupportedItem)
                     {
@@ -145,22 +149,17 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
     private void startIntentService()
     {
-        if (!serviceRunning)
+        if (!serviceRunning && AppUtils.inAuthenticatedRealm(getApplicationContext()))
         {
-            SharedPreferences sharedPreferences = PreferenceManager
-                            .getDefaultSharedPreferences(getApplicationContext());
-            if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-            {
-                intent = new Intent(getApplicationContext(), UserIntentService.class);
-                intent.setAction(StringConstants.INBOX_ITEMS);
-                intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
-                intent.putExtra(StringConstants.PAGE, ++page);
-                intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+            intent = new Intent(getApplicationContext(), UserIntentService.class);
+            intent.setAction(StringConstants.INBOX_ITEMS);
+            intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_INBOX);
+            intent.putExtra(StringConstants.PAGE, ++page);
+            intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
 
-                progressBar.setVisibility(View.VISIBLE);
-                startService(intent);
-                serviceRunning = true;
-            }
+            progressBar.setVisibility(View.VISIBLE);
+            startService(intent);
+            serviceRunning = true;
         }
     }
 
@@ -168,9 +167,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     public boolean onCreateOptionsMenu(Menu menu)
     {
         boolean ret = super.onCreateOptionsMenu(menu);
-
         menu.removeItem(R.id.menu_my_inbox);
-
         return ret & true;
     }
 
@@ -207,31 +204,35 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     @Override
     public View getView(InboxItem item, int position, View convertView, ViewGroup parent)
     {
-        RelativeLayout itemRow = (RelativeLayout) getLayoutInflater().inflate(R.layout.inbox_item, null);
-
-        TextView textView = (TextView) itemRow.findViewById(R.id.itemTitle);
-        textView.setText(Html.fromHtml(item.title));
-
-        if (item.body != null)
+        InboxItemViewHolder inboxItemViewHolder;
+        if (convertView == null)
         {
-            textView = (TextView) itemRow.findViewById(R.id.itemBodyPreview);
-            textView.setText(Html.fromHtml(item.body));
+            inboxItemViewHolder = new InboxItemViewHolder();
+            convertView = getLayoutInflater().inflate(R.layout.inbox_item, null);
+            inboxItemViewHolder.title = (TextView) convertView.findViewById(R.id.itemTitle);
+            inboxItemViewHolder.body = (TextView) convertView.findViewById(R.id.itemBodyPreview);
+            inboxItemViewHolder.creationTime = (TextView) convertView.findViewById(R.id.itemCreationTime);
+            inboxItemViewHolder.itemType = (TextView) convertView.findViewById(R.id.itemType);
+            inboxItemViewHolder.itemSite = (TextView) convertView.findViewById(R.id.itemSite);
+
+            convertView.setTag(inboxItemViewHolder);
         }
-
-        textView = (TextView) itemRow.findViewById(R.id.itemCreationTime);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
-
-        textView = (TextView) itemRow.findViewById(R.id.itemType);
-        textView.setText(item.itemType.getRepr());
-
-        textView = (TextView) itemRow.findViewById(R.id.itemSite);
-        
-        if (item.site != null)
-            textView.setText(item.site.name);
         else
-            textView.setVisibility(View.GONE);
-        
-        return itemRow;
+            inboxItemViewHolder = (InboxItemViewHolder) convertView.getTag();
+
+        inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
+        if (item.body != null)
+            inboxItemViewHolder.body.setText(Html.fromHtml(item.body));
+        inboxItemViewHolder.creationTime.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
+        inboxItemViewHolder.itemType.setText(item.itemType.getRepr());
+        inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
+
+        if (item.site != null)
+            inboxItemViewHolder.itemSite.setText(item.site.name);
+        else
+            inboxItemViewHolder.itemSite.setVisibility(View.GONE);
+
+        return convertView;
     }
 
     @Override
@@ -242,7 +243,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         {
             if (currentPageObject != null && currentPageObject.hasMore)
             {
-                LogWrapper.d(TAG, "onScroll reached bottom threshold. Fetching more questions");
                 progressBar.setVisibility(View.VISIBLE);
                 startIntentService();
             }

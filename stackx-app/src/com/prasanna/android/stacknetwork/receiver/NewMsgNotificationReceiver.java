@@ -46,12 +46,9 @@ import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
-import com.prasanna.android.utils.LogWrapper;
 
 public class NewMsgNotificationReceiver extends BroadcastReceiver
 {
-    private static final String TAG = NewMsgNotificationReceiver.class.getSimpleName();
-
     private static final String NEW_MSG_NOTIF_TITLE = "%d new messages";
     private static final int VIBRATE_DURATION = 300;
 
@@ -59,25 +56,16 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        LogWrapper.d(TAG, "Received new msg notificaiton");
-
         if (SettingsFragment.isNotificationEnabled(context))
         {
-            LogWrapper.d(TAG, "Notification enabled in settings");
-
             StackXPage<InboxItem> page =
                             (StackXPage<InboxItem>) intent.getSerializableExtra(UserIntentAction.NEW_MSG.getAction());
 
             if (page != null && page.items != null && !page.items.isEmpty())
             {
                 sendNotification(context, page.items);
-
                 AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-
-                LogWrapper.d(TAG, "Ringer mode: " + audioManager.getRingerMode());
-
                 vibrateIfEnabled(context, audioManager.getRingerMode());
-
                 playNotificationTone(context, audioManager.getRingerMode());
             }
         }
@@ -88,7 +76,6 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
         if (SettingsFragment.isVibrateEnabled(context)
                         && (ringerMode == AudioManager.RINGER_MODE_VIBRATE || ringerMode == AudioManager.RINGER_MODE_NORMAL))
         {
-            LogWrapper.d(TAG, "Vibrate enabled");
             Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(VIBRATE_DURATION);
         }
@@ -148,7 +135,7 @@ public class NewMsgNotificationReceiver extends BroadcastReceiver
                 else
                     itemTypeCount.put(inboxItem.itemType, ++count);
             }
-            
+
             for (InboxItem.ItemType itemType : itemTypeCount.keySet())
                 inboxStyle.addLine(itemType.getNotificationTitle(itemTypeCount.get(itemType)));
         }

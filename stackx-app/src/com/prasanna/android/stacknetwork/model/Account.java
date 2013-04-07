@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -23,12 +23,10 @@ import java.io.Serializable;
 
 import com.prasanna.android.stacknetwork.model.User.UserType;
 
-public class Account implements Serializable
+public class Account extends IdentifiableItem implements Serializable
 {
     private static final long serialVersionUID = 5454221525646765113L;
 
-    public long id;
-    
     public long userId;
     
     public String siteName;
@@ -37,8 +35,6 @@ public class Account implements Serializable
     
     public UserType userType;
     
-    public Site site;
-
     @Override
     public int hashCode()
     {

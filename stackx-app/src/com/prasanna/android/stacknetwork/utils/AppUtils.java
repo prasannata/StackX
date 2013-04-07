@@ -88,25 +88,12 @@ public class AppUtils
         SharedPreferencesUtil.setBoolean(context, StringConstants.IS_FIRST_RUN, false);
     }
 
-    public static void clearDefaultSite(Context context)
-    {
-        SharedPreferencesUtil.setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
-        removeDefaultSite(context);
-    }
-
-    public static String getDefaultSiteName(Context context)
-    {
-        return SharedPreferencesUtil.getString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, null);
-    }
-
     public static void setDefaultSite(Context context, Site site)
     {
         if (site != null && context != null)
         {
             File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
             SharedPreferencesUtil.writeObject(site, dir, StringConstants.SITE);
-
-            SharedPreferencesUtil.setString(context, SettingsFragment.KEY_PREF_DEFAULT_SITE, site.name);
         }
     }
 
@@ -126,7 +113,7 @@ public class AppUtils
         return null;
     }
 
-    public static void removeDefaultSite(Context context)
+    public static void clearDefaultSite(Context context)
     {
         if (context != null)
         {

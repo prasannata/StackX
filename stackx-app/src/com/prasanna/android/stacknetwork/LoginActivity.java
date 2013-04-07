@@ -31,12 +31,9 @@ import android.widget.Toast;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
-import com.prasanna.android.utils.LogWrapper;
 
 public class LoginActivity extends Activity
 {
-    private static final String TAG = LoginActivity.class.getSimpleName();
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -44,8 +41,6 @@ public class LoginActivity extends Activity
 
         if (AppUtils.isFirstRun(getApplicationContext()))
         {
-            LogWrapper.d(TAG, "Preparing for first run");
-
             setContentView(R.layout.main);
             setupLogin();
             setupSkipLogin();
@@ -53,12 +48,10 @@ public class LoginActivity extends Activity
         else
         {
             Intent intent;
+            OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
 
-            if (AppUtils.getDefaultSiteName(getApplicationContext()) != null)
-            {
-                OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+            if (OperatingSite.getSite() != null)
                 intent = new Intent(this, QuestionsActivity.class);
-            }
             else
                 intent = new Intent(this, StackNetworkListActivity.class);
 
@@ -66,14 +59,6 @@ public class LoginActivity extends Activity
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         }
-    }
-
-    @Override
-    public void onResume()
-    {
-        LogWrapper.d(TAG, "onResume");
-
-        super.onResume();
     }
 
     private void setupLogin()

@@ -347,7 +347,6 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
             String restEndPoint = "search/advanced";
 
             Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-
             queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
             queryParams.put(StackUri.QueryParams.TAGGED, tag);
             queryParams.put(StackUri.QueryParams.SORT, sort);
