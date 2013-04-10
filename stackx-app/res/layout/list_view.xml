@@ -20,6 +20,7 @@
         android:layout_height="fill_parent"
         android:clickable="true"
         android:choiceMode="none"
+        android:scrollbarThumbVertical="@drawable/scrollbar"
         android:listSelector="@android:color/transparent"
         android:descendantFocusability="beforeDescendants"
         android:divider="@android:color/transparent" >
