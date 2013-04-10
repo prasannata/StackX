@@ -33,7 +33,7 @@
                 android:gravity="center"
                 android:text="@string/views"
                 android:textColor="@color/delft"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/questionOwner"
@@ -43,7 +43,7 @@
                 android:layout_alignTop="@id/questionViewsValue"
                 android:gravity="center"
                 android:textColor="@color/delft"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
         </RelativeLayout>
 
         <LinearLayout
