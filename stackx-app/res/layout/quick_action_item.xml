@@ -6,4 +6,4 @@
     android:background="@drawable/selector_quick_action_item"
     android:padding="5dp"
     android:textColor="@color/black"
-    android:textSize="15sp" />
+    android:textSize="17sp" />

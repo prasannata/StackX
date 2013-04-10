@@ -38,14 +38,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionActivity;
-import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.ActivityStartHelper;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -109,15 +108,12 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             switch (item.getItemId())
             {
                 case R.id.q_ctx_related:
-                    Intent questionsIntent = new Intent(getActivity(), QuestionsActivity.class);
-                    questionsIntent.setAction(StringConstants.RELATED);
-                    questionsIntent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
-                    startActivity(questionsIntent);
+                    ActivityStartHelper.startRelatedQuestionActivity(getActivity(),
+                                    itemListAdapter.getItem(position).questionId);
                     return true;
                 case R.id.q_ctx_menu_email:
-                    Intent emailIntent = IntentUtils.createEmailIntent(itemListAdapter.getItem(position).title,
+                    ActivityStartHelper.startEmailActivity(getActivity(), itemListAdapter.getItem(position).title,
                                     itemListAdapter.getItem(position).link);
-                    startActivity(Intent.createChooser(emailIntent, ""));
                     return true;
                 default:
                     return false;

@@ -20,6 +20,7 @@
 package com.prasanna.android.views;
 
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class QuickActionMenu
     private ListView listView;
     private ActionItemAdapter actionItemAdapter;
     private PopupWindow popupWindow;
-    private WindowManager windowManager;
+    private View contentView;
 
     private class ActionItemAdapter extends ArrayAdapter<QuickActionItem>
     {
@@ -55,34 +56,41 @@ public class QuickActionMenu
             view.setText(getItem(position).getTitle());
             return view;
         }
-
     }
 
     public QuickActionMenu(Context context)
     {
         this.context = context;
 
-        windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        contentView = initPopupWindow();
+        setupPopupWindowView();
+    }
+
+    private View initPopupWindow()
+    {
         View v = LayoutInflater.from(context).inflate(R.layout.quick_action_popup, null);
         popupWindow = new PopupWindow(context);
-        popupWindow.setWidth(300);
+        popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setTouchable(true);
         popupWindow.setFocusable(true);
         popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(new BitmapDrawable(context.getResources()));
         popupWindow.setContentView(v);
+        return v;
+    }
 
+    private void setupPopupWindowView()
+    {
         actionItemAdapter = new ActionItemAdapter(context, R.layout.quick_action_item);
-        listView = (ListView) v.findViewById(R.id.quickActionItemlist);
-        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        listView.setSelector(android.R.color.holo_blue_light);
+        listView = (ListView) contentView.findViewById(R.id.quickActionItemlist);
         listView.setOnItemClickListener(new OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 actionItemAdapter.getItem(position).getOnClickListener().onClick(view);
-                popupWindow.dismiss();
+                dismiss();
             }
         });
         listView.setAdapter(actionItemAdapter);
@@ -91,6 +99,12 @@ public class QuickActionMenu
     public void addActionItem(QuickActionItem quickActionItem)
     {
         actionItemAdapter.add(quickActionItem);
+        actionItemAdapter.notifyDataSetChanged();
+    }
+
+    public void removeActionItem(QuickActionItem quickActionItem)
+    {
+        actionItemAdapter.remove(quickActionItem);
         actionItemAdapter.notifyDataSetChanged();
     }
 

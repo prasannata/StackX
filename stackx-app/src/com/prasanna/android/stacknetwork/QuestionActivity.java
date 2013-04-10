@@ -52,8 +52,8 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
+import com.prasanna.android.stacknetwork.utils.ActivityStartHelper;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -168,9 +168,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     private void enableAddCommentIfPermitted(Menu menu)
     {
-        boolean canAddComment =
-                        WritePermissionUtil.canAdd(getApplicationContext(), OperatingSite.getSite().apiSiteParameter,
-                                        ObjectType.COMMENT);
+        boolean canAddComment = WritePermissionUtil.canAdd(getApplicationContext(),
+                        OperatingSite.getSite().apiSiteParameter, ObjectType.COMMENT);
 
         if (AppUtils.inAuthenticatedRealm(this) && canAddComment)
             setupAddComment(menu);
@@ -367,16 +366,16 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                     displayComments(question.id, question.comments);
                     return true;
                 case R.id.q_ctx_similar:
-                    startSimilarQuestionsActivity();
+                    ActivityStartHelper.startSimilarQuestionActivity(this, question.title);
                     return true;
                 case R.id.q_ctx_related:
-                    startRelatedQuestionsActivity();
+                    ActivityStartHelper.startRelatedQuestionActivity(this, question.id);
                     return true;
                 case R.id.q_ctx_menu_user_profile:
-                    viewUserProfile(question.owner.id);
+                    ActivityStartHelper.startUserProfileActivity(this, question.owner.id);
                     return true;
                 case R.id.q_ctx_menu_email:
-                    emailQuestion();
+                    ActivityStartHelper.startEmailActivity(this, question.title, question.link);
                     return true;
                 default:
                     LogWrapper.d(TAG, "Unknown item selected: " + item.getTitle());
@@ -396,22 +395,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         return false;
     }
 
-    private void startRelatedQuestionsActivity()
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.RELATED);
-        questionsIntent.putExtra(StringConstants.QUESTION_ID, question.id);
-        startActivity(questionsIntent);
-    }
-
-    private void startSimilarQuestionsActivity()
-    {
-        Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.SIMILAR);
-        questionsIntent.putExtra(StringConstants.TITLE, question.title);
-        startActivity(questionsIntent);
-    }
-
     private boolean onContextItemSelectedForAnswer(MenuItem item, int answerPosition)
     {
         if (item.getGroupId() == R.id.qContextMenuGroup)
@@ -424,7 +407,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
                     displayComments(answer.id, answer.comments);
                     return true;
                 case R.id.q_ctx_menu_user_profile:
-                    viewUserProfile(answer.owner.id);
+                    ActivityStartHelper.startUserProfileActivity(this, question.owner.id);
                     return true;
                 default:
                     LogWrapper.d(TAG, "Unknown item selected: " + item.getTitle());
@@ -516,9 +499,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
         else
         {
-            AnswerFragment answerFragment =
-                            (AnswerFragment) getFragmentManager().findFragmentByTag(
-                                            getViewPagerFragmentTag(viewPagerPosition));
+            AnswerFragment answerFragment = (AnswerFragment) getFragmentManager().findFragmentByTag(
+                            getViewPagerFragmentTag(viewPagerPosition));
             answerFragment.onCommentAdd(comment);
         }
     }
@@ -556,12 +538,11 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             commentFragment.setComments(comments);
             commentFragment.setResultReceiver(resultReceiver);
 
-            String currentViewPagerFragmentTag =
-                            "android:switcher:" + R.id.viewPager + ":" + viewPager.getCurrentItem();
+            String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
+                            + viewPager.getCurrentItem();
 
-            OnCommentChangeListener onCommentChangeListener =
-                            (OnCommentChangeListener) getFragmentManager().findFragmentByTag(
-                                            currentViewPagerFragmentTag);
+            OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
+                            .findFragmentByTag(currentViewPagerFragmentTag);
 
             if (onCommentChangeListener != null)
                 commentFragment.setOnCommentChangeListener(onCommentChangeListener);
@@ -587,19 +568,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             titlePageIndicator.notifyDataSetChanged();
             questionViewPageAdapter.notifyDataSetChanged();
         }
-    }
-
-    private void viewUserProfile(long userId)
-    {
-        Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
-        startActivity(userProfileIntent);
-    }
-
-    private void emailQuestion()
-    {
-        Intent emailIntent = IntentUtils.createEmailIntent(question.title, question.link);
-        startActivity(Intent.createChooser(emailIntent, ""));
     }
 
     private int getNextPageNumber()

@@ -23,8 +23,6 @@ import java.util.ArrayList;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +33,7 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.views.QuickActionMenu;
 
 public class UserQuestionListFragment extends AbstractQuestionListFragment
 {
@@ -63,9 +62,8 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter =
-                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                                            new ArrayList<Question>(), this);
+            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                            new ArrayList<Question>(), this);
         }
 
         return itemsContainer;
@@ -98,13 +96,10 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+    protected void addUserProfileQuickActionItem(final Question question, QuickActionMenu quickActionMenu)
     {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        menu.removeItem(R.id.q_ctx_comments);
-        if (action == UserIntentService.GET_USER_QUESTIONS)
-            menu.removeItem(R.id.q_ctx_menu_user_profile);
+        if (action != UserIntentService.GET_USER_QUESTIONS)
+            super.addUserProfileQuickActionItem(question, quickActionMenu);
     }
 
     @Override
