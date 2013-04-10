@@ -34,6 +34,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -84,7 +85,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         Question question = itemListAdapter.getItem(position);
         if (item.getGroupId() == R.id.qContextMenuGroup)
         {
-            LogWrapper.d(TAG, "Context item selected: " + item.getTitle());
             switch (item.getItemId())
             {
                 case R.id.q_ctx_menu_user_profile:
@@ -106,7 +106,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         }
         else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
         {
-            LogWrapper.d(TAG, "Tag selected: " + item.getTitle());
             startTagQuestionsActivity((String) item.getTitle());
             return true;
         }
@@ -177,7 +176,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
     public View build(View convertView, final Context context, final Question question)
     {
-        LinearLayout questionRowLayout = (LinearLayout) convertView;
+        FrameLayout questionRowLayout = (FrameLayout) convertView;
         QuestionViewHolder holder;
 
         if (questionRowLayout == null)
@@ -185,10 +184,9 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             holder = new QuestionViewHolder();
 
             questionRowLayout =
-                            (LinearLayout) getActivity().getLayoutInflater().inflate(R.layout.question_snippet_layout,
+                            (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.question_snippet_layout,
                                             null);
             holder.tagsLayout = (LinearLayout) questionRowLayout.findViewById(R.id.questionSnippetTags);
-
             holder.score = (TextView) questionRowLayout.findViewById(R.id.score);
             holder.answerCount = (TextView) questionRowLayout.findViewById(R.id.answerCount);
             holder.answerCountAnswered = (TextView) questionRowLayout.findViewById(R.id.answerCountAnswered);

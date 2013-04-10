@@ -16,6 +16,7 @@
             android:id="@+id/emailCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/selector_highlight"
             android:padding="5dp"
             android:src="@drawable/dark_24x24_email" />
 
@@ -23,6 +24,7 @@
             android:id="@+id/copyCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/selector_highlight"
             android:padding="5dp"
             android:src="@drawable/dark_24x24_copy" />
 
@@ -31,6 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
+            android:background="@drawable/selector_highlight"
             android:padding="5dp"
             android:src="@drawable/dark_24x24_full_screen" />
     </LinearLayout>

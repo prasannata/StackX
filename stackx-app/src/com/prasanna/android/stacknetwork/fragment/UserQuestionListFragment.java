@@ -35,7 +35,6 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 
 public class UserQuestionListFragment extends AbstractQuestionListFragment
 {
@@ -64,8 +63,9 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                            new ArrayList<Question>(), this);
+            itemListAdapter =
+                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                                            new ArrayList<Question>(), this);
         }
 
         return itemsContainer;
@@ -92,8 +92,6 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
-        LogWrapper.d(TAG, "onSaveInstanceState");
-
         outState.putInt(StringConstants.ACTION, action);
 
         super.onSaveInstanceState(outState);
@@ -105,7 +103,8 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         super.onCreateContextMenu(menu, v, menuInfo);
 
         menu.removeItem(R.id.q_ctx_comments);
-        menu.removeItem(R.id.q_ctx_menu_user_profile);
+        if (action == UserIntentService.GET_USER_QUESTIONS)
+            menu.removeItem(R.id.q_ctx_menu_user_profile);
     }
 
     @Override
