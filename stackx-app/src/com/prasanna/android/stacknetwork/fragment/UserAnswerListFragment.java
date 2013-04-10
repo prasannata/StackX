@@ -24,14 +24,9 @@ import java.util.ArrayList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -43,10 +38,10 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.ActivityStartHelper;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
+import com.prasanna.android.views.QuickActionMenu;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
 {
@@ -55,7 +50,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     private static final String ANS_CONTNUES = "...";
     private static final String MULTIPLE_NEW_LINES_AT_END = "[\\n]+$";
 
-    private int position;
     private int page = 1;
     private Intent intent;
 
@@ -66,7 +60,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         TextView answerTime;
         TextView answerBody;
         ImageView acceptedAnswerCue;
-        ImageView itemContextMenu;
+        ImageView quickActionMenuImg;
     }
 
     @Override
@@ -81,46 +75,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
         }
         return itemsContainer;
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
-        position = info.position;
-
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.question_context_menu, menu);
-
-        menu.removeItem(R.id.q_ctx_comments);
-        menu.removeItem(R.id.q_ctx_menu_tags);
-        menu.removeItem(R.id.q_ctx_similar);
-        menu.removeItem(R.id.q_ctx_menu_user_profile);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        if (item.getGroupId() == R.id.qContextMenuGroup)
-        {
-            switch (item.getItemId())
-            {
-                case R.id.q_ctx_related:
-                    ActivityStartHelper.startRelatedQuestionActivity(getActivity(),
-                                    itemListAdapter.getItem(position).questionId);
-                    return true;
-                case R.id.q_ctx_menu_email:
-                    ActivityStartHelper.startEmailActivity(getActivity(), itemListAdapter.getItem(position).title,
-                                    itemListAdapter.getItem(position).link);
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -161,8 +115,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     @Override
     public void onResume()
     {
-        LogWrapper.d(getLogTag(), "onResume");
-
         super.onResume();
 
         if (itemListAdapter != null && itemListAdapter.getCount() == 0)
@@ -195,7 +147,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             viewHolder.answerScore = (TextView) convertView.findViewById(R.id.answerScore);
             viewHolder.answerTime = (TextView) convertView.findViewById(R.id.answerTime);
             viewHolder.answerBody = (TextView) convertView.findViewById(R.id.answerBodyPreview);
-            viewHolder.itemContextMenu = (ImageView) convertView.findViewById(R.id.itemContextMenu);
+            viewHolder.quickActionMenuImg = (ImageView) convertView.findViewById(R.id.itemContextMenu);
             convertView.setTag(viewHolder);
         }
         else
@@ -223,15 +175,28 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
                 viewHolder.answerBody.setText(Html.fromHtml(answerBody));
         }
 
-        viewHolder.itemContextMenu.setOnClickListener(new View.OnClickListener()
+        setupQuickActionMenu(answer, viewHolder);
+        return convertView;
+    }
+
+    /* Shouldn't I recycle quick action menu as well? Yes, but how? */
+    private void setupQuickActionMenu(final Answer answer, ViewHolder holder)
+    {
+        final QuickActionMenu quickActionMenu = initQuickActionMenu(answer);
+        holder.quickActionMenuImg.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                getActivity().openContextMenu(v);
+                quickActionMenu.show(v);
             }
         });
-        return convertView;
+    }
+
+    protected QuickActionMenu initQuickActionMenu(final Answer answer)
+    {
+        return new StackXQuickActionMenu(getActivity()).addRelatedQuickActionItem(answer.questionId)
+                        .addEmailQuickActionItem(answer.title, answer.body).build();
     }
 
     @Override

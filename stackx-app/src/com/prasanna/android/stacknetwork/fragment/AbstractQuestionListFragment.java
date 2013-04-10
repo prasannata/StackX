@@ -59,7 +59,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         ArrayList<TextView> tagViews;
         TextView answerCountAnswered;
         ImageView quickActionImg;
-        QuickActionMenu quickActionMenu;
     }
 
     @Override
@@ -113,7 +112,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             holder.views = (TextView) questionRowLayout.findViewById(R.id.questionViewsValue);
             holder.owner = (TextView) questionRowLayout.findViewById(R.id.questionOwner);
             holder.quickActionImg = (ImageView) questionRowLayout.findViewById(R.id.itemContextMenu);
-            holder.quickActionMenu = initQuickActionMenu(question);
             questionRowLayout.setTag(holder);
         }
         else
@@ -122,8 +120,15 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         questionRowLayout.setId((int) question.id);
         setupViewForQuestionMetadata(holder, question);
         TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags);
+        setupQuickActionMenu(question, holder);
 
-        final QuickActionMenu quickActionMenu = holder.quickActionMenu;
+        return questionRowLayout;
+    }
+
+    /* Shouldn't I recycle quick action menu as well? Yes, but how? */
+    private void setupQuickActionMenu(final Question question, QuestionViewHolder holder)
+    {
+        final QuickActionMenu quickActionMenu = initQuickActionMenu(question);
         holder.quickActionImg.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -132,8 +137,6 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
                 quickActionMenu.show(v);
             }
         });
-
-        return questionRowLayout;
     }
 
     protected QuickActionMenu initQuickActionMenu(final Question question)

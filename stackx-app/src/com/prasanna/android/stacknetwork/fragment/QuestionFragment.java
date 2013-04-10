@@ -103,6 +103,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             @Override
             public void onClick(View v)
             {
+                if (quickActionMenu == null)
+                    quickActionMenu = initQuickActionMenu();
+
                 quickActionMenu.build().show(v);
             }
         });

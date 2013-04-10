@@ -113,8 +113,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
     {
-        LogWrapper.d(TAG, "onActivityCreated");
-
         super.onActivityCreated(savedInstanceState);
 
         if (tag != null)
