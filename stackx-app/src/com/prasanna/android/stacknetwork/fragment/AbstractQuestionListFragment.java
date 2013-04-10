@@ -32,6 +32,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.FrameLayout;
@@ -52,6 +53,8 @@ import com.prasanna.android.stacknetwork.utils.IntentUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.utils.TagsViewBuilder;
+import com.prasanna.android.views.QuickActionItem;
+import com.prasanna.android.views.QuickActionMenu;
 
 public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
 {
@@ -116,6 +119,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     @Override
     public View getView(Question item, int position, View convertView, ViewGroup parent)
     {
+        final Question question = itemListAdapter.getItem(position);
         convertView = build(convertView, getActivity(), item);
         ImageView imageView = (ImageView) convertView.findViewById(R.id.itemContextMenu);
         imageView.setOnClickListener(new View.OnClickListener()
@@ -123,7 +127,27 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             @Override
             public void onClick(View v)
             {
-                getActivity().openContextMenu(v);
+                QuickActionMenu quickActionMenu = new QuickActionMenu(getActivity());
+                quickActionMenu.addActionItem(new QuickActionItem("Similar", new OnClickListener()
+                {
+                    
+                    @Override
+                    public void onClick(View v)
+                    {
+                        startSimirarQuestionsActivity(question.title);   
+                    }
+                }));
+                quickActionMenu.addActionItem(new QuickActionItem("Related", new OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        startRelatedQuestionsActivity(question.id);
+                    }
+                }));
+
+                quickActionMenu.show(v);
+//                getActivity().openContextMenu(v);
             }
         });
         return convertView;
@@ -162,9 +186,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         if (itemListAdapter.getItem(position).tags != null)
         {
             for (int idx = 0; idx < itemListAdapter.getItem(position).tags.length; idx++)
-            {
                 subMenu.add(R.id.qContextTagsMenuGroup, Menu.NONE, idx, itemListAdapter.getItem(position).tags[idx]);
-            }
         }
     }
 
