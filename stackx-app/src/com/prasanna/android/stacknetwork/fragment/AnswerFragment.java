@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -22,16 +22,13 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -44,6 +41,7 @@ import android.widget.TextView;
 import com.prasanna.android.stacknetwork.PageSelectAdapter;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowCommentsListener;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -51,6 +49,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
+import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.HtmlTextView;
@@ -64,6 +63,8 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     private RelativeLayout answerMetaInfoLayout;
     private ImageView answerCtxMenuImageView;
     private PageSelectAdapter pageSelectAdapter;
+    private StackXQuickActionMenu quickActionMenu;
+    private OnShowCommentsListener onShowCommentsListener;
 
     public static AnswerFragment newFragment(Answer answer, int viewPageNumber, PageSelectAdapter pageSelectAdapter)
     {
@@ -72,6 +73,17 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
         answerFragment.answer = answer;
         answerFragment.pageSelectAdapter = pageSelectAdapter;
         return answerFragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        if (!(activity instanceof OnShowCommentsListener))
+            throw new IllegalArgumentException("Activity must implement OnShowCommentsListener");
+
+        onShowCommentsListener = (OnShowCommentsListener) activity;
     }
 
     @Override
@@ -102,8 +114,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
     @Override
     public void onResume()
     {
-        LogWrapper.d(TAG, "onResume");
-
         super.onResume();
 
         displayAnswer();
@@ -118,28 +128,13 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
         super.onSaveInstanceState(outState);
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.question_context_menu, menu);
-        menu.removeItem(R.id.q_ctx_similar);
-        menu.removeItem(R.id.q_ctx_related);
-        menu.removeItem(R.id.q_ctx_menu_email);
-        menu.removeItem(R.id.q_ctx_menu_tags);
-
-        enableCommentsInContextMenu(menu);
-
-        MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
-        menuItem.setTitle(Html.fromHtml(answer.owner.displayName) + "'s profile");
-    }
-
     private void displayAnswer()
     {
         if (answer != null)
         {
+            if (quickActionMenu == null)
+                quickActionMenu = initQuickActionMenu();
+
             TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
             textView.setText(AppUtils.formatNumber(answer.score));
             if (answer.accepted)
@@ -154,13 +149,20 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
             final ImageView questionMarkImageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
             showQuestionTitleOnClick(questionMarkImageView);
             gotoQuestionPageOnLongClick(questionMarkImageView);
-            setupContextMenuForAnswer();
+            setupQuickActionMenuForAnswer();
 
             answerBodyLayout.removeAllViews();
 
             for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
                 answerBodyLayout.addView(answerView);
         }
+    }
+
+    private StackXQuickActionMenu initQuickActionMenu()
+    {
+        StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
+        return quickActionMenu.addCommentsItem(onShowCommentsListener).addUserProfileItem(answer.owner.id,
+                        Html.fromHtml(answer.owner.displayName).toString());
     }
 
     private void displayNumComments()
@@ -173,19 +175,17 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
             textView.setVisibility(View.VISIBLE);
         }
         else
-        {
             textView.setVisibility(View.GONE);
-        }
     }
 
-    private void setupContextMenuForAnswer()
+    private void setupQuickActionMenuForAnswer()
     {
         answerCtxMenuImageView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                AnswerFragment.this.getActivity().openContextMenu(v);
+                quickActionMenu.build().show(v);
             }
         });
     }
@@ -254,13 +254,6 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener
                         : new SpannableString("");
         return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
                         + AppUtils.formatReputation(answer.owner.reputation) + "]";
-    }
-
-    private void enableCommentsInContextMenu(ContextMenu menu)
-    {
-        MenuItem item = menu.findItem(R.id.q_ctx_comments);
-        item.setEnabled(true);
-        item.setVisible(true);
     }
 
     private void gotoQuestionPage(final ImageView questionViewAction, final LinearLayout layout)

@@ -117,8 +117,6 @@ public class TagDAO extends AbstractBaseDao
         if (cursor == null)
             return null;
 
-        LogWrapper.d(TAG, "Tags retrieved from DB");
-
         LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
         getTagCollection(cursor, tags);
         return tags;
@@ -130,8 +128,6 @@ public class TagDAO extends AbstractBaseDao
 
         if (cursor == null || cursor.getCount() == 0)
             return null;
-
-        LogWrapper.d(TAG, "Tags retrieved from DB");
 
         ArrayList<String> tags = new ArrayList<String>();
         getTagStringCollection(cursor, tags);
@@ -154,9 +150,11 @@ public class TagDAO extends AbstractBaseDao
 
     private Cursor getCursor(String site)
     {
-        String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
+        String[] cols = new String[]
+        { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = TagsTable.COLUMN_SITE + " = ?";
-        String[] selectionArgs = { site };
+        String[] selectionArgs =
+        { site };
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, orderBy);
@@ -165,16 +163,16 @@ public class TagDAO extends AbstractBaseDao
 
     public LinkedHashSet<Tag> getTags(String site, boolean includeLocalTags)
     {
-        String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
+        String[] cols = new String[]
+        { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
-        String[] selectionArgs = { site, includeLocalTags ? "1" : "0" };
+        String[] selectionArgs =
+        { site, includeLocalTags ? "1" : "0" };
         String orderBy = TagsTable.COLUMN_VALUE + " Collate NOCASE";
 
         Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, orderBy);
         if (cursor == null || cursor.getCount() == 0)
             return null;
-
-        LogWrapper.d(TAG, "Tags retrieved from DB");
 
         LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
         getTagCollection(cursor, tags);
@@ -203,7 +201,8 @@ public class TagDAO extends AbstractBaseDao
     public void deleteTagsFromServerForSite(String site)
     {
         String whereClause = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
-        String[] whereArgs = { site, "0" };
+        String[] whereArgs =
+        { site, "0" };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
         deleteAuditEntry(AUDIT_ENTRY_TYPE, site);

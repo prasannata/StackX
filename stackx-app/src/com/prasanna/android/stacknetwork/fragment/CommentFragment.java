@@ -67,6 +67,11 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     private PostCommentFragment postCommentFragment;
     private CommentViewHolder selectedViewForReply;
 
+    public interface OnShowCommentsListener
+    {
+        void onShowComments();
+    }
+
     public interface OnCommentChangeListener
     {
         void onCommentAdd(Comment comment);

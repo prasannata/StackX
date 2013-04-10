@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,12 +37,11 @@ import com.prasanna.android.stacknetwork.QuestionActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Question;
-import com.prasanna.android.stacknetwork.utils.ActivityStartHelper;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.TagsViewBuilder;
-import com.prasanna.android.views.QuickActionItem;
 import com.prasanna.android.views.QuickActionMenu;
 
 public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
@@ -138,66 +136,12 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         return questionRowLayout;
     }
 
-    private QuickActionMenu initQuickActionMenu(final Question question)
+    protected QuickActionMenu initQuickActionMenu(final Question question)
     {
-        QuickActionMenu quickActionMenu = new QuickActionMenu(getActivity());
-        addUserProfileQuickActionItem(question, quickActionMenu);
-        addSimilarQuickActionItem(question, quickActionMenu);
-        addRelatedQuickActionItem(question, quickActionMenu);
-        addEmailQuickActionItem(question, quickActionMenu);
-        return quickActionMenu;
-    }
-
-    protected void addUserProfileQuickActionItem(final Question question, QuickActionMenu quickActionMenu)
-    {
-        quickActionMenu.addActionItem(new QuickActionItem(Html.fromHtml(question.owner.displayName) + "'s profile",
-                        new OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
-                                ActivityStartHelper.startUserProfileActivity(getActivity(), question.owner.id);
-                            }
-                        }));
-    }
-
-    private void addSimilarQuickActionItem(final Question question, QuickActionMenu quickActionMenu)
-    {
-        quickActionMenu.addActionItem(new QuickActionItem(getActivity().getApplicationContext(), R.string.similar,
-                        new OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
-                                ActivityStartHelper.startSimilarQuestionActivity(getActivity(), question.title);
-                            }
-                        }));
-    }
-
-    private void addRelatedQuickActionItem(final Question question, QuickActionMenu quickActionMenu)
-    {
-        quickActionMenu.addActionItem(new QuickActionItem(getActivity().getApplicationContext(), R.string.related,
-                        new OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
-                                ActivityStartHelper.startRelatedQuestionActivity(getActivity(), question.id);
-                            }
-                        }));
-    }
-
-    private void addEmailQuickActionItem(final Question question, QuickActionMenu quickActionMenu)
-    {
-        quickActionMenu.addActionItem(new QuickActionItem(getActivity().getApplicationContext(), R.string.email,
-                        new OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View v)
-                            {
-                                ActivityStartHelper.startEmailActivity(getActivity(), question.title, question.link);
-                            }
-                        }));
+        StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
+        quickActionMenu.addUserProfileItem(question.owner.id, Html.fromHtml(question.owner.displayName).toString());
+        return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
+                        .addEmailQuickActionItem(question.title, question.body).build();
     }
 
     private void setupViewForQuestionMetadata(QuestionViewHolder holder, Question question)

@@ -41,6 +41,7 @@ import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.fragment.AnswerFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowCommentsListener;
 import com.prasanna.android.stacknetwork.fragment.PostCommentFragment;
 import com.prasanna.android.stacknetwork.fragment.QuestionFragment;
 import com.prasanna.android.stacknetwork.model.Answer;
@@ -52,20 +53,16 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
-import com.prasanna.android.stacknetwork.utils.ActivityStartHelper;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
-import com.prasanna.android.utils.LogWrapper;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
-                StackXRestQueryResultReceiver, PageSelectAdapter
+                StackXRestQueryResultReceiver, PageSelectAdapter, OnShowCommentsListener
 {
-    private static final String TAG = QuestionActivity.class.getSimpleName();
-
     private boolean serviceRunningForAnswers = false;
     private Question question;
     private QuestionViewPageAdapter questionViewPageAdapter;
@@ -345,87 +342,6 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         }
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        if (viewPager.getCurrentItem() == 0)
-            return onContextItemSelectedForQuestion(item);
-        else
-            return onContextItemSelectedForAnswer(item, viewPager.getCurrentItem() - 1);
-    }
-
-    private boolean onContextItemSelectedForQuestion(MenuItem item)
-    {
-        if (item.getGroupId() == R.id.qContextMenuGroup)
-        {
-            LogWrapper.d(TAG, "Context item selected: " + item.getTitle());
-
-            switch (item.getItemId())
-            {
-                case R.id.q_ctx_comments:
-                    displayComments(question.id, question.comments);
-                    return true;
-                case R.id.q_ctx_similar:
-                    ActivityStartHelper.startSimilarQuestionActivity(this, question.title);
-                    return true;
-                case R.id.q_ctx_related:
-                    ActivityStartHelper.startRelatedQuestionActivity(this, question.id);
-                    return true;
-                case R.id.q_ctx_menu_user_profile:
-                    ActivityStartHelper.startUserProfileActivity(this, question.owner.id);
-                    return true;
-                case R.id.q_ctx_menu_email:
-                    ActivityStartHelper.startEmailActivity(this, question.title, question.link);
-                    return true;
-                default:
-                    LogWrapper.d(TAG, "Unknown item selected: " + item.getTitle());
-                    return false;
-            }
-        }
-        else if (item.getGroupId() == R.id.qContextTagsMenuGroup)
-        {
-            Intent questionsIntent = new Intent(this, QuestionsActivity.class);
-            questionsIntent.setAction(StringConstants.TAG);
-            questionsIntent.putExtra(StringConstants.TAG, item.getTitle());
-            startActivity(questionsIntent);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private boolean onContextItemSelectedForAnswer(MenuItem item, int answerPosition)
-    {
-        if (item.getGroupId() == R.id.qContextMenuGroup)
-        {
-            Answer answer = question.answers.get(answerPosition);
-
-            switch (item.getItemId())
-            {
-                case R.id.q_ctx_comments:
-                    displayComments(answer.id, answer.comments);
-                    return true;
-                case R.id.q_ctx_menu_user_profile:
-                    ActivityStartHelper.startUserProfileActivity(this, question.owner.id);
-                    return true;
-                default:
-                    LogWrapper.d(TAG, "Unknown item selected: " + item.getTitle());
-                    return false;
-            }
-        }
-
-        return false;
-    }
-
-    private void displayComments(long postId, ArrayList<Comment> comments)
-    {
-        if (comments != null && !comments.isEmpty())
-            displayCommentFragment(postId + "-" + StringConstants.COMMENTS, comments);
-        else
-            Toast.makeText(this, "No comments for answer", Toast.LENGTH_SHORT).show();
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData)
@@ -523,36 +439,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             questionFragment = QuestionFragment.newFragment();
 
         questionFragment.setAndDisplay(question);
-
         titlePageIndicator.notifyDataSetChanged();
         questionViewPageAdapter.notifyDataSetChanged();
-    }
-
-    private void displayCommentFragment(String fragmentTag, ArrayList<Comment> comments)
-    {
-        commentFragment = (CommentFragment) getFragmentManager().findFragmentByTag(fragmentTag);
-
-        if (commentFragment == null)
-        {
-            commentFragment = new CommentFragment();
-            commentFragment.setComments(comments);
-            commentFragment.setResultReceiver(resultReceiver);
-
-            String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
-                            + viewPager.getCurrentItem();
-
-            OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
-                            .findFragmentByTag(currentViewPagerFragmentTag);
-
-            if (onCommentChangeListener != null)
-                commentFragment.setOnCommentChangeListener(onCommentChangeListener);
-        }
-
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, commentFragment, fragmentTag);
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        transaction.addToBackStack(fragmentTag);
-        transaction.commit();
     }
 
     private void displayAnswers(ArrayList<Answer> answers, boolean add)
@@ -600,5 +488,53 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     {
         String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":" + position;
         return currentViewPagerFragmentTag;
+    }
+
+    @Override
+    public void onShowComments()
+    {
+        if (viewPager.getCurrentItem() == 0)
+            prepareCommentFragment(question.id, question.comments);
+        else
+        {
+            Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
+            prepareCommentFragment(answer.id, answer.comments);
+        }
+    }
+
+    private void prepareCommentFragment(long postId, ArrayList<Comment> comments)
+    {
+        if (comments != null && !comments.isEmpty())
+            showCommentFragment(postId, comments);
+        else
+            Toast.makeText(this, "No comments for answer", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showCommentFragment(long postId, ArrayList<Comment> comments)
+    {
+        String fragmentTag = postId + "-" + StringConstants.COMMENTS;
+        commentFragment = (CommentFragment) getFragmentManager().findFragmentByTag(fragmentTag);
+
+        if (commentFragment == null)
+        {
+            commentFragment = new CommentFragment();
+            commentFragment.setComments(comments);
+            commentFragment.setResultReceiver(resultReceiver);
+
+            String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":"
+                            + viewPager.getCurrentItem();
+
+            OnCommentChangeListener onCommentChangeListener = (OnCommentChangeListener) getFragmentManager()
+                            .findFragmentByTag(currentViewPagerFragmentTag);
+
+            if (onCommentChangeListener != null)
+                commentFragment.setOnCommentChangeListener(onCommentChangeListener);
+        }
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentContainer, commentFragment, fragmentTag);
+        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        transaction.addToBackStack(fragmentTag);
+        transaction.commit();
     }
 }

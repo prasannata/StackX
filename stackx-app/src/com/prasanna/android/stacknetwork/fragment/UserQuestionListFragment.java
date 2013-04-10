@@ -32,6 +32,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.QuickActionMenu;
 
@@ -96,10 +97,14 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    protected void addUserProfileQuickActionItem(final Question question, QuickActionMenu quickActionMenu)
+    protected QuickActionMenu initQuickActionMenu(final Question question)
     {
         if (action != UserIntentService.GET_USER_QUESTIONS)
-            super.addUserProfileQuickActionItem(question, quickActionMenu);
+            return super.initQuickActionMenu(question);
+
+        StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
+        return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
+                        .addEmailQuickActionItem(question.title, question.body).build();
     }
 
     @Override

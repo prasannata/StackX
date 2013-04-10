@@ -22,15 +22,11 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -41,12 +37,14 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChangeListener;
+import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowCommentsListener;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
+import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.utils.TagsViewBuilder;
@@ -55,13 +53,13 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 {
     private static final String TAG = QuestionFragment.class.getSimpleName();
 
-    private boolean ctxMenuSetup = false;
-
     private FrameLayout parentLayout;
     private Question question;
-    private ContextMenu menu;
     private ImageView backIv;
     private ImageView ctxMenuImage;
+    private StackXQuickActionMenu quickActionMenu;
+    private OnShowCommentsListener onShowCommentsListener;
+
     private String STR_VIEWS;
     private String STR_COMMENTS;
 
@@ -71,6 +69,17 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         questionFragment.setRetainInstance(true);
         questionFragment.setHasOptionsMenu(true);
         return questionFragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        if (!(activity instanceof OnShowCommentsListener))
+            throw new IllegalArgumentException("Activity must implement OnShowCommentsListener");
+
+        onShowCommentsListener = (OnShowCommentsListener) activity;
     }
 
     @Override
@@ -94,24 +103,11 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             @Override
             public void onClick(View v)
             {
-                QuestionFragment.this.getActivity().openContextMenu(v);
+                quickActionMenu.build().show(v);
             }
         });
 
         backIv = (ImageView) parentLayout.findViewById(R.id.navigateBack);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        getActivity().getMenuInflater().inflate(R.menu.question_context_menu, menu);
-        this.menu = menu;
-
-        setupUserProfileInContextMenu();
-        setupTagsInContextMenu();
-        enableCommentsInContextMenu();
     }
 
     @Override
@@ -127,8 +123,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
             displayQuestion();
         }
-
-        registerForContextMenu(ctxMenuImage);
     }
 
     @Override
@@ -148,41 +142,12 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         super.onSaveInstanceState(outState);
     }
 
-    private void setupUserProfileInContextMenu()
-    {
-        if (question != null && question.owner != null)
-        {
-            MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
-
-            if (userProfileMenuItem != null)
-                userProfileMenuItem.setTitle(Html.fromHtml(question.owner.displayName) + "'s profile");
-
-            ctxMenuSetup = true;
-        }
-    }
-
-    private void setupTagsInContextMenu()
-    {
-        if (question != null && question.tags != null)
-        {
-            MenuItem menuItem = menu.findItem(R.id.q_ctx_menu_tags);
-            SubMenu subMenu = menuItem.getSubMenu();
-            for (int idx = 0; idx < question.tags.length; idx++)
-                subMenu.add(R.id.qContextTagsMenuGroup, Menu.NONE, idx, question.tags[idx]);
-
-            ctxMenuSetup = ctxMenuSetup & true;
-        }
-    }
-
     private void displayQuestion()
     {
         if (question != null)
         {
-            if (!ctxMenuSetup && menu != null)
-            {
-                setupTagsInContextMenu();
-                setupUserProfileInContextMenu();
-            }
+            if (quickActionMenu == null)
+                quickActionMenu = initQuickActionMenu();
 
             TextView textView = (TextView) parentLayout.findViewById(R.id.score);
             textView.setText(AppUtils.formatNumber(question.score));
@@ -205,6 +170,15 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             TagsViewBuilder.buildView(getActivity(), (LinearLayout) parentLayout.findViewById(R.id.questionTags),
                             question.tags);
         }
+    }
+
+    private StackXQuickActionMenu initQuickActionMenu()
+    {
+        StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
+        quickActionMenu.addCommentsItem(onShowCommentsListener).addUserProfileItem(question.owner.id,
+                        Html.fromHtml(question.owner.displayName).toString());
+        return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
+                        .addEmailQuickActionItem(question.title, question.body);
     }
 
     private void setupTextViewForAnswerCount()
@@ -245,17 +219,6 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             textView.setText(STR_COMMENTS + ":" + String.valueOf(question.comments.size()));
             textView.setVisibility(question.comments.isEmpty() ? View.GONE : View.VISIBLE);
 
-            enableCommentsInContextMenu();
-        }
-    }
-
-    private void enableCommentsInContextMenu()
-    {
-        if (menu != null)
-        {
-            MenuItem item = menu.findItem(R.id.q_ctx_comments);
-            item.setEnabled(true);
-            item.setVisible(true);
         }
     }
 
