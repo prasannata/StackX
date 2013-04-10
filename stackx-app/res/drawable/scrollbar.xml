@@ -5,7 +5,7 @@
         android:endColor="@color/delft"
         android:startColor="@color/delft" />
 
-    <corners android:radius="1dp" />
+    <corners android:radius="6dp" />
 
     <size android:width="5dp" />
 
