@@ -93,12 +93,17 @@ public class TagListFragment extends ListFragment
         @Override
         protected LinkedHashSet<Tag> doInBackground(Void... params)
         {
-            if (TagsService.isRunning())
-                waitForServiceToComplete();
-
             try
             {
-                return TagDAO.getTagSet(context, OperatingSite.getSite().apiSiteParameter);
+                LinkedHashSet<Tag> tagSet = TagDAO.getTagSet(context, OperatingSite.getSite().apiSiteParameter);
+
+                if ((tagSet == null || tagSet.isEmpty()) && TagsService.isRunning())
+                {
+                    waitForServiceToComplete();
+                    tagSet = TagDAO.getTagSet(context, OperatingSite.getSite().apiSiteParameter);
+                }
+
+                return tagSet;
             }
             catch (AbstractHttpException e)
             {
@@ -110,18 +115,19 @@ public class TagListFragment extends ListFragment
 
         private void waitForServiceToComplete()
         {
-            TagsService.registerForCompleteNotification(this);
-
-            try
+            if (TagsService.registerForCompleteNotification(this))
             {
-                synchronized (this)
+                try
                 {
-                    wait();
+                    synchronized (this)
+                    {
+                        wait();
+                    }
                 }
-            }
-            catch (InterruptedException e)
-            {
-                LogWrapper.e(TAG, e.getMessage());
+                catch (InterruptedException e)
+                {
+                    LogWrapper.e(TAG, e.getMessage());
+                }
             }
         }
 
@@ -156,11 +162,12 @@ public class TagListFragment extends ListFragment
     public class TagFilter extends Filter
     {
         private Object tagFilterLock = new Object();
-        
+
         public TagFilter()
         {
-            
+
         }
+
         @Override
         protected FilterResults performFiltering(CharSequence constraint)
         {
@@ -223,13 +230,13 @@ public class TagListFragment extends ListFragment
         {
             if (convertView == null)
             {
-                LayoutInflater inflater =
-                                (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
+                                Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.tag_list_item, null);
             }
 
             Tag tag = getItem(position);
-            
+
             ((TextView) convertView).setText(tag.name);
 
             if (tag.local)
@@ -346,8 +353,8 @@ public class TagListFragment extends ListFragment
     {
         getProgressBar().setVisibility(View.VISIBLE);
 
-        GetTagsAsyncTask fetchUserAsyncTask =
-                        new GetTagsAsyncTask(getActivity().getApplicationContext(), new GetTagListCompletionNotifier());
+        GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(getActivity().getApplicationContext(),
+                        new GetTagListCompletionNotifier());
 
         AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
     }

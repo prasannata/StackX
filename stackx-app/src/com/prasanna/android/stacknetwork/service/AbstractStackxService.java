@@ -66,20 +66,15 @@ public abstract class AbstractStackxService extends Service
         return START_NOT_STICKY;
     }
 
-    public static void registerForCompleteNotification(Object object)
+    public static boolean registerForCompleteNotification(Object object)
     {
-        if (object != null)
+        if (object != null && isRunning())
         {
-            if (isRunning)
-                toNotifyObjects.add(object);
-            else
-            {
-                synchronized (object)
-                {
-                    object.notify();
-                }
-            }
+            toNotifyObjects.add(object);
+            return true;
         }
+
+        return false;
     }
 
     protected void notifyWaitingObjectsOnComplete()
