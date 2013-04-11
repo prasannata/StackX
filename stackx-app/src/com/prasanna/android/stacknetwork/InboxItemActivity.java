@@ -25,14 +25,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -52,11 +48,9 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver
 {
-    private Post post;
     private RestQueryResultReceiver receiver;
     private InboxItem item;
     private Comment comment;
-    private ContextMenu menu;
     private TextView viewQuestion;
     private String VIEW_ANSWER;
     private String HIDE_ANSWER;
@@ -124,53 +118,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
             menu.removeItem(R.id.menu_refresh);
 
         return ret & true;
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-    {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        getMenuInflater().inflate(R.menu.question_context_menu, menu);
-
-        menu.removeItem(R.id.q_ctx_comments);
-        menu.removeItem(R.id.q_ctx_menu_email);
-        menu.removeItem(R.id.q_ctx_menu_tags);
-        menu.removeItem(R.id.q_ctx_similar);
-        menu.removeItem(R.id.q_ctx_related);
-
-        this.menu = menu;
-
-        setupUserProfileInContextMenu();
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case R.id.q_ctx_menu_user_profile:
-                startUserProfileActivity();
-                return true;
-        }
-
-        return false;
-    }
-
-    private void startUserProfileActivity()
-    {
-        long userId = post != null ? post.owner.id : comment.owner.id;
-        Intent userProfileIntent = new Intent(this, UserProfileActivity.class);
-        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
-        startActivity(userProfileIntent);
-    }
-
-    private void setupUserProfileInContextMenu()
-    {
-        MenuItem userProfileMenuItem = menu.findItem(R.id.q_ctx_menu_user_profile);
-        String userName = post == null ? comment.owner.displayName : post.owner.displayName;
-        if (userProfileMenuItem != null && userName != null)
-            userProfileMenuItem.setTitle(userName + "'s profile");
     }
 
     @Override
@@ -246,10 +193,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView.setText(String.valueOf(stackXItem.score));
 
         setupOnClickForViewQuestion(item.questionId, disableViewQuestion);
-        setuOnClickForContextMenu();
 
         ArrayList<View> views = MarkdownFormatter.parse(this, stackXItem.body);
-
         if (views != null)
         {
             LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
@@ -257,20 +202,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 postBodyLayout.addView(view);
         }
 
-    }
-
-    private void setuOnClickForContextMenu()
-    {
-        ImageView imageView = (ImageView) findViewById(R.id.responseContextMenu);
-        registerForContextMenu(imageView);
-        imageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                InboxItemActivity.this.openContextMenu(v);
-            }
-        });
     }
 
     private void setupOnClickForViewMyPost(Answer answer)

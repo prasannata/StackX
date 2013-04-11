@@ -17,10 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/black"
             android:textIsSelectable="true"
             android:textSize="15sp" />
@@ -84,26 +84,16 @@
         android:textSize="12sp"
         android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/responseContextMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/postTitleLayout"
-        android:layout_centerVertical="true"
-        android:padding="6dp"
-        android:src="@drawable/control_bottom_right" />
-
     <TextView
         android:id="@+id/responseUserAndTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/responseItemScore"
+        android:layout_alignParentRight="true"
         android:layout_alignTop="@id/responseItemScore"
         android:layout_below="@id/postTitleLayout"
         android:layout_centerVertical="true"
         android:layout_margin="3dp"
-        android:layout_toLeftOf="@id/responseContextMenu"
         android:gravity="center"
         android:textColor="@color/black"
         android:textIsSelectable="true"
@@ -144,10 +134,10 @@
 
             <LinearLayout
                 android:id="@+id/postContext"
-                android:background="@drawable/rounded_border_delft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
+                android:background="@drawable/rounded_border_delft"
                 android:orientation="vertical"
                 android:visibility="gone" />
         </LinearLayout>
