@@ -36,7 +36,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:padding="5dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
                     android:src="@drawable/selector_menu_overflow" />
 
                 <TextView
@@ -44,11 +45,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:textIsSelectable="true"
                     android:layout_marginLeft="5dp"
                     android:layout_toLeftOf="@id/questionOptionsContextMenu"
                     android:layout_toRightOf="@id/scoreAndAns"
                     android:textColor="@color/black"
+                    android:textIsSelectable="true"
                     android:textSize="14sp" />
             </RelativeLayout>
 
@@ -57,11 +58,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:textIsSelectable="false"
                 android:layout_below="@id/titleAndScore"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/black"
+                android:textIsSelectable="false"
                 android:textSize="9.5sp" />
 
             <TextView
