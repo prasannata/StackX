@@ -16,7 +16,8 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher1"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:theme="@style/StackXActivityTheme" >
         <provider
             android:name="com.prasanna.android.provider.RecentQueriesProvider"
             android:authorities="com.prasanna.android.provider.RecentQueriesProvider"

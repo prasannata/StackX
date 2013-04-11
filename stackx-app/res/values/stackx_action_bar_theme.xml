@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="StackXActivityTheme" parent="@android:style/Theme.Holo">
+        <item name="android:popupMenuStyle">@style/StackXActionPopup</item>
+        <item name="android:actionBarStyle">@style/StackXActionBar</item>
+    </style>
+
+    <style name="StackXActionBar" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@color/delft</item>
+    </style>
+
+    <style name="StackXActionPopup" parent="@android:style/Widget.Holo.ListPopupWindow">
+        <item name="android:popupBackground">@color/delft</item>
+    </style>
+
+</resources>
