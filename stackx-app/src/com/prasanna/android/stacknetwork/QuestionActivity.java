@@ -507,7 +507,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         if (comments != null && !comments.isEmpty())
             showCommentFragment(postId, comments);
         else
-            Toast.makeText(this, "No comments for answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No comments", Toast.LENGTH_SHORT).show();
     }
 
     private void showCommentFragment(long postId, ArrayList<Comment> comments)
