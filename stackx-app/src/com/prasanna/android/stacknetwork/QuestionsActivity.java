@@ -449,13 +449,18 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         ft.commit();
     }
 
-    private void setupTabsForTag(int action, String tag, boolean frontPage)
+    private void setupTabsForTag(int action, String newTag, boolean frontPage)
     {
-        getActionBar().removeAllTabs();
         actionBarMenu.findItem(R.id.menu_search).setVisible(true);
         actionBarMenu.findItem(R.id.menu_refresh).setVisible(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
-        setupActionBarTabs(action, tag, frontPage);
+        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        if (tag == null || !tag.equals(newTag))
+        {
+            getActionBar().removeAllTabs();
+            setupActionBarTabs(action, newTag, frontPage);
+        }
     }
 
     private void showTagFragment()
