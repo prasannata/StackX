@@ -82,6 +82,7 @@ public class TagListFragment extends ListFragment
         private final String TAG = GetTagsAsyncTask.class.getSimpleName();
         private final AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier;
         private final Context context;
+        private final Object lock = new Object();
 
         public GetTagsAsyncTask(Context context, AsyncTaskCompletionNotifier<LinkedHashSet<Tag>> taskCompletionNotifier)
         {
@@ -95,6 +96,8 @@ public class TagListFragment extends ListFragment
         {
             try
             {
+                LogWrapper.d(TAG, "GetTagsAsyncTask...doInBackground");
+
                 LinkedHashSet<Tag> tagSet = TagDAO.getTagSet(context, OperatingSite.getSite().apiSiteParameter);
 
                 if ((tagSet == null || tagSet.isEmpty()) && TagsService.isRunning())
@@ -115,13 +118,15 @@ public class TagListFragment extends ListFragment
 
         private void waitForServiceToComplete()
         {
-            if (TagsService.registerForCompleteNotification(this))
+            if (TagsService.registerForCompleteNotification(lock))
             {
+                LogWrapper.d(TAG, "waitForServiceToComplete");
+
                 try
                 {
-                    synchronized (this)
+                    synchronized (lock)
                     {
-                        wait();
+                        wait(5000);
                     }
                 }
                 catch (InterruptedException e)
@@ -129,6 +134,8 @@ public class TagListFragment extends ListFragment
                     LogWrapper.e(TAG, e.getMessage());
                 }
             }
+
+            LogWrapper.d(TAG, "waitForServiceToComplete...exit");
         }
 
         @Override
@@ -344,39 +351,43 @@ public class TagListFragment extends ListFragment
             getListView().setTextFilterEnabled(true);
             getListView().addFooterView(getProgressBar());
             setListAdapter(listAdapter);
-            runGetTagsTask();
             activityCreated = true;
         }
     }
 
     private void runGetTagsTask()
     {
+        LogWrapper.d(getClass().getSimpleName(), "runGetTagsTask");
+
         getProgressBar().setVisibility(View.VISIBLE);
 
         GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(getActivity().getApplicationContext(),
                         new GetTagListCompletionNotifier());
 
-        AsyncTaskExecutor.getInstance().executeAsyncTask(getActivity(), fetchUserAsyncTask);
+        AsyncTaskExecutor.getInstance().executeAsyncTask(fetchUserAsyncTask);
     }
 
     @Override
     public void onResume()
     {
+        LogWrapper.d(getClass().getSimpleName(), "onResume");
+
         super.onResume();
 
         getActivity().startService(new Intent(getActivity(), TagsService.class));
 
         if (SharedPreferencesUtil.isSet(getActivity(), TAGS_DIRTY, false))
         {
+            LogWrapper.d(getClass().getSimpleName(), "tags are dirty");
             runGetTagsTask();
             SharedPreferencesUtil.setBoolean(getActivity(), TAGS_DIRTY, false);
         }
         else
         {
-            if (listAdapter != null)
-                listAdapter.notifyDataSetChanged();
-            else
+            if (tags.isEmpty())
                 runGetTagsTask();
+            else
+                LogWrapper.d(getClass().getSimpleName(), "tags already present");
         }
     }
 

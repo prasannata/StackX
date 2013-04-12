@@ -19,7 +19,8 @@
 
 package com.prasanna.android.task;
 
-import android.content.Context;
+import com.prasanna.android.utils.LogWrapper;
+
 import android.os.AsyncTask;
 
 public class AsyncTaskExecutor
@@ -35,9 +36,14 @@ public class AsyncTaskExecutor
         return INSTANCE;
     }
 
-    public <P, S, R> void executeAsyncTask(Context context, AsyncTask<P, S, R> task, P... args)
+    public <P, S, R> AsyncTask<P, S, R> executeAsyncTask(AsyncTask<P, S, R> task, P... args)
     {
         if (task != null)
-            task.execute(args);
+        {
+            LogWrapper.d(getClass().getSimpleName(), "Executing async task");
+            return task.execute(args);
+        }
+
+        return null;
     }
 }
