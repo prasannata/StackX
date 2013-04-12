@@ -19,9 +19,14 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.ClipData.Item;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowCommentsListener;
@@ -31,17 +36,17 @@ import com.prasanna.android.views.QuickActionMenu;
 public class StackXQuickActionMenu
 {
     private QuickActionMenu quickActionMenu;
-    private Activity currentActivity;
+    private Context context;
 
-    public StackXQuickActionMenu(Activity currentActivity)
+    public StackXQuickActionMenu(Context context)
     {
-        this.currentActivity = currentActivity;
-        quickActionMenu = new QuickActionMenu(currentActivity);
+        this.context = context;
+        quickActionMenu = new QuickActionMenu(context);
     }
 
-    public static StackXQuickActionMenu newMenu(Activity currentActivity)
+    public static StackXQuickActionMenu newMenu(Context context)
     {
-        return new StackXQuickActionMenu(currentActivity);
+        return new StackXQuickActionMenu(context);
     }
 
     public StackXQuickActionMenu addUserProfileItem(final long userId, final String userName)
@@ -51,7 +56,7 @@ public class StackXQuickActionMenu
             @Override
             public void onClick(View v)
             {
-                ActivityStartHelper.startUserProfileActivity(currentActivity, userId);
+                ActivityStartHelper.startUserProfileActivity(context, userId);
             }
         }));
 
@@ -60,12 +65,12 @@ public class StackXQuickActionMenu
 
     public StackXQuickActionMenu addSimilarQuestionsItem(final String title)
     {
-        quickActionMenu.addActionItem(new QuickActionItem(currentActivity, R.string.similar, new OnClickListener()
+        quickActionMenu.addActionItem(new QuickActionItem(context, R.string.similar, new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                ActivityStartHelper.startSimilarQuestionActivity(currentActivity, title);
+                ActivityStartHelper.startSimilarQuestionActivity(context, title);
             }
         }));
 
@@ -74,12 +79,12 @@ public class StackXQuickActionMenu
 
     public StackXQuickActionMenu addRelatedQuickActionItem(final long questionId)
     {
-        quickActionMenu.addActionItem(new QuickActionItem(currentActivity, R.string.related, new OnClickListener()
+        quickActionMenu.addActionItem(new QuickActionItem(context, R.string.related, new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                ActivityStartHelper.startRelatedQuestionActivity(currentActivity, questionId);
+                ActivityStartHelper.startRelatedQuestionActivity(context, questionId);
             }
         }));
         return this;
@@ -87,12 +92,12 @@ public class StackXQuickActionMenu
 
     public StackXQuickActionMenu addEmailQuickActionItem(final String subject, final String body)
     {
-        quickActionMenu.addActionItem(new QuickActionItem(currentActivity, R.string.email, new OnClickListener()
+        quickActionMenu.addActionItem(new QuickActionItem(context, R.string.email, new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                ActivityStartHelper.startEmailActivity(currentActivity, subject, body);
+                ActivityStartHelper.startEmailActivity(context, subject, body);
             }
         }));
 
@@ -101,12 +106,49 @@ public class StackXQuickActionMenu
 
     public StackXQuickActionMenu addCommentsItem(final OnShowCommentsListener onShowCommentsListener)
     {
-        quickActionMenu.addActionItem(new QuickActionItem(currentActivity, R.string.comments, new OnClickListener()
+        quickActionMenu.addActionItem(new QuickActionItem(context, R.string.comments, new OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 onShowCommentsListener.onShowComments();
+            }
+        }));
+
+        return this;
+    }
+
+    public StackXQuickActionMenu addCopyToClipboardItem(final String text)
+    {
+        quickActionMenu.addActionItem(new QuickActionItem(context, android.R.string.copy, new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipDescription clipDescription = new ClipDescription("Stackx code", new String[]
+                { ClipDescription.MIMETYPE_TEXT_PLAIN });
+                clipboard.setPrimaryClip(new ClipData(clipDescription, new Item(text)));
+                Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show();
+            }
+        }));
+
+        return this;
+    }
+
+    public StackXQuickActionMenu addItem(final int titleResId, final OnClickListener onClickListener)
+    {
+        return addItem(context.getString(titleResId), onClickListener);
+    }
+
+    public StackXQuickActionMenu addItem(final String title, final OnClickListener onClickListener)
+    {
+        quickActionMenu.addActionItem(new QuickActionItem(title, new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                onClickListener.onClick(v);
             }
         }));
 

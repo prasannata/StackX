@@ -58,6 +58,24 @@ public class SharedPreferencesUtil
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(name, defaultValue);
     }
 
+    public static void setInt(Context context, String key, int value)
+    {
+        if (context != null && key != null)
+        {
+            Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+            prefEditor.putInt(key, value);
+            prefEditor.commit();
+        }
+    }
+
+    public static int getInt(Context context, String key, int defaultValue)
+    {
+        if (context != null && key != null)
+            return PreferenceManager.getDefaultSharedPreferences(context).getInt(key, defaultValue);
+
+        return defaultValue;
+    }
+
     public static void setLong(Context context, String key, long value)
     {
         if (context != null && key != null)
@@ -327,7 +345,8 @@ public class SharedPreferencesUtil
     public static String getHumanReadableCacheSize(File cacheDir)
     {
         final int BYTE_UNIT = 1024;
-        final String[] sizeUnit = { "K", "M" };
+        final String[] sizeUnit =
+        { "K", "M" };
         long size = size(cacheDir);
 
         if (size < BYTE_UNIT)

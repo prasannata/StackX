@@ -81,6 +81,7 @@
     <string name="Add">Add</string>
     <string name="Edit">Edit</string>
     <string name="Delete">Delete</string>
+    <string name="fullscreen">Fullscreen</string>
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>
 

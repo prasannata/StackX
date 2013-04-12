@@ -19,7 +19,7 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 import com.prasanna.android.stacknetwork.QuestionsActivity;
@@ -28,7 +28,7 @@ import com.prasanna.android.stacknetwork.UserProfileActivity;
 public class ActivityStartHelper
 {
 
-    public static void startRelatedQuestionActivity(Activity currentActivity, long questionId)
+    public static void startRelatedQuestionActivity(Context currentActivity, long questionId)
     {
         Intent questionsIntent = new Intent(currentActivity, QuestionsActivity.class);
         questionsIntent.setAction(StringConstants.RELATED);
@@ -36,7 +36,7 @@ public class ActivityStartHelper
         currentActivity.startActivity(questionsIntent);
     }
 
-    public static void startSimilarQuestionActivity(Activity currentActivity, String title)
+    public static void startSimilarQuestionActivity(Context currentActivity, String title)
     {
         Intent questionsIntent = new Intent(currentActivity, QuestionsActivity.class);
         questionsIntent.setAction(StringConstants.SIMILAR);
@@ -44,13 +44,13 @@ public class ActivityStartHelper
         currentActivity.startActivity(questionsIntent);
     }
 
-    public static void startEmailActivity(Activity currentActivity, String subject, String body)
+    public static void startEmailActivity(Context currentActivity, String subject, String body)
     {
         Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
         currentActivity.startActivity(Intent.createChooser(emailIntent, ""));
     }
 
-    public static void startUserProfileActivity(Activity currentActivity, long userId)
+    public static void startUserProfileActivity(Context currentActivity, long userId)
     {
         Intent userProfileIntent = new Intent(currentActivity, UserProfileActivity.class);
         userProfileIntent.putExtra(StringConstants.USER_ID, userId);

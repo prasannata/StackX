@@ -34,16 +34,13 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipData.Item;
-import android.content.res.Configuration;
-import android.content.ClipDescription;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.Html;
@@ -55,13 +52,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.FullscreenTextActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.GetImageAsyncTask;
 import com.prasanna.android.utils.LogWrapper;
+import com.prasanna.android.views.QuickActionMenu;
 
 public class MarkdownFormatter
 {
@@ -115,7 +112,9 @@ public class MarkdownFormatter
                     dialog.dismiss();
                 }
             });
-            imageDialog.show();
+
+            if (!((Activity) context).isFinishing())
+                imageDialog.show();
         }
     };
 
@@ -188,9 +187,8 @@ public class MarkdownFormatter
                 boolean codeFound = false;
                 boolean oneLineCode = false;
 
-                LinearLayout.LayoutParams params =
-                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 while (eventType != XmlPullParser.END_DOCUMENT)
                 {
                     if (eventType == XmlPullParser.START_DOCUMENT)
@@ -344,8 +342,8 @@ public class MarkdownFormatter
     private static float getTextSize(Context context)
     {
         float textSize = 12f;
-        int screentLayoutSize =
-                        context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        int screentLayoutSize = context.getResources().getConfiguration().screenLayout
+                        & Configuration.SCREENLAYOUT_SIZE_MASK;
         if (screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_LARGE
                         || screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_XLARGE)
             textSize = 15f;
@@ -360,33 +358,9 @@ public class MarkdownFormatter
         textView.setText(text);
         textView.setTextSize(getTextSize(context));
 
-        ImageView imageView = (ImageView) codeLayout.findViewById(R.id.emailCode);
-        imageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent emailIntent = IntentUtils.createEmailIntent("", text);
-                context.startActivity(Intent.createChooser(emailIntent, ""));
-            }
-        });
-
-        imageView = (ImageView) codeLayout.findViewById(R.id.copyCode);
-        imageView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipDescription clipDescription =
-                                new ClipDescription("Stackx code", new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN });
-                clipboard.setPrimaryClip(new ClipData(clipDescription, new Item(text)));
-                Toast.makeText(context, "Code copied", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        imageView = (ImageView) codeLayout.findViewById(R.id.fullScreenImg);
-        imageView.setOnClickListener(new View.OnClickListener()
+        StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(context).addEmailQuickActionItem(
+                        "Code sample from StackX", text).addCopyToClipboardItem(text);
+        final QuickActionMenu actionMenu = quickActionMenu.addItem(R.string.fullscreen, new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -394,6 +368,16 @@ public class MarkdownFormatter
                 Intent intent = new Intent(context, FullscreenTextActivity.class);
                 intent.putExtra(StringConstants.TEXT, textView.getText());
                 context.startActivity(intent);
+            }
+        }).build();
+
+        ImageView imageView = (ImageView) codeLayout.findViewById(R.id.codeQuickActionMenu);
+        imageView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                actionMenu.show(v);
             }
         });
 

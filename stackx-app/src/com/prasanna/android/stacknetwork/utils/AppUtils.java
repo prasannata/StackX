@@ -48,7 +48,7 @@ import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 public class AppUtils
 {
     private static String userAccessToken;
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     public static void setAccessToken(Context context, String accessToken)
     {
@@ -185,8 +185,8 @@ public class AppUtils
             return false;
 
         long lastCommentWrite = SharedPreferencesUtil.getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
-        long minSecondsBetweenWrite =
-                        SharedPreferencesUtil.getLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+        long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(context,
+                        WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
         return ((System.currentTimeMillis() - lastCommentWrite) / 1000 > minSecondsBetweenWrite);
     }
 
@@ -312,9 +312,9 @@ public class AppUtils
 
     public static boolean isNetworkAvailable(Context context)
     {
-        if(context == null)
+        if (context == null)
             return false;
-        
+
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
     }
