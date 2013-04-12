@@ -55,7 +55,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private boolean showingSearchFilters = false;
     private PopupWindow popupWindow;
     private SearchView searchView;
-    
+
     protected Menu actionBarMenu;
 
     protected abstract void refresh();
@@ -216,9 +216,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private void setupPopupForSearchOptions()
     {
         RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
-        popupWindow =
-                        new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
-                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow = new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
 
         setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
                         SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
@@ -256,7 +255,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
             }
         });
 
-        AsyncTaskExecutor.getInstance().executeAsyncTask(this, fetchImageAsyncTask, OperatingSite.getSite().iconUrl);
+        AsyncTaskExecutor.getInstance().executeAsyncTask(fetchImageAsyncTask, OperatingSite.getSite().iconUrl);
     }
 
     @Override
@@ -298,10 +297,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     private void startSiteListActivity()
     {
-        Intent siteListIntent = new Intent(this, StackNetworkListActivity.class);
-        siteListIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        siteListIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(siteListIntent);
+        startActivity(new Intent(this, StackNetworkListActivity.class));
     }
 
     private void showSearchFilterOptions(MenuItem item)
