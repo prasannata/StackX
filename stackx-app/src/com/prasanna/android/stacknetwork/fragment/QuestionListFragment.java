@@ -73,7 +73,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         fragment.sort = sort;
         fragment.action = action;
         fragment.tag = tag;
-
         return fragment;
     }
 
@@ -238,10 +237,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
-
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_SIMILAR);
             intent.putExtra(StringConstants.TITLE, getBundle().getString(StringConstants.TITLE));
-
             startIntentService();
         }
     }
@@ -251,10 +248,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
-
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
             intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
-
             startIntentService();
         }
     }
@@ -264,10 +259,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent = getIntentForService(QuestionsIntentService.class, null);
         if (intent != null)
         {
-
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
             intent.putExtra(StringConstants.TAG, tag);
-
             startIntentService();
         }
     }
@@ -280,7 +273,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
             intent.putExtra(StringConstants.TAG, tag);
-
             startIntentService();
         }
     }
@@ -297,7 +289,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent = getIntentForService(QuestionsIntentService.class, null);
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
         intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
-
         startIntentService();
     }
 
