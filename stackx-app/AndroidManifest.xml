@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -39,7 +40,24 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name=".receiver.OnBootAlarmBroadcastReceiver"
+            android:process=":remote" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.PackageUpgradeBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+        <receiver
             android:name=".receiver.InboxRefreshAlarmBroadcastReceiver"
+            android:process=":remote" />
+        <receiver
+            android:name=".receiver.AccountSyncAlarmBroadcastReceiver"
             android:process=":remote" />
         <receiver android:name=".receiver.NewMsgNotificationReceiver" >
             <intent-filter>

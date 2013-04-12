@@ -215,37 +215,22 @@ public class UserIntentService extends AbstractIntentService
 
     private HashMap<String, Account> getMyAccounts()
     {
-        UserAccountsDAO userAccountsDao = new UserAccountsDAO(getApplicationContext());
-        try
+        long accountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
+        if (accountId != -1)
         {
-            long currentAccountId =
-                            SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
-            if (currentAccountId != -1)
-            {
-                userAccountsDao.open();
-                if (AppUtils.aHalfAnHourSince(userAccountsDao.getLastUpdateTime()))
-                    return userService.getMyAccount();
-                else
-                {
-                    ArrayList<Account> accounts = userAccountsDao.getAccounts(currentAccountId);
-                    HashMap<String, Account> accountsMap = new HashMap<String, Account>();
-                    if (accounts != null)
-                    {
-                        for (Account account : accounts)
-                            accountsMap.put(account.siteUrl, account);
-                    }
+            ArrayList<Account> accounts = UserAccountsDAO.get(getApplicationContext(), accountId);
 
-                    return accountsMap;
-                }
+            if (accounts == null)
+                return userService.getMyAccount();
+
+            HashMap<String, Account> accountsMap = new HashMap<String, Account>();
+            if (accounts != null)
+            {
+                for (Account account : accounts)
+                    accountsMap.put(account.siteUrl, account);
             }
-        }
-        catch (SQLException e)
-        {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        finally
-        {
-            userAccountsDao.close();
+
+            return accountsMap;
         }
 
         return null;
@@ -306,14 +291,13 @@ public class UserIntentService extends AbstractIntentService
 
         if (linkAccountsMap != null && linkSitesMap != null)
         {
-            long currentAccountId =
-                            SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
-            if (currentAccountId == -1 && !linkAccountsMap.isEmpty())
+            long accountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
+            if (accountId == -1 && !linkAccountsMap.isEmpty())
             {
-                currentAccountId = linkAccountsMap.values().iterator().next().id;
+                accountId = linkAccountsMap.values().iterator().next().id;
 
-                LogWrapper.d(TAG, "Setting account id in shared preferences: " + currentAccountId);
-                SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, currentAccountId);
+                LogWrapper.d(TAG, "Setting account id in shared preferences: " + accountId);
+                SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, accountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNTS_LAST_UPDATED,
                                 System.currentTimeMillis());
                 DbRequestThreadExecutor.persistAccounts(getApplicationContext(),

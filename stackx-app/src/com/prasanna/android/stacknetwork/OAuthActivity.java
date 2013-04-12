@@ -67,8 +67,10 @@ public class OAuthActivity extends Activity
             {
                 deleteStoredTags();
                 AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
+                AlarmUtils.cancelPeriodicAccountSync(getApplicationContext());
 
                 cacheAccessToken(url);
+                AlarmUtils.activatePeriodicAccountSync(getApplicationContext());
                 startSiteListActivity(view);
                 OAuthActivity.this.finish();
             }

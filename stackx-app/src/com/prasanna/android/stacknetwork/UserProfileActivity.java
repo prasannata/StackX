@@ -24,6 +24,7 @@ import android.app.FragmentManager;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.view.Window;
 
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
@@ -34,7 +35,8 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity
 {
-    private static final String[] PAGES = { "Profile", "Questions", "Answers", "Favorites" };
+    private static final String[] PAGES =
+    { "Profile", "Questions", "Answers", "Favorites" };
 
     private ProfileViewPageAdapter profileViewPageAdapter;
     private ViewPager viewPager;
@@ -81,6 +83,8 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
     {
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.viewpager_title_indicator);

@@ -39,6 +39,7 @@ import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
+import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
@@ -130,16 +131,17 @@ public class LogoutActivity extends Activity
             editor.remove(StringConstants.ACCESS_TOKEN);
             editor.commit();
 
+            AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
+            AlarmUtils.cancelPeriodicAccountSync(getApplicationContext());
+
             AppUtils.clearSharedPreferences(getApplicationContext());
             AppUtils.setFirstRunComplete(getApplicationContext());
-            SiteDAO.deleteAll(getApplicationContext());
-            TagDAO.purge(getApplicationContext());
-            WritePermissionDAO.deleteAll(getApplicationContext());
+
+            clearDatabase();
+
             SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
-            ProfileDAO.purge(getApplicationContext());
-            CookieSyncManager.createInstance(getApplicationContext());
-            CookieManager cookieManager = CookieManager.getInstance();
-            cookieManager.removeAllCookie();
+
+            clearCookies();
             startLoginActivity();
         }
         else if (error != null && error.id > 0)
@@ -152,5 +154,20 @@ public class LogoutActivity extends Activity
             LogWrapper.d(TAG, "Logout failed for unknown reason");
             finish();
         }
+    }
+
+    private void clearDatabase()
+    {
+        SiteDAO.deleteAll(getApplicationContext());
+        TagDAO.purge(getApplicationContext());
+        WritePermissionDAO.deleteAll(getApplicationContext());
+        ProfileDAO.purge(getApplicationContext());
+    }
+
+    private void clearCookies()
+    {
+        CookieSyncManager.createInstance(getApplicationContext());
+        CookieManager cookieManager = CookieManager.getInstance();
+        cookieManager.removeAllCookie();
     }
 }

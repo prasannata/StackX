@@ -25,12 +25,23 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.receiver.AccountSyncAlarmBroadcastReceiver;
 import com.prasanna.android.stacknetwork.receiver.InboxRefreshAlarmBroadcastReceiver;
 import com.prasanna.android.utils.LogWrapper;
 
 public class AlarmUtils
 {
     private static final String TAG = AlarmUtils.class.getSimpleName();
+
+    public static void activatePeriodicAccountSync(Context context)
+    {
+        createRepeatingAlarm(context, AccountSyncAlarmBroadcastReceiver.class, IntegerConstants.MS_IN_HALF_AN_HOUR, 0);
+    }
+
+    public static void cancelPeriodicAccountSync(Context context)
+    {
+        cancelAlarm(context, AccountSyncAlarmBroadcastReceiver.class, 0);
+    }
 
     public static void setInboxRefreshAlarm(Context context)
     {
