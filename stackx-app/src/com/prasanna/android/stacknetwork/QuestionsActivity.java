@@ -154,28 +154,46 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     {
         String query = getIntent().getStringExtra(SearchManager.QUERY);
         saveSearchQuery(query);
-        replaceFragment(QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null), null, false);
+
+        String fragmentTag = "search -" + query;
+        QuestionListFragment questionListFragment = getFragment(fragmentTag);
+
+        if (questionListFragment == null)
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null);
+
+        replaceFragment(questionListFragment, fragmentTag, false);
     }
 
     private void showSimilarQuestionListFragment()
     {
         String title = getIntent().getStringExtra(StringConstants.TITLE);
+        String fragmentTag = StringConstants.SIMILAR + "-" + title.hashCode();
 
         getActionBar().setTitle(getString(R.string.similar) + " to " + title);
 
-        QuestionListFragment newFragment =
-                        QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null, null);
-        newFragment.getBundle().putString(StringConstants.TITLE, title);
-        replaceFragment(newFragment, StringConstants.SIMILAR + "-" + title.hashCode(), false);
+        QuestionListFragment questionListFragment = getFragment(fragmentTag);
+
+        if (questionListFragment == null)
+        {
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null, null);
+            questionListFragment.getBundle().putString(StringConstants.TITLE, title);
+        }
+
+        replaceFragment(questionListFragment, fragmentTag, false);
     }
 
     private void showRelatedQuestionListFragment()
     {
         long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
-        QuestionListFragment newFragment =
-                        QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null, null);
-        newFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-        replaceFragment(newFragment, QuestionsIntentService.GET_RELATED + "-" + questionId, false);
+        String fragmentTag = QuestionsIntentService.GET_RELATED + "-" + questionId;
+
+        QuestionListFragment questionListFragment = getFragment(fragmentTag);
+        if (questionListFragment == null)
+        {
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null, null);
+            questionListFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+        }
+        replaceFragment(questionListFragment, fragmentTag, false);
     }
 
     private void showTagQuestionListFragment()
@@ -209,9 +227,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         }
         else
         {
-            HashMap<String, SearchCriteria> customTabs =
-                            DbRequestThreadExecutor.getSearchesMarkedForTab(getApplicationContext(),
-                                            OperatingSite.getSite().apiSiteParameter);
+            HashMap<String, SearchCriteria> customTabs = DbRequestThreadExecutor.getSearchesMarkedForTab(
+                            getApplicationContext(), OperatingSite.getSite().apiSiteParameter);
 
             if (customTabs != null)
             {
@@ -230,8 +247,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void saveSearchQuery(String query)
     {
-        SearchRecentSuggestions suggestions =
-                        new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY, RecentQueriesProvider.MODE);
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
+                        RecentQueriesProvider.MODE);
         suggestions.saveRecentQuery(query, null);
     }
 
@@ -360,8 +377,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     @Override
     public void refresh()
     {
-        QuestionListFragment questionsFragment =
-                        (QuestionListFragment) getFragmentManager().findFragmentById(R.id.fragmentContainer);
+        QuestionListFragment questionsFragment = (QuestionListFragment) getFragmentManager().findFragmentById(
+                        R.id.fragmentContainer);
         questionsFragment.refresh();
     }
 
