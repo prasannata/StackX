@@ -3,8 +3,9 @@
     android:id="@+id/siteListRow"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/rounded_border_grey"
-    android:orientation="horizontal" >
+    android:background="@color/white"
+    android:orientation="horizontal"
+    android:padding="7dp" >
 
     <ImageView
         android:id="@+id/isDefaultSite"
