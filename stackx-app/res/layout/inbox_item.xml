@@ -1,70 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_border_grey_min_padding"
-    android:orientation="vertical" >
+    android:background="@android:color/transparent"
+    android:paddingBottom="2dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingTop="2dp" >
 
-    <TextView
-        android:id="@+id/itemTitle"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="2dp"
-        android:textColor="@color/black"
-        android:textSize="12sp" />
+        android:background="@drawable/selector_list_item"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/itemBodyPreview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/itemTitle"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="2dp"
-        android:textColor="@color/black"
-        android:textSize="10sp" />
+        <TextView
+            android:id="@+id/itemTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="2dp"
+            android:padding="2dp"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
 
-    <TextView
-        android:id="@+id/itemSite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/itemBodyPreview"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginTop="5dp"
-        android:gravity="right"
-        android:textColor="@color/delft"
-        android:textSize="9sp" />
+        <TextView
+            android:id="@+id/itemBodyPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/itemTitle"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/black"
+            android:textSize="10sp" />
 
-    <TextView
-        android:id="@+id/itemCreationTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/itemSite"
-        android:layout_below="@id/itemBodyPreview"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_toRightOf="@id/itemSite"
-        android:gravity="right"
-        android:textColor="@color/delft"
-        android:textSize="9sp" />
+        <TextView
+            android:id="@+id/itemSite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/itemBodyPreview"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="5dp"
+            android:gravity="right"
+            android:textColor="@color/delft"
+            android:textSize="9sp" />
 
-    <TextView
-        android:id="@+id/itemType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/itemSite"
-        android:layout_below="@id/itemBodyPreview"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_toRightOf="@id/itemSite"
-        android:gravity="right"
-        android:textColor="@color/delft"
-        android:textSize="9sp" />
+        <TextView
+            android:id="@+id/itemCreationTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/itemSite"
+            android:layout_below="@id/itemBodyPreview"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_toRightOf="@id/itemSite"
+            android:gravity="right"
+            android:textColor="@color/delft"
+            android:textSize="9sp" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/itemType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/itemSite"
+            android:layout_below="@id/itemBodyPreview"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_toRightOf="@id/itemSite"
+            android:gravity="right"
+            android:textColor="@color/delft"
+            android:textSize="9sp" />
+    </RelativeLayout>
+
+</FrameLayout>
