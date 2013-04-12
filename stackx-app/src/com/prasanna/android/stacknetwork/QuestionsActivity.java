@@ -83,7 +83,8 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         public void onTabSelected(Tab tab, FragmentTransaction ft)
         {
             Fragment existingFragment = getFragmentManager().findFragmentByTag(fragment.fragmentTag);
-
+            ft.setCustomAnimations(R.anim.slide_in_left, 0);
+            
             if (existingFragment == null)
                 ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
             else
@@ -92,6 +93,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
         public void onTabUnselected(Tab tab, FragmentTransaction ft)
         {
+            ft.setCustomAnimations(0, R.anim.slide_out_left);
             ft.remove(fragment);
         }
 
@@ -466,7 +468,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showTagFragment()
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+        ft.setCustomAnimations(R.anim.slide_in_left, 0);
         ft.show(tagListFragment);
         ft.commit();
     }
@@ -474,8 +476,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void hideTagFragment()
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(0, R.anim.slide_out_left);
         ft.hide(tagListFragment);
         ft.commit();
+        getFragmentManager().executePendingTransactions();
     }
 
     private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack)
