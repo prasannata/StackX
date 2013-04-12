@@ -3,7 +3,7 @@
     android:id="@+id/siteListRow"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/white"
+    android:background="@drawable/selector_highlight"
     android:orientation="horizontal"
     android:padding="7dp" >
 
