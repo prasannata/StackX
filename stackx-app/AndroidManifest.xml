@@ -39,9 +39,7 @@
                 <action android:name="android.intent.action.BATTERY_OKAY" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receiver.OnBootAlarmBroadcastReceiver"
-            android:process=":remote" >
+        <receiver android:name=".receiver.OnBootAlarmBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -53,13 +51,11 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".receiver.InboxRefreshAlarmBroadcastReceiver" />
+        <receiver android:name=".receiver.AccountSyncAlarmBroadcastReceiver" />
         <receiver
-            android:name=".receiver.InboxRefreshAlarmBroadcastReceiver"
-            android:process=":remote" />
-        <receiver
-            android:name=".receiver.AccountSyncAlarmBroadcastReceiver"
-            android:process=":remote" />
-        <receiver android:name=".receiver.NewMsgNotificationReceiver" >
+            android:name=".receiver.NewMsgNotificationReceiver"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="com.prasanna.stacknetwork.newMsg" />
 
