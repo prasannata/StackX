@@ -59,6 +59,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     private ImageView ctxMenuImage;
     private StackXQuickActionMenu quickActionMenu;
     private OnShowCommentsListener onShowCommentsListener;
+    private View questionTitleLayout;
 
     private String STR_VIEWS;
     private String STR_COMMENTS;
@@ -97,6 +98,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     private void createView(LayoutInflater inflater)
     {
         parentLayout = (FrameLayout) inflater.inflate(R.layout.question, null);
+        questionTitleLayout = parentLayout.findViewById(R.id.questionTitleLayout);
         ctxMenuImage = (ImageView) parentLayout.findViewById(R.id.questionOptionsContextMenu);
         ctxMenuImage.setOnClickListener(new View.OnClickListener()
         {
@@ -149,6 +151,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     {
         if (question != null)
         {
+            if (questionTitleLayout.getVisibility() == View.INVISIBLE)
+                questionTitleLayout.setVisibility(View.VISIBLE);
+
             if (quickActionMenu == null)
                 quickActionMenu = initQuickActionMenu();
 

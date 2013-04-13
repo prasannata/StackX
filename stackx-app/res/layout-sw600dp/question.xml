@@ -15,7 +15,8 @@
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:layout_marginTop="4dp"
-            android:clickable="true" >
+            android:clickable="true"
+            android:visibility="invisible" >
 
             <RelativeLayout
                 android:id="@+id/titleAndScore"
