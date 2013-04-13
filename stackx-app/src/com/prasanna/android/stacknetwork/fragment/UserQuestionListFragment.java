@@ -32,6 +32,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.QuickActionMenu;
@@ -63,8 +64,9 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                            new ArrayList<Question>(), this);
+            itemListAdapter =
+                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                                            new ArrayList<Question>(), this);
         }
 
         return itemsContainer;
@@ -124,6 +126,14 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
 
             startService(intent);
         }
+    }
+
+    @Override
+    protected void setValuesForQuestionView(QuestionViewHolder holder, Question question)
+    {
+        super.setValuesForQuestionView(holder, question);
+        
+        holder.owner.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate));
     }
 
     @Override

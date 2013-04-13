@@ -118,7 +118,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             holder = (QuestionViewHolder) questionRowLayout.getTag();
 
         questionRowLayout.setId((int) question.id);
-        setupViewForQuestionMetadata(holder, question);
+        setValuesForQuestionView(holder, question);
         TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags);
         setupQuickActionMenu(question, holder);
 
@@ -147,7 +147,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
                         .addEmailQuickActionItem(question.title, question.body).build();
     }
 
-    private void setupViewForQuestionMetadata(QuestionViewHolder holder, Question question)
+    protected void setValuesForQuestionView(QuestionViewHolder holder, Question question)
     {
         holder.score.setText(AppUtils.formatNumber(question.score));
 
