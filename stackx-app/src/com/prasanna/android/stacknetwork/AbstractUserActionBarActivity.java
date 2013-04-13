@@ -41,6 +41,7 @@ import android.widget.SearchView;
 
 import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -55,6 +56,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private boolean showingSearchFilters = false;
     private PopupWindow popupWindow;
     private SearchView searchView;
+    private Site site;
 
     protected Menu actionBarMenu;
 
@@ -67,11 +69,11 @@ public abstract class AbstractUserActionBarActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        refreshOperatingSite();
+        loadDefaultSite();
         initializeActionBar();
     }
 
-    private void refreshOperatingSite()
+    private void loadDefaultSite()
     {
         if (OperatingSite.getSite() == null)
         {
@@ -83,6 +85,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 finish();
             }
         }
+        
+        site = OperatingSite.getSite();
     }
 
     private void initializeActionBar()
@@ -115,7 +119,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
         super.onResume();
 
         AppUtils.loadAccessToken(getApplicationContext());
-        refreshOperatingSite();
+        OperatingSite.setSite(site);
     }
 
     @Override
@@ -216,8 +220,9 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private void setupPopupForSearchOptions()
     {
         RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
-        popupWindow = new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow =
+                        new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
+                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
 
         setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
                         SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
