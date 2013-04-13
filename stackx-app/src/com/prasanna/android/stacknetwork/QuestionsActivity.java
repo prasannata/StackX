@@ -453,10 +453,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     private void setupTabsForTag(int action, String newTag, boolean frontPage)
     {
-        actionBarMenu.findItem(R.id.menu_search).setVisible(true);
-        actionBarMenu.findItem(R.id.menu_refresh).setVisible(true);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        toggleDisplayForTags(false);
 
         if (tag == null || !tag.equals(newTag))
         {
