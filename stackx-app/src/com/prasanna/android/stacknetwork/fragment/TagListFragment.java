@@ -96,8 +96,6 @@ public class TagListFragment extends ListFragment
         {
             try
             {
-                LogWrapper.d(TAG, "GetTagsAsyncTask...doInBackground");
-
                 LinkedHashSet<Tag> tagSet = TagDAO.getTagSet(context, OperatingSite.getSite().apiSiteParameter);
 
                 if ((tagSet == null || tagSet.isEmpty()) && TagsService.isRunning())
@@ -120,8 +118,6 @@ public class TagListFragment extends ListFragment
         {
             if (TagsService.registerForCompleteNotification(lock))
             {
-                LogWrapper.d(TAG, "waitForServiceToComplete");
-
                 try
                 {
                     synchronized (lock)
@@ -134,8 +130,6 @@ public class TagListFragment extends ListFragment
                     LogWrapper.e(TAG, e.getMessage());
                 }
             }
-
-            LogWrapper.d(TAG, "waitForServiceToComplete...exit");
         }
 
         @Override
@@ -357,8 +351,6 @@ public class TagListFragment extends ListFragment
 
     private void runGetTagsTask()
     {
-        LogWrapper.d(getClass().getSimpleName(), "runGetTagsTask");
-
         getProgressBar().setVisibility(View.VISIBLE);
 
         GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(getActivity().getApplicationContext(),
