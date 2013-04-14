@@ -232,25 +232,18 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
     public void displayBody(String text)
     {
-        LogWrapper.d(TAG, "displayBody");
         if (text != null && parentLayout != null)
         {
-            LogWrapper.d(TAG, "Question body is not null");
             question.body = text;
-
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
 
-            LogWrapper.d(TAG, "Fragment is visible: " + isVisible());
-
-            if (isVisible() && questionBodyLayout != null)
+            if (isAdded() && questionBodyLayout != null)
             {
-                LogWrapper.d(TAG, "Fragment is visible");
                 questionBodyLayout.removeAllViews();
                 ArrayList<View> views = MarkdownFormatter.parse(getActivity(), question.body);
 
                 if (views != null)
                 {
-                    LogWrapper.d(TAG, "Adding body text views");
                     for (final View questionBodyTextView : views)
                         questionBodyLayout.addView(questionBodyTextView);
                 }
