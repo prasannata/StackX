@@ -106,7 +106,7 @@
         android:layout_gravity="bottom|left"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="7dp"
-        android:background="@drawable/rounded_border_grey_min_padding"
+        android:background="@drawable/selector_list_item"
         android:orientation="horizontal"
         android:visibility="gone"
         android:weightSum="1" >
