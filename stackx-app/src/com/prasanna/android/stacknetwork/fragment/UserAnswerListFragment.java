@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -38,9 +39,11 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.QuickActionMenu;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
@@ -48,7 +51,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     private static final String TAG = UserAnswerListFragment.class.getSimpleName();
     private static final int ANSWER_PREVIEW_LEN = 200;
     private static final String ANS_CONTNUES = "...";
-    private static final String MULTIPLE_NEW_LINES_AT_END = "[\\n]+$";
+    private static final String MULTIPLE_NEW_LINES_AT_END = "[\\s]+$";
 
     private int page = 1;
     private Intent intent;
@@ -59,7 +62,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         TextView answerScore;
         TextView answerTime;
         TextView answerBody;
-        ImageView acceptedAnswerCue;
         ImageView quickActionMenuImg;
     }
 
@@ -69,8 +71,9 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
-                            new ArrayList<Answer>(), this);
+            itemListAdapter =
+                            new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
+                                            new ArrayList<Answer>(), this);
 
             itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
         }
@@ -142,7 +145,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         {
             convertView = getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
             viewHolder = new ViewHolder();
-            viewHolder.acceptedAnswerCue = (ImageView) convertView.findViewById(R.id.acceptedAnswer);
             viewHolder.itemTitle = (TextView) convertView.findViewById(R.id.itemTitle);
             viewHolder.answerScore = (TextView) convertView.findViewById(R.id.answerScore);
             viewHolder.answerTime = (TextView) convertView.findViewById(R.id.answerTime);
@@ -153,19 +155,20 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         else
             viewHolder = (ViewHolder) convertView.getTag();
 
-        if (answer.accepted)
-            viewHolder.acceptedAnswerCue.setVisibility(View.VISIBLE);
-        else
-            viewHolder.acceptedAnswerCue.setVisibility(View.GONE);
-
         viewHolder.itemTitle.setText(Html.fromHtml(answer.title));
-        viewHolder.answerScore.setText("Answer Score: " + answer.score);
+        viewHolder.answerScore.setText(AppUtils.formatNumber(answer.score));
+        if (answer.accepted)
+            viewHolder.answerScore.setTextColor(getResources().getColor(R.color.ledGreen));
+        else
+            viewHolder.answerScore.setTextColor(Color.DKGRAY);
         viewHolder.answerTime.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
 
         if (answer.body != null)
         {
-            String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "\n");
+            String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "");
+            answerBody = answerBody.replaceAll("\\<*p>", "");
 
+            LogWrapper.d(TAG, answerBody);
             if (answerBody.length() > ANSWER_PREVIEW_LEN)
             {
                 answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
@@ -195,7 +198,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
 
     protected QuickActionMenu initQuickActionMenu(final Answer answer)
     {
-        return new StackXQuickActionMenu(getActivity()).addRelatedQuickActionItem(answer.questionId)
+        return new StackXQuickActionMenu(getActivity()).addSimilarQuestionsItem(answer.title)
+                        .addRelatedQuickActionItem(answer.questionId)
                         .addEmailQuickActionItem(answer.title, answer.body).build();
     }
 
