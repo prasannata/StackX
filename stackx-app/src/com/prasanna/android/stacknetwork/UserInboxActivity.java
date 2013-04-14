@@ -94,7 +94,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    protected void setActionBarHomeIcon()
+    protected void setActionBarHomeIcon(String site, String siteIconUrl)
     {
         getActionBar().setIcon(R.drawable.ic_launcher1);
         getActionBar().setHomeButtonEnabled(true);
@@ -214,18 +214,17 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
             inboxItemViewHolder.creationTime = (TextView) convertView.findViewById(R.id.itemCreationTime);
             inboxItemViewHolder.itemType = (TextView) convertView.findViewById(R.id.itemType);
             inboxItemViewHolder.itemSite = (TextView) convertView.findViewById(R.id.itemSite);
-
             convertView.setTag(inboxItemViewHolder);
         }
         else
             inboxItemViewHolder = (InboxItemViewHolder) convertView.getTag();
 
         inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
-        if (item.body != null)
-            inboxItemViewHolder.body.setText(Html.fromHtml(item.body));
         inboxItemViewHolder.creationTime.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
         inboxItemViewHolder.itemType.setText(item.itemType.getRepr());
         inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
+        if (item.body != null)
+            inboxItemViewHolder.body.setText(Html.fromHtml(item.body));
 
         if (item.site != null)
             inboxItemViewHolder.itemSite.setText(item.site.name);

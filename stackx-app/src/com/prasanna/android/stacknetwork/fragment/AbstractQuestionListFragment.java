@@ -39,6 +39,7 @@ import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.TagsViewBuilder;
@@ -83,6 +84,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
             displayQuestionIntent.setAction(StringConstants.QUESTION);
             displayQuestionIntent.putExtra(StringConstants.QUESTION, itemListAdapter.getItem(position));
             displayQuestionIntent.putExtra(StringConstants.CACHED, false);
+            displayQuestionIntent.putExtra(StringConstants.SITE, OperatingSite.getSite().apiSiteParameter);
             startActivity(displayQuestionIntent);
         }
     }
