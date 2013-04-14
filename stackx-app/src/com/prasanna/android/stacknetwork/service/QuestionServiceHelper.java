@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
@@ -133,18 +134,25 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     private void getCommentsForAnswers(ArrayList<Answer> answers)
     {
-        StringBuilder stringBuilder = new StringBuilder();
-        HashMap<Long, Answer> idAnswerMap = new HashMap<Long, Answer>();
-
-        for (Answer answer : answers)
+        try
         {
-            stringBuilder.append(answer.id).append(";");
-            idAnswerMap.put(answer.id, answer);
+            StringBuilder stringBuilder = new StringBuilder();
+            HashMap<Long, Answer> idAnswerMap = new HashMap<Long, Answer>();
+
+            for (Answer answer : answers)
+            {
+                stringBuilder.append(answer.id).append(";");
+                idAnswerMap.put(answer.id, answer);
+            }
+
+            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+
+            getCommensAndUpdateAnswer(stringBuilder.toString(), idAnswerMap);
         }
-
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-
-        getCommensAndUpdateAnswer(stringBuilder.toString(), idAnswerMap);
+        catch (AbstractHttpException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
+        }
     }
 
     private void getCommensAndUpdateAnswer(String answerIds, HashMap<Long, Answer> idAnswerMap)

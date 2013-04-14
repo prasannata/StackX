@@ -150,12 +150,19 @@ public class QuestionDetailsIntentService extends AbstractIntentService
 
     private void getCommentsAndSend(String site, ResultReceiver receiver, Question question)
     {
-        StackXPage<Comment> commentsPage = questionService.getComments(StringConstants.QUESTIONS, site,
-                        String.valueOf(question.id), 1);
-        if (commentsPage != null)
+        try
         {
-            question.comments = commentsPage.items;
-            sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
+            StackXPage<Comment> commentsPage =
+                            questionService.getComments(StringConstants.QUESTIONS, site, String.valueOf(question.id), 1);
+            if (commentsPage != null)
+            {
+                question.comments = commentsPage.items;
+                sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
+            }
+        }
+        catch (AbstractHttpException e)
+        {
+            LogWrapper.e(TAG, e.getMessage());
         }
     }
 
