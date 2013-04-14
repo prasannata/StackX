@@ -41,9 +41,9 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.QuickActionMenu;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
@@ -208,6 +208,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
         Intent intent = new Intent(getActivity(), QuestionActivity.class);
         intent.setAction(StringConstants.QUESTION_ID);
         intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
+        intent.putExtra(StringConstants.SITE, OperatingSite.getSite().apiSiteParameter);
         startActivity(intent);
     }
 

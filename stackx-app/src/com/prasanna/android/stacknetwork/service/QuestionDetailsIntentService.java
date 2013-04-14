@@ -60,7 +60,6 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     @Override
     protected void onHandleIntent(Intent intent)
     {
-        LogWrapper.d(TAG, "Action: " + intent.getAction());
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
         try
