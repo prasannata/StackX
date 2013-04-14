@@ -17,10 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginBottom="8dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/black"
             android:textIsSelectable="true"
             android:textSize="18sp" />
@@ -44,7 +44,7 @@
             android:layout_alignParentRight="true"
             android:layout_below="@id/postTitle"
             android:layout_marginRight="2dp"
-            android:background="@drawable/rounded_border_delft"
+            android:background="@drawable/selector_list_item"
             android:clickable="false"
             android:enabled="false"
             android:gravity="left"
@@ -60,7 +60,7 @@
             android:layout_below="@id/postTitle"
             android:layout_marginRight="2dp"
             android:layout_toLeftOf="@id/viewQuestion"
-            android:background="@drawable/rounded_border_delft"
+            android:background="@drawable/selector_list_item"
             android:gravity="left"
             android:text="@string/viewAnswer"
             android:textColor="@color/black"
@@ -144,10 +144,10 @@
 
             <LinearLayout
                 android:id="@+id/postContext"
-                android:background="@drawable/rounded_border_delft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
+                android:background="@drawable/rounded_border_delft"
                 android:orientation="vertical"
                 android:visibility="gone" />
         </LinearLayout>
