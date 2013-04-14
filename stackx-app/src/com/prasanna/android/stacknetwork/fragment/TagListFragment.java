@@ -53,7 +53,6 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
-import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.utils.LogWrapper;
 
 public class TagListFragment extends ListFragment
@@ -231,8 +230,8 @@ public class TagListFragment extends ListFragment
         {
             if (convertView == null)
             {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(
-                                Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater =
+                                (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.tag_list_item, null);
             }
 
@@ -353,10 +352,10 @@ public class TagListFragment extends ListFragment
     {
         getProgressBar().setVisibility(View.VISIBLE);
 
-        GetTagsAsyncTask fetchUserAsyncTask = new GetTagsAsyncTask(getActivity().getApplicationContext(),
-                        new GetTagListCompletionNotifier());
+        GetTagsAsyncTask fetchUserAsyncTask =
+                        new GetTagsAsyncTask(getActivity().getApplicationContext(), new GetTagListCompletionNotifier());
 
-        AsyncTaskExecutor.getInstance().executeAsyncTask(fetchUserAsyncTask);
+        fetchUserAsyncTask.execute();
     }
 
     @Override

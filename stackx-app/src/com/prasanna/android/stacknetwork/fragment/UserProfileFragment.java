@@ -56,6 +56,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -248,8 +249,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             ((TextView) profileHomeLayout.findViewById(R.id.writePermissionsInfo)).setText(Html
                             .fromHtml(getString(R.string.writePermissionsInfo)));
 
-            HashMap<ObjectType, WritePermission> permissions = WritePermissionDAO.getPermissions(getActivity(),
-                            OperatingSite.getSite().apiSiteParameter);
+            HashMap<ObjectType, WritePermission> permissions =
+                            WritePermissionDAO.getPermissions(getActivity(), OperatingSite.getSite().apiSiteParameter);
             WritePermission writePermission = permissions.get(ObjectType.COMMENT);
 
             if (writePermission != null)
@@ -282,22 +283,23 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         final ProgressBar avatarProgressBar = (ProgressBar) profileHomeLayout.findViewById(R.id.getAvatarProgressBar);
         avatarProgressBar.setVisibility(View.VISIBLE);
 
-        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
-        {
-            @Override
-            public void notifyOnCompletion(Bitmap result)
-            {
-                displayAvatar(result);
-                avatarProgressBar.setVisibility(View.GONE);
+        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl =
+                        new AsyncTaskCompletionNotifier<Bitmap>()
+                        {
+                            @Override
+                            public void notifyOnCompletion(Bitmap result)
+                            {
+                                displayAvatar(result);
+                                avatarProgressBar.setVisibility(View.GONE);
 
-                if (me)
-                    new PersistMyAvatarAsyncTask().execute(result);
-            }
+                                if (me)
+                                    new PersistMyAvatarAsyncTask().execute(result);
+                            }
 
-        };
+                        };
 
-        GetImageAsyncTask imageAsyncTask = new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl);
-        imageAsyncTask.execute(user.profileImageLink);
+        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl),
+                        user.profileImageLink);
     }
 
     private void showUserAccounts()
@@ -306,8 +308,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
-                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
-                                R.layout.textview_black_textcolor, null);
+                TextView textView =
+                                (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor,
+                                                null);
                 textView.setText(Html.fromHtml(user.accounts.get(userAccountListCursor).siteName));
                 userAccountList.addView(textView);
             }
@@ -333,8 +336,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                 showUserProfile(resultData);
                 break;
             case UserIntentService.ERROR:
-                ViewGroup errorView = AppUtils.getErrorView(getActivity(),
-                                (HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+                ViewGroup errorView =
+                                AppUtils.getErrorView(getActivity(),
+                                                (HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
                 profileHomeLayout.removeAllViews();
                 profileHomeLayout.addView(errorView);
                 break;
@@ -350,8 +354,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             user = userPage.items.get(0);
             showUserDetail();
 
-            HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
-                            .getSerializable(StringConstants.USER_ACCOUNTS);
+            HashMap<String, Account> accounts =
+                            (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
             if (accounts != null)
             {
                 if (user.accounts == null)

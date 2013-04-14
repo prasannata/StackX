@@ -260,7 +260,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
             }
         });
 
-        AsyncTaskExecutor.getInstance().executeAsyncTask(fetchImageAsyncTask, OperatingSite.getSite().iconUrl);
+        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(fetchImageAsyncTask, OperatingSite.getSite().iconUrl);
     }
 
     @Override
