@@ -132,8 +132,9 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     protected void setValuesForQuestionView(QuestionViewHolder holder, Question question)
     {
         super.setValuesForQuestionView(holder, question);
-        
-        holder.owner.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate));
+
+        if (action == UserIntentService.GET_USER_QUESTIONS)
+            holder.owner.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate));
     }
 
     @Override
