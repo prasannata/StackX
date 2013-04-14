@@ -168,7 +168,6 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "");
             answerBody = answerBody.replaceAll("\\<*p>", "");
 
-            LogWrapper.d(TAG, answerBody);
             if (answerBody.length() > ANSWER_PREVIEW_LEN)
             {
                 answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
