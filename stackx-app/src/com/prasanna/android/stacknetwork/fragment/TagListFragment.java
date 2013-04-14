@@ -361,15 +361,12 @@ public class TagListFragment extends ListFragment
     @Override
     public void onResume()
     {
-        LogWrapper.d(getClass().getSimpleName(), "onResume");
-
         super.onResume();
 
         getActivity().startService(new Intent(getActivity(), TagsService.class));
 
         if (SharedPreferencesUtil.isSet(getActivity(), TAGS_DIRTY, false))
         {
-            LogWrapper.d(getClass().getSimpleName(), "tags are dirty");
             runGetTagsTask();
             SharedPreferencesUtil.setBoolean(getActivity(), TAGS_DIRTY, false);
         }
@@ -377,8 +374,6 @@ public class TagListFragment extends ListFragment
         {
             if (tags.isEmpty())
                 runGetTagsTask();
-            else
-                LogWrapper.d(getClass().getSimpleName(), "tags already present");
         }
     }
 
