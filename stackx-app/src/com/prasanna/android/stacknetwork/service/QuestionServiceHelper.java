@@ -60,9 +60,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "questions/" + id;
         String questionBody = null;
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
+        Map<String, String> queryParams = getDefaultQueryParams(site);
 
         JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionJsonResponse != null)
@@ -88,16 +86,14 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     public String getQuestionBodyForId(long id)
     {
-        return getQuestionBodyForId(id, null);
+        return getQuestionBodyForId(id, OperatingSite.getSite().apiSiteParameter);
     }
 
     public ArrayList<Answer> getAnswersForQuestion(long id, String site, int page)
     {
         ArrayList<Answer> answers = new ArrayList<Answer>();
         String restEndPoint = "questions/" + id + "/answers";
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
+        Map<String, String> queryParams = getDefaultQueryParams(site);
 
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE,
@@ -185,9 +181,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         StackXPage<Comment> commentsPage = null;
 
         String restEndPoint = parent + "/" + parentIds + "/comments";
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
+        Map<String, String> queryParams = getDefaultQueryParams(site);
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.CREATION);
         queryParams.put(StackUri.QueryParams.ORDER, Order.ASC);
@@ -225,7 +219,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     public StackXPage<Comment> getComments(String parent, String parentIds, int page)
     {
-        return getComments(parent, null, parentIds, page);
+        return getComments(parent, OperatingSite.getSite().apiSiteParameter, parentIds, page);
     }
 
     public StackXPage<Question> search(String query, int page)
@@ -262,9 +256,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
     {
         String restEndPoint = "questions/" + id;
         Question question = null;
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
+        Map<String, String> queryParams = getDefaultQueryParams(site);
         JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
         if (questionJsonResponse != null)
         {
@@ -290,7 +282,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     public Question getQuestionFullDetails(long id)
     {
-        return getQuestionFullDetails(id, null);
+        return getQuestionFullDetails(id, OperatingSite.getSite().apiSiteParameter);
     }
 
     public StackXPage<Question> getAllQuestions(String sort, int page)
@@ -391,9 +383,14 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
     public Answer getAnswer(long id)
     {
+        return getAnswer(id, OperatingSite.getSite().apiSiteParameter);
+    }
+
+    public Answer getAnswer(long id, String site)
+    {
         String restEndPoint = "answers/" + id;
 
-        JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, getDefaultQueryParams());
+        JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, getDefaultQueryParams(site));
         if (jsonObjectWrapper != null)
         {
             try

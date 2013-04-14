@@ -59,6 +59,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     public void onCreate(android.os.Bundle savedInstanceState)
     {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        item = (InboxItem) getIntent().getSerializableExtra(StringConstants.INBOX_ITEM);
 
         super.onCreate(savedInstanceState);
 
@@ -72,6 +73,16 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
         showInboxItem();
         getPostDetail();
+    }
+
+    @Override
+    protected void setActionBarTitleAndIcon()
+    {
+        if (item == null || item.site == null)
+            super.setActionBarTitleAndIcon();
+
+        getActionBar().setTitle(Html.fromHtml(item.title));
+        setActionBarHomeIcon(item.site.name, item.site.iconUrl);
     }
 
     private void getPostDetail()
@@ -98,10 +109,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
     private void showInboxItem()
     {
-        item = (InboxItem) getIntent().getSerializableExtra(StringConstants.INBOX_ITEM);
-
-        getActionBar().setTitle(Html.fromHtml(item.title));
-
         TextView textView = (TextView) findViewById(R.id.postTitle);
         textView.setText(Html.fromHtml(item.title));
 
@@ -164,6 +171,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private void getAnswer()
     {
         Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
+        getAnswerIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
         getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
         getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
         getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);

@@ -39,7 +39,6 @@ import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -260,10 +259,10 @@ public abstract class AbstractBaseServiceHelper
 
     }
 
-    protected Map<String, String> getDefaultQueryParams()
+    protected Map<String, String> getDefaultQueryParams(String apiSiteParameter)
     {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.SITE, apiSiteParameter);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
         return queryParams;
     }

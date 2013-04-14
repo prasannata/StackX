@@ -85,32 +85,51 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 finish();
             }
         }
-        
+
         site = OperatingSite.getSite();
     }
 
     private void initializeActionBar()
     {
         getActionBar().setHomeButtonEnabled(false);
+        setActionBarTitleAndIcon();
+    }
 
+    protected void setActionBarTitleAndIcon()
+    {
         if (getActionBar().getTitle() == null)
             getActionBar().setTitle(OperatingSite.getSite().name);
 
-        setActionBarHomeIcon();
+        setActionBarHomeIcon(OperatingSite.getSite().name, OperatingSite.getSite().iconUrl);
     }
 
-    protected void setActionBarHomeIcon()
+    protected void setActionBarHomeIcon(String site, String siteIconUrl)
     {
-        if (BitmapCache.getInstance().containsKey(OperatingSite.getSite().name))
-            setActionBarHomeIcon(BitmapCache.getInstance().get(OperatingSite.getSite().name));
+        if (BitmapCache.getInstance().containsKey(site))
+            setActionBarHomeIcon(BitmapCache.getInstance().get(site));
         else
-            loadIcon();
+            loadIcon(site, siteIconUrl);
     }
 
-    private void setActionBarHomeIcon(Bitmap result)
+    protected void setActionBarHomeIcon(Bitmap result)
     {
         getActionBar().setIcon(new BitmapDrawable(getResources(), result));
         getActionBar().setHomeButtonEnabled(true);
+    }
+
+    private void loadIcon(final String site, final String siteIconUrl)
+    {
+        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
+        {
+            @Override
+            public void notifyOnCompletion(Bitmap result)
+            {
+                setActionBarHomeIcon(result);
+                BitmapCache.getInstance().add(site, result);
+            }
+        });
+
+        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(fetchImageAsyncTask, siteIconUrl);
     }
 
     @Override
@@ -155,10 +174,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     private void setupActionBarForAuthenticatedUser(Menu menu)
     {
         if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
-        {
             menu.removeItem(R.id.menu_my_profile);
-            menu.removeItem(R.id.menu_my_inbox);
-        }
     }
 
     private void setupSearchItem(final Menu menu)
@@ -246,21 +262,6 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 SharedPreferencesUtil.setBoolean(getApplicationContext(), prefName, isChecked);
             }
         });
-    }
-
-    private void loadIcon()
-    {
-        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
-        {
-            @Override
-            public void notifyOnCompletion(Bitmap result)
-            {
-                setActionBarHomeIcon(result);
-                BitmapCache.getInstance().add(OperatingSite.getSite().name, result);
-            }
-        });
-
-        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(fetchImageAsyncTask, OperatingSite.getSite().iconUrl);
     }
 
     @Override

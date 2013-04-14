@@ -55,9 +55,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     public Post getPost(long id, String site)
     {
         String restEndPoint = "/posts/" + id;
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
+        Map<String, String> queryParams = getDefaultQueryParams(site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
@@ -98,10 +96,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     public Post getPostComment(long id, String site)
     {
         String restEndPoint = "/posts/" + id;
-        Map<String, String> queryParams = getDefaultQueryParams();
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
-
+        Map<String, String> queryParams = getDefaultQueryParams(site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)
@@ -139,10 +134,8 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
     public Comment getComment(long id, String site)
     {
         String restEndPoint = "/comments/" + id;
-        Map<String, String> queryParams = getDefaultQueryParams();
+        Map<String, String> queryParams = getDefaultQueryParams(site);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
-        if (site != null)
-            queryParams.put(StackUri.QueryParams.SITE, site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (jsonResponse != null)

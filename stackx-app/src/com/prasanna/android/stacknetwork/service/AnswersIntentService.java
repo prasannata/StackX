@@ -51,6 +51,7 @@ public class AnswersIntentService extends AbstractIntentService
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final long id = intent.getLongExtra(StringConstants.ANSWER_ID, -1);
+        final String site = intent.getStringExtra(StringConstants.SITE);
         Bundle bundle = new Bundle();
 
         try
@@ -60,8 +61,7 @@ public class AnswersIntentService extends AbstractIntentService
             switch (action)
             {
                 case GET_ANSWER:
-                    LogWrapper.d(TAG, "Get answer");
-                    bundle.putSerializable(StringConstants.ANSWER, questionService.getAnswer(id));
+                    bundle.putSerializable(StringConstants.ANSWER, questionService.getAnswer(id, site));
                     receiver.send(GET_ANSWER, bundle);
                     break;
 
