@@ -43,7 +43,7 @@ public class TagsViewBuilder
         if (parentLayout.getChildCount() > 0)
             parentLayout.removeAllViews();
 
-        int maxWidth = context.getResources().getDisplayMetrics().widthPixels - 20;
+        int screenWidth = context.getResources().getDisplayMetrics().widthPixels - 20;
         LinearLayout rowLayout = createNewRowForTags(context, 0);
 
         if (tags != null && tags.length > 0)
@@ -60,7 +60,7 @@ public class TagsViewBuilder
                 tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 rowLayout.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-                if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > maxWidth)
+                if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > screenWidth)
                 {
                     parentLayout.addView(rowLayout);
                     rowLayout = createNewRowForTags(context, 3);
