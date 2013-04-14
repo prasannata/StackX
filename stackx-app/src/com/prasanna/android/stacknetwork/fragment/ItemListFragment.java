@@ -22,10 +22,13 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -63,11 +66,24 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     protected ItemListAdapter<T> itemListAdapter;
     private TextView emptyItemsTextView;
 
+    private Context applicationContext;
+
     protected abstract String getReceiverExtraName();
+
     protected abstract void loadNextPage();
+
     protected abstract void startIntentService();
+
     protected abstract String getLogTag();
-    
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        applicationContext = activity.getApplicationContext();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -140,7 +156,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     {
         if (!serviceRunning)
         {
-            Intent intentForService = new Intent(getActivity().getApplicationContext(), clazz);
+            Intent intentForService = new Intent(applicationContext, clazz);
             if (action != null)
                 intentForService.setAction(action);
             return intentForService;
@@ -197,26 +213,23 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     {
         serviceRunning = false;
 
-        if (isVisible())
+        dismissProgressBar();
+
+        if (resultCode == AbstractIntentService.ERROR)
+            onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+        else
         {
-            if (resultCode == AbstractIntentService.ERROR)
-                onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
-            else
+            currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
+            if (currentPageObject != null)
             {
-                currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
-                if (currentPageObject != null)
-                {
-                    pages.add(currentPageObject);
-                    displayItems(currentPageObject.items);
-                }
+                pages.add(currentPageObject);
+                displayItems(currentPageObject.items);
             }
         }
     }
 
-    protected void displayItems(ArrayList<T> newItems)
+    private void displayItems(ArrayList<T> newItems)
     {
-        dismissProgressBar();
-
         if (itemListAdapter != null && newItems != null)
         {
             if (items == null)
@@ -243,14 +256,12 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     {
         LogWrapper.d(TAG, "Http error " + e.getStatusCode() + " " + e.getErrorResponse());
 
-        dismissProgressBar();
-
         if (activityCreated)
             getListView().setVisibility(View.GONE);
-        
+
         View errorLayout = getParentLayout().findViewById(R.id.errorLayout);
         if (errorLayout == null)
-            getParentLayout().addView(AppUtils.getErrorView(getActivity(), e));
+            getParentLayout().addView(AppUtils.getErrorView(applicationContext, e));
         else
         {
             TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
@@ -277,7 +288,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     protected ProgressBar getProgressBar()
     {
         if (progressBar == null)
-            progressBar = (ProgressBar) getActivity().getLayoutInflater().inflate(R.layout.progress_bar, null);
+            progressBar = (ProgressBar) LayoutInflater.from(applicationContext).inflate(R.layout.progress_bar, null);
         return progressBar;
     }
 }
