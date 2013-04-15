@@ -5,6 +5,7 @@
     android:layout_height="fill_parent"
     android:layout_gravity="center"
     android:gravity="center"
+    android:textColor="@color/white"
     android:text="@string/nada"
     android:textSize="15sp"
     android:textIsSelectable="false" />
