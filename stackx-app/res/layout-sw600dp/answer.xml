@@ -20,16 +20,6 @@
             android:layout_marginRight="3dp"
             android:layout_marginTop="2dp" >
 
-            <TextView
-                android:id="@+id/answerScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:background="@drawable/rounded_border_delft"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="15sp" />
-
             <ImageView
                 android:id="@+id/answerOptionsContextMenu"
                 android:layout_width="wrap_content"
@@ -40,11 +30,24 @@
                 android:src="@drawable/selector_menu_overflow" />
 
             <TextView
+                android:id="@+id/answerScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/answerOptionsContextMenu"
+                android:layout_alignParentLeft="true"
+                android:layout_alignTop="@id/answerOptionsContextMenu"
+                android:background="@drawable/rounded_border_delft"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="15sp" />
+
+            <TextView
                 android:id="@+id/answerAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/answerScore"
-                android:layout_alignTop="@id/answerScore"
+                android:layout_alignBottom="@id/answerOptionsContextMenu"
+                android:layout_alignTop="@id/answerOptionsContextMenu"
                 android:layout_marginLeft="4dp"
                 android:layout_toLeftOf="@id/answerOptionsContextMenu"
                 android:layout_toRightOf="@id/answerScore"
