@@ -30,6 +30,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.R;
@@ -77,6 +79,7 @@ public class QuickActionMenu
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(new BitmapDrawable(context.getResources()));
         popupWindow.setContentView(v);
+        contentViewHolder = new RelativeLayout(context);
         return v;
     }
 
@@ -111,6 +114,11 @@ public class QuickActionMenu
     public void show(View anchor)
     {
         popupWindow.showAsDropDown(anchor);
+    }
+
+    public void setOnDisimissListener(OnDismissListener onDismissListener)
+    {
+        popupWindow.setOnDismissListener(onDismissListener);
     }
 
     public void dismiss()

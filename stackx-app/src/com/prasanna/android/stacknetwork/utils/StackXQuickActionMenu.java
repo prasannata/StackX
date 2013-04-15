@@ -78,6 +78,7 @@ public class StackXQuickActionMenu
 
         return this;
     }
+
     public StackXQuickActionMenu addSimilarQuestionsItem(final String title)
     {
         quickActionMenu.addActionItem(new QuickActionItem(context, R.string.similar, new OnClickListener()
@@ -172,9 +173,10 @@ public class StackXQuickActionMenu
 
     public StackXQuickActionMenu setOnDismissListener(OnDismissListener onDismissListener)
     {
+        quickActionMenu.setOnDisimissListener(onDismissListener);
         return this;
     }
-    
+
     public QuickActionMenu build()
     {
         return quickActionMenu;
