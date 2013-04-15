@@ -33,9 +33,8 @@
                 android:id="@+id/answerScore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/answerOptionsContextMenu"
                 android:layout_alignParentLeft="true"
-                android:layout_alignTop="@id/answerOptionsContextMenu"
+                android:layout_centerVertical="true"
                 android:background="@drawable/rounded_border_delft"
                 android:gravity="center"
                 android:textColor="@color/black"
@@ -55,18 +54,17 @@
                 android:textColor="@color/black"
                 android:textIsSelectable="false"
                 android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/answerCommentsCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/answerScore"
-                android:layout_below="@id/answerScore"
-                android:layout_marginTop="3dp"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="9.5sp" />
         </RelativeLayout>
+
+        <TextView
+            android:id="@+id/answerCommentsCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/answerScore"
+            android:layout_marginLeft="3dp"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:textSize="9.5sp" />
 
         <View
             android:layout_width="fill_parent"
