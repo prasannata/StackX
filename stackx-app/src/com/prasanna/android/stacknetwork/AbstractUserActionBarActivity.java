@@ -282,6 +282,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 return true;
             case R.id.menu_my_profile:
                 Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
+                userProfileIntent.putExtra(StringConstants.SITE, OperatingSite.getSite());
                 userProfileIntent.putExtra(StringConstants.ME, true);
                 startActivity(userProfileIntent);
                 return true;

@@ -204,19 +204,19 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getQuestions(restEndPoint, queryParams);
     }
 
-    public StackXPage<User> getMe()
+    public StackXPage<User> getMe(String site)
     {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.SITE, site);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
         return getSerializedUserObject(executeHttpGetRequest("/me", queryParams));
     }
 
-    public StackXPage<User> getUserById(long userId)
+    public StackXPage<User> getUserById(long userId, String site)
     {
         StackXPage<User> page = null;
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-        queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+        queryParams.put(StackUri.QueryParams.SITE, site);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
         if (userId != -1)

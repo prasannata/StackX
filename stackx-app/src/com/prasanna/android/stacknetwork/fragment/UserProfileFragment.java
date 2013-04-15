@@ -42,6 +42,7 @@ import android.widget.TextView;
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Account;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.model.WritePermission;
@@ -72,6 +73,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private RestQueryResultReceiver resultReceiver;
     private long userId;
     private boolean forceRefresh;
+    private Site site;
 
     class PersistMyAvatarAsyncTask extends AsyncTask<Bitmap, Void, Void>
     {
@@ -110,12 +112,14 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             me = savedInstanceState.getBoolean(StringConstants.ME);
             userId = savedInstanceState.getLong(StringConstants.USER_ID);
+            site = (Site) savedInstanceState.getSerializable(StringConstants.SITE);
             forceRefresh = false;
         }
         else
         {
             me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
             userId = getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L);
+            site = (Site) getActivity().getIntent().getSerializableExtra(StringConstants.SITE);
             forceRefresh = getActivity().getIntent().getBooleanExtra(StringConstants.REFRESH, false);
         }
     }
@@ -151,6 +155,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     public void onSaveInstanceState(Bundle outState)
     {
         outState.putBoolean(StringConstants.ME, me);
+        outState.putSerializable(StringConstants.SITE, site);
         outState.putLong(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
         super.onSaveInstanceState(outState);
     }
@@ -164,6 +169,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         userProfileIntent.putExtra(StringConstants.USER_ID, userId);
         userProfileIntent.putExtra(StringConstants.REFRESH, forceRefresh);
         userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        userProfileIntent.putExtra(StringConstants.SITE, site.apiSiteParameter);
         getActivity().startService(userProfileIntent);
     }
 

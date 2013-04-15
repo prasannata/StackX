@@ -220,7 +220,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                         + Html.fromHtml(stackXItem.owner.displayName));
 
         stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
-                        .toString());
+                        .toString(), item.site);
 
         setupOnClickForViewQuestion(item.questionId);
         showPostBody(stackXItem.body);

@@ -24,6 +24,7 @@ import android.content.Intent;
 
 import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.UserProfileActivity;
+import com.prasanna.android.stacknetwork.model.Site;
 
 public class ActivityStartHelper
 {
@@ -50,10 +51,16 @@ public class ActivityStartHelper
         currentActivity.startActivity(Intent.createChooser(emailIntent, ""));
     }
 
-    public static void startUserProfileActivity(Context currentActivity, long userId)
+    public static void startUserProfileActivityForDefaultSite(Context currentActivity, long userId)
+    {
+        startUserProfileActivity(currentActivity, userId, OperatingSite.getSite());
+    }
+
+    public static void startUserProfileActivity(Context currentActivity, long userId, Site site)
     {
         Intent userProfileIntent = new Intent(currentActivity, UserProfileActivity.class);
         userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+        userProfileIntent.putExtra(StringConstants.SITE, site);
         currentActivity.startActivity(userProfileIntent);
     }
 }

@@ -41,7 +41,6 @@ import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DbRequestThreadExecutor;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -88,8 +87,9 @@ public class UserIntentService extends AbstractIntentService
             switch (action)
             {
                 case GET_USER_PROFILE:
+                    String site = intent.getStringExtra(StringConstants.SITE);
                     boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
-                    StackXPage<User> userDetail = getUserDetail(me, userId, refresh, page);
+                    StackXPage<User> userDetail = getUserDetail(me, userId, refresh, site, page);
                     bundle.putSerializable(StringConstants.USER, userDetail);
                     bundle.putSerializable(StringConstants.USER_ACCOUNTS, getUserAccounts(me, userDetail));
                     receiver.send(GET_USER_PROFILE, bundle);
@@ -137,7 +137,7 @@ public class UserIntentService extends AbstractIntentService
         }
     }
 
-    private StackXPage<User> getUserDetail(boolean me, long userId, boolean refresh, int page)
+    private StackXPage<User> getUserDetail(boolean me, long userId, boolean refresh, String site, int page)
     {
         if (me)
         {
@@ -148,14 +148,14 @@ public class UserIntentService extends AbstractIntentService
                 profileDAO.open();
                 User myProfile = null;
                 if (!refresh)
-                    myProfile = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
+                    myProfile = profileDAO.getMe(site);
 
                 if (myProfile == null)
-                    userPage = getUserProfile(profileDAO);
+                    userPage = getUserProfile(profileDAO, site);
                 else
                 {
                     if (AppUtils.aHalfAnHourSince(myProfile.lastUpdateTime))
-                        syncUserProfile();
+                        syncUserProfile(site);
 
                     userPage = new StackXPage<User>();
                     userPage.items = new ArrayList<User>();
@@ -174,10 +174,10 @@ public class UserIntentService extends AbstractIntentService
             return userPage;
         }
         else
-            return userService.getUserById(userId);
+            return userService.getUserById(userId, site);
     }
 
-    private void syncUserProfile()
+    private void syncUserProfile(final String site)
     {
         AppUtils.runOnBackgroundThread(new Runnable()
         {
@@ -188,7 +188,7 @@ public class UserIntentService extends AbstractIntentService
                 try
                 {
                     profileDAO.open();
-                    getUserProfile(profileDAO);
+                    getUserProfile(profileDAO, site);
                 }
                 catch (SQLException e)
                 {
@@ -363,13 +363,13 @@ public class UserIntentService extends AbstractIntentService
         sendBroadcast(broadcastIntent);
     }
 
-    protected StackXPage<User> getUserProfile(final ProfileDAO profileDAO)
+    protected StackXPage<User> getUserProfile(final ProfileDAO profileDAO, String site)
     {
-        StackXPage<User> userPage = userService.getMe();
+        StackXPage<User> userPage = userService.getMe(site);
         if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
         {
-            profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
-            profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
+            profileDAO.deleteMe(site);
+            profileDAO.insert(site, userPage.items.get(0), true);
             SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID, userPage.items.get(0).id);
         }
 

@@ -29,17 +29,19 @@ import android.view.Window;
 import com.prasanna.android.stacknetwork.fragment.UserAnswerListFragment;
 import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class UserProfileActivity extends AbstractUserActionBarActivity
 {
-    private static final String[] PAGES =
-    { "Profile", "Questions", "Answers", "Favorites" };
+    private static final String[] PAGES = { "Profile", "Questions", "Answers", "Favorites" };
 
     private ProfileViewPageAdapter profileViewPageAdapter;
     private ViewPager viewPager;
+    private Site site;
 
     public static class ProfileViewPageAdapter extends FragmentPagerAdapter
     {
@@ -84,17 +86,23 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     public void onCreate(android.os.Bundle savedInstanceState)
     {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        site = (Site) getIntent().getSerializableExtra(StringConstants.SITE);
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.viewpager_title_indicator);
-
         profileViewPageAdapter = new ProfileViewPageAdapter(getFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(profileViewPageAdapter);
 
         TitlePageIndicator indicator = (TitlePageIndicator) findViewById(R.id.indicator);
         indicator.setViewPager(viewPager);
+    }
+
+    protected void setActionBarTitleAndIcon()
+    {
+        getActionBar().setTitle(site.name);
+        setActionBarHomeIcon(site.name, site.iconUrl);
     }
 
     @Override

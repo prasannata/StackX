@@ -62,7 +62,7 @@ public class MyProfileService extends AbstractStackxService
 
                 if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR)
                 {
-                    StackXPage<User> userPage = UserServiceHelper.getInstance().getMe();
+                    StackXPage<User> userPage = UserServiceHelper.getInstance().getMe(OperatingSite.getSite().apiSiteParameter);
                     if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
                     {
                         profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);

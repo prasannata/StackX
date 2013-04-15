@@ -20,10 +20,10 @@
 package com.prasanna.android.stacknetwork.utils;
 
 import android.content.ClipData;
+import android.content.ClipData.Item;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.ClipData.Item;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.PopupWindow.OnDismissListener;
@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowCommentsListener;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.views.QuickActionItem;
 import com.prasanna.android.views.QuickActionMenu;
 
@@ -57,13 +58,26 @@ public class StackXQuickActionMenu
             @Override
             public void onClick(View v)
             {
-                ActivityStartHelper.startUserProfileActivity(context, userId);
+                ActivityStartHelper.startUserProfileActivityForDefaultSite(context, userId);
             }
         }));
 
         return this;
     }
 
+    public StackXQuickActionMenu addUserProfileItem(final long userId, final String userName, final Site site)
+    {
+        quickActionMenu.addActionItem(new QuickActionItem(userName + "'s profile", new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                ActivityStartHelper.startUserProfileActivity(context, userId, site);
+            }
+        }));
+
+        return this;
+    }
     public StackXQuickActionMenu addSimilarQuestionsItem(final String title)
     {
         quickActionMenu.addActionItem(new QuickActionItem(context, R.string.similar, new OnClickListener()
