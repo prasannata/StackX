@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.ClipData.Item;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.R;
@@ -155,6 +156,12 @@ public class StackXQuickActionMenu
         return this;
     }
 
+    public StackXQuickActionMenu setOnDismissListener(OnDismissListener onDismissListener)
+    {
+        quickActionMenu.setOnDismissListener(onDismissListener);
+        return this;
+    }
+    
     public QuickActionMenu build()
     {
         return quickActionMenu;
