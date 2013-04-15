@@ -21,6 +21,7 @@ package com.prasanna.android.views;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,7 @@ public class QuickActionMenu
     private ListView listView;
     private ActionItemAdapter actionItemAdapter;
     private PopupWindow popupWindow;
-    private View contentView;
+    private View rootView;
 
     private class ActionItemAdapter extends ArrayAdapter<QuickActionItem>
     {
@@ -63,7 +64,7 @@ public class QuickActionMenu
     {
         this.context = context;
 
-        contentView = initPopupWindow();
+        rootView = initPopupWindow();
         setupPopupWindowView();
     }
 
@@ -84,7 +85,7 @@ public class QuickActionMenu
     private void setupPopupWindowView()
     {
         actionItemAdapter = new ActionItemAdapter(context, R.layout.quick_action_item);
-        listView = (ListView) contentView.findViewById(R.id.quickActionItemlist);
+        listView = (ListView) rootView.findViewById(R.id.quickActionItemlist);
         listView.setOnItemClickListener(new OnItemClickListener()
         {
             @Override
@@ -111,14 +112,30 @@ public class QuickActionMenu
 
     public void show(View anchor)
     {
-        popupWindow.showAsDropDown(anchor);
+        int[] anchorLocation = new int[2];
+        int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+        anchor.getLocationOnScreen(anchorLocation);
+
+        if (anchorLocation[1] > (screenHeight / 2 + 150))
+            popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, anchorLocation[0],
+                            anchorLocation[1] - rootView.getHeight());
+        else
+            popupWindow.showAsDropDown(anchor);
     }
 
+<<<<<<< HEAD
     public void setOnDisimissListener(OnDismissListener onDismissListener)
     {
         popupWindow.setOnDismissListener(onDismissListener);
     }
 
+=======
+    public void setOnDismissListener(OnDismissListener onDismissListener)
+    {
+        popupWindow.setOnDismissListener(onDismissListener);
+    }
+    
+>>>>>>> Handle exceptions in background service
     public void dismiss()
     {
         popupWindow.dismiss();

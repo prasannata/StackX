@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
@@ -73,7 +74,11 @@ public class MyProfileService extends AbstractStackxService
             }
             catch (SQLException e)
             {
-                LogWrapper.d(TAG, e.getMessage());
+                LogWrapper.e(TAG, e.getMessage());
+            }
+            catch(AbstractHttpException e)
+            {
+                LogWrapper.e(TAG, e.getMessage());
             }
             finally
             {

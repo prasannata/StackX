@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.StackNetworkListActivity;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
@@ -64,20 +65,27 @@ public class AccountSyncService extends AbstractStackxService
         public void handleMessage(Message msg)
         {
             boolean newThingsFound = false;
-            HashMap<String, Site> sites = SiteDAO.getAll(context);
-            if (sites != null && AppUtils.isNetworkAvailable(context))
+            try
             {
-                long sitesLastUpdated = SiteDAO.getLastUpdateTime(context);
-                if (AppUtils.aDaySince(sitesLastUpdated))
-                    refreshSiteList(sites);
+                HashMap<String, Site> sites = SiteDAO.getAll(context);
+                if (sites != null && AppUtils.isNetworkAvailable(context))
+                {
+                    long sitesLastUpdated = SiteDAO.getLastUpdateTime(context);
+                    if (AppUtils.aDaySince(sitesLastUpdated))
+                        refreshSiteList(sites);
 
-                long accountsLastUpdated = SharedPreferencesUtil.getLong(context,
-                                StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
+                    long accountsLastUpdated =
+                                    SharedPreferencesUtil.getLong(context, StringConstants.ACCOUNTS_LAST_UPDATED, 0L);
 
-                if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
-                    newThingsFound = syncAccounts(sites);
+                    if (AppUtils.aHalfAnHourSince(accountsLastUpdated))
+                        newThingsFound = syncAccounts(sites);
+                }
+                onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
             }
-            onHandlerComplete.onHandleMessageFinish(msg, newThingsFound);
+            catch (AbstractHttpException e)
+            {
+                LogWrapper.e(TAG, e.getMessage());
+            }
         }
 
         private boolean syncAccounts(HashMap<String, Site> sites)
@@ -101,13 +109,15 @@ public class AccountSyncService extends AbstractStackxService
             {
                 if (retrievedAccounts != null)
                 {
-                    accountsDeleted = checkAndUpdateForDeletedAccounts(new HashMap<String, Account>(retrievedAccounts),
-                                    new ArrayList<Account>(existingAccounts));
-                    accountsAdded = checkAndUpdateNewAccounts(sites, new HashMap<String, Account>(retrievedAccounts),
-                                    new ArrayList<Account>(existingAccounts));
-                    accountsModified = checkForWriterPermissionsForExistingAccounts(sites,
-                                    new HashMap<String, Account>(retrievedAccounts), new ArrayList<Account>(
-                                                    existingAccounts));
+                    accountsDeleted =
+                                    checkAndUpdateForDeletedAccounts(new HashMap<String, Account>(retrievedAccounts),
+                                                    new ArrayList<Account>(existingAccounts));
+                    accountsAdded =
+                                    checkAndUpdateNewAccounts(sites, new HashMap<String, Account>(retrievedAccounts),
+                                                    new ArrayList<Account>(existingAccounts));
+                    accountsModified =
+                                    checkForWriterPermissionsForExistingAccounts(sites, new HashMap<String, Account>(
+                                                    retrievedAccounts), new ArrayList<Account>(existingAccounts));
                 }
             }
 
@@ -220,12 +230,12 @@ public class AccountSyncService extends AbstractStackxService
 
         private boolean getAndPersistWritePermissions(Site site)
         {
-            ArrayList<WritePermission> writePermissions = UserServiceHelper.getInstance().getWritePermissions(
-                            site.apiSiteParameter);
+            ArrayList<WritePermission> writePermissions =
+                            UserServiceHelper.getInstance().getWritePermissions(site.apiSiteParameter);
             if (writePermissions != null)
             {
-                HashMap<ObjectType, WritePermission> existingPermissions = WritePermissionDAO.getPermissions(context,
-                                site.apiSiteParameter);
+                HashMap<ObjectType, WritePermission> existingPermissions =
+                                WritePermissionDAO.getPermissions(context, site.apiSiteParameter);
                 if (existingPermissions == null)
                 {
                     LogWrapper.d(TAG, "Getting write permissions for " + site.apiSiteParameter);
