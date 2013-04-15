@@ -23,7 +23,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="15dp"
-        android:background="@drawable/rounded_border_grey_min_padding"
+        android:background="@drawable/selector_list_item"
         android:text="@string/login"
         android:textColor="@color/delft"
         android:textSize="30sp" />
