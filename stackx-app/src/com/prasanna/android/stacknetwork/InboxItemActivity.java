@@ -72,40 +72,22 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         receiver.setReceiver(this);
         postTitleLayout = findViewById(R.id.postTitleLayout);
 
+        setupQuickActionMenuClick();
         showInboxItem();
         getPostDetail();
     }
 
-    @Override
-    protected void setActionBarTitleAndIcon()
+    private void setupQuickActionMenuClick()
     {
-        if (item == null || item.site == null)
-            super.setActionBarTitleAndIcon();
-
-        getActionBar().setTitle(Html.fromHtml(item.title));
-        setActionBarHomeIcon(item.site.name, item.site.iconUrl);
-    }
-
-    private void getPostDetail()
-    {
-        setProgressBarIndeterminateVisibility(true);
-
-        Intent intent = new Intent(this, PostIntentService.class);
-        intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
-        if (item.itemType.equals(ItemType.NEW_ANSWER))
+        final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
+        imageView.setOnClickListener(new OnClickListener()
         {
-            intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
-            intent.putExtra(StringConstants.POST_ID, item.answerId);
-        }
-        else
-        {
-            intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST_COMMENT);
-            intent.putExtra(StringConstants.COMMENT_ID, item.commentId);
-        }
-
-        intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
-
-        startService(intent);
+            @Override
+            public void onClick(View v)
+            {
+                stackXQuickActionMenu.build().show(v);
+            }
+        });
     }
 
     private void showInboxItem()
@@ -128,6 +110,37 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
             textView = (TextView) findViewById(R.id.postSite);
             textView.setText("Asked in " + item.site.name);
         }
+    }
+
+    private void getPostDetail()
+    {
+        setProgressBarIndeterminateVisibility(true);
+
+        Intent intent = new Intent(this, PostIntentService.class);
+        intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
+        if (item.itemType.equals(ItemType.NEW_ANSWER))
+        {
+            intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
+            intent.putExtra(StringConstants.POST_ID, item.answerId);
+        }
+        else
+        {
+            intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST_COMMENT);
+            intent.putExtra(StringConstants.COMMENT_ID, item.commentId);
+        }
+
+        intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+        startService(intent);
+    }
+
+    @Override
+    protected void setActionBarTitleAndIcon()
+    {
+        if (item == null || item.site == null)
+            super.setActionBarTitleAndIcon();
+
+        getActionBar().setTitle(Html.fromHtml(item.title));
+        setActionBarHomeIcon(item.site.name, item.site.iconUrl);
     }
 
     @Override
@@ -208,6 +221,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
         stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
                         .toString());
+
         setupOnClickForViewQuestion(item.questionId);
         showPostBody(stackXItem.body);
     }
@@ -257,16 +271,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                                     android.R.anim.slide_in_left));
                     postContextLayout.setVisibility(View.VISIBLE);
                 }
-            }
-        });
-
-        final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
-        imageView.setOnClickListener(new OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                stackXQuickActionMenu.build().show(v);
             }
         });
     }
