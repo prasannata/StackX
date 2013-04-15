@@ -28,9 +28,10 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="false"
         android:layout_marginBottom="5dp"
-        android:descendantFocusability="beforeDescendants" >
+        android:clickable="false"
+        android:descendantFocusability="beforeDescendants"
+        android:scrollbarThumbVertical="@drawable/scrollbar" >
     </ListView>
 
     <LinearLayout
