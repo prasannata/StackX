@@ -123,19 +123,11 @@ public class QuickActionMenu
             popupWindow.showAsDropDown(anchor);
     }
 
-<<<<<<< HEAD
-    public void setOnDisimissListener(OnDismissListener onDismissListener)
-    {
-        popupWindow.setOnDismissListener(onDismissListener);
-    }
-
-=======
     public void setOnDismissListener(OnDismissListener onDismissListener)
     {
         popupWindow.setOnDismissListener(onDismissListener);
     }
     
->>>>>>> Handle exceptions in background service
     public void dismiss()
     {
         popupWindow.dismiss();
