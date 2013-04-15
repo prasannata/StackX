@@ -55,6 +55,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private InboxItem item;
     private Comment comment;
     private View postTitleLayout;
+    private StackXQuickActionMenu stackXQuickActionMenu;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
@@ -66,6 +67,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
         setContentView(R.layout.inbox_item_detail);
 
+        stackXQuickActionMenu = new StackXQuickActionMenu(this);
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
         postTitleLayout = findViewById(R.id.postTitleLayout);
@@ -204,6 +206,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
                         + Html.fromHtml(stackXItem.owner.displayName));
 
+        stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
+                        .toString());
         setupOnClickForViewQuestion(item.questionId);
         showPostBody(stackXItem.body);
     }
@@ -230,7 +234,12 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 postContextLayout.addView(view);
         }
 
-        final StackXQuickActionMenu stackXQuickActionMenu = new StackXQuickActionMenu(this);
+        addViewAnswerToQuickActionMenu(postContextLayout);
+        setupOnClickForViewQuestion(answer.questionId);
+    }
+
+    private void addViewAnswerToQuickActionMenu(final LinearLayout postContextLayout)
+    {
         stackXQuickActionMenu.addItem(R.string.viewAnswer, new OnClickListener()
         {
             @Override
@@ -252,7 +261,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         });
 
         final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
-        imageView.setVisibility(View.VISIBLE);
         imageView.setOnClickListener(new OnClickListener()
         {
             @Override
@@ -261,7 +269,6 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 stackXQuickActionMenu.build().show(v);
             }
         });
-        setupOnClickForViewQuestion(answer.questionId);
     }
 
     private void setupOnClickForViewQuestion(final long questionId)
