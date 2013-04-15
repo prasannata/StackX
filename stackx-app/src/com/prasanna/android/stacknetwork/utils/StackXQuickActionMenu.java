@@ -172,7 +172,6 @@ public class StackXQuickActionMenu
 
     public StackXQuickActionMenu setOnDismissListener(OnDismissListener onDismissListener)
     {
-        quickActionMenu.setOnDismissListener(onDismissListener);
         return this;
     }
     

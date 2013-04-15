@@ -104,5 +104,4 @@
         android:visibility="gone" />
 
     <include layout="@layout/stackx_simple_list_view" />
-
-</LinearLayout>
+</LinearLayout>
