@@ -55,8 +55,8 @@
             android:layout_marginTop="5dp"
             android:gravity="left"
             android:paddingLeft="5dp"
-            android:textIsSelectable="false"
             android:textColor="@color/black"
+            android:textIsSelectable="false"
             android:textSize="20sp" />
 
         <TextView
@@ -68,9 +68,9 @@
             android:layout_below="@id/itemText"
             android:layout_toRightOf="@id/itemOptions"
             android:gravity="left"
-            android:textIsSelectable="false"
             android:paddingLeft="5dp"
             android:textColor="@color/grey"
+            android:textIsSelectable="false"
             android:textSize="12sp" />
 
         <TextView
@@ -81,9 +81,9 @@
             android:layout_below="@id/itemDetails"
             android:layout_margin="5dp"
             android:gravity="left"
-            android:textIsSelectable="false"
             android:text="@string/ran"
             android:textColor="@color/black"
+            android:textIsSelectable="false"
             android:textSize="12sp" />
 
         <TextView
