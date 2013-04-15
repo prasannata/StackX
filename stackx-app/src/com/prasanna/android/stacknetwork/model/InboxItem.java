@@ -25,59 +25,59 @@ public class InboxItem extends Post implements Serializable
 {
     public static enum ItemType
     {
-	COMMENT("comment"),
-	CHAT_MESSAGE("chat message"),
-	NEW_ANSWER("answer"),
-	CAREERS_MESSAGE("career message"),
-	CAREERS_INVITATIONS("career invite"),
-	META_QUESTION("meta question"),
-	POST_NOTICE("post notice"),
-	MODERATOR_MESSAGE("message from moderator");
+        COMMENT("comment"),
+        CHAT_MESSAGE("chat message"),
+        NEW_ANSWER("answer"),
+        CAREERS_MESSAGE("career message"),
+        CAREERS_INVITATIONS("career invite"),
+        META_QUESTION("meta question"),
+        POST_NOTICE("post notice"),
+        MODERATOR_MESSAGE("message from moderator");
 
-	private final String repr;
+        private final String repr;
 
-	ItemType(String repr)
-	{
-	    this.repr = repr;
-	}
+        ItemType(String repr)
+        {
+            this.repr = repr;
+        }
 
-	public static ItemType getValue(String string)
-	{
-	    ItemType itemType = null;
+        public static ItemType getValue(String string)
+        {
+            ItemType itemType = null;
 
-	    if (string != null)
-	    {
-		try
-		{
-		    itemType = valueOf(string.toUpperCase());
-		}
-		catch (IllegalArgumentException e)
-		{
-		    itemType = null;
-		}
+            if (string != null)
+            {
+                try
+                {
+                    itemType = valueOf(string.toUpperCase());
+                }
+                catch (IllegalArgumentException e)
+                {
+                    itemType = null;
+                }
 
-	    }
-	    return itemType;
-	}
+            }
+            return itemType;
+        }
 
-	public String getNotificationTitle(int count)
-	{
-	    String plural = (count > 1) ? "s" : "";
+        public String getNotificationTitle(int count)
+        {
+            String plural = (count > 1) ? "s" : "";
 
-	    return count + " new " + getRepr() + plural;
-	}
+            return count + " new " + getRepr() + plural;
+        }
 
-	public String getRepr()
-	{
-	    return repr;
-	}
+        public String getRepr()
+        {
+            return repr;
+        }
     }
 
     private static final long serialVersionUID = 7015749387787062217L;
 
-    public long questionId;
+    public long questionId = -1;
 
-    public long answerId;
+    public long answerId = -1;
 
     public long commentId;
 

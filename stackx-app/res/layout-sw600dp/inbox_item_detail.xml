@@ -8,8 +8,11 @@
         android:id="@+id/postTitleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="2dp"
-        android:background="@drawable/rounded_border_grey"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/selector_list_item"
         android:orientation="vertical" >
 
         <TextView
@@ -22,7 +25,7 @@
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
             android:textColor="@color/black"
-            android:textIsSelectable="true"
+            android:textIsSelectable="false"
             android:textSize="18sp" />
 
         <TextView
@@ -36,88 +39,41 @@
             android:textColor="@color/black"
             android:textIsSelectable="false"
             android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/viewQuestion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/postTitle"
-            android:layout_marginRight="2dp"
-            android:background="@drawable/selector_list_item"
-            android:clickable="false"
-            android:enabled="false"
-            android:gravity="left"
-            android:text="@string/goToQuestion"
-            android:textColor="@color/lightGrey"
-            android:textIsSelectable="false"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/viewAnswer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/postTitle"
-            android:layout_marginRight="2dp"
-            android:layout_toLeftOf="@id/viewQuestion"
-            android:background="@drawable/selector_list_item"
-            android:gravity="left"
-            android:text="@string/viewAnswer"
-            android:textColor="@color/black"
-            android:textIsSelectable="false"
-            android:textSize="15sp"
-            android:visibility="gone" />
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/responseItemScore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/postTitleLayout"
-        android:layout_marginBottom="5dp"
-        android:layout_marginLeft="3dp"
-        android:layout_marginRight="3dp"
-        android:background="@drawable/rounded_border_delft"
-        android:textColor="@color/black"
-        android:textIsSelectable="false"
-        android:textSize="15sp"
-        android:visibility="gone" />
-
     <ImageView
-        android:id="@+id/responseContextMenu"
+        android:id="@+id/quickActionMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_below="@id/postTitleLayout"
-        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:clickable="true"
         android:padding="6dp"
-        android:src="@drawable/control_bottom_right" />
+        android:src="@drawable/selector_menu_overflow"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/responseUserAndTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/responseItemScore"
-        android:layout_alignTop="@id/responseItemScore"
+        android:layout_toLeftOf="@id/quickActionMenu"
         android:layout_below="@id/postTitleLayout"
         android:layout_centerVertical="true"
         android:layout_margin="3dp"
-        android:layout_toLeftOf="@id/responseContextMenu"
         android:gravity="center"
         android:textColor="@color/black"
-        android:textIsSelectable="true"
+        android:textIsSelectable="false"
         android:textSize="15sp" />
 
     <TextView
         android:id="@+id/postType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/responseItemScore"
-        android:layout_alignTop="@id/responseItemScore"
+        android:layout_alignBottom="@id/responseUserAndTime"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@id/responseUserAndTime"
         android:layout_below="@id/postTitleLayout"
         android:layout_marginLeft="2dp"
-        android:layout_toRightOf="@id/responseItemScore"
         android:gravity="center"
         android:textColor="@color/black"
         android:textIsSelectable="false"
@@ -130,7 +86,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@id/postTitleLayout"
         android:layout_alignRight="@id/postTitleLayout"
-        android:layout_below="@id/responseUserAndTime"
+        android:layout_below="@id/quickActionMenu"
         android:layout_marginLeft="3dp"
         android:layout_marginRight="3dp"
         android:layout_marginTop="8dp"

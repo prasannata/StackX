@@ -27,8 +27,10 @@ import android.os.Handler;
 import android.text.Html;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,6 +46,7 @@ import com.prasanna.android.stacknetwork.service.AnswersIntentService;
 import com.prasanna.android.stacknetwork.service.PostIntentService;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
+import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver
@@ -51,9 +54,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private RestQueryResultReceiver receiver;
     private InboxItem item;
     private Comment comment;
-    private TextView viewQuestion;
-    private String VIEW_ANSWER;
-    private String HIDE_ANSWER;
+    private View postTitleLayout;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState)
@@ -65,11 +66,9 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
         setContentView(R.layout.inbox_item_detail);
 
-        VIEW_ANSWER = getString(R.string.viewAnswer);
-        HIDE_ANSWER = getString(R.string.hideAnswer);
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
-        viewQuestion = (TextView) findViewById(R.id.viewQuestion);
+        postTitleLayout = findViewById(R.id.postTitleLayout);
 
         showInboxItem();
         getPostDetail();
@@ -113,7 +112,20 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView.setText(Html.fromHtml(item.title));
 
         textView = (TextView) findViewById(R.id.postType);
-        textView.setText(item.itemType.getRepr());
+        if (item.questionId != -1 && ItemType.NEW_ANSWER.equals(item.itemType))
+            textView.setText(item.itemType.getRepr() + " to your question");
+        else if (item.questionId != -1)
+            textView.setText(item.itemType.getRepr() + " on your question");
+        else if (item.answerId != -1)
+            textView.setText(item.itemType.getRepr() + " on your answer");
+        else
+            textView.setText(item.itemType.getRepr());
+
+        if (item.site != null)
+        {
+            textView = (TextView) findViewById(R.id.postSite);
+            textView.setText("Asked in " + item.site.name);
+        }
     }
 
     @Override
@@ -147,20 +159,22 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         switch (resultCode)
         {
             case PostIntentService.GET_POST:
-                showPostDetail((Post) resultData.getSerializable(StringConstants.POST), false);
+                showPostDetail((Post) resultData.getSerializable(StringConstants.POST));
                 break;
             case PostIntentService.GET_POST_COMMENT:
                 comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
                 if (comment != null)
                 {
                     boolean commentOnAnswer = isCommentOnAnswer();
-                    showPostDetail(comment, commentOnAnswer);
+                    showPostDetail(comment);
                     if (commentOnAnswer)
-                        getAnswer();
+                        startGetAnswerService();
                 }
+                else
+                    showPostBody(item.body);
                 break;
             case AnswersIntentService.GET_ANSWER:
-                setupOnClickForViewMyPost((Answer) resultData.getSerializable(StringConstants.ANSWER));
+                setupOnClickForViewMyAnswer((Answer) resultData.getSerializable(StringConstants.ANSWER));
                 break;
             case AnswersIntentService.ERROR:
                 break;
@@ -168,7 +182,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         }
     }
 
-    private void getAnswer()
+    private void startGetAnswerService()
     {
         Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
         getAnswerIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
@@ -184,35 +198,28 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         return comment.type != null && comment.type.equals(PostType.ANSWER);
     }
 
-    private void showPostDetail(Post stackXItem, boolean disableViewQuestion)
+    private void showPostDetail(Post stackXItem)
     {
         TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
                         + Html.fromHtml(stackXItem.owner.displayName));
 
-        if (item.site != null)
-        {
-            textView = (TextView) findViewById(R.id.postSite);
-            textView.setText("Asked in " + item.site.name);
-        }
+        setupOnClickForViewQuestion(item.questionId);
+        showPostBody(stackXItem.body);
+    }
 
-        textView = (TextView) findViewById(R.id.responseItemScore);
-        textView.setVisibility(View.VISIBLE);
-        textView.setText(String.valueOf(stackXItem.score));
-
-        setupOnClickForViewQuestion(item.questionId, disableViewQuestion);
-
-        ArrayList<View> views = MarkdownFormatter.parse(this, stackXItem.body);
+    protected void showPostBody(String body)
+    {
+        ArrayList<View> views = MarkdownFormatter.parse(this, body);
         if (views != null)
         {
             LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
             for (final View view : views)
                 postBodyLayout.addView(view);
         }
-
     }
 
-    private void setupOnClickForViewMyPost(Answer answer)
+    private void setupOnClickForViewMyAnswer(Answer answer)
     {
         final LinearLayout postContextLayout = (LinearLayout) findViewById(R.id.postContext);
         ArrayList<View> views = MarkdownFormatter.parse(this, answer.body);
@@ -223,9 +230,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 postContextLayout.addView(view);
         }
 
-        final TextView textView = (TextView) findViewById(R.id.viewAnswer);
-        textView.setVisibility(View.VISIBLE);
-        textView.setOnClickListener(new View.OnClickListener()
+        final StackXQuickActionMenu stackXQuickActionMenu = new StackXQuickActionMenu(this);
+        stackXQuickActionMenu.addItem(R.string.viewAnswer, new OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -235,43 +241,39 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                     postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
                                     android.R.anim.slide_out_right));
                     postContextLayout.setVisibility(View.GONE);
-                    textView.setText(VIEW_ANSWER);
                 }
                 else
                 {
                     postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
                                     android.R.anim.slide_in_left));
                     postContextLayout.setVisibility(View.VISIBLE);
-                    textView.setText(HIDE_ANSWER);
                 }
             }
         });
 
-        setupOnClickForViewQuestion(answer.questionId, false);
+        final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
+        imageView.setVisibility(View.VISIBLE);
+        imageView.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                stackXQuickActionMenu.build().show(v);
+            }
+        });
+        setupOnClickForViewQuestion(answer.questionId);
     }
 
-    private void setupOnClickForViewQuestion(final long questionId, boolean disableViewQuestion)
+    private void setupOnClickForViewQuestion(final long questionId)
     {
-        if (disableViewQuestion)
+        postTitleLayout.setOnClickListener(new View.OnClickListener()
         {
-            viewQuestion.setClickable(false);
-            viewQuestion.setEnabled(false);
-            viewQuestion.setTextColor(getResources().getColor(R.color.lightGrey));
-        }
-        else
-        {
-            viewQuestion.setClickable(true);
-            viewQuestion.setEnabled(true);
-            viewQuestion.setTextColor(getResources().getColor(R.color.delft));
-            viewQuestion.setOnClickListener(new View.OnClickListener()
+            @Override
+            public void onClick(View v)
             {
-                @Override
-                public void onClick(View v)
-                {
-                    startQuestionDetailActivity(questionId);
-                }
-            });
-        }
+                startQuestionDetailActivity(questionId);
+            }
+        });
     }
 
     private void startQuestionDetailActivity(long questionId)
