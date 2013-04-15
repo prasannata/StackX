@@ -31,7 +31,6 @@ import com.prasanna.android.stacknetwork.fragment.UserProfileFragment;
 import com.prasanna.android.stacknetwork.fragment.UserQuestionListFragment;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
