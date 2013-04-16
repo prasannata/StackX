@@ -27,6 +27,7 @@ Screenshots
 ![Post Comment](http://i.stack.imgur.com/Yga67.png) 
 ![Formatted Code](http://i.stack.imgur.com/UCuH3.png) 
 ![Comments](http://i.stack.imgur.com/2GK27.png) 
-![Profile](http://i.stack.imgur.com/foMmb.png) 
+![Profile](http://i.stack.imgur.com/x91hF.png)
+![User Answers](http://i.stack.imgur.com/MX6pZ.png) 
 ![Saved Searches](http://i.stack.imgur.com/ZWjzo.png)  
 ![Advanced Search](http://i.stack.imgur.com/x2Zyn.png)
