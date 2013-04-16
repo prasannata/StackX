@@ -22,7 +22,9 @@ package com.prasanna.android.stacknetwork.fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
 import android.graphics.Bitmap;
@@ -74,14 +76,21 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     private long userId;
     private boolean forceRefresh;
     private Site site;
+    private Context appContext;
 
-    class PersistMyAvatarAsyncTask extends AsyncTask<Bitmap, Void, Void>
+    static class PersistMyAvatarAsyncTask extends AsyncTask<Bitmap, Void, Void>
     {
+        private Context context;
+
+        public PersistMyAvatarAsyncTask(Context context)
+        {
+            this.context = context;
+        }
 
         @Override
         protected Void doInBackground(Bitmap... params)
         {
-            ProfileDAO profileDAO = new ProfileDAO(getActivity());
+            ProfileDAO profileDAO = new ProfileDAO(context);
             try
             {
                 profileDAO.open();
@@ -97,6 +106,14 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             }
             return null;
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+
+        appContext = activity.getApplicationContext();
     }
 
     @Override
@@ -255,8 +272,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             ((TextView) profileHomeLayout.findViewById(R.id.writePermissionsInfo)).setText(Html
                             .fromHtml(getString(R.string.writePermissionsInfo)));
 
-            HashMap<ObjectType, WritePermission> permissions =
-                            WritePermissionDAO.getPermissions(getActivity(), OperatingSite.getSite().apiSiteParameter);
+            HashMap<ObjectType, WritePermission> permissions = WritePermissionDAO.getPermissions(getActivity(),
+                            OperatingSite.getSite().apiSiteParameter);
             WritePermission writePermission = permissions.get(ObjectType.COMMENT);
 
             if (writePermission != null)
@@ -289,23 +306,22 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         final ProgressBar avatarProgressBar = (ProgressBar) profileHomeLayout.findViewById(R.id.getAvatarProgressBar);
         avatarProgressBar.setVisibility(View.VISIBLE);
 
-        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl =
-                        new AsyncTaskCompletionNotifier<Bitmap>()
-                        {
-                            @Override
-                            public void notifyOnCompletion(Bitmap result)
-                            {
-                                displayAvatar(result);
-                                avatarProgressBar.setVisibility(View.GONE);
+        AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl = new AsyncTaskCompletionNotifier<Bitmap>()
+        {
+            @Override
+            public void notifyOnCompletion(Bitmap result)
+            {
+                displayAvatar(result);
+                avatarProgressBar.setVisibility(View.GONE);
 
-                                if (me)
-                                    new PersistMyAvatarAsyncTask().execute(result);
-                            }
+                if (me)
+                    new PersistMyAvatarAsyncTask(appContext).execute(result);
+            }
 
-                        };
+        };
 
-        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl),
-                        user.profileImageLink);
+        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(
+                        new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl), user.profileImageLink);
     }
 
     private void showUserAccounts()
@@ -314,9 +330,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         {
             for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++)
             {
-                TextView textView =
-                                (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor,
-                                                null);
+                TextView textView = (TextView) getActivity().getLayoutInflater().inflate(
+                                R.layout.textview_black_textcolor, null);
                 textView.setText(Html.fromHtml(user.accounts.get(userAccountListCursor).siteName));
                 userAccountList.addView(textView);
             }
@@ -342,9 +357,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
                 showUserProfile(resultData);
                 break;
             case UserIntentService.ERROR:
-                ViewGroup errorView =
-                                AppUtils.getErrorView(getActivity(),
-                                                (HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+                ViewGroup errorView = AppUtils.getErrorView(getActivity(),
+                                (HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
                 profileHomeLayout.removeAllViews();
                 profileHomeLayout.addView(errorView);
                 break;
@@ -360,8 +374,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             user = userPage.items.get(0);
             showUserDetail();
 
-            HashMap<String, Account> accounts =
-                            (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
+            HashMap<String, Account> accounts = (HashMap<String, Account>) resultData
+                            .getSerializable(StringConstants.USER_ACCOUNTS);
             if (accounts != null)
             {
                 if (user.accounts == null)
