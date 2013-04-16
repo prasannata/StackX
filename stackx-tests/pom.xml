@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.prasanna.android</groupId>
         <artifactId>stackx</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>1.0.6</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>com.prasanna.android</groupId>
             <artifactId>stackx-app</artifactId>
-            <version>1.0.6-SNAPSHOT</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>org.robolectric</groupId>
