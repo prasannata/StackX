@@ -311,13 +311,12 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                         permission.canAdd = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_ADD);
                         permission.canDelete = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_DELETE);
                         permission.canEdit = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_EDIT);
-                        permission.maxDailyActions =
-                                        permissionJsonObject.getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
-                        permission.minSecondsBetweenActions =
-                                        permissionJsonObject.getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
-                        permission.objectType =
-                                        ObjectType.getEnum(permissionJsonObject
-                                                        .getString(JsonFields.Permission.OBJECT_TYPE));
+                        permission.maxDailyActions = permissionJsonObject
+                                        .getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
+                        permission.minSecondsBetweenActions = permissionJsonObject
+                                        .getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
+                        permission.objectType = ObjectType.getEnum(permissionJsonObject
+                                        .getString(JsonFields.Permission.OBJECT_TYPE));
                         permission.userId = permissionJsonObject.getLong(JsonFields.Permission.USER_ID);
                         permissions.add(permission);
                     }
@@ -476,12 +475,15 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
         JSONObjectWrapper jsonObject = executeHttpGetRequest(restEndPoint, null);
-        String deauthenticatedAccessToken = jsonObject.getString(JsonFields.AccessToken.ACCESS_TOKEN);
-        if (deauthenticatedAccessToken == null || !accessToken.equals(deauthenticatedAccessToken))
+        if (jsonObject != null)
         {
-            error.id = jsonObject.getInt(JsonFields.Error.ERROR_ID);
-            error.name = jsonObject.getString(JsonFields.Error.ERROR_NAME);
-            error.message = jsonObject.getString(JsonFields.Error.ERROR_MESSAGE);
+            String deauthenticatedAccessToken = jsonObject.getString(JsonFields.AccessToken.ACCESS_TOKEN);
+            if (deauthenticatedAccessToken == null || !accessToken.equals(deauthenticatedAccessToken))
+            {
+                error.id = jsonObject.getInt(JsonFields.Error.ERROR_ID);
+                error.name = jsonObject.getString(JsonFields.Error.ERROR_NAME);
+                error.message = jsonObject.getString(JsonFields.Error.ERROR_MESSAGE);
+            }
         }
 
         return error;
