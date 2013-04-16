@@ -48,7 +48,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
 
-                <data android:scheme="package" />
+                <data
+                    android:path="com.prasanna.android.stacknetwork"
+                    android:scheme="package" />
             </intent-filter>
         </receiver>
         <receiver

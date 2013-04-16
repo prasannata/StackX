@@ -25,18 +25,17 @@ import android.content.Intent;
 
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.utils.LogWrapper;
 
 public class PackageUpgradeBroadcastReceiver extends BroadcastReceiver
 {
-    private static final String TAG = PackageUpgradeBroadcastReceiver.class.getSimpleName();
-
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        LogWrapper.d(TAG, "Alarm receiver invoked");
-
-        if (AppUtils.inAuthenticatedRealm(context))
-            AlarmUtils.activatePeriodicAccountSync(context.getApplicationContext());
+        if (Intent.ACTION_PACKAGE_REPLACED.equals(intent.getAction()))
+        {
+            if (AppUtils.inAuthenticatedRealm(context)
+                            && !AlarmUtils.isAccountSyncAlarmSet(context.getApplicationContext()))
+                AlarmUtils.activatePeriodicAccountSync(context.getApplicationContext());
+        }
     }
 }

@@ -33,6 +33,12 @@ public class AlarmUtils
 {
     private static final String TAG = AlarmUtils.class.getSimpleName();
 
+    public static boolean isAccountSyncAlarmSet(Context context)
+    {
+        Intent intent = new Intent(context, AccountSyncAlarmBroadcastReceiver.class);
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_NO_CREATE) != null;
+    }
+
     public static void activatePeriodicAccountSync(Context context)
     {
         createRepeatingAlarm(context, AccountSyncAlarmBroadcastReceiver.class, IntegerConstants.MS_IN_HALF_AN_HOUR, 0);
