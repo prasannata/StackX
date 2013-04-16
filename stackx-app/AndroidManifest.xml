@@ -51,8 +51,12 @@
                 <data android:scheme="package" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.InboxRefreshAlarmBroadcastReceiver" />
-        <receiver android:name=".receiver.AccountSyncAlarmBroadcastReceiver" />
+        <receiver
+            android:name=".receiver.InboxRefreshAlarmBroadcastReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".receiver.AccountSyncAlarmBroadcastReceiver"
+            android:exported="false" />
         <receiver
             android:name=".receiver.NewMsgNotificationReceiver"
             android:exported="false" >
