@@ -28,7 +28,6 @@ import com.prasanna.android.runners.ConfigurableRobolectricTestRunner;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.service.AccountSyncService;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -70,7 +69,6 @@ public class StackNetworkListActivityTest extends AbstractBaseListActivityTest<S
         ListView listView = (ListView) stackNetworkListActivity.findViewById(android.R.id.list);
 
         ShadowListActivity shadowListActivity = Robolectric.shadowOf(stackNetworkListActivity);
-        assertAccountSyncServiceStarted(shadowListActivity);
         assertGetUserSitesIntentServiceStarted(shadowListActivity, true);
         ArrayList<View> siteListViews = assertListView(listView, siteList);
         assertListItemClick(siteList, siteListViews, 1);
@@ -131,11 +129,6 @@ public class StackNetworkListActivityTest extends AbstractBaseListActivityTest<S
                     assertTrue(view.findViewById(R.id.writePermissionEnabled).getVisibility() == View.VISIBLE);
             }
         }
-    }
-
-    private void assertAccountSyncServiceStarted(ShadowListActivity shadowListActivity)
-    {
-        assertNextStartedIntentService(shadowListActivity, AccountSyncService.class);
     }
 
     private void assertGetUserSitesIntentServiceStarted(ShadowListActivity shadowListActivity, boolean me)
