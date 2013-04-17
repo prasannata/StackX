@@ -118,8 +118,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
             if (comments == null)
                 comments = new ArrayList<Comment>();
             itemsContainer = (ViewGroup) inflater.inflate(R.layout.comment_list_view, container, false);
-            postCommentFragmentContainer = (LinearLayout) itemsContainer
-                            .findViewById(R.id.post_comment_fragment_container);
+            postCommentFragmentContainer =
+                            (LinearLayout) itemsContainer.findViewById(R.id.post_comment_fragment_container);
             itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment, comments, this);
         }
 
@@ -389,12 +389,16 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     private void displayError(Bundle resultData)
     {
-        HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
-        String errorMsg = "Request failed for unknown reason";
-        if (e != null)
-            postCommentFragment.setSendError(e.getErrorResponse());
-        else
-            postCommentFragment.setSendError(errorMsg);
+        int requestCode = resultData.getInt(StringConstants.REQUEST_CODE, -1);
+        if (requestCode == WriteIntentService.ACTION_ADD_COMMENT)
+        {
+            HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
+            String errorMsg = "Request failed for unknown reason";
+            if (e != null)
+                postCommentFragment.setSendError(e.getErrorResponse());
+            else
+                postCommentFragment.setSendError(errorMsg);
+        }
     }
 
     private void onAddCommentComplete(Bundle resultData)
