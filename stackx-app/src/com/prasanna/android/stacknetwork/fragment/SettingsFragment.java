@@ -41,6 +41,7 @@ import android.preference.RingtonePreference;
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
 import com.prasanna.android.stacknetwork.R;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
@@ -118,10 +119,10 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private void setupDefaultSitePreference()
     {
         defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
-        String entry = (String) defaultSitePref.getValue();
+        Site defaultSite = AppUtils.getDefaultSite(getActivity().getApplicationContext());
         defaultSitePref.setEntryValues(new String[0]);
         defaultSitePref.setEntries(new String[0]);
-        defaultSitePref.setSummary(entry != null ? entry : "None");
+        defaultSitePref.setSummary(defaultSite != null ? defaultSite.name : "None");
 
         defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
         {
@@ -197,8 +198,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             {
                 accountActionPref.getDialog().dismiss();
 
-                AlertDialog yesNoDialog =
-                                DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener);
+                AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg,
+                                dialogClickListener);
                 yesNoDialog.show();
 
                 return true;
@@ -229,9 +230,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             }
         });
 
-        Uri ringtoneUri =
-                        Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
-                                        DEFAULT_RINGTONE));
+        Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
+                        DEFAULT_RINGTONE));
         if (ringtoneUri != null)
             setRingtoneSummary(ringtoneUri);
     }
