@@ -63,6 +63,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/textInput"
         android:layout_marginTop="4dp"
+        android:background="@drawable/selector_highlight"
         android:clickable="false"
         android:drawableRight="@drawable/dark_32x32_send_now"
         android:gravity="center"
