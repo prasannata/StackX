@@ -37,9 +37,10 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
+                    android:background="@drawable/selector_highlight"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
-                    android:src="@drawable/selector_menu_overflow" />
+                    android:src="@drawable/menu_overflow" />
 
                 <TextView
                     android:id="@+id/questionTitle"

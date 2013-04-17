@@ -10,8 +10,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:background="@drawable/selector_menu_overflow"
-        android:padding="5dp" />
+        android:background="@drawable/selector_highlight"
+        android:padding="5dp"
+        android:src="@drawable/menu_overflow" />
 
     <TextView
         android:id="@+id/code"

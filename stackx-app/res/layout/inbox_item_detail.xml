@@ -47,9 +47,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@id/postTitleLayout"
+        android:background="@drawable/selector_highlight"
         android:clickable="true"
         android:padding="3dp"
-        android:src="@drawable/selector_menu_overflow" />
+        android:src="@drawable/menu_overflow" />
 
     <TextView
         android:id="@+id/responseUserAndTime"
