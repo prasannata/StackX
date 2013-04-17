@@ -396,6 +396,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
             PostCommentFragment lastPostCommentFragment = (PostCommentFragment) getFragmentManager().findFragmentByTag("postCommentFragment");
             if (lastPostCommentFragment != null)
                 lastPostCommentFragment.setSendError(e.getErrorResponse());
+            else if(postCommentFragment != null)
+                postCommentFragment.setSendError(e.getErrorResponse());
         }
         else
             AppUtils.getErrorView(this, e);
