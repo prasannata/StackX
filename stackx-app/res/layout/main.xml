@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@id/login_button"
         android:layout_below="@id/login_button"
+        android:background="@drawable/selector_highlight"
         android:clickable="true"
         android:drawableLeft="@drawable/dark_48x48_av_next"
         android:gravity="center"
