@@ -15,8 +15,8 @@
         android:layout_marginRight="2dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textIsSelectable="false"
         android:textColor="@color/delft"
+        android:textIsSelectable="false"
         android:textSize="15sp" />
 
     <TextView
@@ -26,8 +26,8 @@
         android:layout_toRightOf="@id/commentScore"
         android:scrollHorizontally="false"
         android:textColor="@color/black"
-        android:textIsSelectable="true"
         android:textCursorDrawable="@null"
+        android:textIsSelectable="true"
         android:textSize="17sp" />
 
     <RelativeLayout
@@ -45,6 +45,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:background="@drawable/selector_highlight"
+            android:padding="5dp"
             android:src="@drawable/dark_24x24_social_reply"
             android:visibility="gone" />
 
@@ -60,6 +62,7 @@
                 android:id="@+id/editComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/selector_highlight"
                 android:padding="5dp"
                 android:src="@drawable/dark_24x24_edit"
                 android:visibility="gone" />
@@ -68,6 +71,7 @@
                 android:id="@+id/deleteComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/selector_highlight"
                 android:padding="5dp"
                 android:src="@drawable/dark_24x24_discard"
                 android:visibility="gone" />
