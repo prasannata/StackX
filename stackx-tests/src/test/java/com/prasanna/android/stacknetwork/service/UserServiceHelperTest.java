@@ -2,6 +2,7 @@ package com.prasanna.android.stacknetwork.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.model.StackXPage;
+import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -75,6 +77,39 @@ public class UserServiceHelperTest extends AbstractBaseServiceHelperTest
         int count = 0;
         while (iter.hasNext())
             assertSiteEquals(expectedSites.get(count++), allSitesInNetwork.get(iter.next()));
+    }
+
+    @Test
+    public void getMe() throws JSONException
+    {
+        assertUSerProfilePage(mockCallAndGetExpctedUser("stackoverflow", true),
+                        userServiceHelper.getMe("stackoverflow"));
+    }
+
+    @Test
+    public void getUser() throws JSONException
+    {
+        User expectedUser = mockCallAndGetExpctedUser("stackoverflow", false);
+        assertUSerProfilePage(expectedUser, userServiceHelper.getUserById(expectedUser.id, "stackoverflow"));
+    }
+
+    private User mockCallAndGetExpctedUser(final String site, final boolean me) throws JSONException
+    {
+        User expectedUser = getDetailedUser();
+        JSONObjectWrapper jsonObjectWrapper = JsonUtil.usertoJsonObjectWrapper(expectedUser);
+        HashMap<String, String> queryParams = getMinimumExpectedQueryParams(site);
+        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
+        String expectedUri = me ? "/me" : "/users/" + expectedUser.id;
+        mockRestCall(expectedUri, queryParams, jsonObjectWrapper);
+        return expectedUser;
+    }
+
+    private void assertUSerProfilePage(User expectedUser, StackXPage<User> me)
+    {
+        assertNotNull(me);
+        assertNotNull(me.items);
+        assertTrue(me.items.size() == 1);
+        assertDetailUserEquals(expectedUser, me.items.get(0));
     }
 
     @Test
@@ -155,28 +190,29 @@ public class UserServiceHelperTest extends AbstractBaseServiceHelperTest
         for (Account expectedAccount : expectedAccounts)
             assertAccountEquals(expectedAccount, accounts.get(expectedAccount.siteUrl));
     }
-    
+
     @Test
     public void logoutSuccess() throws JSONException
     {
         final String ACCESS_TOKEN = "access_token";
-        
-        mockRestCall("/apps/" + ACCESS_TOKEN + "/de-authenticate", null, JsonUtil.toJsonObjectWrapper(ACCESS_TOKEN, 100L));
+
+        mockRestCall("/apps/" + ACCESS_TOKEN + "/de-authenticate", null,
+                        JsonUtil.toJsonObjectWrapper(ACCESS_TOKEN, 100L));
         StackExchangeHttpError stackExchangeHttpError = userServiceHelper.logout(ACCESS_TOKEN);
         assertNotNull(stackExchangeHttpError);
         assertEquals(-1, stackExchangeHttpError.id);
     }
-    
+
     @Test
     public void logoutFail() throws JSONException
     {
         final String ACCESS_TOKEN = "access_token";
-        
+
         StackExchangeHttpError expectedError = new StackExchangeHttpError();
         expectedError.id = 400;
         expectedError.name = "bad_request";
         expectedError.message = "biatch!";
-        
+
         JSONObjectWrapper jsonObjectWrapper = JsonUtil.toJsonObjectWrapper(expectedError);
         mockRestCall("/apps/" + ACCESS_TOKEN + "/de-authenticate", null, jsonObjectWrapper);
         StackExchangeHttpError stackExchangeHttpError = userServiceHelper.logout(ACCESS_TOKEN);

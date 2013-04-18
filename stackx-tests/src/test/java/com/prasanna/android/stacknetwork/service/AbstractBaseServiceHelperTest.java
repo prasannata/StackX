@@ -64,6 +64,14 @@ public abstract class AbstractBaseServiceHelperTest
         return expectedQueryParams;
     }
 
+    protected HashMap<String, String> getMinimumExpectedQueryParams(String site)
+    {
+        HashMap<String, String> expectedQueryParams = new HashMap<String, String>();
+        expectedQueryParams.put(StackUri.QueryParams.SITE, site);
+        expectedQueryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
+        return expectedQueryParams;
+    }
+
     protected HashMap<String, String> getMinimumExpectedQueryParamsForAuthUser()
     {
         HashMap<String, String> expectedQueryParams = getMinimumExpectedQueryParams();
@@ -193,6 +201,27 @@ public abstract class AbstractBaseServiceHelperTest
         return comment;
     }
 
+    protected User getDetailedUser()
+    {
+        User user = new User();
+        user.id = 199;
+        user.displayName = "displayName";
+        user.acceptRate = 50;
+        user.accountId = 299;
+        user.reputation = 500;
+        user.profileViews = 100;
+        user.badgeCounts = new int[3];
+        user.badgeCounts[0] = 1;
+        user.badgeCounts[1] = 10;
+        user.badgeCounts[2] = 20;
+        user.questionCount = 10;
+        user.answerCount = 5;
+        user.upvoteCount = 25;
+        user.downvoteCount = 2;
+        user.lastAccessTime = System.currentTimeMillis();
+        return user;
+    }
+
     protected User getShallowUser()
     {
         User user = new User();
@@ -204,6 +233,22 @@ public abstract class AbstractBaseServiceHelperTest
         return user;
     }
 
+    protected void assertDetailUserEquals(User expectedUser, User user)
+    {
+        assertNotNull(user);
+        assertEquals(expectedUser.id, user.id);
+        assertEquals(expectedUser.displayName, user.displayName);
+        assertEquals(expectedUser.reputation, user.reputation);
+        assertEquals(expectedUser.acceptRate, user.acceptRate);
+        assertEquals(expectedUser.profileViews, user.profileViews);
+        assertArrayEquals(expectedUser.badgeCounts, user.badgeCounts);
+        assertEquals(expectedUser.questionCount, user.questionCount);
+        assertEquals(expectedUser.answerCount, user.answerCount);
+        assertEquals(expectedUser.upvoteCount, user.upvoteCount);
+        assertEquals(expectedUser.downvoteCount, user.downvoteCount);
+        assertEquals(expectedUser.lastAccessTime, user.lastAccessTime);
+    }
+    
     protected void assertSiteEquals(Site expectedSite, Site site)
     {
         assertNotNull(site);

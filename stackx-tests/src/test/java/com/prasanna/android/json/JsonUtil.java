@@ -156,9 +156,32 @@ public class JsonUtil
         return addItemToArrayAndGetJSONObjectWrapper(toJSONObject(comment));
     }
 
-    public static JSONObjectWrapper toJsonObjectWrapper(User user) throws JSONException
+    public static JSONObjectWrapper usertoJsonObjectWrapper(User user) throws JSONException
     {
-        return null;
+        return addItemToArrayAndGetJSONObjectWrapper(detailedUsertoJSONObject(user));
+    }
+
+    private static JSONObject detailedUsertoJSONObject(User user) throws JSONException
+    {
+        JSONObject owner = new JSONObject();
+        owner.put(JsonFields.User.USER_ID, user.id);
+        owner.put(JsonFields.User.DISPLAY_NAME, user.displayName);
+        owner.put(JsonFields.User.REPUTATION, user.reputation);
+        owner.put(JsonFields.User.ACCEPT_RATE, user.acceptRate);
+        owner.put(JsonFields.User.PROFILE_IMAGE, user.profileImageLink);
+        owner.put(JsonFields.User.VIEW_COUNT, user.profileViews);
+        owner.put(JsonFields.User.QUESTION_COUNT, user.questionCount);
+        owner.put(JsonFields.User.ANSWER_COUNT, user.answerCount);
+        owner.put(JsonFields.User.UP_VOTE_COUNT, user.upvoteCount);
+        owner.put(JsonFields.User.DOWN_VOTE_COUNT, user.downvoteCount);
+        owner.put(JsonFields.User.LAST_ACCESS_DATE, user.lastAccessTime);
+        
+        JSONObject badgeCounts = new JSONObject();
+        badgeCounts.put(JsonFields.BadgeCounts.GOLD, user.badgeCounts[0]);
+        badgeCounts.put(JsonFields.BadgeCounts.SILVER, user.badgeCounts[1]);
+        badgeCounts.put(JsonFields.BadgeCounts.BRONZE, user.badgeCounts[2]);
+        owner.put(JsonFields.User.BADGE_COUNTS, badgeCounts);
+        return owner;
     }
 
     public static JSONObjectWrapper toJsonObjectWrapper(InboxItem inboxItem) throws JSONException
@@ -186,14 +209,14 @@ public class JsonUtil
         return wrapObject(itemArrayList);
     }
 
-    private static JSONObject toJSONObject(User user) throws JSONException
+    private static JSONObject toJSONObject(User shallowUser) throws JSONException
     {
         JSONObject owner = new JSONObject();
-        owner.put(JsonFields.User.USER_ID, user.id);
-        owner.put(JsonFields.User.DISPLAY_NAME, user.displayName);
-        owner.put(JsonFields.User.REPUTATION, user.reputation);
-        owner.put(JsonFields.User.ACCEPT_RATE, user.acceptRate);
-        owner.put(JsonFields.User.PROFILE_IMAGE, user.profileImageLink);
+        owner.put(JsonFields.User.USER_ID, shallowUser.id);
+        owner.put(JsonFields.User.DISPLAY_NAME, shallowUser.displayName);
+        owner.put(JsonFields.User.REPUTATION, shallowUser.reputation);
+        owner.put(JsonFields.User.ACCEPT_RATE, shallowUser.acceptRate);
+        owner.put(JsonFields.User.PROFILE_IMAGE, shallowUser.profileImageLink);
         return owner;
     }
 
