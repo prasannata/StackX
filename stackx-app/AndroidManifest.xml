@@ -89,7 +89,7 @@
             android:name=".StackNetworkListActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
         <activity
@@ -125,7 +125,7 @@
             android:name=".UserInboxActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleInstance" >
+            android:launchMode="singleTask" >
         </activity>
         <activity
             android:name=".InboxItemActivity"
