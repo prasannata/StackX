@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -97,18 +98,21 @@ public abstract class AbstractUserActionBarActivity extends Activity
 
     protected void setActionBarTitleAndIcon()
     {
-        if (getActionBar().getTitle() == null)
-            getActionBar().setTitle(OperatingSite.getSite().name);
-
-        setActionBarHomeIcon(OperatingSite.getSite().name, OperatingSite.getSite().iconUrl);
+        setActionBarTitle(OperatingSite.getSite().name);
+        setActionBarHomeIcon(OperatingSite.getSite());
     }
 
-    protected void setActionBarHomeIcon(String site, String siteIconUrl)
+    protected void setActionBarTitle(String title)
     {
-        if (BitmapCache.getInstance().containsKey(site))
-            setActionBarHomeIcon(BitmapCache.getInstance().get(site));
+        getActionBar().setTitle(Html.fromHtml(title));
+    }
+
+    protected void setActionBarHomeIcon(Site site)
+    {
+        if (BitmapCache.getInstance().containsKey(site.name))
+            setActionBarHomeIcon(BitmapCache.getInstance().get(site.name));
         else
-            loadIcon(site, siteIconUrl);
+            loadIcon(site.name, site.iconUrl);
     }
 
     protected void setActionBarHomeIcon(Bitmap result)

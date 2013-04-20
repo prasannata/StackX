@@ -41,6 +41,7 @@ import android.widget.Toast;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.InboxItem;
+import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
@@ -94,7 +95,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    protected void setActionBarHomeIcon(String site, String siteIconUrl)
+    protected void setActionBarHomeIcon(Site site)
     {
         getActionBar().setIcon(R.drawable.ic_launcher1);
         getActionBar().setHomeButtonEnabled(true);

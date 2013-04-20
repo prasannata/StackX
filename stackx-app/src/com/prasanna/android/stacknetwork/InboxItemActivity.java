@@ -139,8 +139,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         if (item == null || item.site == null)
             super.setActionBarTitleAndIcon();
 
-        getActionBar().setTitle(Html.fromHtml(item.title));
-        setActionBarHomeIcon(item.site.name, item.site.iconUrl);
+        setActionBarTitle(item.title);
+        setActionBarHomeIcon(item.site);
     }
 
     @Override

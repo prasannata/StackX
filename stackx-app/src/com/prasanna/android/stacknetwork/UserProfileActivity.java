@@ -100,8 +100,8 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
 
     protected void setActionBarTitleAndIcon()
     {
-        getActionBar().setTitle(site.name);
-        setActionBarHomeIcon(site.name, site.iconUrl);
+        setActionBarTitle(site.name);
+        setActionBarHomeIcon(site);
     }
 
     @Override
