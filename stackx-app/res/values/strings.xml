@@ -82,6 +82,7 @@
     <string name="Edit">Edit</string>
     <string name="Delete">Delete</string>
     <string name="fullscreen">Fullscreen</string>
+    <string name="rateApp">Rate App</string>
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>
 

@@ -9,6 +9,11 @@
             android:key="pref_defaultSite"
             android:persistent="true"
             android:title="@string/defaultSite" />
+        <ListPreference
+            android:key="pref_rateApp"
+            android:persistent="true"
+            android:title="@string/rateApp" />
+        
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_inbox"

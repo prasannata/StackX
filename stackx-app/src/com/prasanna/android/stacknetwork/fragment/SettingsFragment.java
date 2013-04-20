@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -57,7 +58,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_INBOX_NOTIFICATION = "pref_newNotification";
     public static final String KEY_PREF_NOTIF_VIBRATE = "pref_vibrate";
     public static final String KEY_PREF_NOTIF_RINGTONE = "pref_notificationTone";
-    public static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
     public static final String KEY_PREF_CLEAR_CACHE = "pref_clearCache";
     public static final String KEY_PREF_DEFAULT_SITE = "pref_defaultSite";
     public static final String KEY_PREF_SEARCH_IN_TITLE = "pref_searchInTitle";
@@ -65,13 +65,15 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_SEARCH_ONLY_ANSWERED = "pref_searchOnlyAnswered";
     public static final String KEY_PREF_NUM_SAVED_SEARCHES = "pref_numSavedSearches";
 
+    private static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
+    private static final String KEY_PREF_RATE_APP = "pref_rateApp";
+
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
     public static final String PREFIX_KEY_PREF_WRITE_PERMISSION = "pref_writePermission_";
 
     private ListPreference refreshIntervalPref;
     private ListPreference accountActionPref;
-    private ListPreference defaultSitePref;
     private RingtonePreference notifRingTonePref;
     private PreferenceCategory inboxPrefCategory;
 
@@ -112,13 +114,14 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         addPreferencesFromResource(R.xml.preferences);
 
         setupDefaultSitePreference();
+        setupRateAppPreference();
         setupAccountPreference();
         setupInboxPreference();
     }
 
     private void setupDefaultSitePreference()
     {
-        defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
+        final ListPreference defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
         Site defaultSite = AppUtils.getDefaultSite(getActivity().getApplicationContext());
         defaultSitePref.setEntryValues(new String[0]);
         defaultSitePref.setEntries(new String[0]);
@@ -130,6 +133,35 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             public boolean onPreferenceClick(Preference preference)
             {
                 defaultSitePref.getDialog().dismiss();
+                return true;
+            }
+        });
+    }
+
+    private void setupRateAppPreference()
+    {
+        final ListPreference rateApp = (ListPreference) findPreference(KEY_PREF_RATE_APP);
+        rateApp.setEntryValues(new String[0]);
+        rateApp.setEntries(new String[0]);
+
+        rateApp.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                rateApp.getDialog().dismiss();
+                String appName = "com.prasanna.android.stacknetwork";
+                
+                try
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
+                }
+                catch (ActivityNotFoundException anfe)
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri
+                                    .parse("http://play.google.com/store/apps/details?id=" + appName)));
+                }
+
                 return true;
             }
         });
@@ -198,8 +230,8 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             {
                 accountActionPref.getDialog().dismiss();
 
-                AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg,
-                                dialogClickListener);
+                AlertDialog yesNoDialog =
+                                DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener);
                 yesNoDialog.show();
 
                 return true;
@@ -230,8 +262,9 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             }
         });
 
-        Uri ringtoneUri = Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
-                        DEFAULT_RINGTONE));
+        Uri ringtoneUri =
+                        Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
+                                        DEFAULT_RINGTONE));
         if (ringtoneUri != null)
             setRingtoneSummary(ringtoneUri);
     }
