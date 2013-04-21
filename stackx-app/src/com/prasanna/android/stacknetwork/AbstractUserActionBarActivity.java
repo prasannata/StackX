@@ -32,6 +32,7 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -68,6 +69,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        
         super.onCreate(savedInstanceState);
 
         loadDefaultSite();
