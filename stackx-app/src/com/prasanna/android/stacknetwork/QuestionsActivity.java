@@ -129,79 +129,11 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         }
     }
 
-    private void showFragmentForIntentAction()
-    {
-        intentAction = getIntent().getAction();
-
-        if (Intent.ACTION_SEARCH.equals(intentAction))
-            showSearchFragment();
-        else if (StringConstants.SIMILAR.equals(intentAction))
-            showSimilarQuestionListFragment();
-        else if (StringConstants.RELATED.equals(intentAction))
-            showRelatedQuestionListFragment();
-        else if (StringConstants.TAG.equals(intentAction))
-            showTagQuestionListFragment();
-        else
-            showFrontPageForSite();
-    }
-
     private void showFrontPageForSite()
     {
         showTagsFragment = true;
         getActionBar().setDisplayHomeAsUpEnabled(true);
         setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
-    }
-
-    private void showSearchFragment()
-    {
-        String query = getIntent().getStringExtra(SearchManager.QUERY);
-        saveSearchQuery(query);
-
-        String fragmentTag = "search -" + query;
-        QuestionListFragment questionListFragment = getFragment(fragmentTag);
-
-        if (questionListFragment == null)
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null);
-
-        replaceFragment(questionListFragment, fragmentTag, false);
-    }
-
-    private void showSimilarQuestionListFragment()
-    {
-        String title = getIntent().getStringExtra(StringConstants.TITLE);
-        String fragmentTag = StringConstants.SIMILAR + "-" + title.hashCode();
-
-        getActionBar().setTitle(getString(R.string.similar) + " to " + title);
-
-        QuestionListFragment questionListFragment = getFragment(fragmentTag);
-
-        if (questionListFragment == null)
-        {
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null, null);
-            questionListFragment.getBundle().putString(StringConstants.TITLE, title);
-        }
-
-        replaceFragment(questionListFragment, fragmentTag, false);
-    }
-
-    private void showRelatedQuestionListFragment()
-    {
-        long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
-        String fragmentTag = QuestionsIntentService.GET_RELATED + "-" + questionId;
-
-        QuestionListFragment questionListFragment = getFragment(fragmentTag);
-        if (questionListFragment == null)
-        {
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null, null);
-            questionListFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-        }
-        replaceFragment(questionListFragment, fragmentTag, false);
-    }
-
-    private void showTagQuestionListFragment()
-    {
-        String tag = getIntent().getStringExtra(StringConstants.TAG);
-        setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
     private void showLastTagQuestionListFragment(Bundle savedInstanceState)
@@ -245,13 +177,6 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         Tab tab = getActionBar().newTab();
         tab.setText(title).setTabListener(new TabListener(fragment));
         getActionBar().addTab(tab, setSelected);
-    }
-
-    private void saveSearchQuery(String query)
-    {
-        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
-                        RecentQueriesProvider.MODE);
-        suggestions.saveRecentQuery(query, null);
     }
 
     @Override
@@ -305,6 +230,81 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
                 }
             }
         }
+    }
+
+    private void showFragmentForIntentAction()
+    {
+        intentAction = getIntent().getAction();
+
+        if (Intent.ACTION_SEARCH.equals(intentAction))
+            showSearchFragment();
+        else if (StringConstants.SIMILAR.equals(intentAction))
+            showSimilarQuestionListFragment();
+        else if (StringConstants.RELATED.equals(intentAction))
+            showRelatedQuestionListFragment();
+        else if (StringConstants.TAG.equals(intentAction))
+            showTagQuestionListFragment();
+        else
+            showFrontPageForSite();
+    }
+    
+    private void showSearchFragment()
+    {
+        String query = getIntent().getStringExtra(SearchManager.QUERY);
+        saveSearchQuery(query);
+
+        String fragmentTag = "search -" + query;
+        QuestionListFragment questionListFragment = getFragment(fragmentTag);
+
+        if (questionListFragment == null)
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null);
+
+        replaceFragment(questionListFragment, fragmentTag, false);
+    }
+
+    private void saveSearchQuery(String query)
+    {
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY,
+                        RecentQueriesProvider.MODE);
+        suggestions.saveRecentQuery(query, null);
+    }
+    
+    private void showSimilarQuestionListFragment()
+    {
+        String title = getIntent().getStringExtra(StringConstants.TITLE);
+        String fragmentTag = StringConstants.SIMILAR + "-" + title.hashCode();
+
+        getActionBar().setTitle(getString(R.string.similar) + " to " + title);
+
+        QuestionListFragment questionListFragment = getFragment(fragmentTag);
+
+        if (questionListFragment == null)
+        {
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null, null);
+            questionListFragment.getBundle().putString(StringConstants.TITLE, title);
+        }
+
+        replaceFragment(questionListFragment, fragmentTag, false);
+    }
+
+    private void showRelatedQuestionListFragment()
+    {
+        long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
+        String fragmentTag = QuestionsIntentService.GET_RELATED + "-" + questionId;
+
+        QuestionListFragment questionListFragment = getFragment(fragmentTag);
+        if (questionListFragment == null)
+        {
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null, null);
+            questionListFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+        }
+        replaceFragment(questionListFragment, fragmentTag, false);
+    }
+
+    private void showTagQuestionListFragment()
+    {
+        String tag = getIntent().getStringExtra(StringConstants.TAG);
+        setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
     }
 
     @Override
