@@ -31,7 +31,7 @@ public abstract class AbstractHttpException extends RuntimeException implements 
     {
         super();
     }
-    
+
     public AbstractHttpException(String message)
     {
         this(0, null, message);
@@ -50,10 +50,15 @@ public abstract class AbstractHttpException extends RuntimeException implements 
     public AbstractHttpException(int statusCode, String statusDescription, String errorResponse)
     {
         super(errorResponse);
-        
+
         this.statusCode = statusCode;
         this.statusDescription = statusDescription;
         this.errorResponse = errorResponse;
+    }
+
+    public AbstractHttpException(Throwable throwable)
+    {
+        super(throwable);
     }
 
     @Override

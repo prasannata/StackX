@@ -30,6 +30,8 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.prasanna.android.http.SecureHttpHelper;
+import com.prasanna.android.http.SecureHttpHelper.HttpResponseBodyParser;
+import com.prasanna.android.http.SecureHttpHelper.HttpResponseParseException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.IdentifiableItem;
@@ -45,6 +47,26 @@ import com.prasanna.android.utils.LogWrapper;
 public abstract class AbstractBaseServiceHelper
 {
     protected abstract String getLogTag();
+
+    private final JSONParser jsonParser = new JSONParser();
+
+    public static class JSONParser implements HttpResponseBodyParser<JSONObjectWrapper>
+    {
+
+        @Override
+        public JSONObjectWrapper parse(String responseBody) throws HttpResponseParseException
+        {
+            try
+            {
+                return new JSONObjectWrapper(new JSONObject(responseBody));
+            }
+            catch (JSONException e)
+            {
+                throw new HttpResponseParseException(e);
+            }
+        }
+
+    }
 
     protected SecureHttpHelper getHttpHelper()
     {
@@ -70,8 +92,8 @@ public abstract class AbstractBaseServiceHelper
         if (jsonObject != null)
         {
             JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
-            JSONObjectWrapper userJsonObject =
-                            JSONObjectWrapper.wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
+            JSONObjectWrapper userJsonObject = JSONObjectWrapper
+                            .wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
 
             page.items = new ArrayList<User>();
 
@@ -103,7 +125,8 @@ public abstract class AbstractBaseServiceHelper
 
     protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject)
     {
-        int[] badgeCounts = { 0, 0, 0 };
+        int[] badgeCounts =
+        { 0, 0, 0 };
 
         if (badgeCountJsonObject != null)
         {
@@ -248,14 +271,14 @@ public abstract class AbstractBaseServiceHelper
     protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
     {
         return getHttpHelper().executeHttpGet(StackUri.STACKX_API_HOST, restEndPoint, queryParams,
-                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR);
+                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, jsonParser);
     }
 
     protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
                     Map<String, String> queryParams, HttpEntity httpEntity)
     {
         return getHttpHelper().executeHttpPost(StackUri.STACKX_API_HOST, restEndPoint, requestHeaders, queryParams,
-                        httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR);
+                        httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, jsonParser);
 
     }
 

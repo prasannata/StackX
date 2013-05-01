@@ -29,7 +29,8 @@ public class ClientException extends AbstractHttpException implements Serializab
     {
         NO_NETWORK(1, "No network available"),
         INVALID_ENCODING(2, "Invalid encoding"),
-        HTTP_REQ_ERROR(3, "Failed to create http request");
+        HTTP_REQ_ERROR(3, "Failed to create http request"),
+        RESPONSE_PARSE_ERROR(4, "Http response parsing failed");
 
         private final int statusCode;
         private final String description;
@@ -70,6 +71,13 @@ public class ClientException extends AbstractHttpException implements Serializab
     public ClientException(ClientErrorCode code, String errorResponse)
     {
         super(errorResponse);
+
+        this.code = code;
+    }
+
+    public ClientException(ClientErrorCode code, Throwable throwable)
+    {
+        super(throwable);
 
         this.code = code;
     }

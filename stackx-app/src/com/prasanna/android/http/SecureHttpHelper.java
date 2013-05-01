@@ -52,8 +52,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -61,7 +59,6 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 
 import com.prasanna.android.http.ClientException.ClientErrorCode;
-import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.Validate;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -76,6 +73,11 @@ public class SecureHttpHelper
     private static final SecureHttpHelper httpHelper = new SecureHttpHelper();
     public static final HttpGzipResponseInterceptor HTTP_GZIP_RESPONSE_INTERCEPTOR = new HttpGzipResponseInterceptor(
                     GZIP, GzipDecompressingEntity.class);
+
+    public interface HttpResponseBodyParser<T>
+    {
+        T parse(String responseBody) throws HttpResponseParseException;
+    }
 
     public static class HttpErrorFamily
     {
@@ -101,6 +103,17 @@ public class SecureHttpHelper
         {
             return -1;
         }
+    }
+
+    public static class HttpResponseParseException extends Exception
+    {
+        private static final long serialVersionUID = 8952054677122646195L;
+
+        public HttpResponseParseException(Throwable throwable)
+        {
+            super(throwable);
+        }
+
     }
 
     protected SecureHttpHelper()
@@ -129,16 +142,16 @@ public class SecureHttpHelper
             {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            
+
             throw new ClientException(ClientErrorCode.HTTP_REQ_ERROR);
         }
 
         return null;
     }
 
-    public JSONObjectWrapper executeHttpPost(String host, String path, Map<String, String> requestHeaders,
+    public <T> T executeHttpPost(String host, String path, Map<String, String> requestHeaders,
                     Map<String, String> queryParams, HttpEntity httpEntity,
-                    HttpResponseInterceptor httpResponseInterceptor)
+                    HttpResponseInterceptor httpResponseInterceptor, HttpResponseBodyParser<T> responseBodyParser)
     {
         HttpPost request = getHttpPostObject(buildUri(host, path, queryParams));
 
@@ -148,18 +161,19 @@ public class SecureHttpHelper
                 request.setHeader(entry.getKey(), entry.getValue());
         }
         request.setEntity(httpEntity);
-        return executeRequest(getHttpClient(httpResponseInterceptor), request);
+        return executeRequest(getHttpClient(httpResponseInterceptor), request, responseBodyParser);
     }
 
-    public JSONObjectWrapper executeHttpGet(String host, String path, Map<String, String> queryParams,
-                    HttpResponseInterceptor httpResponseInterceptor)
+    public <T> T executeHttpGet(String host, String path, Map<String, String> queryParams,
+                    HttpResponseInterceptor httpResponseInterceptor, HttpResponseBodyParser<T> responseBodyParser)
     {
         HttpGet request = getHttpGetObject(buildUri(host, path, queryParams));
         request.setHeader(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
-        return executeRequest(getHttpClient(httpResponseInterceptor), request);
+        return executeRequest(getHttpClient(httpResponseInterceptor), request, responseBodyParser);
     }
 
-    private JSONObjectWrapper executeRequest(HttpClient client, HttpRequestBase request)
+    private <T> T executeRequest(HttpClient client, HttpRequestBase request,
+                    HttpResponseBodyParser<T> responseBodyParser)
     {
         LogWrapper.d(TAG, "HTTP request to: " + request.getURI().toString());
 
@@ -167,19 +181,19 @@ public class SecureHttpHelper
         {
             HttpResponse httpResponse = client.execute(request);
             HttpEntity entity = httpResponse.getEntity();
-            String jsonText = EntityUtils.toString(entity, HTTP.UTF_8);
+            String responseBody = EntityUtils.toString(entity, HTTP.UTF_8);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
 
             if (statusCode == HttpStatus.SC_OK)
-                return new JSONObjectWrapper(new JSONObject(jsonText));
+                return responseBodyParser.parse(responseBody);
             else
             {
-                LogWrapper.d(TAG, "Http request failed: " + statusCode + ", " + jsonText);
+                LogWrapper.d(TAG, "Http request failed: " + statusCode + ", " + responseBody);
 
                 if (statusCode >= HttpErrorFamily.SERVER_ERROR)
-                    throw new ServerException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), jsonText);
+                    throw new ServerException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), responseBody);
                 else if (statusCode >= HttpErrorFamily.CLIENT_ERROR)
-                    throw new ClientException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), jsonText);
+                    throw new ClientException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), responseBody);
             }
         }
         catch (ClientProtocolException e)
@@ -190,9 +204,9 @@ public class SecureHttpHelper
         {
             LogWrapper.e(TAG, e.getMessage());
         }
-        catch (JSONException e)
+        catch (HttpResponseParseException e)
         {
-            LogWrapper.e(TAG, e.getMessage());
+            throw new ClientException(ClientErrorCode.RESPONSE_PARSE_ERROR, e.getCause());
         }
 
         return null;
@@ -202,7 +216,7 @@ public class SecureHttpHelper
     {
         HttpClient client = createSecureHttpClient();
         if (httpResponseInterceptor != null)
-            ((DefaultHttpClient)client).addResponseInterceptor(httpResponseInterceptor);
+            ((DefaultHttpClient) client).addResponseInterceptor(httpResponseInterceptor);
         return client;
     }
 
@@ -258,7 +272,7 @@ public class SecureHttpHelper
         Validate.notNull(host, path);
 
         Builder uriBuilder = Uri.parse(host).buildUpon().appendPath(path);
-        
+
         if (queryParams != null)
         {
             for (Map.Entry<String, String> entrySet : queryParams.entrySet())
@@ -267,7 +281,7 @@ public class SecureHttpHelper
 
         return uriBuilder.build().toString();
     }
-    
+
     protected Bitmap getBitmap(HttpResponse response) throws IOException
     {
         return BitmapFactory.decodeStream(response.getEntity().getContent());
