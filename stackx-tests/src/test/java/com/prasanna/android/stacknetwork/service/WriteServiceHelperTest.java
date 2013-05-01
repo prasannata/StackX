@@ -32,6 +32,7 @@ import com.prasanna.android.http.HttpHeaderParams;
 import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.json.JsonUtil;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.service.AbstractBaseServiceHelper.JSONParser;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
@@ -69,11 +70,12 @@ public class WriteServiceHelperTest extends AbstractBaseServiceHelperTest
         when(
                         httpHelper.executeHttpPost(anyString(), anyString(), (Map<String, String>) anyMap(),
                                         (Map<String, String>) anyMap(), (UrlEncodedFormEntity) anyObject(),
-                                        (HttpResponseInterceptor) anyObject())).thenReturn(jsonObjectWrapper);
+                                        (HttpResponseInterceptor) anyObject(), (JSONParser) anyObject())).thenReturn(
+                        jsonObjectWrapper);
 
         assertAddedComment(expectedComment, writeServiceHelper.addComment(1L, "body"), "/posts/1/comments/add");
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void editComment() throws JSONException, UnsupportedEncodingException
@@ -85,7 +87,8 @@ public class WriteServiceHelperTest extends AbstractBaseServiceHelperTest
         when(
                         httpHelper.executeHttpPost(anyString(), anyString(), (Map<String, String>) anyMap(),
                                         (Map<String, String>) anyMap(), (UrlEncodedFormEntity) anyObject(),
-                                        (HttpResponseInterceptor) anyObject())).thenReturn(jsonObjectWrapper);
+                                        (HttpResponseInterceptor) anyObject(), (JSONParser) anyObject())).thenReturn(
+                        jsonObjectWrapper);
 
         assertAddedComment(expectedComment, writeServiceHelper.editComment(1L, "body"), "/comments/1/edit");
     }
@@ -96,7 +99,7 @@ public class WriteServiceHelperTest extends AbstractBaseServiceHelperTest
         writeServiceHelper.deleteComment(1L);
         assertDeletedComment("/comments/1/delete", getBasicNameValuePartListForWriteComment());
     }
-    
+
     private void assertDeletedComment(String path, List<BasicNameValuePair> basicNameValuePartListForWriteComment)
     {
         Map<String, String> requestHeaders = new HashMap<String, String>();
@@ -129,7 +132,8 @@ public class WriteServiceHelperTest extends AbstractBaseServiceHelperTest
         return requestHeaders;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings(
+    { "rawtypes", "unchecked" })
     private void verifyHttpPostExecuteInvocation(String expectedPath, Map<String, String> expectedRequestHeaders,
                     List<BasicNameValuePair> expectedNameValuePair)
     {
@@ -138,17 +142,19 @@ public class WriteServiceHelperTest extends AbstractBaseServiceHelperTest
         ArgumentCaptor<Map> requestHeadersArgCaptor = ArgumentCaptor.forClass(Map.class);
         ArgumentCaptor<Map> queryParamsArgCaptor = ArgumentCaptor.forClass(Map.class);
         ArgumentCaptor<UrlEncodedFormEntity> httpEntityArgCaptor = ArgumentCaptor.forClass(UrlEncodedFormEntity.class);
-        ArgumentCaptor<HttpGzipResponseInterceptor> interceptorArgCaptor =
-                        ArgumentCaptor.forClass(HttpGzipResponseInterceptor.class);
+        ArgumentCaptor<HttpGzipResponseInterceptor> interceptorArgCaptor = ArgumentCaptor
+                        .forClass(HttpGzipResponseInterceptor.class);
+        ArgumentCaptor<JSONParser> parserArgCaptor = ArgumentCaptor.forClass(JSONParser.class);
 
         verify(httpHelper, times(1)).executeHttpPost(hostArgCaptor.capture(), pathArgCaptor.capture(),
                         requestHeadersArgCaptor.capture(), queryParamsArgCaptor.capture(),
-                        httpEntityArgCaptor.capture(), interceptorArgCaptor.capture());
+                        httpEntityArgCaptor.capture(), interceptorArgCaptor.capture(), parserArgCaptor.capture());
 
         assertEquals(StackUri.STACKX_API_HOST, hostArgCaptor.getValue());
         assertEquals(expectedPath, pathArgCaptor.getValue());
         assertEquals(expectedRequestHeaders, requestHeadersArgCaptor.getValue());
         assertNull(queryParamsArgCaptor.getValue());
         assertEquals(SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, interceptorArgCaptor.getValue());
+        assertEquals(AbstractBaseServiceHelper.JSON_PARSER, parserArgCaptor.getValue());
     }
 }

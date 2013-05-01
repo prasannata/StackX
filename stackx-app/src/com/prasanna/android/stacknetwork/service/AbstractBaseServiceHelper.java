@@ -48,7 +48,7 @@ public abstract class AbstractBaseServiceHelper
 {
     protected abstract String getLogTag();
 
-    private final JSONParser jsonParser = new JSONParser();
+    public static final JSONParser JSON_PARSER = new JSONParser();
 
     public static class JSONParser implements HttpResponseBodyParser<JSONObjectWrapper>
     {
@@ -271,14 +271,14 @@ public abstract class AbstractBaseServiceHelper
     protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
     {
         return getHttpHelper().executeHttpGet(StackUri.STACKX_API_HOST, restEndPoint, queryParams,
-                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, jsonParser);
+                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
     }
 
     protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
                     Map<String, String> queryParams, HttpEntity httpEntity)
     {
         return getHttpHelper().executeHttpPost(StackUri.STACKX_API_HOST, restEndPoint, requestHeaders, queryParams,
-                        httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, jsonParser);
+                        httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
 
     }
 

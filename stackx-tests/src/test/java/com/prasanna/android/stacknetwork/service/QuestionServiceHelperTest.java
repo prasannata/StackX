@@ -29,6 +29,7 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXPage;
+import com.prasanna.android.stacknetwork.service.AbstractBaseServiceHelper.JSONParser;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
@@ -69,7 +70,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
 
         when(
                         httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, "questions/" + 1, expectedQueryParams,
-                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenReturn(jsonObjectWrapper);
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR,
+                                        AbstractBaseServiceHelper.JSON_PARSER)).thenReturn(jsonObjectWrapper);
 
         assertEquals(BODY, questionServiceHelper.getQuestionBodyForId(1, site.apiSiteParameter));
     }
@@ -88,7 +90,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
     {
         when(
                         httpHelper.executeHttpGet(anyString(), anyString(), (Map<String, String>) anyMap(),
-                                        (HttpGzipResponseInterceptor) anyObject())).thenReturn(null);
+                                        (HttpGzipResponseInterceptor) anyObject(), (JSONParser) anyObject()))
+                        .thenReturn(null);
         assertNull(questionServiceHelper.getQuestionBodyForId(1, "stackoverflow"));
     }
 
@@ -102,7 +105,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
         expectedQueryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
         when(
                         httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, "questions/" + 1, expectedQueryParams,
-                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenReturn(jsonObjectWrapper);
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR,
+                                        AbstractBaseServiceHelper.JSON_PARSER)).thenReturn(jsonObjectWrapper);
 
         Question question = questionServiceHelper.getQuestionFullDetails(1, site.apiSiteParameter);
         assertQuestionEquals(expectedQuestion, question);
@@ -126,9 +130,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
         String expectedRestEndpoint = StringConstants.QUESTIONS + "/" + POST_ID + "/" + StringConstants.COMMENTS;
         mockRestCall(expectedRestEndpoint, expectedQueryParams, jsonObjectWrapper);
 
-        StackXPage<Comment> commentsPage =
-                        questionServiceHelper.getComments(StringConstants.QUESTIONS, site.apiSiteParameter,
-                                        String.valueOf(POST_ID), PAGE);
+        StackXPage<Comment> commentsPage = questionServiceHelper.getComments(StringConstants.QUESTIONS,
+                        site.apiSiteParameter, String.valueOf(POST_ID), PAGE);
         assertNotNull(commentsPage);
         assertCommentsEquals(expectedComments, commentsPage.items);
     }
@@ -154,8 +157,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
         String expectedRestEndpoint = StringConstants.QUESTIONS + "/" + QUESTION_ID + "/" + StringConstants.ANSWERS;
         mockRestCall(expectedRestEndpoint, expectedQueryParams, jsonObjectWrapper);
 
-        ArrayList<Answer> answers =
-                        questionServiceHelper.getAnswersForQuestion(QUESTION_ID, site.apiSiteParameter, PAGE);
+        ArrayList<Answer> answers = questionServiceHelper.getAnswersForQuestion(QUESTION_ID, site.apiSiteParameter,
+                        PAGE);
         assertNotNull(answers);
         assertAnswersEquals(expectedAnswers, answers);
     }
@@ -178,9 +181,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
         String expectedRestEndpoint = StringConstants.ANSWERS + "/" + POST_ID + "/" + StringConstants.COMMENTS;
         mockRestCall(expectedRestEndpoint, expectedQueryParams, jsonObjectWrapper);
 
-        StackXPage<Comment> commentsPage =
-                        questionServiceHelper.getComments(StringConstants.ANSWERS, site.apiSiteParameter,
-                                        String.valueOf(POST_ID), PAGE);
+        StackXPage<Comment> commentsPage = questionServiceHelper.getComments(StringConstants.ANSWERS,
+                        site.apiSiteParameter, String.valueOf(POST_ID), PAGE);
         assertNotNull(commentsPage);
         assertCommentsEquals(expectedComments, commentsPage.items);
     }
@@ -321,7 +323,8 @@ public class QuestionServiceHelperTest extends AbstractBaseServiceHelperTest
 
         when(
                         httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, expectedRestEndpoint, expectedQueryParams,
-                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenThrow(
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR,
+                                        AbstractBaseServiceHelper.JSON_PARSER)).thenThrow(
                         new ServerException(404, "Not found", null));
 
         questionServiceHelper.getFaqForTag(TAG, PAGE);

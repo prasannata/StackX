@@ -151,7 +151,8 @@ public abstract class AbstractBaseServiceHelperTest
         question.creationDate = System.currentTimeMillis();
         question.link = "http://link/1";
         question.score = 1;
-        question.tags = new String[] { "tag1", "tag2" };
+        question.tags = new String[]
+        { "tag1", "tag2" };
         question.answered = false;
         question.viewCount = 10;
         question.votes = 2;
@@ -248,7 +249,7 @@ public abstract class AbstractBaseServiceHelperTest
         assertEquals(expectedUser.downvoteCount, user.downvoteCount);
         assertEquals(expectedUser.lastAccessTime, user.lastAccessTime);
     }
-    
+
     protected void assertSiteEquals(Site expectedSite, Site site)
     {
         assertNotNull(site);
@@ -348,8 +349,8 @@ public abstract class AbstractBaseServiceHelperTest
     {
         when(
                         httpHelper.executeHttpGet(StackUri.STACKX_API_HOST, expectedRestEndpoint, expectedQueryParams,
-                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR)).thenReturn(
-                        returnJsonObjectWrapper);
+                                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR,
+                                        AbstractBaseServiceHelper.JSON_PARSER)).thenReturn(returnJsonObjectWrapper);
     }
 
 }

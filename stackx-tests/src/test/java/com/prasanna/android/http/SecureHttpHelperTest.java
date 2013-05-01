@@ -41,6 +41,7 @@ import android.graphics.Bitmap;
 
 import com.prasanna.android.stacknetwork.matchers.ClientExceptionMatcher;
 import com.prasanna.android.stacknetwork.matchers.ServerExceptionMatcher;
+import com.prasanna.android.stacknetwork.service.AbstractBaseServiceHelper;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
@@ -111,8 +112,8 @@ public class SecureHttpHelperTest
 
             try
             {
-                URIBuilder uriBuilder =
-                                new URIBuilder().setScheme("https").setHost("www.example.com").setPath("/v1/path");
+                URIBuilder uriBuilder = new URIBuilder().setScheme("https").setHost("www.example.com")
+                                .setPath("/v1/path");
                 for (String key : queryParams.keySet())
                     uriBuilder.addParameter(key, queryParams.get(key));
 
@@ -220,7 +221,8 @@ public class SecureHttpHelperTest
         when(httpResponse.getStatusLine()).thenReturn(getStatusLine(HttpStatus.SC_OK, "OK"));
         when(httpResponse.getEntity()).thenReturn(new StringEntity("{'var' : 'val'}"));
 
-        JSONObjectWrapper jsonObjectWrapper = secureHttpHelper.executeHttpGet(HOST, PATH, getQueryParams(), null);
+        JSONObjectWrapper jsonObjectWrapper = secureHttpHelper.executeHttpGet(HOST, PATH, getQueryParams(), null,
+                        AbstractBaseServiceHelper.JSON_PARSER);
         assertNotNull(jsonObjectWrapper);
         assertEquals("val", jsonObjectWrapper.getString("var"));
 
@@ -239,7 +241,7 @@ public class SecureHttpHelperTest
                         getStatusLine(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Server Error"));
         when(httpResponse.getEntity()).thenReturn(new StringEntity("{'error' : 'server'}"));
 
-        secureHttpHelper.executeHttpGet(HOST, PATH, getQueryParams(), null);
+        secureHttpHelper.executeHttpGet(HOST, PATH, getQueryParams(), null, AbstractBaseServiceHelper.JSON_PARSER);
     }
 
     @Test
@@ -253,7 +255,7 @@ public class SecureHttpHelperTest
         when(httpResponse.getStatusLine()).thenReturn(getStatusLine(HttpStatus.SC_BAD_REQUEST, "Bad Request"));
         when(httpResponse.getEntity()).thenReturn(new StringEntity("{'error' : 'client'}"));
 
-        secureHttpHelper.executeHttpGet(HOST, PATH, getQueryParams(), null);
+        secureHttpHelper.executeHttpGet(HOST, PATH, getQueryParams(), null, AbstractBaseServiceHelper.JSON_PARSER);
     }
 
     @Test
@@ -264,8 +266,8 @@ public class SecureHttpHelperTest
         when(httpResponse.getEntity()).thenReturn(new StringEntity("{'var' : 'val'}"));
 
         Map<String, String> requestHeaders = getRequestHeaders();
-        JSONObjectWrapper jsonObjectWrapper =
-                        secureHttpHelper.executeHttpPost(HOST, PATH, requestHeaders, getQueryParams(), null, null);
+        JSONObjectWrapper jsonObjectWrapper = secureHttpHelper.executeHttpPost(HOST, PATH, requestHeaders,
+                        getQueryParams(), null, null, AbstractBaseServiceHelper.JSON_PARSER);
         assertNotNull(jsonObjectWrapper);
         assertEquals("val", jsonObjectWrapper.getString("var"));
 
