@@ -59,6 +59,23 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
+        QuestionListFragment fragment = getFragment(getFragmentTag(tag, sort));
+        fragment.sort = sort;
+        fragment.action = action;
+        fragment.tag = tag;
+        return fragment;
+    }
+
+    public static QuestionListFragment newFragment(String fragmentTag, SearchCriteria searchCriteria)
+    {
+        QuestionListFragment fragment = getFragment(fragmentTag);
+        fragment.criteria = searchCriteria;
+        fragment.action = QuestionsIntentService.SEARCH_ADVANCED;
+        return fragment;
+    }
+    
+    public static String getFragmentTag(String tag, String sort)
+    {
         String fragmentTag = null;
 
         if (tag != null)
@@ -66,30 +83,17 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
         if (sort != null)
             fragmentTag = fragmentTag + "_" + sort;
-
-        QuestionListFragment fragment = getFragment(fragmentTag);
-
-        fragment.fragmentTag = fragmentTag;
-        fragment.sort = sort;
-        fragment.action = action;
-        fragment.tag = tag;
-        return fragment;
+        
+        return fragmentTag;
     }
 
     private static QuestionListFragment getFragment(String fragmentTag)
     {
-        QuestionListFragment newFragment = QuestionsActivity.getFragment(fragmentTag);
-        if (newFragment == null)
-            newFragment = new QuestionListFragment();
-        return newFragment;
-    }
-
-    public static QuestionListFragment newFragment(String fragmentTag, SearchCriteria searchCriteria)
-    {
-        QuestionListFragment fragment = getFragment(fragmentTag);
+        QuestionListFragment fragment = QuestionsActivity.getFragment(fragmentTag);
+        if (fragment == null)
+            fragment = new QuestionListFragment();
+        
         fragment.fragmentTag = fragmentTag;
-        fragment.criteria = searchCriteria;
-        fragment.action = QuestionsIntentService.SEARCH_ADVANCED;
         return fragment;
     }
 
