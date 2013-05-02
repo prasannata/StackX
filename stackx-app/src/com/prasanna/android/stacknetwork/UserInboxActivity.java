@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -72,7 +73,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         TextView itemType;
         TextView itemSite;
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -231,6 +232,17 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
             inboxItemViewHolder.itemSite.setText(item.site.name);
         else
             inboxItemViewHolder.itemSite.setVisibility(View.GONE);
+
+        if (item.unread)
+        {
+            inboxItemViewHolder.title.setTypeface(null, Typeface.BOLD);
+            inboxItemViewHolder.body.setTypeface(null, Typeface.BOLD);
+        }
+        else
+        {
+            inboxItemViewHolder.title.setTypeface(null, Typeface.NORMAL);
+            inboxItemViewHolder.body.setTypeface(null, Typeface.NORMAL);
+        }
 
         return convertView;
     }
