@@ -131,14 +131,15 @@ public class DbRequestThreadExecutor
 
     public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site)
     {
+        HashMap<String, SearchCriteria> searchCriterias = null;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Callable<HashMap<String, SearchCriteria>> callable = new Callable<HashMap<String, SearchCriteria>>()
         {
             @Override
             public HashMap<String, SearchCriteria> call() throws Exception
             {
-                ArrayList<SearchCriteriaDomain> criteriaForCustomTabs = SearchCriteriaDAO.getCriteriaForCustomTabs(
-                                context, site);
+                ArrayList<SearchCriteriaDomain> criteriaForCustomTabs =
+                                SearchCriteriaDAO.getCriteriaForCustomTabs(context, site);
                 if (criteriaForCustomTabs != null)
                 {
                     HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
@@ -151,10 +152,11 @@ public class DbRequestThreadExecutor
             }
         };
 
-        Future<HashMap<String, SearchCriteria>> future = executor.submit(callable);
         try
         {
-            return future.get();
+            Future<HashMap<String, SearchCriteria>> future = executor.submit(callable);
+            searchCriterias = future.get();
+            executor.shutdown();
         }
         catch (InterruptedException e)
         {
@@ -165,6 +167,6 @@ public class DbRequestThreadExecutor
             LogWrapper.e(TAG, e.getMessage());
         }
 
-        return null;
+        return searchCriterias;
     }
 }
