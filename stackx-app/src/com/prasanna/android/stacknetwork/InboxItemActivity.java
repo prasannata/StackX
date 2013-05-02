@@ -96,19 +96,24 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         textView.setText(Html.fromHtml(item.title));
 
         textView = (TextView) findViewById(R.id.postType);
-        if (item.questionId != -1 && ItemType.NEW_ANSWER.equals(item.itemType))
-            textView.setText(item.itemType.getRepr() + " to your question");
-        else if (item.questionId != -1)
-            textView.setText(item.itemType.getRepr() + " on your question");
-        else if (item.answerId != -1)
-            textView.setText(item.itemType.getRepr() + " on your answer");
-        else
-            textView.setText(item.itemType.getRepr());
+        switch (item.itemType)
+        {
+            case COMMENT:
+                if (item.questionId != -1)
+                    textView.setText(item.itemType.getRepr() + " on question");
+                else
+                    textView.setText(item.itemType.getRepr() + " on answer");
+                break;
+            case NEW_ANSWER:
+            default:
+                textView.setText(item.itemType.getRepr());
+                break;
+        }
 
         if (item.site != null)
         {
             textView = (TextView) findViewById(R.id.postSite);
-            textView.setText("Asked in " + item.site.name);
+            textView.setText("Asked in " + Html.fromHtml(item.site.name));
         }
     }
 
