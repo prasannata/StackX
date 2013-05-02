@@ -79,8 +79,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     {
         super.onCreate(savedInstanceState);
 
-        getActionBar().setTitle(getString(R.string.inbox));
-
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
 
@@ -93,6 +91,12 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         setContentView(R.layout.list_view);
         setupListView();
         startIntentService();
+    }
+
+    @Override
+    protected void setActionBarTitle(String title)
+    {
+        getActionBar().setTitle(getString(R.string.inbox));
     }
 
     @Override
