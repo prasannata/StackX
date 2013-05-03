@@ -37,6 +37,7 @@ import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
 import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
@@ -73,7 +74,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         fragment.action = QuestionsIntentService.SEARCH_ADVANCED;
         return fragment;
     }
-    
+
     public static String getFragmentTag(String tag, String sort)
     {
         String fragmentTag = null;
@@ -83,7 +84,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
         if (sort != null)
             fragmentTag = fragmentTag + "_" + sort;
-        
+
         return fragmentTag;
     }
 
@@ -92,7 +93,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         QuestionListFragment fragment = QuestionsActivity.getFragment(fragmentTag);
         if (fragment == null)
             fragment = new QuestionListFragment();
-        
+
         fragment.fragmentTag = fragmentTag;
         return fragment;
     }
@@ -125,7 +126,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             getActivity().getActionBar().setTitle(tag);
         }
-
+        else if (OperatingSite.getSite() != null)
+            getActivity().getActionBar().setTitle(OperatingSite.getSite().name);
+        else
+            getActivity().getActionBar().setTitle(R.string.app_name);
         findActionAndStartService();
 
     }
