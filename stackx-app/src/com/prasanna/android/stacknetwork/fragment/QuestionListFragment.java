@@ -25,6 +25,7 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -104,8 +105,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         if (itemsContainer == null)
         {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter = new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                            new ArrayList<Question>(), this);
+            itemListAdapter =
+                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                                            new ArrayList<Question>(), this);
         }
 
         if (savedInstanceState != null)
@@ -123,15 +125,18 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         {
             if ((action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG || action == QuestionsIntentService.GET_FAQ_FOR_TAG)
                             && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
+            {
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            getActivity().getActionBar().setTitle(tag);
+            }
+            
+            getActivity().getActionBar().setTitle(Html.fromHtml(tag));
         }
         else if (OperatingSite.getSite() != null)
-            getActivity().getActionBar().setTitle(OperatingSite.getSite().name);
+            getActivity().getActionBar().setTitle(Html.fromHtml(OperatingSite.getSite().name));
         else
             getActivity().getActionBar().setTitle(R.string.app_name);
-        findActionAndStartService();
 
+        findActionAndStartService();
     }
 
     @Override
