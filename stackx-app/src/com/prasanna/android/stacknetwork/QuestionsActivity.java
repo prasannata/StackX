@@ -274,7 +274,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         String title = getIntent().getStringExtra(StringConstants.TITLE);
         String fragmentTag = StringConstants.SIMILAR + "-" + title.hashCode();
 
-        getActionBar().setTitle(getString(R.string.similar) + " to " + title);
+        setActionBarTitle(getString(R.string.similar) + " to " + title);
 
         QuestionListFragment questionListFragment = getFragment(fragmentTag);
 
@@ -420,7 +420,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         if (forTags)
         {
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            getActionBar().setTitle(StringConstants.TAGS);
+            setActionBarTitle(StringConstants.TAGS);
         }
         else
             getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

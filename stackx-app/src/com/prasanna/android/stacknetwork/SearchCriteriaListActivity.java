@@ -388,7 +388,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.search_criteria_list_view);
-        getActionBar().setTitle(ACTION_BAR_TITLE);
+        setActionBarTitle(ACTION_BAR_TITLE);
         remainingSearch = (TextView) findViewById(R.id.remainingSearch);
         emptyItemsView = (TextView) findViewById(R.id.emptyItems);
 

@@ -151,7 +151,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
             {
                 if (result)
                 {
-                    getActionBar().setTitle(searchCriteriaFragment.getCriteriaName());
+                    setActionBarTitle(searchCriteriaFragment.getCriteriaName());
                     Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
                 }
                 else
