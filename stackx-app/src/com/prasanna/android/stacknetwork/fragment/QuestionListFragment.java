@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -42,6 +43,8 @@ import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
+import com.prasanna.android.utils.TagsViewBuilder;
+import com.prasanna.android.utils.TagsViewBuilder.DefaultOnTagClickListener;
 
 public class QuestionListFragment extends AbstractQuestionListFragment
 {
@@ -58,6 +61,27 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     public String fragmentTag;
 
     private SearchCriteria criteria;
+
+    private static class OnTagClickListenerImpl extends DefaultOnTagClickListener
+    {
+        private final String questionTag;
+        private final int intentAction;
+
+        public OnTagClickListenerImpl(int intentAction, String questionTag)
+        {
+            this.intentAction = intentAction;
+            this.questionTag = questionTag;
+        }
+
+        @Override
+        public void onTagClick(Context context, String tag)
+        {
+            if (QuestionsIntentService.GET_QUESTIONS_FOR_TAG != intentAction || questionTag == null
+                            || !questionTag.equals(tag))
+                super.onTagClick(context, tag);
+        }
+
+    }
 
     public static QuestionListFragment newFragment(int action, String tag, String sort)
     {
@@ -128,7 +152,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
             {
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             }
-            
+
             getActivity().getActionBar().setTitle(Html.fromHtml(tag));
         }
         else if (OperatingSite.getSite() != null)
@@ -202,6 +226,13 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
         intent.putExtra(StringConstants.SORT, sort);
         startService(intent);
+    }
+
+    @Override
+    protected void buildTagsView(final Question question, final QuestionViewHolder holder)
+    {
+        TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags, new OnTagClickListenerImpl(action,
+                        tag));
     }
 
     @Override

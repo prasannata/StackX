@@ -33,12 +33,36 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class TagsViewBuilder
 {
-    public static LinearLayout buildView(Context context, LinearLayout parentLayout, String[] tags)
+    public interface OnTagClickListener
     {
-        return new TagsViewBuilder().build(context, parentLayout, tags);
+        void onTagClick(Context context, String tag);
     }
 
-    private LinearLayout build(final Context context, final LinearLayout parentLayout, final String[] tags)
+    public static class DefaultOnTagClickListener implements OnTagClickListener
+    {
+        @Override
+        public void onTagClick(Context context, String tag)
+        {
+            Intent questionsIntent = new Intent(context, QuestionsActivity.class);
+            questionsIntent.setAction(StringConstants.TAG);
+            questionsIntent.putExtra(StringConstants.TAG, tag);
+            context.startActivity(questionsIntent);
+        }
+    }
+
+    public static LinearLayout buildView(Context context, LinearLayout parentLayout, String[] tags)
+    {
+        return build(context, parentLayout, tags, new DefaultOnTagClickListener());
+    }
+
+    public static LinearLayout buildView(Context context, LinearLayout parentLayout, String[] tags,
+                    OnTagClickListener onTagClickListener)
+    {
+        return build(context, parentLayout, tags, onTagClickListener);
+    }
+
+    private static LinearLayout build(final Context context, final LinearLayout parentLayout, final String[] tags,
+                    OnTagClickListener onTagClickListener)
     {
         if (parentLayout.getChildCount() > 0)
             parentLayout.removeAllViews();
@@ -66,7 +90,7 @@ public class TagsViewBuilder
                     rowLayout = createNewRowForTags(context, 3);
                 }
 
-                setOnClickListenerForTextView(context, tagTextView, tags[i]);
+                setOnClickListenerForTextView(context, tagTextView, tags[i], onTagClickListener);
                 rowLayout.addView(tagTextView, params);
             }
 
@@ -76,27 +100,20 @@ public class TagsViewBuilder
         return parentLayout;
     }
 
-    private void setOnClickListenerForTextView(final Context context, final TextView tagTextView, final String tag)
+    private static void setOnClickListenerForTextView(final Context context, final TextView tagTextView,
+                    final String tag, final OnTagClickListener onTagClickListener)
     {
         tagTextView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                startQuestionsActivityForTag(context, tag);
+                onTagClickListener.onTagClick(context, tag);
             }
         });
     }
 
-    private void startQuestionsActivityForTag(final Context context, final String tag)
-    {
-        Intent questionsIntent = new Intent(context, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.TAG);
-        questionsIntent.putExtra(StringConstants.TAG, tag);
-        context.startActivity(questionsIntent);
-    }
-
-    private LinearLayout createNewRowForTags(Context context, int topMargin)
+    private static LinearLayout createNewRowForTags(Context context, int topMargin)
     {
         LinearLayout rowLayout = new LinearLayout(context);
         rowLayout.setOrientation(LinearLayout.HORIZONTAL);

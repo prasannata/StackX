@@ -121,10 +121,15 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
 
         questionRowLayout.setId((int) question.id);
         setValuesForQuestionView(holder, question);
-        TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags);
+        buildTagsView(question, holder);
         setupQuickActionMenu(question, holder);
 
         return questionRowLayout;
+    }
+
+    protected void buildTagsView(final Question question, final QuestionViewHolder holder)
+    {
+        TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags);
     }
 
     /* Shouldn't I recycle quick action menu as well? Yes, but how? */
