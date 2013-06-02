@@ -92,6 +92,13 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         return fragment;
     }
 
+    public static QuestionListFragment newFragment(int action, String fragmentTag)
+    {
+        QuestionListFragment fragment = getFragment(fragmentTag);
+        fragment.action = action;
+        return fragment;
+    }
+
     public static QuestionListFragment newFragment(String fragmentTag, SearchCriteria searchCriteria)
     {
         QuestionListFragment fragment = getFragment(fragmentTag);
@@ -172,6 +179,8 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private void findActionAndStartService()
     {
+        LogWrapper.d(TAG, "findActionAndStartService");
+        
         if (!created)
         {
             switch (action)
@@ -259,9 +268,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     private void clean()
     {
         stopRunningServiceAndReceiver();
-
         itemListAdapter.clear();
-
         currentPage = 0;
     }
 

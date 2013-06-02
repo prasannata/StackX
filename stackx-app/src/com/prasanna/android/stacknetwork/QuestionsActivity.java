@@ -272,19 +272,16 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
     private void showSimilarQuestionListFragment()
     {
         String title = getIntent().getStringExtra(StringConstants.TITLE);
-        String fragmentTag = StringConstants.SIMILAR + "-" + title.hashCode();
-
+        String fragmentTag = QuestionsIntentService.GET_SIMILAR + "-" + title.hashCode();
         setActionBarTitle(getString(R.string.similar) + " to " + title);
 
         QuestionListFragment questionListFragment = getFragment(fragmentTag);
-
         if (questionListFragment == null)
         {
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, null, null);
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, fragmentTag);
             questionListFragment.getBundle().putString(StringConstants.TITLE, title);
+            replaceFragment(questionListFragment, fragmentTag, false);
         }
-
-        replaceFragment(questionListFragment, fragmentTag, false);
     }
 
     private void showRelatedQuestionListFragment()
@@ -295,10 +292,10 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
         QuestionListFragment questionListFragment = getFragment(fragmentTag);
         if (questionListFragment == null)
         {
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, null, null);
+            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, fragmentTag);
             questionListFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+            replaceFragment(questionListFragment, fragmentTag, false);
         }
-        replaceFragment(questionListFragment, fragmentTag, false);
     }
 
     private void showTagQuestionListFragment()
