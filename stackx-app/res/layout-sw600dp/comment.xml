@@ -27,7 +27,7 @@
         android:scrollHorizontally="false"
         android:textColor="@color/black"
         android:textCursorDrawable="@null"
-        android:textIsSelectable="true"
+        android:textIsSelectable="false"
         android:textSize="17sp" />
 
     <RelativeLayout
