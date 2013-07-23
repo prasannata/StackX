@@ -102,7 +102,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     @Override
     protected void setActionBarHomeIcon(Site site)
     {
-        getActionBar().setIcon(R.drawable.ic_launcher1);
+        getActionBar().setIcon(R.drawable.icon);
         getActionBar().setHomeButtonEnabled(true);
     }
 
