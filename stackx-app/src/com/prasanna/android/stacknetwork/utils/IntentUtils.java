@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright 2013 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -25,11 +25,11 @@ public class IntentUtils
 {
     public static Intent createEmailIntent(String subject, String body)
     {
-	String type = "plain/text";
-	Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-	emailIntent.setType(type);
-	emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
-	emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
-	return emailIntent;
+        String type = "plain/text";
+        Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+        emailIntent.setType(type);
+        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+        return emailIntent;
     }
 }
