@@ -23,6 +23,7 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -38,6 +39,9 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
@@ -64,14 +68,16 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     public static final String KEY_PREF_SEARCH_ONLY_WITH_ANSWERS = "pref_searchOnlyWithAnswers";
     public static final String KEY_PREF_SEARCH_ONLY_ANSWERED = "pref_searchOnlyAnswered";
     public static final String KEY_PREF_NUM_SAVED_SEARCHES = "pref_numSavedSearches";
+    public static final String KEY_PREF_RO_APP_VERSION = "pref_ro_appVersion";
+    public static final String KEY_PREF_WRITE_RESTRICTIONS = "pref_write_restrictions";
+    public static final String PREFIX_KEY_PREF_WRITE_PERMISSION = "pref_writePermission_";
 
     private static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
     private static final String KEY_PREF_RATE_APP = "pref_rateApp";
-
     private static final String DEFAULT_RINGTONE = "content://settings/system/Silent";
 
-    public static final String PREFIX_KEY_PREF_WRITE_PERMISSION = "pref_writePermission_";
-
+    private String versionName;
+    private int versionCode = -1;
     private ListPreference refreshIntervalPref;
     private ListPreference accountActionPref;
     private RingtonePreference notifRingTonePref;
@@ -117,6 +123,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         setupRateAppPreference();
         setupAccountPreference();
         setupInboxPreference();
+        setupAboutPreference();
     }
 
     private void setupDefaultSitePreference()
@@ -126,16 +133,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         defaultSitePref.setEntryValues(new String[0]);
         defaultSitePref.setEntries(new String[0]);
         defaultSitePref.setSummary(defaultSite != null ? defaultSite.name : "None");
-
-        defaultSitePref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
-            @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                defaultSitePref.getDialog().dismiss();
-                return true;
-            }
-        });
     }
 
     private void setupRateAppPreference()
@@ -151,7 +148,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             {
                 rateApp.getDialog().dismiss();
                 String appName = "com.prasanna.android.stacknetwork";
-                
+
                 try
                 {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
@@ -269,6 +266,87 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             setRingtoneSummary(ringtoneUri);
     }
 
+    private void setupAboutPreference()
+    {
+        setupVersionSummary();
+        setupWriteRestrictionSummary();
+    }
+
+    private void setupVersionSummary()
+    {
+        final ListPreference appVersionROPref = (ListPreference) findPreference(KEY_PREF_RO_APP_VERSION);
+        appVersionROPref.setEntryValues(new String[0]);
+        appVersionROPref.setEntries(new String[0]);
+        appVersionROPref.setSummary(getAppVersion());
+    }
+
+    private void setupWriteRestrictionSummary()
+    {
+        final ListPreference writeRestrictionsPref = (ListPreference) findPreference(KEY_PREF_WRITE_RESTRICTIONS);
+        writeRestrictionsPref.setEntryValues(new String[0]);
+        writeRestrictionsPref.setEntries(new String[0]);
+        writeRestrictionsPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
+        {
+
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+            {
+                if (writeRestrictionsPref.getDialog() != null)
+                {
+                    writeRestrictionsPref.getDialog().dismiss();
+                    showDialog(getWebView());
+                    return true;
+                }
+
+                return false;
+            }
+
+            private WebView getWebView()
+            {
+                WebView webView = new WebView(getActivity());
+                webView.setWebChromeClient(new WebChromeClient());
+                webView.setWebViewClient(new WebViewClient()
+                {
+                    public boolean shouldOverrideUrlLoading(WebView view, String url)
+                    {
+                        if (url != null && url.startsWith("http://"))
+                        {
+                            view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                            return true;
+                        }
+
+                        return false;
+                    }
+                });
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.loadUrl("file:///android_asset/write_permissions.html");
+                return webView;
+            }
+
+            private void showDialog(WebView webView)
+            {
+                AlertDialog alertDialog = DialogBuilder.okDialog(getActivity(), webView, new OnClickListener()
+                {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.show();
+            }
+        });
+    }
+
+    private String getAppVersion()
+    {
+        if (versionName != null && versionCode > -1)
+            return versionName + "." + versionCode;
+
+        return "Unknown";
+    }
+
     @Override
     public void onResume()
     {
@@ -302,5 +380,15 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
         else
             notifRingTonePref.setSummary("");
+    }
+
+    public void setAppVersionName(String versionName)
+    {
+        this.versionName = versionName;
+    }
+
+    public void setAppVersionCode(int versionCode)
+    {
+        this.versionCode = versionCode;
     }
 }

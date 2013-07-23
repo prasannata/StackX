@@ -36,8 +36,6 @@
     <string name="loadingSites">Loading sites</string>
     <string name="loadingSitesForAuthUser">Loading sites, accounts and permissions. This will take few seconds first time.</string>
     <string name="viewQuestion">View Question</string>
-    <string name="viewAnswer">View Answer</string>
-    <string name="hideAnswer">Hide Answer</string>
     <string name="registered">Registered</string>
     <string name="accepted">Accepted</string>
     <string name="delete">Delete</string>
@@ -83,6 +81,9 @@
     <string name="Delete">Delete</string>
     <string name="fullscreen">Fullscreen</string>
     <string name="rateApp">Rate App</string>
+    <string name="version">Version</string>
+    <string name="writeRestrictions">Write restrictions</string>
+    <string name="writeRestrictionsSummary">Why can\'t I ask a question or answer a question or upvote or....?</string>
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>
 

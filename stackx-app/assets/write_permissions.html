@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<p>
+This application provides create, edit or delete comment as the only write functionality. This is because, Stack Exchange, the parent site, 
+as of API version 2.1 exposes read only APIs for third party applications (except for comment). Please refer the API 
+doc <a href="http://api.stackexchange.com/">here</a>.
+</p>
+<p> 
+Because of these API write limitations you might notice there is no support to:
+<ul type="disc">
+<li>Ask a question</li>
+<li>Answer a question</li>
+<li>Accept an answer</li>
+<li>Upvote or downvote</li>
+<li>Favorite a question or answer</li>
+<li>Mark unread inbox items as read after reading. Hence if notifications are enabled, for a new unread inbox item,
+notification will be generated every time inbox synchronizes with the server even after having read it using third party API. Visiting 
+<a href="http://www.stackoverflow.com">stackoverflow</a> and marking the item as read will stop the notification from the application.</li>
+</ul>
+</p>
+</body>
+</html>

@@ -22,6 +22,7 @@ package com.prasanna.android.stacknetwork.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.View;
 
 public class DialogBuilder
 {
@@ -38,6 +39,12 @@ public class DialogBuilder
         return alertDialogBuilder.setMessage(msgStringResId).setPositiveButton(android.R.string.ok, listener).create();
     }
 
+    public static AlertDialog okDialog(Context context, View view, DialogInterface.OnClickListener listener)
+    {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        return alertDialogBuilder.setView(view).setPositiveButton(android.R.string.ok, listener).create();
+    }
+    
     public static AlertDialog okDialog(Context context, String msg, DialogInterface.OnClickListener listener)
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
