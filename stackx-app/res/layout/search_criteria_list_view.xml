@@ -55,8 +55,10 @@
         android:id="@android:id/list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:clickable="true"
-        android:descendantFocusability="beforeDescendants" >
-    </ListView>
-
+        android:clickable="true"        
+        android:scrollbarThumbVertical="@drawable/scrollbar"
+        android:listSelector="@android:color/transparent"
+        android:descendantFocusability="beforeDescendants"
+        android:divider="@android:color/transparent" >
+    </ListView>        
 </LinearLayout>

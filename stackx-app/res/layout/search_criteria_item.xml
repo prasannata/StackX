@@ -10,9 +10,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/selector_list_item"
-        android:orientation="horizontal" >
+        android:layout_height="match_parent"
+        >
 
         <LinearLayout
             android:id="@+id/itemOptions"
@@ -50,6 +49,7 @@
             android:id="@+id/item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/selector_list_item"
             android:layout_margin="2dp"
             android:layout_toRightOf="@id/itemOptions"
             android:orientation="horizontal" >
@@ -108,5 +108,4 @@
                 android:textSize="12sp" />
         </RelativeLayout>
     </RelativeLayout>
-
 </FrameLayout>
