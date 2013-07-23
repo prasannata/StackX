@@ -259,7 +259,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
     private void addViewAnswerToQuickActionMenu(final LinearLayout postContextLayout)
     {
-        stackXQuickActionMenu.addItem(R.string.viewAnswer, new OnClickListener()
+        stackXQuickActionMenu.addItem(R.string.answer, new OnClickListener()
         {
             @Override
             public void onClick(View v)
