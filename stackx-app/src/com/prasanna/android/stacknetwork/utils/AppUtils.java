@@ -49,6 +49,7 @@ public class AppUtils
 {
     private static String userAccessToken;
     public static final boolean DEBUG = false;
+    public static final boolean AMAZON_APK = false;
 
     public static void setAccessToken(Context context, String accessToken)
     {

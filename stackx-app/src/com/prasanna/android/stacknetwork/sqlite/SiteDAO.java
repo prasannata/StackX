@@ -145,6 +145,7 @@ public class SiteDAO extends AbstractBaseDao
 
     public ArrayList<Site> getSites()
     {
+
         Cursor cursor = getDatabase().query(TABLE_NAME, null, null, null, null, null, null);
 
         if (cursor == null || cursor.getCount() == 0)
@@ -152,43 +153,50 @@ public class SiteDAO extends AbstractBaseDao
             LogWrapper.d(TAG, "No entries");
             return null;
         }
-
-        cursor.moveToFirst();
-
-        ArrayList<Site> registerdSites = new ArrayList<Site>();
-        ArrayList<Site> sites = new ArrayList<Site>();
-        while (!cursor.isAfterLast())
+        try
         {
-            Site site = getSiteObject(cursor);
-            if (site.userType != null && UserType.REGISTERED.equals(site.userType))
-                registerdSites.add(site);
+            cursor.moveToFirst();
+
+            ArrayList<Site> registerdSites = new ArrayList<Site>();
+            ArrayList<Site> sites = new ArrayList<Site>();
+            while (!cursor.isAfterLast())
+            {
+                Site site = getSiteObject(cursor);
+                if (site.userType != null && UserType.REGISTERED.equals(site.userType))
+                    registerdSites.add(site);
+                else
+                    sites.add(site);
+                cursor.moveToNext();
+            }
+
+            Site defaultSite = AppUtils.getDefaultSite(context);
+            if (defaultSite != null && sites.indexOf(defaultSite) > 0)
+                sites.remove(defaultSite);
+
+            if (registerdSites.isEmpty())
+            {
+                if (defaultSite != null && !sites.contains(defaultSite))
+                    sites.add(defaultSite);
+                return sites;
+            }
             else
-                sites.add(site);
-            cursor.moveToNext();
+            {
+                ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>();
+                if (defaultSite != null)
+                    sitesWithRegisteredFirst.add(defaultSite);
+
+                if (registerdSites.contains(defaultSite))
+                    registerdSites.remove(defaultSite);
+
+                sitesWithRegisteredFirst.addAll(registerdSites);
+                sitesWithRegisteredFirst.addAll(sites);
+                return sitesWithRegisteredFirst;
+            }
+
         }
-
-        Site defaultSite = AppUtils.getDefaultSite(context);
-        if (defaultSite != null && sites.indexOf(defaultSite) > 0)
-            sites.remove(defaultSite);
-
-        if (registerdSites.isEmpty())
+        finally
         {
-            if (defaultSite != null && !sites.contains(defaultSite))
-                sites.add(defaultSite);
-            return sites;
-        }
-        else
-        {
-            ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>();
-            if (defaultSite != null)
-                sitesWithRegisteredFirst.add(defaultSite);
-
-            if (registerdSites.contains(defaultSite))
-                registerdSites.remove(defaultSite);
-
-            sitesWithRegisteredFirst.addAll(registerdSites);
-            sitesWithRegisteredFirst.addAll(sites);
-            return sitesWithRegisteredFirst;
+            cursor.close();
         }
     }
 
@@ -202,17 +210,23 @@ public class SiteDAO extends AbstractBaseDao
             return null;
         }
 
-        cursor.moveToFirst();
-
-        HashMap<String, Site> sites = new HashMap<String, Site>();
-        while (!cursor.isAfterLast())
+        try
         {
-            Site site = getSiteObject(cursor);
-            sites.put(site.link, site);
-            cursor.moveToNext();
-        }
+            cursor.moveToFirst();
 
-        return sites;
+            HashMap<String, Site> sites = new HashMap<String, Site>();
+            while (!cursor.isAfterLast())
+            {
+                Site site = getSiteObject(cursor);
+                sites.put(site.link, site);
+                cursor.moveToNext();
+            }
+            return sites;
+        }
+        finally
+        {
+            cursor.close();
+        }
     }
 
     private Site getSiteObject(Cursor cursor)
@@ -262,8 +276,7 @@ public class SiteDAO extends AbstractBaseDao
     public void update(Site site)
     {
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
-        String[] whereArgs = new String[]
-        { site.apiSiteParameter };
+        String[] whereArgs = new String[] { site.apiSiteParameter };
         getDatabase().update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
@@ -272,8 +285,7 @@ public class SiteDAO extends AbstractBaseDao
         for (Account account : newAccounts)
         {
             String whereClause = SiteTable.COLUMN_SITE_URL + "= ?";
-            String[] whereArgs = new String[]
-            { account.siteUrl };
+            String[] whereArgs = new String[] { account.siteUrl };
 
             ContentValues values = new ContentValues();
 
@@ -290,15 +302,20 @@ public class SiteDAO extends AbstractBaseDao
 
     public boolean isRegistered(String site)
     {
-        String[] cols = new String[]
-        { SiteTable.COLUMN_API_SITE_PARAMTETER };
+        String[] cols = new String[] { SiteTable.COLUMN_API_SITE_PARAMTETER };
         String selection = SiteTable.COLUMN_API_SITE_PARAMTETER + " = ? and " + SiteTable.COLUMN_USER_TYPE + " = ?";
-        String[] selectionArgs =
-        { site, UserType.REGISTERED.getValue() };
+        String[] selectionArgs = { site, UserType.REGISTERED.getValue() };
 
         Cursor cursor = getDatabase().query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
 
-        return cursor != null && cursor.getCount() > 0;
+        try
+        {
+            return cursor != null && cursor.getCount() > 0;
+        }
+        finally
+        {
+            cursor.close();
+        }
     }
 
     public static void insert(Context context, Site site)

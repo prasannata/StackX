@@ -181,9 +181,16 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        cursor.moveToFirst();
+        try
+        {
+            cursor.moveToFirst();
 
-        return getCriteria(cursor);
+            return getCriteria(cursor);
+        }
+        finally
+        {
+            cursor.close();
+        }
 
     }
 
@@ -223,16 +230,24 @@ public class SearchCriteriaDAO extends AbstractBaseDao
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        ArrayList<SearchCriteriaDomain> criteriaList = new ArrayList<SearchCriteriaDomain>();
-        cursor.moveToFirst();
-
-        while (!cursor.isAfterLast())
+        try
         {
-            criteriaList.add(getCriteria(cursor));
-            cursor.moveToNext();
+            ArrayList<SearchCriteriaDomain> criteriaList = new ArrayList<SearchCriteriaDomain>();
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast())
+            {
+                criteriaList.add(getCriteria(cursor));
+                cursor.moveToNext();
+            }
+
+            return criteriaList;
+        }
+        finally
+        {
+            cursor.close();
         }
 
-        return criteriaList;
     }
 
     public ArrayList<SearchCriteriaDomain> getCriteriaForCustomTabs(String site)
@@ -248,15 +263,24 @@ public class SearchCriteriaDAO extends AbstractBaseDao
             return null;
 
         ArrayList<SearchCriteriaDomain> criteriaList = new ArrayList<SearchCriteriaDomain>();
-        cursor.moveToFirst();
 
-        while (!cursor.isAfterLast())
+        try
         {
-            criteriaList.add(getCriteria(cursor));
-            cursor.moveToNext();
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast())
+            {
+                criteriaList.add(getCriteria(cursor));
+                cursor.moveToNext();
+            }
+
+            return criteriaList;
+        }
+        finally
+        {
+            cursor.close();
         }
 
-        return criteriaList;
     }
 
     private SearchCriteriaDomain getCriteria(Cursor cursor)
@@ -296,7 +320,15 @@ public class SearchCriteriaDAO extends AbstractBaseDao
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
 
-        return cursor != null && cursor.getCount() > 0;
+        try
+        {
+            return cursor != null && cursor.getCount() > 0;
+        }
+        finally
+        {
+            cursor.close();
+        }
+
     }
 
     public void delete(long id)

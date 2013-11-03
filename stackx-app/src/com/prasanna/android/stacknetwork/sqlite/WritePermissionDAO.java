@@ -127,8 +127,9 @@ public class WritePermissionDAO extends AbstractBaseDao
         if (site == null || objectType == null)
             return null;
 
-        String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
-                        + " = ?";
+        String selection =
+                        WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE
+                                        + " = ?";
         String[] selectionArgs = { site, objectType.getValue() };
 
         Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
@@ -143,22 +144,30 @@ public class WritePermissionDAO extends AbstractBaseDao
     public ArrayList<String> getSites()
     {
         String[] cols = { WritePermissionTable.COLUMN_SITE };
-        String selection = WritePermissionTable.COLUMN_ADD + " = ? and" + WritePermissionTable.COLUMN_DEL + " = ? and "
-                        + WritePermissionTable.COLUMN_EDIT + "= ?";
+        String selection =
+                        WritePermissionTable.COLUMN_ADD + " = ? and" + WritePermissionTable.COLUMN_DEL + " = ? and "
+                                        + WritePermissionTable.COLUMN_EDIT + "= ?";
         String[] selectionArgs = { "1", "1", "1" };
 
         Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
         if (cursor == null || cursor.getCount() == 0)
             return null;
 
-        ArrayList<String> sites = new ArrayList<String>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
+        try
         {
-            sites.add(cursor.getString(0));
-            cursor.moveToNext();
+            ArrayList<String> sites = new ArrayList<String>();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast())
+            {
+                sites.add(cursor.getString(0));
+                cursor.moveToNext();
+            }
+            return sites;
         }
-        return sites;
+        finally
+        {
+            cursor.close();
+        }
     }
 
     public HashMap<ObjectType, WritePermission> getPermissions(String site)
@@ -175,7 +184,14 @@ public class WritePermissionDAO extends AbstractBaseDao
 
         LogWrapper.d(TAG, "Permissions retrieved from DB for " + site);
 
-        return getPermissions(cursor);
+        try
+        {
+            return getPermissions(cursor);
+        }
+        finally
+        {
+            cursor.close();
+        }
     }
 
     private HashMap<ObjectType, WritePermission> getPermissions(Cursor cursor)
@@ -201,12 +217,13 @@ public class WritePermissionDAO extends AbstractBaseDao
         permission.canAdd = cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_ADD)) == 1;
         permission.canDelete = cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_DEL)) == 1;
         permission.canEdit = cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_EDIT)) == 1;
-        permission.maxDailyActions = cursor
-                        .getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS));
-        permission.minSecondsBetweenActions = cursor.getInt(cursor
-                        .getColumnIndex(WritePermissionTable.COLUMN_WAIT_TIME));
-        permission.objectType = ObjectType.getEnum(cursor.getString(cursor
-                        .getColumnIndex(WritePermissionTable.COLUMN_OBJECT_TYPE)));
+        permission.maxDailyActions =
+                        cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_MAX_DAILY_ACTIONS));
+        permission.minSecondsBetweenActions =
+                        cursor.getInt(cursor.getColumnIndex(WritePermissionTable.COLUMN_WAIT_TIME));
+        permission.objectType =
+                        ObjectType.getEnum(cursor.getString(cursor
+                                        .getColumnIndex(WritePermissionTable.COLUMN_OBJECT_TYPE)));
         return permission;
     }
 
@@ -279,7 +296,7 @@ public class WritePermissionDAO extends AbstractBaseDao
         catch (SQLException e)
         {
             LogWrapper.e(TAG, e.getMessage());
-        }        
+        }
         finally
         {
             writePermissionDAO.close();

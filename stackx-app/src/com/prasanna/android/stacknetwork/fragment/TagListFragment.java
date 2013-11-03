@@ -121,7 +121,7 @@ public class TagListFragment extends ListFragment
                 {
                     synchronized (lock)
                     {
-                        wait(5000);
+                        lock.wait(5000);
                     }
                 }
                 catch (InterruptedException e)

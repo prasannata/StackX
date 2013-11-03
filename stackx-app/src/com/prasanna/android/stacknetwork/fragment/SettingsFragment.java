@@ -42,6 +42,7 @@ import android.preference.RingtonePreference;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.LogoutActivity;
 import com.prasanna.android.stacknetwork.OAuthActivity;
@@ -147,19 +148,40 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             public boolean onPreferenceClick(Preference preference)
             {
                 rateApp.getDialog().dismiss();
-                String appName = "com.prasanna.android.stacknetwork";
+                String packageName = "com.prasanna.android.stacknetwork";
 
+                if (AppUtils.AMAZON_APK)
+                    openAmazonAppStore(packageName);
+                else
+                    openPlayStore(packageName);
+
+                return true;
+            }
+
+            private void openAmazonAppStore(String packageName)
+            {
                 try
                 {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.amazon.com/gp/mas/dl/android?p="
+                                    + packageName)));
+                }
+                catch (ActivityNotFoundException anfe)
+                {
+                    Toast.makeText(getActivity(), "Amazon AppStore not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            private void openPlayStore(String packageName)
+            {
+                try
+                {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
                 }
                 catch (ActivityNotFoundException anfe)
                 {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri
-                                    .parse("http://play.google.com/store/apps/details?id=" + appName)));
+                                    .parse("http://play.google.com/store/apps/details?id=" + packageName)));
                 }
-
-                return true;
             }
         });
     }
