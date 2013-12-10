@@ -90,7 +90,7 @@ public class OAuthActivity extends Activity {
             else {
                 /*
                  * Yahoo's login page does not seem to support horizontal
-                 * scrolling inside webview, so enabling wide view port. Not
+                 * scrolling inside webview, so enabling wide view port. Note
                  * good.
                  */
                 if (url.startsWith(YAHOO_LOGIN_URL))
