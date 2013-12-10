@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.task;
 
@@ -26,30 +26,23 @@ import android.os.AsyncTask;
 
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
-public class ReadObjectAsyncTask extends AsyncTask<Void, Void, ArrayList<Object>>
-{
+public class ReadObjectAsyncTask extends AsyncTask<Void, Void, ArrayList<Object>> {
     private final File directory;
     private final String fileName;
     private final AsyncTaskCompletionNotifier<ArrayList<Object>> notifier;
 
-    public ReadObjectAsyncTask(File directory,
-            String fileName,
-            AsyncTaskCompletionNotifier<ArrayList<Object>> notifier)
-    {
+    public ReadObjectAsyncTask(File directory, String fileName, AsyncTaskCompletionNotifier<ArrayList<Object>> notifier) {
         this.directory = directory;
         this.fileName = fileName;
         this.notifier = notifier;
     }
 
     @Override
-    protected ArrayList<Object> doInBackground(Void... params)
-    {
-        if (fileName == null)
-        {
+    protected ArrayList<Object> doInBackground(Void... params) {
+        if (fileName == null) {
             return SharedPreferencesUtil.readObjects(directory);
         }
-        else
-        {
+        else {
             ArrayList<Object> objects = new ArrayList<Object>();
             objects.add(SharedPreferencesUtil.readObject(new File(directory, fileName)));
             return objects;
@@ -57,10 +50,8 @@ public class ReadObjectAsyncTask extends AsyncTask<Void, Void, ArrayList<Object>
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Object> objects)
-    {
-        if (notifier != null)
-        {
+    protected void onPostExecute(ArrayList<Object> objects) {
+        if (notifier != null) {
             notifier.notifyOnCompletion(objects);
         }
     }

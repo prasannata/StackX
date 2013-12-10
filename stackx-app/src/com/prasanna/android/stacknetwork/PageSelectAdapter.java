@@ -1,6 +1,5 @@
 package com.prasanna.android.stacknetwork;
 
-public interface PageSelectAdapter
-{
+public interface PageSelectAdapter {
     void selectQuestionPage();
 }

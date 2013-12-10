@@ -45,66 +45,53 @@ import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 
-public class AppUtils
-{
+public class AppUtils {
     private static String userAccessToken;
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     public static final boolean AMAZON_APK = false;
 
-    public static void setAccessToken(Context context, String accessToken)
-    {
-        if (userAccessToken == null && accessToken != null)
-        {
+    public static void setAccessToken(Context context, String accessToken) {
+        if (userAccessToken == null && accessToken != null) {
             SharedPreferencesUtil.setString(context, StringConstants.ACCESS_TOKEN, accessToken);
             userAccessToken = accessToken;
         }
     }
 
-    public static String getAccessToken(Context context)
-    {
+    public static String getAccessToken(Context context) {
         if (userAccessToken == null)
             userAccessToken = SharedPreferencesUtil.getString(context, StringConstants.ACCESS_TOKEN, null);
 
         return userAccessToken;
     }
 
-    public static void loadAccessToken(Context context)
-    {
+    public static void loadAccessToken(Context context) {
         getAccessToken(context);
     }
 
-    public static void clearSharedPreferences(Context context)
-    {
+    public static void clearSharedPreferences(Context context) {
         SharedPreferencesUtil.clearSharedPreferences(context);
         userAccessToken = null;
     }
 
-    public static boolean isFirstRun(Context context)
-    {
+    public static boolean isFirstRun(Context context) {
         return SharedPreferencesUtil.isSet(context, StringConstants.IS_FIRST_RUN, true);
     }
 
-    public static void setFirstRunComplete(Context context)
-    {
+    public static void setFirstRunComplete(Context context) {
         SharedPreferencesUtil.setBoolean(context, StringConstants.IS_FIRST_RUN, false);
     }
 
-    public static void setDefaultSite(Context context, Site site)
-    {
-        if (site != null && context != null)
-        {
+    public static void setDefaultSite(Context context, Site site) {
+        if (site != null && context != null) {
             File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
             SharedPreferencesUtil.writeObject(site, dir, StringConstants.SITE);
         }
     }
 
-    public static Site getDefaultSite(Context context)
-    {
-        if (context != null)
-        {
+    public static Site getDefaultSite(Context context) {
+        if (context != null) {
             File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-            if (dir.exists() && dir.isDirectory())
-            {
+            if (dir.exists() && dir.isDirectory()) {
                 File file = new File(dir, StringConstants.SITE);
                 if (file.exists() && file.isFile())
                     return (Site) SharedPreferencesUtil.readObject(file);
@@ -114,13 +101,10 @@ public class AppUtils
         return null;
     }
 
-    public static void clearDefaultSite(Context context)
-    {
-        if (context != null)
-        {
+    public static void clearDefaultSite(Context context) {
+        if (context != null) {
             File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
-            if (dir.exists() && dir.isDirectory())
-            {
+            if (dir.exists() && dir.isDirectory()) {
                 File file = new File(dir, StringConstants.SITE);
                 if (file.exists() && file.isFile())
                     SharedPreferencesUtil.deleteFile(file);
@@ -128,16 +112,14 @@ public class AppUtils
         }
     }
 
-    public static String formatReputation(int reputation)
-    {
+    public static String formatReputation(int reputation) {
         if (reputation > 0)
             return formatNumber(reputation);
 
         return "";
     }
 
-    public static String formatNumber(int number)
-    {
+    public static String formatNumber(int number) {
         String reputationString = "";
 
         if (number > 10000)
@@ -148,25 +130,21 @@ public class AppUtils
         return reputationString;
     }
 
-    public static boolean inAuthenticatedRealm(Context context)
-    {
+    public static boolean inAuthenticatedRealm(Context context) {
         return getAccessToken(context) == null ? false : true;
     }
 
-    public static boolean inRegisteredSite(Context context)
-    {
+    public static boolean inRegisteredSite(Context context) {
         return inAuthenticatedRealm(context)
-                        && SiteDAO.isRegisteredForSite(context, OperatingSite.getSite().apiSiteParameter);
+                && SiteDAO.isRegisteredForSite(context, OperatingSite.getSite().apiSiteParameter);
     }
 
-    public static Map<String, String> getDefaultQueryParams()
-    {
+    public static Map<String, String> getDefaultQueryParams() {
         Map<String, String> queryParams = new HashMap<String, String>();
         queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
 
         String accessToken = getAccessToken(null);
-        if (accessToken != null)
-        {
+        if (accessToken != null) {
             queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);
             queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
         }
@@ -174,25 +152,22 @@ public class AppUtils
         return queryParams;
     }
 
-    public static SoftReference<Bitmap> getBitmap(Resources resources, int drawable)
-    {
+    public static SoftReference<Bitmap> getBitmap(Resources resources, int drawable) {
         Bitmap bitmap = BitmapFactory.decodeResource(resources, drawable);
         return new SoftReference<Bitmap>(bitmap);
     }
 
-    public static boolean allowedToWrite(Context context)
-    {
+    public static boolean allowedToWrite(Context context) {
         if (context == null)
             return false;
 
         long lastCommentWrite = SharedPreferencesUtil.getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
-        long minSecondsBetweenWrite = SharedPreferencesUtil.getLong(context,
-                        WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
+        long minSecondsBetweenWrite =
+                SharedPreferencesUtil.getLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
         return ((System.currentTimeMillis() - lastCommentWrite) / 1000 > minSecondsBetweenWrite);
     }
 
-    public static ViewGroup getErrorView(Context context, HttpException e)
-    {
+    public static ViewGroup getErrorView(Context context, HttpException e) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout errorLayout = (RelativeLayout) inflater.inflate(R.layout.error, null);
         String errorMsg = getStackXErrorMsg(e);
@@ -202,19 +177,15 @@ public class AppUtils
         return errorLayout;
     }
 
-    public static TextView getEmptyItemsView(Context context)
-    {
+    public static TextView getEmptyItemsView(Context context) {
         return (TextView) LayoutInflater.from(context).inflate(R.layout.empty_items, null);
     }
 
-    public static String getStackXErrorMsg(HttpException e)
-    {
+    public static String getStackXErrorMsg(HttpException e) {
         String errorMsg = "Unknown error";
 
-        if (e != null)
-        {
-            if (e.getCode() == null)
-            {
+        if (e != null) {
+            if (e.getCode() == null) {
                 StackXError error = StackXError.deserialize(e.getErrorResponse());
                 if (error != null)
                     errorMsg = error.name;
@@ -227,20 +198,16 @@ public class AppUtils
         return errorMsg;
     }
 
-    public static void showSoftInput(Context context, View v)
-    {
+    public static void showSoftInput(Context context, View v) {
         toggleSoftInput(context, v, false);
     }
 
-    public static void hideSoftInput(Context context, View v)
-    {
+    public static void hideSoftInput(Context context, View v) {
         toggleSoftInput(context, v, true);
     }
 
-    private static void toggleSoftInput(Context context, View v, boolean hide)
-    {
-        if (context != null && v != null)
-        {
+    private static void toggleSoftInput(Context context, View v, boolean hide) {
+        if (context != null && v != null) {
             InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             if (hide)
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -249,13 +216,10 @@ public class AppUtils
         }
     }
 
-    public static Thread runOnBackgroundThread(final Runnable runnable)
-    {
-        final Thread t = new Thread()
-        {
+    public static Thread runOnBackgroundThread(final Runnable runnable) {
+        final Thread t = new Thread() {
             @Override
-            public void run()
-            {
+            public void run() {
                 runnable.run();
             }
         };
@@ -263,56 +227,47 @@ public class AppUtils
         return t;
     }
 
-    public static void incrementNumSavedSearches(Context context)
-    {
+    public static void incrementNumSavedSearches(Context context) {
         long num = getNumSavedSearches(context);
 
         SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, ++num);
     }
 
-    public static void decrementNumSavedSearches(Context context)
-    {
+    public static void decrementNumSavedSearches(Context context) {
         long num = getNumSavedSearches(context);
 
         if (num > 0)
             SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, --num);
     }
 
-    public static void decrementNumSavedSearches(Context context, int by)
-    {
+    public static void decrementNumSavedSearches(Context context, int by) {
         long num = getNumSavedSearches(context);
 
         if (num > 0 && num - by >= 0)
             SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, num - by);
     }
 
-    public static long getNumSavedSearches(Context context)
-    {
+    public static long getNumSavedSearches(Context context) {
         return SharedPreferencesUtil.getLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, 0);
     }
 
-    public static boolean savedSearchesMaxed(Context context)
-    {
+    public static boolean savedSearchesMaxed(Context context) {
         return getNumSavedSearches(context) == SearchCriteriaListActivity.MAX_SAVED_SEARCHES;
     }
 
-    public static boolean anHourSince(long ms)
-    {
+    public static boolean anHourSince(long ms) {
         return System.currentTimeMillis() - ms > IntegerConstants.MS_IN_AN_HOUR;
     }
 
-    public static boolean aDaySince(long ms)
-    {
+    public static boolean aDaySince(long ms) {
         return System.currentTimeMillis() - ms > IntegerConstants.MS_IN_A_DAY;
     }
 
-    public static boolean aHalfAnHourSince(long ms)
-    {
+    public static boolean aHalfAnHourSince(long ms) {
         return System.currentTimeMillis() - ms > IntegerConstants.MS_IN_HALF_AN_HOUR;
     }
 
-    public static boolean isNetworkAvailable(Context context)
-    {
+    public static boolean isNetworkAvailable(Context context) {
         if (context == null)
             return false;
 

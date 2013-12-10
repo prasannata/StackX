@@ -27,13 +27,11 @@ import com.prasanna.android.stacknetwork.service.AccountSyncService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.utils.LogWrapper;
 
-public class AccountSyncAlarmBroadcastReceiver extends BroadcastReceiver
-{
+public class AccountSyncAlarmBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = AccountSyncAlarmBroadcastReceiver.class.getSimpleName();
 
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         LogWrapper.d(TAG, "Alarm receiver invoked");
 
         if (AppUtils.inAuthenticatedRealm(context))

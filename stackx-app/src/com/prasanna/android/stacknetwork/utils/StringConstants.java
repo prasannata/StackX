@@ -19,8 +19,7 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-public class StringConstants
-{
+public class StringConstants {
     public static String RESULT_RECEIVER = "result_receiver";
 
     public static String SORT = "sort";
@@ -97,10 +96,8 @@ public class StringConstants
     public static final String REQUEST_CODE = "request_code";
 
     public static final String VIEW_PAGER_POSITION = "view_pager_position";
-    
 
-    public static final class HttpError
-    {
+    public static final class HttpError {
         public static final String CODE = "code";
         public static final String ERROR_ID = "error_id";
         public static final String ERROR_NAME = "error_name";

@@ -29,8 +29,7 @@ import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class QuestionsIntentService extends AbstractIntentService
-{
+public class QuestionsIntentService extends AbstractIntentService {
     private static final String TAG = QuestionsIntentService.class.getSimpleName();
     public static final int GET_FRONT_PAGE = 0x501;
     public static final int GET_FAQ_FOR_TAG = 0x502;
@@ -42,31 +41,26 @@ public class QuestionsIntentService extends AbstractIntentService
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
-    public QuestionsIntentService()
-    {
+    public QuestionsIntentService() {
         this("UserQuestionsService");
     }
 
-    public QuestionsIntentService(String name)
-    {
+    public QuestionsIntentService(String name) {
         super(name);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final int page = intent.getIntExtra(StringConstants.PAGE, 1);
         final String sort = intent.getStringExtra(StringConstants.SORT);
         Bundle bundle = new Bundle();
 
-        try
-        {
+        try {
             super.onHandleIntent(intent);
 
-            switch (action)
-            {
+            switch (action) {
                 case GET_FRONT_PAGE:
                     LogWrapper.d(TAG, "Get front page");
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.getAllQuestions(sort, page));
@@ -84,7 +78,7 @@ public class QuestionsIntentService extends AbstractIntentService
                     String seachTagged = intent.getStringExtra(StringConstants.TAG);
                     LogWrapper.d(TAG, "Get questions for " + seachTagged);
                     bundle.putSerializable(StringConstants.QUESTIONS,
-                                    questionService.getQuestionsForTag(seachTagged, sort, page));
+                            questionService.getQuestionsForTag(seachTagged, sort, page));
                     break;
                 case GET_SIMILAR:
                     String title = intent.getStringExtra(StringConstants.TITLE);
@@ -97,8 +91,8 @@ public class QuestionsIntentService extends AbstractIntentService
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.search(query, page));
                     break;
                 case SEARCH_ADVANCED:
-                    SearchCriteria criteria = (SearchCriteria) intent
-                                    .getSerializableExtra(StringConstants.SEARCH_CRITERIA);
+                    SearchCriteria criteria =
+                            (SearchCriteria) intent.getSerializableExtra(StringConstants.SEARCH_CRITERIA);
                     bundle.putSerializable(StringConstants.QUESTIONS, questionService.advancedSearch(criteria));
                     break;
 
@@ -109,15 +103,13 @@ public class QuestionsIntentService extends AbstractIntentService
 
             receiver.send(0, bundle);
         }
-        catch (AbstractHttpException e)
-        {
+        catch (AbstractHttpException e) {
             bundle.putSerializable(StringConstants.EXCEPTION, e);
             receiver.send(ERROR, bundle);
         }
     }
 
-    private void getRelatedQuestions(Intent intent, final int page, Bundle bundle)
-    {
+    private void getRelatedQuestions(Intent intent, final int page, Bundle bundle) {
         long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
         if (questionId > 0)
             bundle.putSerializable(StringConstants.QUESTIONS, questionService.getRelatedQuestions(questionId, page));

@@ -35,53 +35,44 @@ import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class MyProfileService extends AbstractStackxService
-{
+public class MyProfileService extends AbstractStackxService {
     private static final String TAG = TagsService.class.getSimpleName();
 
-    private final static class ServiceHandler extends Handler
-    {
+    private final static class ServiceHandler extends Handler {
         private OnHandlerComplete onHandlerComplete;
         private Context context;
 
-        public ServiceHandler(Looper looper, Context context, OnHandlerComplete onHandlerComplete)
-        {
+        public ServiceHandler(Looper looper, Context context, OnHandlerComplete onHandlerComplete) {
             super(looper);
             this.context = context;
             this.onHandlerComplete = onHandlerComplete;
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             ProfileDAO profileDAO = new ProfileDAO(context);
 
-            try
-            {
+            try {
                 profileDAO.open();
                 User me = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
 
-                if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR)
-                {
-                    StackXPage<User> userPage = UserServiceHelper.getInstance().getMe(OperatingSite.getSite().apiSiteParameter);
-                    if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
-                    {
+                if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR) {
+                    StackXPage<User> userPage =
+                            UserServiceHelper.getInstance().getMe(OperatingSite.getSite().apiSiteParameter);
+                    if (userPage != null && userPage.items != null && !userPage.items.isEmpty()) {
                         profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
                         profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
                         SharedPreferencesUtil.setLong(context, StringConstants.USER_ID, userPage.items.get(0).id);
                     }
                 }
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            catch(AbstractHttpException e)
-            {
+            catch (AbstractHttpException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            finally
-            {
+            finally {
                 profileDAO.close();
             }
 
@@ -90,13 +81,10 @@ public class MyProfileService extends AbstractStackxService
     }
 
     @Override
-    protected Handler getServiceHandler(Looper looper)
-    {
-        return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete()
-        {
+    protected Handler getServiceHandler(Looper looper) {
+        return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete() {
             @Override
-            public void onHandleMessageFinish(Message message, Object... args)
-            {
+            public void onHandleMessageFinish(Message message, Object... args) {
                 setRunning(false);
                 MyProfileService.this.stopSelf(message.arg1);
             }

@@ -52,25 +52,21 @@ import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class UserServiceHelper extends AbstractBaseServiceHelper
-{
+public class UserServiceHelper extends AbstractBaseServiceHelper {
     private final String TAG = UserServiceHelper.class.getSimpleName();
 
     private static final UserServiceHelper userService = new UserServiceHelper();
 
-    public static UserServiceHelper getInstance()
-    {
+    public static UserServiceHelper getInstance() {
         return userService;
     }
 
     @Override
-    protected String getLogTag()
-    {
+    protected String getLogTag() {
         return TAG;
     }
 
-    public LinkedHashMap<String, Site> getAllSitesInNetwork()
-    {
+    public LinkedHashMap<String, Site> getAllSitesInNetwork() {
         String restEndPoint = StringConstants.SITES;
         LinkedHashMap<String, Site> sites = new LinkedHashMap<String, Site>();
         boolean hasMore = true;
@@ -79,17 +75,14 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(PAGE_SIZE));
 
-        while (hasMore)
-        {
+        while (hasMore) {
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
             JSONObjectWrapper jsonObject = executeHttpGetRequest(restEndPoint, queryParams);
 
-            try
-            {
+            try {
                 hasMore = addSites(sites, jsonObject);
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(getLogTag(), e.getMessage());
                 hasMore = false;
             }
@@ -97,16 +90,12 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return sites;
     }
 
-    private boolean addSites(LinkedHashMap<String, Site> sites, JSONObjectWrapper jsonObject) throws JSONException
-    {
-        if (jsonObject != null)
-        {
+    private boolean addSites(LinkedHashMap<String, Site> sites, JSONObjectWrapper jsonObject) throws JSONException {
+        if (jsonObject != null) {
             JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
 
-            if (jsonArray != null)
-            {
-                for (int i = 0; i < jsonArray.length(); i++)
-                {
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject siteJsonObject = jsonArray.getJSONObject(i);
                     Site site = getSerializedSiteObject(new JSONObjectWrapper(siteJsonObject));
                     if (site != null)
@@ -120,8 +109,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return false;
     }
 
-    private Site getSerializedSiteObject(JSONObjectWrapper siteJsonObject)
-    {
+    private Site getSerializedSiteObject(JSONObjectWrapper siteJsonObject) {
         if (siteJsonObject == null)
             return null;
 
@@ -136,20 +124,17 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return site;
     }
 
-    private StackXPage<Question> getQuestions(String restEndPoint, Map<String, String> queryParams)
-    {
+    private StackXPage<Question> getQuestions(String restEndPoint, Map<String, String> queryParams) {
         JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (questionsJsonResponse != null)
-        {
+        if (questionsJsonResponse != null) {
             return getQuestionModel(questionsJsonResponse);
         }
 
         return null;
     }
 
-    public StackXPage<Question> getMyQuestions(int page)
-    {
+    public StackXPage<Question> getMyQuestions(int page) {
         String restEndPoint = "/me/questions";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -162,8 +147,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getQuestions(restEndPoint, queryParams);
     }
 
-    public StackXPage<Question> getQuestionsByUser(long userId, int page)
-    {
+    public StackXPage<Question> getQuestionsByUser(long userId, int page) {
         String restEndPoint = "/users/" + userId + "/questions";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -176,8 +160,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getQuestions(restEndPoint, queryParams);
     }
 
-    public StackXPage<Question> getMyFavorites(int page)
-    {
+    public StackXPage<Question> getMyFavorites(int page) {
         String restEndPoint = "/me/favorites";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -190,8 +173,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getQuestions(restEndPoint, queryParams);
     }
 
-    public StackXPage<Question> getFavoritesByUser(long userId, int page)
-    {
+    public StackXPage<Question> getFavoritesByUser(long userId, int page) {
         String restEndPoint = "/users/" + userId + "/favorites";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -204,16 +186,14 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getQuestions(restEndPoint, queryParams);
     }
 
-    public StackXPage<User> getMe(String site)
-    {
+    public StackXPage<User> getMe(String site) {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, site);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
         return getSerializedUserObject(executeHttpGetRequest("/me", queryParams));
     }
 
-    public StackXPage<User> getUserById(long userId, String site)
-    {
+    public StackXPage<User> getUserById(long userId, String site) {
         StackXPage<User> page = null;
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, site);
@@ -225,30 +205,24 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return page;
     }
 
-    private StackXPage<Answer> getAnswers(String restEndPoint, Map<String, String> queryParams)
-    {
+    private StackXPage<Answer> getAnswers(String restEndPoint, Map<String, String> queryParams) {
         StackXPage<Answer> page = new StackXPage<Answer>();
 
         JSONObjectWrapper answersJsonObject = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (answersJsonObject != null)
-        {
+        if (answersJsonObject != null) {
             getPageInfo(answersJsonObject, page);
             page.items = new ArrayList<Answer>();
             JSONArray jsonArray = answersJsonObject.getJSONArray(JsonFields.ITEMS);
-            if (jsonArray != null)
-            {
+            if (jsonArray != null) {
 
-                try
-                {
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
+                try {
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                         page.items.add(getSerializedAnswerObject(jsonObject));
                     }
                 }
-                catch (JSONException e)
-                {
+                catch (JSONException e) {
                     LogWrapper.d(getLogTag(), e.getMessage());
                 }
             }
@@ -257,8 +231,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return page;
     }
 
-    public StackXPage<Answer> getMyAnswers(int page)
-    {
+    public StackXPage<Answer> getMyAnswers(int page) {
         String restEndPoint = "/me/answers";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -272,8 +245,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getAnswers(restEndPoint, queryParams);
     }
 
-    public StackXPage<Answer> getAnswersByUser(long userId, int page)
-    {
+    public StackXPage<Answer> getAnswersByUser(long userId, int page) {
         String restEndPoint = "/users/" + userId + "/answers";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -286,8 +258,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getAnswers(restEndPoint, queryParams);
     }
 
-    public ArrayList<WritePermission> getWritePermissions(String site)
-    {
+    public ArrayList<WritePermission> getWritePermissions(String site) {
         ArrayList<WritePermission> permissions = new ArrayList<WritePermission>();
 
         String restEndPoint = "me/write-permissions";
@@ -296,33 +267,28 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SITE, site);
         JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (jsonObjectWrapper != null)
-        {
+        if (jsonObjectWrapper != null) {
             JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
-            if (jsonArray != null && jsonArray.length() > 0)
-            {
-                try
-                {
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
+            if (jsonArray != null && jsonArray.length() > 0) {
+                try {
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObjectWrapper permissionJsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
 
                         WritePermission permission = new WritePermission();
                         permission.canAdd = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_ADD);
                         permission.canDelete = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_DELETE);
                         permission.canEdit = permissionJsonObject.getBoolean(JsonFields.Permission.CAN_EDIT);
-                        permission.maxDailyActions = permissionJsonObject
-                                        .getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
-                        permission.minSecondsBetweenActions = permissionJsonObject
-                                        .getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
-                        permission.objectType = ObjectType.getEnum(permissionJsonObject
-                                        .getString(JsonFields.Permission.OBJECT_TYPE));
+                        permission.maxDailyActions =
+                                permissionJsonObject.getInt(JsonFields.Permission.MAX_DAILY_ACTIONS);
+                        permission.minSecondsBetweenActions =
+                                permissionJsonObject.getInt(JsonFields.Permission.MIN_SECONDS_BETWEEN_ACTIONS);
+                        permission.objectType =
+                                ObjectType.getEnum(permissionJsonObject.getString(JsonFields.Permission.OBJECT_TYPE));
                         permission.userId = permissionJsonObject.getLong(JsonFields.Permission.USER_ID);
                         permissions.add(permission);
                     }
                 }
-                catch (JSONException e)
-                {
+                catch (JSONException e) {
                     LogWrapper.d(getLogTag(), e.getMessage());
                 }
             }
@@ -331,8 +297,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return permissions;
     }
 
-    public StackXPage<InboxItem> getInbox(int page)
-    {
+    public StackXPage<InboxItem> getInbox(int page) {
         String restEndPoint = "inbox";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -345,8 +310,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getInboxItems(restEndPoint, queryParams);
     }
 
-    public StackXPage<InboxItem> getUnreadItemsInInbox(int page)
-    {
+    public StackXPage<InboxItem> getUnreadItemsInInbox(int page) {
         String restEndPoint = "/inbox/unread";
 
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -357,32 +321,26 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return getInboxItems(restEndPoint, queryParams);
     }
 
-    private StackXPage<InboxItem> getInboxItems(String restEndPoint, Map<String, String> queryParams)
-    {
+    private StackXPage<InboxItem> getInboxItems(String restEndPoint, Map<String, String> queryParams) {
         StackXPage<InboxItem> page = null;
 
         JSONObjectWrapper jsonOfInboxItems = executeHttpGetRequest(restEndPoint, queryParams);
-        if (jsonOfInboxItems != null)
-        {
+        if (jsonOfInboxItems != null) {
             JSONArray itemsArray = jsonOfInboxItems.getJSONArray(JsonFields.ITEMS);
 
-            if (itemsArray != null)
-            {
+            if (itemsArray != null) {
                 page = new StackXPage<InboxItem>();
                 getPageInfo(jsonOfInboxItems, page);
 
                 page.items = new ArrayList<InboxItem>();
 
-                for (int i = 0; i < itemsArray.length(); i++)
-                {
-                    try
-                    {
+                for (int i = 0; i < itemsArray.length(); i++) {
+                    try {
                         JSONObjectWrapper itemJsonObject = JSONObjectWrapper.wrap(itemsArray.getJSONObject(i));
                         if (itemJsonObject != null)
                             page.items.add(getSerializedInboxItem(itemJsonObject));
                     }
-                    catch (JSONException e)
-                    {
+                    catch (JSONException e) {
                         LogWrapper.d(getLogTag(), e.getMessage());
                     }
 
@@ -392,8 +350,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return page;
     }
 
-    private InboxItem getSerializedInboxItem(JSONObjectWrapper itemJsonObject)
-    {
+    private InboxItem getSerializedInboxItem(JSONObjectWrapper itemJsonObject) {
         InboxItem inboxItem = new InboxItem();
         inboxItem.questionId = itemJsonObject.getLong(JsonFields.InboxItem.QUESTION_ID);
         inboxItem.answerId = itemJsonObject.getLong(JsonFields.InboxItem.ANSWER_ID);
@@ -407,45 +364,36 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return inboxItem;
     }
 
-    public HashMap<String, Account> getMyAccount()
-    {
+    public HashMap<String, Account> getMyAccount() {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.NETWORK_USER_TYPE_FILTER);
         return getAccounts("/me/associated", 1, queryParams);
     }
 
-    public HashMap<String, Account> getAccount(long accountId)
-    {
+    public HashMap<String, Account> getAccount(long accountId) {
         return getAccounts("/users/" + accountId + "/associated", 1, AppUtils.getDefaultQueryParams());
     }
 
-    private HashMap<String, Account> getAccounts(String restEndPoint, int page, Map<String, String> queryParams)
-    {
+    private HashMap<String, Account> getAccounts(String restEndPoint, int page, Map<String, String> queryParams) {
         final int PAGE_SIZE = 100;
         boolean hasMore = true;
         HashMap<String, Account> accounts = new HashMap<String, Account>();
 
         queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(PAGE_SIZE));
 
-        while (hasMore)
-        {
+        while (hasMore) {
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
             hasMore = addAccountsToMap(accounts, executeHttpGetRequest(restEndPoint, queryParams));
         }
         return accounts;
     }
 
-    private boolean addAccountsToMap(HashMap<String, Account> accounts, JSONObjectWrapper accountsJsonObject)
-    {
-        if (accountsJsonObject != null)
-        {
+    private boolean addAccountsToMap(HashMap<String, Account> accounts, JSONObjectWrapper accountsJsonObject) {
+        if (accountsJsonObject != null) {
             JSONArray jsonArray = accountsJsonObject.getJSONArray(JsonFields.ITEMS);
-            if (jsonArray != null)
-            {
-                for (int i = 0; i < jsonArray.length(); i++)
-                {
-                    try
-                    {
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    try {
                         JSONObjectWrapper accountJsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                         Account account = new Account();
                         account.id = accountJsonObject.getLong(JsonFields.Account.ACCOUNT_ID);
@@ -455,8 +403,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
                         account.userType = UserType.toEnum(accountJsonObject.getString(JsonFields.Account.USER_TYPE));
                         accounts.put(account.siteUrl, account);
                     }
-                    catch (JSONException e)
-                    {
+                    catch (JSONException e) {
                         LogWrapper.d(getLogTag(), e.getMessage());
                     }
                 }
@@ -468,18 +415,15 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return false;
     }
 
-    public StackExchangeHttpError logout(String accessToken)
-    {
+    public StackExchangeHttpError logout(String accessToken) {
         StackExchangeHttpError error = new StackExchangeHttpError();
         error.id = -1;
 
         String restEndPoint = "/apps/" + accessToken + "/de-authenticate";
         JSONObjectWrapper jsonObject = executeHttpGetRequest(restEndPoint, null);
-        if (jsonObject != null)
-        {
+        if (jsonObject != null) {
             String deauthenticatedAccessToken = jsonObject.getString(JsonFields.AccessToken.ACCESS_TOKEN);
-            if (deauthenticatedAccessToken == null || !accessToken.equals(deauthenticatedAccessToken))
-            {
+            if (deauthenticatedAccessToken == null || !accessToken.equals(deauthenticatedAccessToken)) {
                 error.id = jsonObject.getInt(JsonFields.Error.ERROR_ID);
                 error.name = jsonObject.getString(JsonFields.Error.ERROR_NAME);
                 error.message = jsonObject.getString(JsonFields.Error.ERROR_MESSAGE);
@@ -489,8 +433,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return error;
     }
 
-    public LinkedHashSet<Tag> getTags(String site, int pageSize, boolean meTags)
-    {
+    public LinkedHashSet<Tag> getTags(String site, int pageSize, boolean meTags) {
         int page = 1;
         LinkedHashSet<Tag> tags = null;
         String restEndPoint = meTags ? "/me/tags" : "/tags";
@@ -503,28 +446,22 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         queryParams.put(StackUri.QueryParams.SORT, meTags ? Sort.NAME : Sort.POPULAR);
         queryParams.put(StackUri.QueryParams.ORDER, meTags ? Order.ASC : Order.DESC);
 
-        while (hasMore)
-        {
+        while (hasMore) {
             queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
             JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, queryParams);
 
-            if (jsonObjectWrapper != null)
-            {
+            if (jsonObjectWrapper != null) {
                 JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
-                if (jsonArray != null && jsonArray.length() > 0)
-                {
+                if (jsonArray != null && jsonArray.length() > 0) {
                     if (tags == null)
                         tags = new LinkedHashSet<Tag>();
 
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
-                        try
-                        {
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        try {
                             JSONObjectWrapper tagJson = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                             tags.add(new Tag(tagJson.getString(JsonFields.Tag.NAME)));
                         }
-                        catch (JSONException e)
-                        {
+                        catch (JSONException e) {
                             LogWrapper.d(getLogTag(), e.getMessage());
                         }
                     }
@@ -544,14 +481,11 @@ public class UserServiceHelper extends AbstractBaseServiceHelper
         return tags;
     }
 
-    private void sleep(long ms)
-    {
-        try
-        {
+    private void sleep(long ms) {
+        try {
             Thread.sleep(ms);
         }
-        catch (InterruptedException e)
-        {
+        catch (InterruptedException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
     }

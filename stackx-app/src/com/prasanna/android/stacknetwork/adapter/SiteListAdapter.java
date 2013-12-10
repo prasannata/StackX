@@ -39,25 +39,21 @@ import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 
-public class SiteListAdapter extends ArrayAdapter<Site>
-{
+public class SiteListAdapter extends ArrayAdapter<Site> {
     private OnSiteSelectedListener onSiteSelectedListener;
     private Filter filter;
 
-    public interface OnSiteSelectedListener
-    {
+    public interface OnSiteSelectedListener {
         void onSiteSelected(Site site);
     }
 
     public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> sites,
-                    Filter filter)
-    {
+            Filter filter) {
         super(context, layoutResourceId, textViewResourceId, sites);
         this.filter = filter;
     }
 
-    static class ViewHolder
-    {
+    static class ViewHolder {
         TextView siteNameView;
         TextView siteAudience;
         TextView registeredView;
@@ -66,12 +62,10 @@ public class SiteListAdapter extends ArrayAdapter<Site>
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent)
-    {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
 
-        if (convertView == null)
-        {
+        if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
             holder = new ViewHolder();
             holder.siteNameView = (TextView) convertView.findViewById(R.id.siteName);
@@ -96,14 +90,10 @@ public class SiteListAdapter extends ArrayAdapter<Site>
 
         holder.writePermissionView.setVisibility(View.GONE);
 
-        if (site.writePermissions != null)
-        {
-            for (WritePermission permission : site.writePermissions)
-            {
-                if (permission.objectType != null && ObjectType.COMMENT.equals(permission.objectType))
-                {
-                    if (permission.canAdd & permission.canDelete & permission.canEdit)
-                    {
+        if (site.writePermissions != null) {
+            for (WritePermission permission : site.writePermissions) {
+                if (permission.objectType != null && ObjectType.COMMENT.equals(permission.objectType)) {
+                    if (permission.canAdd & permission.canDelete & permission.canEdit) {
                         holder.writePermissionView.setVisibility(View.VISIBLE);
                         break;
                     }
@@ -116,28 +106,23 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         return convertView;
     }
 
-    private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder)
-    {
+    private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder) {
         final Site defaultSite = AppUtils.getDefaultSite(getContext());
         if (isDefaultSite(defaultSite, position))
             holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
         else
             holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
 
-        holder.defaultSiteOpt.setOnClickListener(new View.OnClickListener()
-        {
+        holder.defaultSiteOpt.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Site item = getItem(position);
 
-                if (isDefaultSite(defaultSite, position))
-                {
+                if (isDefaultSite(defaultSite, position)) {
                     holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
                     AppUtils.clearDefaultSite(getContext());
                 }
-                else
-                {
+                else {
                     holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
                     AppUtils.setDefaultSite(getContext(), item);
                     notifyDataSetChanged();
@@ -147,17 +132,13 @@ public class SiteListAdapter extends ArrayAdapter<Site>
         });
     }
 
-    private boolean isDefaultSite(Site defaultSite, final int position)
-    {
+    private boolean isDefaultSite(Site defaultSite, final int position) {
         return defaultSite != null && defaultSite.name != null && defaultSite.name.equals(getItem(position).name);
     }
 
-    private void setOnClickForSite(final int position, View layoutForSites)
-    {
-        layoutForSites.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
+    private void setOnClickForSite(final int position, View layoutForSites) {
+        layoutForSites.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 if (onSiteSelectedListener != null)
                     onSiteSelectedListener.onSiteSelected(getItem(position));
             }
@@ -165,13 +146,11 @@ public class SiteListAdapter extends ArrayAdapter<Site>
     }
 
     @Override
-    public Filter getFilter()
-    {
+    public Filter getFilter() {
         return filter;
     }
 
-    public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener)
-    {
+    public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener) {
         this.onSiteSelectedListener = onSiteSelectedListener;
     }
 }

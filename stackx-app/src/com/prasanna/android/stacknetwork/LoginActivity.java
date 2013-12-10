@@ -32,21 +32,17 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
-public class LoginActivity extends Activity
-{
+public class LoginActivity extends Activity {
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (AppUtils.isFirstRun(getApplicationContext()))
-        {
+        if (AppUtils.isFirstRun(getApplicationContext())) {
             setContentView(R.layout.main);
             setupLogin();
             setupSkipLogin();
         }
-        else
-        {
+        else {
             Intent intent;
             OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
 
@@ -61,13 +57,10 @@ public class LoginActivity extends Activity
         }
     }
 
-    private void setupLogin()
-    {
+    private void setupLogin() {
         Button loginButton = (Button) findViewById(R.id.login_button);
-        loginButton.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View view)
-            {
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
                 AppUtils.setFirstRunComplete(LoginActivity.this);
                 Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
                 startActivity(oAuthIntent);
@@ -75,28 +68,22 @@ public class LoginActivity extends Activity
         });
     }
 
-    private void setupSkipLogin()
-    {
+    private void setupSkipLogin() {
         TextView skipLoginTextView = (TextView) findViewById(R.id.skipLogin);
-        skipLoginTextView.setOnClickListener(new View.OnClickListener()
-        {
-            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
-            {
+        skipLoginTextView.setOnClickListener(new View.OnClickListener() {
+            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    if (DialogInterface.BUTTON_POSITIVE == which)
-                    {
+                public void onClick(DialogInterface dialog, int which) {
+                    if (DialogInterface.BUTTON_POSITIVE == which) {
                         Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
-                                        .show();
+                                .show();
                         AppUtils.setFirstRunComplete(LoginActivity.this);
                         startActivity(new Intent(LoginActivity.this, StackNetworkListActivity.class));
                     }
                 }
             };
 
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 DialogBuilder.yesNoDialog(LoginActivity.this, R.string.noLoginWarn, dialogClickListener).show();
             }
         });

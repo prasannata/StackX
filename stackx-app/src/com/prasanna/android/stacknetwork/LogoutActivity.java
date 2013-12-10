@@ -46,23 +46,20 @@ import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentActi
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class LogoutActivity extends Activity
-{
+public class LogoutActivity extends Activity {
     private static final String TAG = LogoutActivity.class.getSimpleName();
 
     private Intent deauthAppIntent;
 
     private ProgressDialog progressDialog;
 
-    private BroadcastReceiver receiver = new BroadcastReceiver()
-    {
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             progressDialog.dismiss();
 
-            StackExchangeHttpError error = (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT
-                            .getAction());
+            StackExchangeHttpError error =
+                    (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT.getAction());
 
             processLogoutResponse(error);
         }
@@ -72,8 +69,7 @@ public class LogoutActivity extends Activity
     private SharedPreferences sharedPreferences;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(new LinearLayout(this));
@@ -84,21 +80,17 @@ public class LogoutActivity extends Activity
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
-        try
-        {
+        try {
             unregisterReceiver(receiver);
         }
-        catch (IllegalArgumentException e)
-        {
+        catch (IllegalArgumentException e) {
             LogWrapper.d(TAG, e.getMessage());
         }
     }
 
-    private void startIntentService(String accessToken)
-    {
+    private void startIntentService(String accessToken) {
         progressDialog = ProgressDialog.show(LogoutActivity.this, "", "Logging out");
 
         deauthAppIntent = new Intent(this, UserIntentService.class);
@@ -107,15 +99,13 @@ public class LogoutActivity extends Activity
         startService(deauthAppIntent);
     }
 
-    private void registerReceiver()
-    {
+    private void registerReceiver() {
         IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.getAction());
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiver, filter);
     }
 
-    private void startLoginActivity()
-    {
+    private void startLoginActivity() {
         Intent intent = new Intent(this, StackNetworkListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -123,10 +113,8 @@ public class LogoutActivity extends Activity
         startActivity(intent);
     }
 
-    private void processLogoutResponse(StackExchangeHttpError error)
-    {
-        if (error != null && error.id == -1)
-        {
+    private void processLogoutResponse(StackExchangeHttpError error) {
+        if (error != null && error.id == -1) {
             Editor editor = sharedPreferences.edit();
             editor.remove(StringConstants.ACCESS_TOKEN);
             editor.commit();
@@ -144,28 +132,24 @@ public class LogoutActivity extends Activity
             clearCookies();
             startLoginActivity();
         }
-        else if (error != null && error.id > 0)
-        {
+        else if (error != null && error.id > 0) {
             LogWrapper.d(TAG, "Logout failed with " + error.message);
             finish();
         }
-        else
-        {
+        else {
             LogWrapper.d(TAG, "Logout failed for unknown reason");
             finish();
         }
     }
 
-    private void clearDatabase()
-    {
+    private void clearDatabase() {
         SiteDAO.deleteAll(getApplicationContext());
         TagDAO.purge(getApplicationContext());
         WritePermissionDAO.deleteAll(getApplicationContext());
         ProfileDAO.purge(getApplicationContext());
     }
 
-    private void clearCookies()
-    {
+    private void clearCookies() {
         CookieSyncManager.createInstance(getApplicationContext());
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.removeAllCookie();

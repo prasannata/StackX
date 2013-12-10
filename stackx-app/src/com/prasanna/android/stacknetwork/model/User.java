@@ -24,10 +24,8 @@ import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 
-public class User extends IdentifiableItem implements Serializable
-{
-    public static enum UserType
-    {
+public class User extends IdentifiableItem implements Serializable {
+    public static enum UserType {
         REGISTERED("registered"),
         UNREGISTERED("unregistered"),
         MODERATOR("moderator"),
@@ -35,59 +33,47 @@ public class User extends IdentifiableItem implements Serializable
 
         private final String value;
 
-        UserType(String value)
-        {
+        UserType(String value) {
             this.value = value;
         }
 
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
 
-        public static UserType toEnum(String value)
-        {
+        public static UserType toEnum(String value) {
             UserType userType = null;
 
-            if (value != null)
-            {
-                try
-                {
-                    for (UserType type : UserType.values())
-                    {
-                        if (type.getValue().equals(value))
-                        {
+            if (value != null) {
+                try {
+                    for (UserType type : UserType.values()) {
+                        if (type.getValue().equals(value)) {
                             userType = type;
                             break;
                         }
                     }
                 }
-                catch (IllegalArgumentException e)
-                {
+                catch (IllegalArgumentException e) {
                     userType = null;
                 }
             }
             return userType;
         }
 
-        public static UserType getEnum(String userType)
-        {
+        public static UserType getEnum(String userType) {
             if (userType == null)
                 return null;
 
-            try
-            {
+            try {
                 return valueOf(userType.toUpperCase());
             }
-            catch (IllegalArgumentException e)
-            {
+            catch (IllegalArgumentException e) {
                 return null;
             }
         }
     }
 
-    public static User copyShallowUser(User that)
-    {
+    public static User copyShallowUser(User that) {
         if (that == null)
             return null;
 

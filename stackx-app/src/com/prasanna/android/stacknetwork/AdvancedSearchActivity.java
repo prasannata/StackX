@@ -36,51 +36,43 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.utils.LogWrapper;
 
-public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener
-{
+public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener {
     private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
     private SearchQuestionListFragment questionListFragment;
     private SearchCriteriaFragment searchCriteriaFragment;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.advanced_search);
         searchCriteriaFragment =
-                        (SearchCriteriaFragment) getFragmentManager().findFragmentById(R.id.searchCriteriaFragment);
+                (SearchCriteriaFragment) getFragmentManager().findFragmentById(R.id.searchCriteriaFragment);
         questionListFragment =
-                        (SearchQuestionListFragment) getFragmentManager().findFragmentById(R.id.questionListFragment);
+                (SearchQuestionListFragment) getFragmentManager().findFragmentById(R.id.questionListFragment);
 
         if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
             searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
-                            StringConstants.SEARCH_CRITERIA));
+                    StringConstants.SEARCH_CRITERIA));
     }
 
-    private void showOrHideQuestionListFragment(Configuration configuration)
-    {
-        if (!searchCriteriaFragment.isRemoving() && !questionListFragment.isRemoving())
-        {
+    private void showOrHideQuestionListFragment(Configuration configuration) {
+        if (!searchCriteriaFragment.isRemoving() && !questionListFragment.isRemoving()) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
-            {
-                if (questionListFragment.hasResults())
-                {
+            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                if (questionListFragment.hasResults()) {
                     getActionBar().setDisplayHomeAsUpEnabled(true);
                     ft.hide(searchCriteriaFragment);
                     ft.show(questionListFragment);
                     AppUtils.hideSoftInput(this, getWindow().getCurrentFocus());
                 }
-                else
-                {
+                else {
                     getActionBar().setDisplayHomeAsUpEnabled(false);
                     ft.show(searchCriteriaFragment);
                     ft.hide(questionListFragment);
                 }
             }
-            else
-            {
+            else {
                 getActionBar().setDisplayHomeAsUpEnabled(false);
                 ft.show(searchCriteriaFragment);
                 if (questionListFragment.hasResults())
@@ -101,8 +93,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu)
-    {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         boolean ret = super.onPrepareOptionsMenu(menu);
 
         menu.removeItem(R.id.menu_refresh);
@@ -112,8 +103,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         LogWrapper.d(TAG, "onStart");
 
         super.onStart();
@@ -122,8 +112,7 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig)
-    {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         showOrHideQuestionListFragment(newConfig);
@@ -131,10 +120,8 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        if (item.getItemId() == R.id.menu_save)
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_save) {
             searchCriteriaFragment.saveCriteria(getSaveCriteriaTaskCompletionNotifier());
             return true;
         }
@@ -142,15 +129,11 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         return super.onOptionsItemSelected(item);
     }
 
-    private AsyncTaskCompletionNotifier<Boolean> getSaveCriteriaTaskCompletionNotifier()
-    {
-        return new AsyncTaskCompletionNotifier<Boolean>()
-        {
+    private AsyncTaskCompletionNotifier<Boolean> getSaveCriteriaTaskCompletionNotifier() {
+        return new AsyncTaskCompletionNotifier<Boolean>() {
             @Override
-            public void notifyOnCompletion(Boolean result)
-            {
-                if (result)
-                {
+            public void notifyOnCompletion(Boolean result) {
+                if (result) {
                     setActionBarTitle(searchCriteriaFragment.getCriteriaName());
                     Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
                 }
@@ -161,31 +144,25 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
     }
 
     @Override
-    protected void refresh()
-    {
+    protected void refresh() {
         throw new UnsupportedOperationException("Refresh not supported for " + TAG);
     }
 
     @Override
-    protected boolean shouldSearchViewBeEnabled()
-    {
+    protected boolean shouldSearchViewBeEnabled() {
         return false;
     }
 
     @Override
-    public void onRunSearch(SearchCriteria searchCriteria, boolean savedCriteria)
-    {
+    public void onRunSearch(SearchCriteria searchCriteria, boolean savedCriteria) {
         runSearchAndShowResults(searchCriteria, false, savedCriteria);
     }
 
     @Override
-    protected boolean onActionBarHomeButtonClick(MenuItem menuItem)
-    {
+    protected boolean onActionBarHomeButtonClick(MenuItem menuItem) {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-                        && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible())
-        {
-            if (!getFragmentManager().popBackStackImmediate())
-            {
+                && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible()) {
+            if (!getFragmentManager().popBackStackImmediate()) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.show(searchCriteriaFragment);
                 ft.hide(questionListFragment);
@@ -198,13 +175,11 @@ public class AdvancedSearchActivity extends AbstractUserActionBarActivity implem
         return super.onActionBarHomeButtonClick(menuItem);
     }
 
-    private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack, boolean savedCriteria)
-    {
+    private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack, boolean savedCriteria) {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
 
         ft.show(questionListFragment);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-        {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             ft.hide(searchCriteriaFragment);
             ft.addToBackStack(null);
         }

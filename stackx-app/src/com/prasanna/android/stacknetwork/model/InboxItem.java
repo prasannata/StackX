@@ -21,10 +21,8 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class InboxItem extends Post implements Serializable
-{
-    public static enum ItemType
-    {
+public class InboxItem extends Post implements Serializable {
+    public static enum ItemType {
         COMMENT("comment"),
         CHAT_MESSAGE("chat message"),
         NEW_ANSWER("answer"),
@@ -36,23 +34,18 @@ public class InboxItem extends Post implements Serializable
 
         private final String repr;
 
-        ItemType(String repr)
-        {
+        ItemType(String repr) {
             this.repr = repr;
         }
 
-        public static ItemType getValue(String string)
-        {
+        public static ItemType getValue(String string) {
             ItemType itemType = null;
 
-            if (string != null)
-            {
-                try
-                {
+            if (string != null) {
+                try {
                     itemType = valueOf(string.toUpperCase());
                 }
-                catch (IllegalArgumentException e)
-                {
+                catch (IllegalArgumentException e) {
                     itemType = null;
                 }
 
@@ -60,15 +53,13 @@ public class InboxItem extends Post implements Serializable
             return itemType;
         }
 
-        public String getNotificationTitle(int count)
-        {
+        public String getNotificationTitle(int count) {
             String plural = (count > 1) ? "s" : "";
 
             return count + " new " + getRepr() + plural;
         }
 
-        public String getRepr()
-        {
+        public String getRepr() {
             return repr;
         }
     }

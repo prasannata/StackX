@@ -54,8 +54,7 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.utils.LogWrapper;
 
-public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener
-{
+public class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     public static final String KEY_PREF_INBOX = "pref_inbox";
@@ -84,28 +83,24 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     private RingtonePreference notifRingTonePref;
     private PreferenceCategory inboxPrefCategory;
 
-    public static int getInboxRefreshInterval(Context context)
-    {
+    public static int getInboxRefreshInterval(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return Integer.parseInt(sharedPreferences.getString(KEY_PREF_INBOX_REFRESH_INTERVAL, "-1"));
     }
 
-    public static boolean isNotificationEnabled(Context context)
-    {
+    public static boolean isNotificationEnabled(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(KEY_PREF_INBOX_NOTIFICATION, false);
     }
 
-    public static boolean isVibrateEnabled(Context context)
-    {
+    public static boolean isVibrateEnabled(Context context) {
         if (!isNotificationEnabled(context))
             return false;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getBoolean(KEY_PREF_NOTIF_VIBRATE, false);
     }
 
-    public static Uri getRingtone(Context context)
-    {
+    public static Uri getRingtone(Context context) {
         if (!isNotificationEnabled(context))
             return null;
 
@@ -114,8 +109,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.preferences);
@@ -127,8 +121,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         setupAboutPreference();
     }
 
-    private void setupDefaultSitePreference()
-    {
+    private void setupDefaultSitePreference() {
         final ListPreference defaultSitePref = (ListPreference) findPreference(KEY_PREF_DEFAULT_SITE);
         Site defaultSite = AppUtils.getDefaultSite(getActivity().getApplicationContext());
         defaultSitePref.setEntryValues(new String[0]);
@@ -136,17 +129,14 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         defaultSitePref.setSummary(defaultSite != null ? defaultSite.name : "None");
     }
 
-    private void setupRateAppPreference()
-    {
+    private void setupRateAppPreference() {
         final ListPreference rateApp = (ListPreference) findPreference(KEY_PREF_RATE_APP);
         rateApp.setEntryValues(new String[0]);
         rateApp.setEntries(new String[0]);
 
-        rateApp.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
+        rateApp.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
+            public boolean onPreferenceClick(Preference preference) {
                 rateApp.getDialog().dismiss();
                 String packageName = "com.prasanna.android.stacknetwork";
 
@@ -158,36 +148,29 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 return true;
             }
 
-            private void openAmazonAppStore(String packageName)
-            {
-                try
-                {
+            private void openAmazonAppStore(String packageName) {
+                try {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.amazon.com/gp/mas/dl/android?p="
-                                    + packageName)));
+                            + packageName)));
                 }
-                catch (ActivityNotFoundException anfe)
-                {
+                catch (ActivityNotFoundException anfe) {
                     Toast.makeText(getActivity(), "Amazon AppStore not found", Toast.LENGTH_SHORT).show();
                 }
             }
 
-            private void openPlayStore(String packageName)
-            {
-                try
-                {
+            private void openPlayStore(String packageName) {
+                try {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
                 }
-                catch (ActivityNotFoundException anfe)
-                {
+                catch (ActivityNotFoundException anfe) {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri
-                                    .parse("http://play.google.com/store/apps/details?id=" + packageName)));
+                            .parse("http://play.google.com/store/apps/details?id=" + packageName)));
                 }
             }
         });
     }
 
-    private void setupAccountPreference()
-    {
+    private void setupAccountPreference() {
         accountActionPref = (ListPreference) findPreference(KEY_PREF_ACCOUNT_ACTION);
         accountActionPref.setEntryValues(new String[0]);
         accountActionPref.setEntries(new String[0]);
@@ -198,14 +181,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             setupLoginPreference();
     }
 
-    private void setupLoginPreference()
-    {
+    private void setupLoginPreference() {
         accountActionPref.setTitle(getString(R.string.login));
-        accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
+        accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
+            public boolean onPreferenceClick(Preference preference) {
                 accountActionPref.getDialog().dismiss();
 
                 Intent oAuthIntent = new Intent(getActivity(), OAuthActivity.class);
@@ -217,18 +197,13 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         });
     }
 
-    private void setupLogoutPreference()
-    {
+    private void setupLogoutPreference() {
         accountActionPref.setTitle(getString(R.string.logout));
-        accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
-            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
-            {
+        accountActionPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    switch (which)
-                    {
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             Intent logoutIntent = new Intent(getActivity(), LogoutActivity.class);
                             AppUtils.clearDefaultSite(getActivity());
@@ -245,12 +220,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             };
 
             @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
+            public boolean onPreferenceClick(Preference preference) {
                 accountActionPref.getDialog().dismiss();
 
                 AlertDialog yesNoDialog =
-                                DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener);
+                        DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener);
                 yesNoDialog.show();
 
                 return true;
@@ -258,8 +232,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         });
     }
 
-    private void setupInboxPreference()
-    {
+    private void setupInboxPreference() {
         inboxPrefCategory = (PreferenceCategory) findPreference(KEY_PREF_INBOX);
         inboxPrefCategory.setEnabled(AppUtils.inAuthenticatedRealm(getActivity()));
         refreshIntervalPref = (ListPreference) findPreference(KEY_PREF_INBOX_REFRESH_INTERVAL);
@@ -268,53 +241,43 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         setupRingtonePreference();
     }
 
-    private void setupRingtonePreference()
-    {
+    private void setupRingtonePreference() {
         notifRingTonePref = (RingtonePreference) findPreference(KEY_PREF_NOTIF_RINGTONE);
-        notifRingTonePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener()
-        {
+        notifRingTonePref.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
             @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue)
-            {
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
                 setRingtoneSummary(Uri.parse((String) newValue));
                 return true;
             }
         });
 
         Uri ringtoneUri =
-                        Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE,
-                                        DEFAULT_RINGTONE));
+                Uri.parse(notifRingTonePref.getSharedPreferences().getString(KEY_PREF_NOTIF_RINGTONE, DEFAULT_RINGTONE));
         if (ringtoneUri != null)
             setRingtoneSummary(ringtoneUri);
     }
 
-    private void setupAboutPreference()
-    {
+    private void setupAboutPreference() {
         setupVersionSummary();
         setupWriteRestrictionSummary();
     }
 
-    private void setupVersionSummary()
-    {
+    private void setupVersionSummary() {
         final ListPreference appVersionROPref = (ListPreference) findPreference(KEY_PREF_RO_APP_VERSION);
         appVersionROPref.setEntryValues(new String[0]);
         appVersionROPref.setEntries(new String[0]);
         appVersionROPref.setSummary(getAppVersion());
     }
 
-    private void setupWriteRestrictionSummary()
-    {
+    private void setupWriteRestrictionSummary() {
         final ListPreference writeRestrictionsPref = (ListPreference) findPreference(KEY_PREF_WRITE_RESTRICTIONS);
         writeRestrictionsPref.setEntryValues(new String[0]);
         writeRestrictionsPref.setEntries(new String[0]);
-        writeRestrictionsPref.setOnPreferenceClickListener(new OnPreferenceClickListener()
-        {
+        writeRestrictionsPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
             @Override
-            public boolean onPreferenceClick(Preference preference)
-            {
-                if (writeRestrictionsPref.getDialog() != null)
-                {
+            public boolean onPreferenceClick(Preference preference) {
+                if (writeRestrictionsPref.getDialog() != null) {
                     writeRestrictionsPref.getDialog().dismiss();
                     showDialog(getWebView());
                     return true;
@@ -323,16 +286,12 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 return false;
             }
 
-            private WebView getWebView()
-            {
+            private WebView getWebView() {
                 WebView webView = new WebView(getActivity());
                 webView.setWebChromeClient(new WebChromeClient());
-                webView.setWebViewClient(new WebViewClient()
-                {
-                    public boolean shouldOverrideUrlLoading(WebView view, String url)
-                    {
-                        if (url != null && url.startsWith("http://"))
-                        {
+                webView.setWebViewClient(new WebViewClient() {
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        if (url != null && url.startsWith("http://")) {
                             view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                             return true;
                         }
@@ -345,14 +304,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
                 return webView;
             }
 
-            private void showDialog(WebView webView)
-            {
-                AlertDialog alertDialog = DialogBuilder.okDialog(getActivity(), webView, new OnClickListener()
-                {
+            private void showDialog(WebView webView) {
+                AlertDialog alertDialog = DialogBuilder.okDialog(getActivity(), webView, new OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
+                    public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
@@ -361,8 +317,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         });
     }
 
-    private String getAppVersion()
-    {
+    private String getAppVersion() {
         if (versionName != null && versionCode > -1)
             return versionName + "." + versionCode;
 
@@ -370,33 +325,28 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
-    public void onPause()
-    {
+    public void onPause() {
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
-    {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         LogWrapper.d(TAG, "Preference changed for " + key);
 
-        if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL))
-        {
+        if (key.equals(KEY_PREF_INBOX_REFRESH_INTERVAL)) {
             refreshIntervalPref.setSummary(refreshIntervalPref.getEntry());
             AlarmUtils.rescheduleInboxRefreshAlarm(getActivity().getApplicationContext());
         }
     }
 
-    private void setRingtoneSummary(Uri uri)
-    {
+    private void setRingtoneSummary(Uri uri) {
         Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), uri);
         if (ringtone != null)
             notifRingTonePref.setSummary(ringtone.getTitle(getActivity()));
@@ -404,13 +354,11 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
             notifRingTonePref.setSummary("");
     }
 
-    public void setAppVersionName(String versionName)
-    {
+    public void setAppVersionName(String versionName) {
         this.versionName = versionName;
     }
 
-    public void setAppVersionCode(int versionCode)
-    {
+    public void setAppVersionCode(int versionCode) {
         this.versionCode = versionCode;
     }
 }

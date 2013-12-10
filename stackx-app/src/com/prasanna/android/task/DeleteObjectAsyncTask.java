@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.task;
 
@@ -25,30 +25,25 @@ import android.os.AsyncTask;
 
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
-public class DeleteObjectAsyncTask extends AsyncTask<Object, Void, Boolean>
-{
+public class DeleteObjectAsyncTask extends AsyncTask<Object, Void, Boolean> {
     private final File directory;
     private final String fileName;
     private final AsyncTaskCompletionNotifier<Boolean> notifier;
 
-    public DeleteObjectAsyncTask(File directory, String fileName, AsyncTaskCompletionNotifier<Boolean> notifier)
-    {
+    public DeleteObjectAsyncTask(File directory, String fileName, AsyncTaskCompletionNotifier<Boolean> notifier) {
         this.directory = directory;
         this.fileName = fileName;
         this.notifier = notifier;
     }
 
     @Override
-    protected Boolean doInBackground(Object... paramArrayOfParams)
-    {
+    protected Boolean doInBackground(Object... paramArrayOfParams) {
         return SharedPreferencesUtil.deleteDir(new File(directory, fileName));
     }
 
     @Override
-    protected void onPostExecute(Boolean deleted)
-    {
-        if (notifier != null)
-        {
+    protected void onPostExecute(Boolean deleted) {
+        if (notifier != null) {
             notifier.notifyOnCompletion(deleted);
         }
     }

@@ -25,35 +25,29 @@ import java.lang.ref.WeakReference;
 
 import com.prasanna.android.cache.LRU;
 
-public class LruCache<K, T>
-{
+public class LruCache<K, T> {
     private final int size;
     private final LRU<K, Reference<T>> lru;
 
-    public LruCache(int size)
-    {
+    public LruCache(int size) {
         this.size = size;
         lru = new LRU<K, Reference<T>>(size);
     }
 
-    public void add(K key, T value)
-    {
+    public void add(K key, T value) {
         if (key != null && value != null)
             lru.put(key, new SoftReference<T>(value));
     }
 
-    public void addWeak(K key, T value)
-    {
+    public void addWeak(K key, T value) {
         if (key != null && value != null)
             lru.put(key, new WeakReference<T>(value));
     }
 
-    public T get(K key)
-    {
+    public T get(K key) {
         T value = null;
 
-        if (key != null && lru.containsKey(key))
-        {
+        if (key != null && lru.containsKey(key)) {
             value = lru.get(key).get();
             if (value == null)
                 lru.remove(key);
@@ -62,15 +56,12 @@ public class LruCache<K, T>
         return value;
     }
 
-    public boolean containsKey(K key)
-    {
+    public boolean containsKey(K key) {
         return lru.containsKey(key);
     }
 
-    public T remove(K key)
-    {
-        if (key != null)
-        {
+    public T remove(K key) {
+        if (key != null) {
             Reference<T> ref = lru.remove(key);
             if (ref != null)
                 return ref.get();
@@ -79,8 +70,7 @@ public class LruCache<K, T>
         return null;
     }
 
-    public int getSize()
-    {
+    public int getSize() {
         return size;
     }
 }

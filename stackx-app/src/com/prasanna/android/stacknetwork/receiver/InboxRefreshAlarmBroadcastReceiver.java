@@ -30,23 +30,19 @@ import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentActi
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class InboxRefreshAlarmBroadcastReceiver extends BroadcastReceiver
-{
+public class InboxRefreshAlarmBroadcastReceiver extends BroadcastReceiver {
     private static final String TAG = InboxRefreshAlarmBroadcastReceiver.class.getSimpleName();
 
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         LogWrapper.d(TAG, "Alarm receiver invoked");
 
         checkForNewMessages(context);
     }
 
-    private void checkForNewMessages(Context context)
-    {
+    private void checkForNewMessages(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN))
-        {
+        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN)) {
             LogWrapper.d(TAG, "Checking inbox for updates");
 
             Intent fetchInboxIntent = new Intent(context, UserIntentService.class);

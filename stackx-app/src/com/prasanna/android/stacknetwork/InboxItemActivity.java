@@ -49,8 +49,7 @@ import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver
-{
+public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver {
     private RestQueryResultReceiver receiver;
     private InboxItem item;
     private Comment comment;
@@ -58,8 +57,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     private StackXQuickActionMenu stackXQuickActionMenu;
 
     @Override
-    public void onCreate(android.os.Bundle savedInstanceState)
-    {
+    public void onCreate(android.os.Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         item = (InboxItem) getIntent().getSerializableExtra(StringConstants.INBOX_ITEM);
 
@@ -77,27 +75,22 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         getPostDetail();
     }
 
-    private void setupQuickActionMenuClick()
-    {
+    private void setupQuickActionMenuClick() {
         final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
-        imageView.setOnClickListener(new OnClickListener()
-        {
+        imageView.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 stackXQuickActionMenu.build().show(v);
             }
         });
     }
 
-    private void showInboxItem()
-    {
+    private void showInboxItem() {
         TextView textView = (TextView) findViewById(R.id.postTitle);
         textView.setText(Html.fromHtml(item.title));
 
         textView = (TextView) findViewById(R.id.postType);
-        switch (item.itemType)
-        {
+        switch (item.itemType) {
             case COMMENT:
                 if (item.questionId != -1)
                     textView.setText(item.itemType.getRepr() + " on question");
@@ -110,26 +103,22 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
                 break;
         }
 
-        if (item.site != null)
-        {
+        if (item.site != null) {
             textView = (TextView) findViewById(R.id.postSite);
             textView.setText("Asked in " + Html.fromHtml(item.site.name));
         }
     }
 
-    private void getPostDetail()
-    {
+    private void getPostDetail() {
         setProgressBarIndeterminateVisibility(true);
 
         Intent intent = new Intent(this, PostIntentService.class);
         intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
-        if (item.itemType.equals(ItemType.NEW_ANSWER))
-        {
+        if (item.itemType.equals(ItemType.NEW_ANSWER)) {
             intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
             intent.putExtra(StringConstants.POST_ID, item.answerId);
         }
-        else
-        {
+        else {
             intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST_COMMENT);
             intent.putExtra(StringConstants.COMMENT_ID, item.commentId);
         }
@@ -139,8 +128,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    protected void setActionBarTitleAndIcon()
-    {
+    protected void setActionBarTitleAndIcon() {
         if (item == null || item.site == null)
             super.setActionBarTitleAndIcon();
 
@@ -149,8 +137,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         boolean ret = super.onCreateOptionsMenu(menu);
 
         if (menu != null)
@@ -160,31 +147,26 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     }
 
     @Override
-    protected void refresh()
-    {
+    protected void refresh() {
         throw new UnsupportedOperationException("Refersh not supported");
     }
 
     @Override
-    protected boolean shouldSearchViewBeEnabled()
-    {
+    protected boolean shouldSearchViewBeEnabled() {
         return false;
     }
 
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData)
-    {
+    public void onReceiveResult(int resultCode, Bundle resultData) {
         setProgressBarIndeterminateVisibility(false);
 
-        switch (resultCode)
-        {
+        switch (resultCode) {
             case PostIntentService.GET_POST:
                 showPostDetail((Post) resultData.getSerializable(StringConstants.POST));
                 break;
             case PostIntentService.GET_POST_COMMENT:
                 comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
-                if (comment != null)
-                {
+                if (comment != null) {
                     boolean commentOnAnswer = isCommentOnAnswer();
                     showPostDetail(comment);
                     if (commentOnAnswer)
@@ -202,8 +184,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         }
     }
 
-    private void startGetAnswerService()
-    {
+    private void startGetAnswerService() {
         Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
         getAnswerIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
         getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
@@ -213,42 +194,36 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         setProgressBarIndeterminateVisibility(true);
     }
 
-    private boolean isCommentOnAnswer()
-    {
+    private boolean isCommentOnAnswer() {
         return comment.type != null && comment.type.equals(PostType.ANSWER);
     }
 
-    private void showPostDetail(Post stackXItem)
-    {
+    private void showPostDetail(Post stackXItem) {
         TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
         textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
-                        + Html.fromHtml(stackXItem.owner.displayName));
+                + Html.fromHtml(stackXItem.owner.displayName));
 
         stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
-                        .toString(), item.site);
+                .toString(), item.site);
 
         setupOnClickForViewQuestion(item.questionId);
         showPostBody(stackXItem.body);
     }
 
-    protected void showPostBody(String body)
-    {
+    protected void showPostBody(String body) {
         ArrayList<View> views = MarkdownFormatter.parse(this, body);
-        if (views != null)
-        {
+        if (views != null) {
             LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
             for (final View view : views)
                 postBodyLayout.addView(view);
         }
     }
 
-    private void setupOnClickForViewMyAnswer(Answer answer)
-    {
+    private void setupOnClickForViewMyAnswer(Answer answer) {
         final LinearLayout postContextLayout = (LinearLayout) findViewById(R.id.postContext);
         ArrayList<View> views = MarkdownFormatter.parse(this, answer.body);
 
-        if (views != null)
-        {
+        if (views != null) {
             for (final View view : views)
                 postContextLayout.addView(view);
         }
@@ -257,43 +232,34 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         setupOnClickForViewQuestion(answer.questionId);
     }
 
-    private void addViewAnswerToQuickActionMenu(final LinearLayout postContextLayout)
-    {
-        stackXQuickActionMenu.addItem(R.string.answer, new OnClickListener()
-        {
+    private void addViewAnswerToQuickActionMenu(final LinearLayout postContextLayout) {
+        stackXQuickActionMenu.addItem(R.string.answer, new OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (postContextLayout.getVisibility() == View.VISIBLE)
-                {
+            public void onClick(View v) {
+                if (postContextLayout.getVisibility() == View.VISIBLE) {
                     postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
-                                    android.R.anim.slide_out_right));
+                            android.R.anim.slide_out_right));
                     postContextLayout.setVisibility(View.GONE);
                 }
-                else
-                {
+                else {
                     postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
-                                    android.R.anim.slide_in_left));
+                            android.R.anim.slide_in_left));
                     postContextLayout.setVisibility(View.VISIBLE);
                 }
             }
         });
     }
 
-    private void setupOnClickForViewQuestion(final long questionId)
-    {
-        postTitleLayout.setOnClickListener(new View.OnClickListener()
-        {
+    private void setupOnClickForViewQuestion(final long questionId) {
+        postTitleLayout.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 startQuestionDetailActivity(questionId);
             }
         });
     }
 
-    private void startQuestionDetailActivity(long questionId)
-    {
+    private void startQuestionDetailActivity(long questionId) {
         Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
         displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
         displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, questionId);

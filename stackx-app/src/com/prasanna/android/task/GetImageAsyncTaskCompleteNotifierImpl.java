@@ -15,28 +15,24 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.task;
 
 import android.graphics.Bitmap;
 import android.widget.ImageView;
 
-public class GetImageAsyncTaskCompleteNotifierImpl implements AsyncTaskCompletionNotifier<Bitmap>
-{
+public class GetImageAsyncTaskCompleteNotifierImpl implements AsyncTaskCompletionNotifier<Bitmap> {
     private final ImageView imageView;
 
-    public GetImageAsyncTaskCompleteNotifierImpl(ImageView imageView)
-    {
-	this.imageView = imageView;
+    public GetImageAsyncTaskCompleteNotifierImpl(ImageView imageView) {
+        this.imageView = imageView;
     }
 
-    public void notifyOnCompletion(Bitmap result)
-    {
-	if (result != null && imageView != null)
-	{
-	    imageView.setImageBitmap(result);
-	}
+    public void notifyOnCompletion(Bitmap result) {
+        if (result != null && imageView != null) {
+            imageView.setImageBitmap(result);
+        }
     }
 
 }

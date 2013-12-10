@@ -24,29 +24,24 @@ import android.content.DialogInterface.OnClickListener;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 
-public class DialogPreferenceImpl extends DialogPreference
-{
+public class DialogPreferenceImpl extends DialogPreference {
     private OnClickListener onClickListener;
 
-    public DialogPreferenceImpl(Context context, AttributeSet attrs)
-    {
+    public DialogPreferenceImpl(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public DialogPreferenceImpl(Context context, AttributeSet attrs, int defStyle)
-    {
+    public DialogPreferenceImpl(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
     @Override
-    public void onClick(DialogInterface dialog, int which)
-    {
+    public void onClick(DialogInterface dialog, int which) {
         if (onClickListener != null)
             onClickListener.onClick(dialog, which);
     }
 
-    public void setOnClickListener(OnClickListener onClickListener)
-    {
+    public void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 }

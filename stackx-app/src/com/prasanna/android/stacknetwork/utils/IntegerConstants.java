@@ -19,8 +19,7 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-public final class IntegerConstants
-{
+public final class IntegerConstants {
     public static final int MS_IN_HALF_AN_HOUR = 1800000;
     public static final int MS_IN_AN_HOUR = 3600000;
     public static final long MS_IN_A_DAY = 86400000;

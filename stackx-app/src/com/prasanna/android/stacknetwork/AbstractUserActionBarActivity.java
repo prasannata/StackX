@@ -43,7 +43,6 @@ import android.widget.SearchView;
 import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -52,8 +51,7 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
 
-public abstract class AbstractUserActionBarActivity extends Activity
-{
+public abstract class AbstractUserActionBarActivity extends Activity {
     private boolean showingSearchFilters = false;
     private PopupWindow popupWindow;
     private SearchView searchView;
@@ -66,22 +64,18 @@ public abstract class AbstractUserActionBarActivity extends Activity
     protected abstract boolean shouldSearchViewBeEnabled();
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         loadDefaultSite();
         initializeActionBar();
     }
 
-    private void loadDefaultSite()
-    {
-        if (OperatingSite.getSite() == null)
-        {
+    private void loadDefaultSite() {
+        if (OperatingSite.getSite() == null) {
             OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
 
-            if (OperatingSite.getSite() == null)
-            {
+            if (OperatingSite.getSite() == null) {
                 startSiteListActivity();
                 finish();
             }
@@ -90,44 +84,38 @@ public abstract class AbstractUserActionBarActivity extends Activity
         site = OperatingSite.getSite();
     }
 
-    private void initializeActionBar()
-    {
+    private void initializeActionBar() {
         getActionBar().setHomeButtonEnabled(false);
         setActionBarTitleAndIcon();
     }
 
-    protected void setActionBarTitleAndIcon()
-    {
-        setActionBarTitle(OperatingSite.getSite().name);
-        setActionBarHomeIcon(OperatingSite.getSite());
+    protected void setActionBarTitleAndIcon() {
+        if (OperatingSite.getSite() != null) {
+            setActionBarTitle(OperatingSite.getSite().name);
+            setActionBarHomeIcon(OperatingSite.getSite());
+        }
     }
 
-    protected void setActionBarTitle(String title)
-    {
+    protected void setActionBarTitle(String title) {
         getActionBar().setTitle(Html.fromHtml(title));
     }
 
-    protected void setActionBarHomeIcon(Site site)
-    {
+    protected void setActionBarHomeIcon(Site site) {
         if (BitmapCache.getInstance().containsKey(site.name))
             setActionBarHomeIcon(BitmapCache.getInstance().get(site.name));
         else
             loadIcon(site.name, site.iconUrl);
     }
 
-    protected void setActionBarHomeIcon(Bitmap result)
-    {
+    protected void setActionBarHomeIcon(Bitmap result) {
         getActionBar().setIcon(new BitmapDrawable(getResources(), result));
         getActionBar().setHomeButtonEnabled(true);
     }
 
-    private void loadIcon(final String site, final String siteIconUrl)
-    {
-        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>()
-        {
+    private void loadIcon(final String site, final String siteIconUrl) {
+        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>() {
             @Override
-            public void notifyOnCompletion(Bitmap result)
-            {
+            public void notifyOnCompletion(Bitmap result) {
                 setActionBarHomeIcon(result);
                 BitmapCache.getInstance().add(site, result);
             }
@@ -137,8 +125,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         AppUtils.loadAccessToken(getApplicationContext());
@@ -146,21 +133,17 @@ public abstract class AbstractUserActionBarActivity extends Activity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_menu, menu);
 
         if (shouldSearchViewBeEnabled())
             setupSearchItem(menu);
-        else
-        {
+        else {
             menu.removeItem(R.id.menu_search);
             menu.removeItem(R.id.menu_search_filter);
         }
 
-        if (AppUtils.inAuthenticatedRealm(getApplicationContext()))
-            setupActionBarForAuthenticatedUser(menu);
-        else
+        if (!AppUtils.inAuthenticatedRealm(getApplicationContext()))
             setupActionBarForAnyUser(menu);
 
         this.actionBarMenu = menu;
@@ -169,36 +152,24 @@ public abstract class AbstractUserActionBarActivity extends Activity
         return true;
     }
 
-    private void setupActionBarForAnyUser(Menu menu)
-    {
+    private void setupActionBarForAnyUser(Menu menu) {
         menu.removeItem(R.id.menu_my_profile);
         menu.removeItem(R.id.menu_my_inbox);
     }
 
-    private void setupActionBarForAuthenticatedUser(Menu menu)
-    {
-        if (OperatingSite.getSite().userType == null || !OperatingSite.getSite().userType.equals(UserType.REGISTERED))
-            menu.removeItem(R.id.menu_my_profile);
-    }
-
-    private void setupSearchItem(final Menu menu)
-    {
+    private void setupSearchItem(final Menu menu) {
         searchView = setupSearchMenuItemAndGetActionView(menu);
         setupSearchActionView(menu);
         setupPopupForSearchOptions();
     }
 
-    private void setupSearchActionView(final Menu menu)
-    {
+    private void setupSearchActionView(final Menu menu) {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener()
-        {
+        searchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus)
-            {
-                if (hasFocus && popupWindow.isShowing())
-                {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus && popupWindow.isShowing()) {
                     popupWindow.dismiss();
                     menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
                     showingSearchFilters = false;
@@ -207,22 +178,18 @@ public abstract class AbstractUserActionBarActivity extends Activity
         });
     }
 
-    private SearchView setupSearchMenuItemAndGetActionView(final Menu menu)
-    {
+    private SearchView setupSearchMenuItemAndGetActionView(final Menu menu) {
         MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchItem.setOnActionExpandListener(new OnActionExpandListener()
-        {
+        searchItem.setOnActionExpandListener(new OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item)
-            {
+            public boolean onMenuItemActionExpand(MenuItem item) {
                 menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                 menu.findItem(R.id.menu_search_filter).setVisible(true);
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionCollapse(MenuItem item)
-            {
+            public boolean onMenuItemActionCollapse(MenuItem item) {
                 menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
                 menu.findItem(R.id.menu_search_filter).setVisible(false);
                 if (popupWindow.isShowing())
@@ -237,42 +204,36 @@ public abstract class AbstractUserActionBarActivity extends Activity
         return ((SearchView) searchItem.getActionView());
     }
 
-    private void setupPopupForSearchOptions()
-    {
+    private void setupPopupForSearchOptions() {
         RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
         popupWindow =
-                        new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
-                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+                new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
 
         setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
-                        SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
+                SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
 
         setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyAnsweredCB),
-                        SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
+                SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
 
         setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyWithAnswersCB),
-                        SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
+                SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
 
     }
 
-    private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName)
-    {
+    private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName) {
         checkBox.setChecked(SharedPreferencesUtil.isSet(getApplicationContext(), prefName, false));
-        checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener()
-        {
+        checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 SharedPreferencesUtil.setBoolean(getApplicationContext(), prefName, isChecked);
             }
         });
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 return onActionBarHomeButtonClick(item);
             case R.id.menu_refresh:
@@ -292,7 +253,8 @@ public abstract class AbstractUserActionBarActivity extends Activity
                 return true;
             case R.id.menu_my_inbox:
                 Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
-                userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, AppUtils.getAccessToken(getApplicationContext()));
+                userInboxIntent
+                        .putExtra(StringConstants.ACCESS_TOKEN, AppUtils.getAccessToken(getApplicationContext()));
                 startActivity(userInboxIntent);
                 return true;
             case R.id.menu_option_change_site:
@@ -306,22 +268,18 @@ public abstract class AbstractUserActionBarActivity extends Activity
         return false;
     }
 
-    private void startSiteListActivity()
-    {
+    private void startSiteListActivity() {
         startActivity(new Intent(this, StackNetworkListActivity.class));
     }
 
-    private void showSearchFilterOptions(MenuItem item)
-    {
-        if (showingSearchFilters)
-        {
+    private void showSearchFilterOptions(MenuItem item) {
+        if (showingSearchFilters) {
             item.setIcon(R.drawable.expand);
             popupWindow.dismiss();
             showingSearchFilters = false;
             searchView.requestFocus();
         }
-        else
-        {
+        else {
             item.setIcon(R.drawable.navigation_collapse);
             searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             popupWindow.showAsDropDown(searchView, 300, 0);
@@ -330,8 +288,7 @@ public abstract class AbstractUserActionBarActivity extends Activity
         }
     }
 
-    protected boolean onActionBarHomeButtonClick(MenuItem item)
-    {
+    protected boolean onActionBarHomeButtonClick(MenuItem item) {
         if (this instanceof QuestionsActivity)
             finish();
 

@@ -32,44 +32,35 @@ import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.utils.LogWrapper;
 
-public class PostServiceHelper extends AbstractBaseServiceHelper
-{
+public class PostServiceHelper extends AbstractBaseServiceHelper {
     private static final String TAG = PostIntentService.class.getSimpleName();
     private static final PostServiceHelper postService = new PostServiceHelper();
 
-    public static PostServiceHelper getInstance()
-    {
+    public static PostServiceHelper getInstance() {
         return postService;
     }
 
-    private PostServiceHelper()
-    {
+    private PostServiceHelper() {
     }
 
     @Override
-    protected String getLogTag()
-    {
+    protected String getLogTag() {
         return TAG;
     }
 
-    public Post getPost(long id, String site)
-    {
+    public Post getPost(long id, String site) {
         String restEndPoint = "/posts/" + id;
         Map<String, String> queryParams = getDefaultQueryParams(site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (jsonResponse != null)
-        {
-            try
-            {
+        if (jsonResponse != null) {
+            try {
                 JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
+                if (jsonArray != null && jsonArray.length() == 1) {
                     JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
 
-                    if (jsonObject != null)
-                    {
+                    if (jsonObject != null) {
                         Post post = new Post();
                         post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
                         post.body = jsonObject.getString(JsonFields.Post.BODY);
@@ -83,8 +74,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
                     }
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
 
@@ -93,24 +83,19 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public Post getPostComment(long id, String site)
-    {
+    public Post getPostComment(long id, String site) {
         String restEndPoint = "/posts/" + id;
         Map<String, String> queryParams = getDefaultQueryParams(site);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (jsonResponse != null)
-        {
-            try
-            {
+        if (jsonResponse != null) {
+            try {
                 JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
+                if (jsonArray != null && jsonArray.length() == 1) {
                     JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
 
-                    if (jsonObject != null)
-                    {
+                    if (jsonObject != null) {
                         Post post = new Post();
                         post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
                         post.body = jsonObject.getString(JsonFields.Post.BODY);
@@ -121,8 +106,7 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
                     }
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
 
@@ -131,25 +115,20 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public Comment getComment(long id, String site)
-    {
+    public Comment getComment(long id, String site) {
         String restEndPoint = "/comments/" + id;
         Map<String, String> queryParams = getDefaultQueryParams(site);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
         JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (jsonResponse != null)
-        {
-            try
-            {
+        if (jsonResponse != null) {
+            try {
                 JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
+                if (jsonArray != null && jsonArray.length() == 1) {
                     JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
 
-                    if (jsonObject != null)
-                    {
+                    if (jsonObject != null) {
                         Comment comment = new Comment();
                         comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
                         comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
@@ -157,15 +136,13 @@ public class PostServiceHelper extends AbstractBaseServiceHelper
                         comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
                         comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
                         comment.owner =
-                                        getSerializableUserSnippetObject(jsonObject
-                                                        .getJSONObject(JsonFields.Post.OWNER));
+                                getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
                         comment.type = PostType.getEnum(jsonObject.getString(JsonFields.Comment.POST_TYPE));
                         return comment;
                     }
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
 

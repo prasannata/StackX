@@ -44,63 +44,52 @@ import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.utils.LogWrapper;
 
-public abstract class AbstractBaseServiceHelper
-{
+public abstract class AbstractBaseServiceHelper {
     protected abstract String getLogTag();
 
     public static final JSONParser JSON_PARSER = new JSONParser();
 
-    public static class JSONParser implements HttpResponseBodyParser<JSONObjectWrapper>
-    {
+    public static class JSONParser implements HttpResponseBodyParser<JSONObjectWrapper> {
 
         @Override
-        public JSONObjectWrapper parse(String responseBody) throws HttpResponseParseException
-        {
-            try
-            {
+        public JSONObjectWrapper parse(String responseBody) throws HttpResponseParseException {
+            try {
                 return new JSONObjectWrapper(new JSONObject(responseBody));
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 throw new HttpResponseParseException(e);
             }
         }
 
     }
 
-    protected SecureHttpHelper getHttpHelper()
-    {
+    protected SecureHttpHelper getHttpHelper() {
         return SecureHttpHelper.getInstance();
     }
 
-    protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper, StackXPage<? extends IdentifiableItem> page)
-    {
-        if (jsonObjectWrapper != null && page != null)
-        {
+    protected void getPageInfo(JSONObjectWrapper jsonObjectWrapper, StackXPage<? extends IdentifiableItem> page) {
+        if (jsonObjectWrapper != null && page != null) {
             page.quota_remaining = jsonObjectWrapper.getInt(JsonFields.QUOTA_REMAINING);
             page.quota_max = jsonObjectWrapper.getInt(JsonFields.QUOTA_MAX);
             page.hasMore = jsonObjectWrapper.getBoolean(JsonFields.HAS_MORE);
         }
     }
 
-    protected StackXPage<User> getSerializedUserObject(JSONObjectWrapper jsonObject)
-    {
+    protected StackXPage<User> getSerializedUserObject(JSONObjectWrapper jsonObject) {
         StackXPage<User> page = new StackXPage<User>();
 
         User user = null;
 
-        if (jsonObject != null)
-        {
+        if (jsonObject != null) {
             JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
-            JSONObjectWrapper userJsonObject = JSONObjectWrapper
-                            .wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
+            JSONObjectWrapper userJsonObject =
+                    JSONObjectWrapper.wrap(getIndexFromArray(jsonArray, 0, JSONObject.class));
 
             page.items = new ArrayList<User>();
 
             getPageInfo(jsonObject, page);
 
-            if (userJsonObject != null)
-            {
+            if (userJsonObject != null) {
                 user = new User();
                 user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
                 user.accountId = userJsonObject.getLong(JsonFields.User.ACCOUNT_ID);
@@ -123,13 +112,10 @@ public abstract class AbstractBaseServiceHelper
         return page;
     }
 
-    protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject)
-    {
-        int[] badgeCounts =
-        { 0, 0, 0 };
+    protected int[] getBadgeCounts(JSONObjectWrapper badgeCountJsonObject) {
+        int[] badgeCounts = { 0, 0, 0 };
 
-        if (badgeCountJsonObject != null)
-        {
+        if (badgeCountJsonObject != null) {
             badgeCounts[0] = badgeCountJsonObject.getInt(JsonFields.BadgeCounts.GOLD);
             badgeCounts[1] = badgeCountJsonObject.getInt(JsonFields.BadgeCounts.SILVER);
             badgeCounts[2] = badgeCountJsonObject.getInt(JsonFields.BadgeCounts.BRONZE);
@@ -138,26 +124,20 @@ public abstract class AbstractBaseServiceHelper
         return badgeCounts;
     }
 
-    protected StackXPage<Question> getQuestionModel(JSONObjectWrapper questionsJsonResponse)
-    {
+    protected StackXPage<Question> getQuestionModel(JSONObjectWrapper questionsJsonResponse) {
         StackXPage<Question> page = new StackXPage<Question>();
-        if (questionsJsonResponse != null)
-        {
+        if (questionsJsonResponse != null) {
             page.items = new ArrayList<Question>();
             getPageInfo(questionsJsonResponse, page);
 
             JSONArray jsonArray = questionsJsonResponse.getJSONArray(JsonFields.ITEMS);
-            if (jsonArray != null)
-            {
-                for (int i = 0; i < jsonArray.length(); i++)
-                {
-                    try
-                    {
+            if (jsonArray != null) {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    try {
                         JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                         page.items.add(getSerializedQuestionObject(jsonObject));
                     }
-                    catch (JSONException e)
-                    {
+                    catch (JSONException e) {
                         LogWrapper.d(getLogTag(), e.getMessage());
                     }
                 }
@@ -167,8 +147,7 @@ public abstract class AbstractBaseServiceHelper
         return page;
     }
 
-    protected Question getSerializedQuestionObject(JSONObjectWrapper jsonObject) throws JSONException
-    {
+    protected Question getSerializedQuestionObject(JSONObjectWrapper jsonObject) throws JSONException {
         Question question = new Question();
 
         question.title = jsonObject.getString(JsonFields.Question.TITLE);
@@ -188,11 +167,9 @@ public abstract class AbstractBaseServiceHelper
         return question;
     }
 
-    protected User getSerializableUserSnippetObject(JSONObjectWrapper userJsonObject)
-    {
+    protected User getSerializableUserSnippetObject(JSONObjectWrapper userJsonObject) {
         User user = null;
-        if (userJsonObject != null)
-        {
+        if (userJsonObject != null) {
             user = new User();
             user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
             user.displayName = userJsonObject.getString(JsonFields.User.DISPLAY_NAME);
@@ -204,8 +181,7 @@ public abstract class AbstractBaseServiceHelper
         return user;
     }
 
-    protected Answer getSerializedAnswerObject(JSONObjectWrapper jsonObject) throws JSONException
-    {
+    protected Answer getSerializedAnswerObject(JSONObjectWrapper jsonObject) throws JSONException {
         Answer answer = new Answer();
         answer.id = jsonObject.getLong(JsonFields.Answer.ANSWER_ID);
         answer.questionId = jsonObject.getLong(JsonFields.Answer.QUESTION_ID);
@@ -219,8 +195,7 @@ public abstract class AbstractBaseServiceHelper
         return answer;
     }
 
-    protected Comment getSerializedCommentObject(JSONObjectWrapper jsonObject) throws JSONException
-    {
+    protected Comment getSerializedCommentObject(JSONObjectWrapper jsonObject) throws JSONException {
         Comment comment = new Comment();
         comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
         comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
@@ -231,17 +206,14 @@ public abstract class AbstractBaseServiceHelper
         return comment;
     }
 
-    protected String[] getTags(JSONObjectWrapper jsonObject) throws JSONException
-    {
+    protected String[] getTags(JSONObjectWrapper jsonObject) throws JSONException {
         String[] tags = null;
 
         JSONArray tagsJsonArray = jsonObject.getJSONArray(JsonFields.Question.TAGS);
-        if (tagsJsonArray != null)
-        {
+        if (tagsJsonArray != null) {
             tags = new String[tagsJsonArray.length()];
 
-            for (int i = 0; i < tags.length; i++)
-            {
+            for (int i = 0; i < tags.length; i++) {
                 tags[i] = tagsJsonArray.getString(i);
             }
         }
@@ -249,18 +221,14 @@ public abstract class AbstractBaseServiceHelper
     }
 
     @SuppressWarnings("unchecked")
-    protected <T> T getIndexFromArray(JSONArray jsonArray, int index, Class<T> type)
-    {
+    protected <T> T getIndexFromArray(JSONArray jsonArray, int index, Class<T> type) {
         T wrapperObject = null;
 
-        if (jsonArray != null && jsonArray.length() > index)
-        {
-            try
-            {
+        if (jsonArray != null && jsonArray.length() > index) {
+            try {
                 wrapperObject = (T) jsonArray.get(index);
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 Log.w(getLogTag(), e.getMessage());
             }
         }
@@ -268,22 +236,19 @@ public abstract class AbstractBaseServiceHelper
         return wrapperObject;
     }
 
-    protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams)
-    {
+    protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams) {
         return getHttpHelper().executeHttpGet(StackUri.STACKX_API_HOST, restEndPoint, queryParams,
-                        SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
+                SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
     }
 
     protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
-                    Map<String, String> queryParams, HttpEntity httpEntity)
-    {
+            Map<String, String> queryParams, HttpEntity httpEntity) {
         return getHttpHelper().executeHttpPost(StackUri.STACKX_API_HOST, restEndPoint, requestHeaders, queryParams,
-                        httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
+                httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
 
     }
 
-    protected Map<String, String> getDefaultQueryParams(String apiSiteParameter)
-    {
+    protected Map<String, String> getDefaultQueryParams(String apiSiteParameter) {
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, apiSiteParameter);
         queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);

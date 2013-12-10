@@ -21,8 +21,7 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class Comment extends Post implements Serializable
-{
+public class Comment extends Post implements Serializable {
     private static final long serialVersionUID = 4507419037482371574L;
 
     public long post_id;
@@ -30,8 +29,7 @@ public class Comment extends Post implements Serializable
     public PostType type;
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (id ^ (id >>> 32));
@@ -40,8 +38,7 @@ public class Comment extends Post implements Serializable
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)

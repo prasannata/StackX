@@ -60,38 +60,32 @@ import com.prasanna.android.task.GetImageAsyncTask;
 import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.QuickActionMenu;
 
-public class MarkdownFormatter
-{
+public class MarkdownFormatter {
     private static final String TAG = MarkdownFormatter.class.getSimpleName();
     private static final String NEW_LINE = System.getProperty("line.separator");
     private static final String CR = "\r";
 
-    public static class Tags
-    {
+    public static class Tags {
         public static final String CODE = "code";
         public static final String IMG = "img";
         public static final String BR = "br";
     }
 
-    public static class Attributes
-    {
+    public static class Attributes {
         public static final String SRC = "src";
     }
 
-    private static class AsyncTaskCompletionNotifierImagePopup implements AsyncTaskCompletionNotifier<Bitmap>
-    {
+    private static class AsyncTaskCompletionNotifierImagePopup implements AsyncTaskCompletionNotifier<Bitmap> {
         private final Context context;
         private Dialog progressDialog;
 
-        public AsyncTaskCompletionNotifierImagePopup(Context context, Dialog progressDialog)
-        {
+        public AsyncTaskCompletionNotifierImagePopup(Context context, Dialog progressDialog) {
             this.context = context;
             this.progressDialog = progressDialog;
         }
 
         @Override
-        public void notifyOnCompletion(Bitmap result)
-        {
+        public void notifyOnCompletion(Bitmap result) {
             if (progressDialog != null)
                 progressDialog.dismiss();
 
@@ -100,15 +94,12 @@ public class MarkdownFormatter
             showImageDialog(context, imageView);
         }
 
-        private void showImageDialog(final Context context, ImageView imageView)
-        {
+        private void showImageDialog(final Context context, ImageView imageView) {
             AlertDialog.Builder imageDialog = new AlertDialog.Builder(context);
             imageDialog.setView(imageView);
             String hide = context.getResources().getString(R.string.hide);
-            imageDialog.setPositiveButton(hide, new DialogInterface.OnClickListener()
-            {
-                public void onClick(DialogInterface dialog, int which)
-                {
+            imageDialog.setPositiveButton(hide, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
                 }
             });
@@ -118,14 +109,12 @@ public class MarkdownFormatter
         }
     };
 
-    public static String escapeHtml(CharSequence text)
-    {
+    public static String escapeHtml(CharSequence text) {
         if (text == null)
             return null;
 
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < text.length(); i++)
-        {
+        for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
 
             if (c == '<')
@@ -141,8 +130,7 @@ public class MarkdownFormatter
         return builder.toString();
     }
 
-    private static String clean(String markdownText) throws IOException
-    {
+    private static String clean(String markdownText) throws IOException {
         HtmlCleaner cleaner = new HtmlCleaner();
 
         CleanerTransformations transformations = new CleanerTransformations();
@@ -168,13 +156,10 @@ public class MarkdownFormatter
      * @param markdownText
      * @return
      */
-    public static ArrayList<View> parse(Context context, String markdownText)
-    {
-        if (context != null && markdownText != null)
-        {
+    public static ArrayList<View> parse(Context context, String markdownText) {
+        if (context != null && markdownText != null) {
             ArrayList<View> views = new ArrayList<View>();
-            try
-            {
+            try {
                 markdownText = clean(markdownText);
 
                 XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
@@ -187,81 +172,66 @@ public class MarkdownFormatter
                 boolean codeFound = false;
                 boolean oneLineCode = false;
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                while (eventType != XmlPullParser.END_DOCUMENT)
-                {
-                    if (eventType == XmlPullParser.START_DOCUMENT)
-                    {
+                LinearLayout.LayoutParams params =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    if (eventType == XmlPullParser.START_DOCUMENT) {
                     }
-                    else if (eventType == XmlPullParser.START_TAG)
-                    {
+                    else if (eventType == XmlPullParser.START_TAG) {
                         if (xmlPullParser.getName().equals(Tags.CODE))
                             codeFound = true;
-                        else if (xmlPullParser.getName().equals(Tags.IMG))
-                        {
+                        else if (xmlPullParser.getName().equals(Tags.IMG)) {
                             addSimpleTextToView(context, views, buffer, params);
 
                             String attributeValue = xmlPullParser.getAttributeValue(null, Attributes.SRC);
                             addImgLinkText(context, views, attributeValue, params);
                         }
-                        else
-                        {
+                        else {
                             buffer.append("<" + xmlPullParser.getName());
-                            for (int i = 0; i < xmlPullParser.getAttributeCount(); i++)
-                            {
+                            for (int i = 0; i < xmlPullParser.getAttributeCount(); i++) {
                                 buffer.append(" " + xmlPullParser.getAttributeName(i) + "=\""
-                                                + xmlPullParser.getAttributeValue(i) + "\"");
+                                        + xmlPullParser.getAttributeValue(i) + "\"");
                             }
 
                             buffer.append(">");
                         }
                     }
-                    else if (eventType == XmlPullParser.END_TAG)
-                    {
-                        if (xmlPullParser.getName().equals(Tags.CODE))
-                        {
+                    else if (eventType == XmlPullParser.END_TAG) {
+                        if (xmlPullParser.getName().equals(Tags.CODE)) {
                             codeFound = false;
 
                             if (oneLineCode)
                                 oneLineCode = false;
-                            else
-                            {
+                            else {
                                 addSimpleTextToView(context, views, buffer, params);
                                 views.add(getTextViewForCode(context, code.toString()));
                                 code.delete(0, code.length());
                             }
                         }
-                        else if (xmlPullParser.getName().equals(Tags.IMG))
-                        {
+                        else if (xmlPullParser.getName().equals(Tags.IMG)) {
                             LogWrapper.v(TAG, "Ignore img tag");
                         }
-                        else
-                        {
+                        else {
                             buffer.append("</" + xmlPullParser.getName() + ">");
                         }
                     }
-                    else if (eventType == XmlPullParser.TEXT)
-                    {
+                    else if (eventType == XmlPullParser.TEXT) {
                         String text = xmlPullParser.getText();
 
-                        if (codeFound)
-                        {
-                            if (!text.contains(NEW_LINE))
-                            {
+                        if (codeFound) {
+                            if (!text.contains(NEW_LINE)) {
                                 if (buffer.length() > 0 && buffer.lastIndexOf(NEW_LINE) == buffer.length() - 1)
                                     buffer.setCharAt(buffer.length() - 1, ' ');
 
                                 buffer.append(text);
                                 oneLineCode = true;
                             }
-                            else
-                            {
+                            else {
                                 code.append(text);
                             }
                         }
-                        else
-                        {
+                        else {
                             text = text.replace(NEW_LINE, " ").replace(CR, " ");
                             buffer.append(text);
                         }
@@ -272,12 +242,10 @@ public class MarkdownFormatter
 
                 addSimpleTextToView(context, views, buffer, params);
             }
-            catch (XmlPullParserException e)
-            {
+            catch (XmlPullParserException e) {
                 LogWrapper.e(TAG, "Error parsing: " + e);
             }
-            catch (IOException e)
-            {
+            catch (IOException e) {
                 LogWrapper.e(TAG, "Error parsing: " + e);
             }
             return views;
@@ -287,18 +255,15 @@ public class MarkdownFormatter
     }
 
     private static void addSimpleTextToView(Context context, ArrayList<View> views, StringBuffer buffer,
-                    LinearLayout.LayoutParams params)
-    {
-        if (buffer.length() > 0)
-        {
+            LinearLayout.LayoutParams params) {
+        if (buffer.length() > 0) {
             views.add(getTextView(context, params, buffer));
             buffer.delete(0, buffer.length());
         }
     }
 
     private static void addImgLinkText(final Context context, ArrayList<View> views, final String url,
-                    LinearLayout.LayoutParams params)
-    {
+            LinearLayout.LayoutParams params) {
         final TextView textView = new TextView(context);
         textView.setTextColor(Color.BLUE);
         textView.setLayoutParams(params);
@@ -311,13 +276,10 @@ public class MarkdownFormatter
         views.add(textView);
     }
 
-    private static void setupOnLinkClick(final Context context, final String url, final TextView textView)
-    {
-        textView.setOnClickListener(new View.OnClickListener()
-        {
+    private static void setupOnLinkClick(final Context context, final String url, final TextView textView) {
+        textView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 AlertDialog.Builder imageDialog = new AlertDialog.Builder(context);
                 ProgressBar progressBar = new ProgressBar(context);
                 imageDialog.setView(progressBar);
@@ -328,8 +290,7 @@ public class MarkdownFormatter
         });
     }
 
-    private static TextView getTextView(Context context, LinearLayout.LayoutParams params, StringBuffer buffer)
-    {
+    private static TextView getTextView(Context context, LinearLayout.LayoutParams params, StringBuffer buffer) {
         TextView textView = new TextView(context);
         textView.setTextColor(Color.BLACK);
         textView.setLayoutParams(params);
@@ -339,32 +300,29 @@ public class MarkdownFormatter
         return textView;
     }
 
-    private static float getTextSize(Context context)
-    {
+    private static float getTextSize(Context context) {
         float textSize = 12f;
-        int screentLayoutSize = context.getResources().getConfiguration().screenLayout
-                        & Configuration.SCREENLAYOUT_SIZE_MASK;
+        int screentLayoutSize =
+                context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
         if (screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_LARGE
-                        || screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_XLARGE)
+                || screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_XLARGE)
             textSize = 15f;
         return textSize;
     }
 
-    private static RelativeLayout getTextViewForCode(final Context context, final String text)
-    {
+    private static RelativeLayout getTextViewForCode(final Context context, final String text) {
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final RelativeLayout codeLayout = (RelativeLayout) inflater.inflate(R.layout.code, null);
         final TextView textView = (TextView) codeLayout.findViewById(R.id.code);
         textView.setText(text);
         textView.setTextSize(getTextSize(context));
 
-        StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(context).addEmailQuickActionItem(
-                        "Code sample from StackX", text).addCopyToClipboardItem(text);
-        final QuickActionMenu actionMenu = quickActionMenu.addItem(R.string.fullscreen, new View.OnClickListener()
-        {
+        StackXQuickActionMenu quickActionMenu =
+                new StackXQuickActionMenu(context).addEmailQuickActionItem("Code sample from StackX", text)
+                        .addCopyToClipboardItem(text);
+        final QuickActionMenu actionMenu = quickActionMenu.addItem(R.string.fullscreen, new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Intent intent = new Intent(context, FullscreenTextActivity.class);
                 intent.putExtra(StringConstants.TEXT, textView.getText());
                 context.startActivity(intent);
@@ -372,11 +330,9 @@ public class MarkdownFormatter
         }).build();
 
         ImageView imageView = (ImageView) codeLayout.findViewById(R.id.codeQuickActionMenu);
-        imageView.setOnClickListener(new View.OnClickListener()
-        {
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 actionMenu.show(v);
             }
         });

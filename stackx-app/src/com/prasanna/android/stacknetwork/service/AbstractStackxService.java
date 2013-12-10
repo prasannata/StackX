@@ -13,8 +13,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 
-public abstract class AbstractStackxService extends Service
-{
+public abstract class AbstractStackxService extends Service {
     private static boolean isRunning = false;
     private Looper serviceLooper;
     private Handler serviceHandler;
@@ -23,30 +22,25 @@ public abstract class AbstractStackxService extends Service
 
     private static List<Object> toNotifyObjects = Collections.synchronizedList(new ArrayList<Object>());
 
-    public interface OnHandlerComplete
-    {
+    public interface OnHandlerComplete {
         void onHandleMessageFinish(Message message, Object... args);
     }
 
-    public static boolean isRunning()
-    {
+    public static boolean isRunning() {
         return isRunning;
     }
 
-    protected static synchronized void setRunning(boolean running)
-    {
+    protected static synchronized void setRunning(boolean running) {
         isRunning = running;
     }
 
     @Override
-    public IBinder onBind(Intent intent)
-    {
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
 
@@ -55,8 +49,7 @@ public abstract class AbstractStackxService extends Service
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId)
-    {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         setRunning(true);
 
         Message msg = serviceHandler.obtainMessage();
@@ -66,10 +59,8 @@ public abstract class AbstractStackxService extends Service
         return START_NOT_STICKY;
     }
 
-    public static boolean registerForCompleteNotification(Object object)
-    {
-        if (object != null && isRunning())
-        {
+    public static boolean registerForCompleteNotification(Object object) {
+        if (object != null && isRunning()) {
             toNotifyObjects.add(object);
             return true;
         }
@@ -77,12 +68,9 @@ public abstract class AbstractStackxService extends Service
         return false;
     }
 
-    protected void notifyWaitingObjectsOnComplete()
-    {
-        for (Object object : toNotifyObjects)
-        {
-            synchronized (object)
-            {
+    protected void notifyWaitingObjectsOnComplete() {
+        for (Object object : toNotifyObjects) {
+            synchronized (object) {
                 object.notify();
             }
         }

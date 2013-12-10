@@ -37,44 +37,38 @@ import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.QuickActionMenu;
 
-public class UserQuestionListFragment extends AbstractQuestionListFragment
-{
+public class UserQuestionListFragment extends AbstractQuestionListFragment {
     private static final String TAG = UserQuestionListFragment.class.getSimpleName();
     private Intent intent;
     private int page = 0;
     private int action;
 
-    public static UserQuestionListFragment newFragment(int action)
-    {
+    public static UserQuestionListFragment newFragment(int action) {
         UserQuestionListFragment userQuestionListFragment = new UserQuestionListFragment();
         userQuestionListFragment.action = action;
         return userQuestionListFragment;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         page = 0;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        if (itemsContainer == null)
-        {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (itemsContainer == null) {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter =
-                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                                            new ArrayList<Question>(), this);
+                    new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                            new ArrayList<Question>(), this);
         }
 
         return itemsContainer;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         if (savedInstanceState != null)
@@ -82,8 +76,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         if (itemListAdapter != null && itemListAdapter.getCount() == 0)
@@ -91,36 +84,32 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putInt(StringConstants.ACTION, action);
 
         super.onSaveInstanceState(outState);
     }
 
     @Override
-    protected QuickActionMenu initQuickActionMenu(final Question question)
-    {
+    protected QuickActionMenu initQuickActionMenu(final Question question) {
         if (action != UserIntentService.GET_USER_QUESTIONS)
             return super.initQuickActionMenu(question);
 
         StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
         return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
-                        .addEmailQuickActionItem(question.title, question.body).build();
+                .addEmailQuickActionItem(question.title, question.body).build();
     }
 
     @Override
-    protected void startIntentService()
-    {
+    protected void startIntentService() {
         intent = getIntentForService(UserIntentService.class, null);
-        if (intent != null)
-        {
+        if (intent != null) {
             showProgressBar();
 
             intent.putExtra(StringConstants.ACTION, action);
             intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
             intent.putExtra(StringConstants.USER_ID, getActivity().getIntent()
-                            .getLongExtra(StringConstants.USER_ID, 0L));
+                    .getLongExtra(StringConstants.USER_ID, 0L));
             intent.putExtra(StringConstants.PAGE, ++page);
             intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
@@ -129,8 +118,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    protected void setValuesForQuestionView(QuestionViewHolder holder, Question question)
-    {
+    protected void setValuesForQuestionView(QuestionViewHolder holder, Question question) {
         super.setValuesForQuestionView(holder, question);
 
         if (action == UserIntentService.GET_USER_QUESTIONS)
@@ -138,14 +126,12 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public String getLogTag()
-    {
+    public String getLogTag() {
         return TAG;
     }
 
     @Override
-    protected void loadNextPage()
-    {
+    protected void loadNextPage() {
         startIntentService();
     }
 }

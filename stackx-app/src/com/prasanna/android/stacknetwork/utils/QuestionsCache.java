@@ -24,30 +24,23 @@ import java.util.ArrayList;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 
-public class QuestionsCache extends LruCache<Long, Question>
-{
+public class QuestionsCache extends LruCache<Long, Question> {
     private static int CACHE_SIZE = 15;
     private static final QuestionsCache INSTANCE = new QuestionsCache();
 
-    private QuestionsCache()
-    {
+    private QuestionsCache() {
         super(CACHE_SIZE);
     }
 
-    public static QuestionsCache getInstance()
-    {
+    public static QuestionsCache getInstance() {
         return INSTANCE;
     }
 
-    public void updateAnswersForQuestion(Long questionId, ArrayList<Answer> answers)
-    {
-        if (answers != null && containsKey(questionId))
-        {
+    public void updateAnswersForQuestion(Long questionId, ArrayList<Answer> answers) {
+        if (answers != null && containsKey(questionId)) {
             Question question = get(questionId);
-            if (question != null)
-            {
-                if (question.answers == null)
-                {
+            if (question != null) {
+                if (question.answers == null) {
                     question.answers = new ArrayList<Answer>();
                 }
 

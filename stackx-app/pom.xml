@@ -4,9 +4,9 @@
     <parent>
         <groupId>com.prasanna.android</groupId>
         <artifactId>stackx</artifactId>
-        <version>1.0.11</version>
+        <version>1.0.13</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>stackx-app</artifactId>
     <packaging>apk</packaging>
@@ -36,7 +36,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <profiles>
         <profile>
             <id>dev</id>
@@ -48,7 +48,7 @@
                     <plugin>
                         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                         <artifactId>android-maven-plugin</artifactId>
-                        <version>3.5.0</version>
+                        <version>3.6.0</version>
                         <configuration>
                             <sdk>
                                 <path>${android.sdk.path}</path>
@@ -96,7 +96,7 @@
                     <plugin>
                         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                         <artifactId>android-maven-plugin</artifactId>
-                        <version>3.5.0</version>
+                        <version>3.6.0</version>
                         <executions>
                             <execution>
                                 <id>optimizeAndAlign</id>

@@ -11,33 +11,28 @@ import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class SearchQuestionListFragment extends QuestionListFragment
-{
+public class SearchQuestionListFragment extends QuestionListFragment {
     private Intent intent;
     private SearchCriteria searchCriteria;
     private Menu menu;
     private boolean saved = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu)
-    {
+    public void onPrepareOptionsMenu(Menu menu) {
         this.menu = menu;
         if (saved || !AppUtils.savedSearchesMaxed(getActivity()))
             menu.findItem(R.id.menu_save).setVisible(true);
     }
 
     @Override
-    protected void startIntentService()
-    {
-        if (isAdded())
-        {
+    protected void startIntentService() {
+        if (isAdded()) {
             prepareIntent();
             showProgressBar();
             startService(intent);
@@ -45,29 +40,23 @@ public class SearchQuestionListFragment extends QuestionListFragment
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden)
-    {
+    public void onHiddenChanged(boolean hidden) {
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
             getActivity().getActionBar().setDisplayHomeAsUpEnabled(!hidden);
     }
 
-    public boolean hasResults()
-    {
+    public boolean hasResults() {
         return itemListAdapter != null && itemListAdapter.getCount() > 0;
     }
 
-    public void search(SearchCriteria searchCriteria, boolean saved)
-    {
-        if (searchCriteria != null)
-        {
+    public void search(SearchCriteria searchCriteria, boolean saved) {
+        if (searchCriteria != null) {
             this.saved = saved;
 
-            if (menu != null)
-            {
+            if (menu != null) {
                 if (saved)
                     menu.findItem(R.id.menu_save).setVisible(true);
-                else
-                {
+                else {
                     if (AppUtils.savedSearchesMaxed(getActivity()))
                         menu.findItem(R.id.menu_save).setVisible(false);
                     else
@@ -81,13 +70,10 @@ public class SearchQuestionListFragment extends QuestionListFragment
         }
     }
 
-    private void prepareIntent()
-    {
-        if (intent == null)
-        {
+    private void prepareIntent() {
+        if (intent == null) {
             intent = getIntentForService(QuestionsIntentService.class, null);
-            if (intent != null)
-            {
+            if (intent != null) {
                 intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
                 intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
                 intent.putExtra(StringConstants.SEARCH_CRITERIA, searchCriteria);
@@ -98,8 +84,7 @@ public class SearchQuestionListFragment extends QuestionListFragment
     }
 
     @Override
-    protected void loadNextPage()
-    {
+    protected void loadNextPage() {
         if (searchCriteria != null)
             searchCriteria = searchCriteria.nextPage();
 

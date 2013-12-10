@@ -30,24 +30,20 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAction;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public abstract class AbstractIntentService extends IntentService
-{
+public abstract class AbstractIntentService extends IntentService {
     public static final int ERROR = -1;
 
-    public AbstractIntentService(String name)
-    {
+    public AbstractIntentService(String name) {
         super(name);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         if (!AppUtils.isNetworkAvailable(getApplicationContext()))
             throw new ClientException(ClientException.ClientErrorCode.NO_NETWORK);
     }
 
-    protected void broadcastHttpErrorIntent(StackXError error)
-    {
+    protected void broadcastHttpErrorIntent(StackXError error) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -55,8 +51,7 @@ public abstract class AbstractIntentService extends IntentService
         sendBroadcast(broadcastIntent);
     }
 
-    protected void broadcastSerializableExtra(String action, String extraName, Serializable extra)
-    {
+    protected void broadcastSerializableExtra(String action, String extraName, Serializable extra) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(action);
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

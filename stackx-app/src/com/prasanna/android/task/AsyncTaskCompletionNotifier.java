@@ -15,11 +15,10 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.task;
 
-public interface AsyncTaskCompletionNotifier<T>
-{
+public interface AsyncTaskCompletionNotifier<T> {
     public void notifyOnCompletion(T result);
 }

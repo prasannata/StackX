@@ -19,15 +19,13 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-public class JsonFields
-{
+public class JsonFields {
     public static final String ITEMS = "items";
     public static final String QUOTA_REMAINING = "quota_remaining";
     public static final String QUOTA_MAX = "quota_max";
     public static final String HAS_MORE = "has_more";
 
-    public static class CommonFields
-    {
+    public static class CommonFields {
         public static final String SCORE = "score";
         public static final String OWNER = "owner";
         public static final String BODY = "body";
@@ -36,14 +34,12 @@ public class JsonFields
         public static final String LINK = "link";
     }
 
-    public static class Post extends CommonFields
-    {
+    public static class Post extends CommonFields {
         public static final String POST_ID = "post_id";
         public static final String POST_TYPE = "post_type";
     }
 
-    public static class Question extends CommonFields
-    {
+    public static class Question extends CommonFields {
         public static final String QUESTION_ID = "question_id";
         public static final String IS_ANSWERED = "is_answered";
         public static final String ANSWER_COUNT = "answer_count";
@@ -52,22 +48,19 @@ public class JsonFields
         public static final String ACCEPTED_ANSWER_ID = "accepted_answer_id";
     }
 
-    public static class Answer extends CommonFields
-    {
+    public static class Answer extends CommonFields {
         public static final String ANSWER_ID = "answer_id";
         public static final String QUESTION_ID = "question_id";
         public static final String IS_ACCEPTED = "is_accepted";
     }
 
-    public static class Comment extends CommonFields
-    {
+    public static class Comment extends CommonFields {
         public static final String POST_ID = "post_id";
         public static final String COMMENT_ID = "comment_id";
         public static final String POST_TYPE = "post_type";
     }
 
-    public static class Site
-    {
+    public static class Site {
         public static final String NAME = "name";
         public static final String AUDIENCE = "audience";
         public static final String LOGO_URL = "logo_url";
@@ -77,8 +70,7 @@ public class JsonFields
         public static final String ICON_URL = "icon_url";
     }
 
-    public static class User extends CommonFields
-    {
+    public static class User extends CommonFields {
         public static final String USER_ID = "user_id";
         public static final String ACCOUNT_ID = "account_id";
         public static final String DISPLAY_NAME = "display_name";
@@ -94,8 +86,7 @@ public class JsonFields
         public static final String BADGE_COUNTS = "badge_counts";
     }
 
-    public static class Account
-    {
+    public static class Account {
         public static final String ACCOUNT_ID = "account_id";
         public static final String USER_ID = "user_id";
         public static final String SITE_NAME = "site_name";
@@ -103,15 +94,13 @@ public class JsonFields
         public static final String USER_TYPE = "user_type";
     }
 
-    public static class BadgeCounts
-    {
+    public static class BadgeCounts {
         public static final String GOLD = "gold";
         public static final String SILVER = "silver";
         public static final String BRONZE = "bronze";
     }
 
-    public static class InboxItem extends CommonFields
-    {
+    public static class InboxItem extends CommonFields {
         public static final String QUESTION_ID = "question_id";
         public static final String ANSWER_ID = "answer_id";
         public static final String COMMENT_ID = "comment_id";
@@ -120,15 +109,13 @@ public class JsonFields
         public static final String IS_UNREAD = "is_unread";
     }
 
-    public static class Error
-    {
+    public static class Error {
         public static final String ERROR_ID = "error_id";
         public static final String ERROR_NAME = "error_name";
         public static final String ERROR_MESSAGE = "error_message";
     }
 
-    public static class Permission
-    {
+    public static class Permission {
         public static final String CAN_ADD = "can_add";
         public static final String CAN_DELETE = "can_delete";
         public static final String CAN_EDIT = "can_edit";
@@ -138,13 +125,11 @@ public class JsonFields
         public static final String USER_ID = "user_id";
     }
 
-    public static class Tag
-    {
+    public static class Tag {
         public static final String NAME = "name";
     }
 
-    public static class AccessToken
-    {
+    public static class AccessToken {
         public static final String ACCESS_TOKEN = "access_token";
         public static final String EXPIRES_ON_DATE = "expires_on_date";
         public static final String ACCOUNT_ID = "account_id";

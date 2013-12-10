@@ -54,8 +54,7 @@ import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class StackNetworkListActivity extends ListActivity implements StackXRestQueryResultReceiver,
-                OnSiteSelectedListener, TextWatcher
-{
+        OnSiteSelectedListener, TextWatcher {
     private final String CHANGE_SITE_HINT = "change_site_hint";
     public static final String ACCOUNT_UPDATE_INTENT_FILTER = "com.prasanna.android.stacknetwork.sites.update";
 
@@ -71,21 +70,16 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     private ImageView searchSite;
     private EditText searchText;
 
-    public class SiteFilter extends Filter
-    {
+    public class SiteFilter extends Filter {
         @Override
-        protected FilterResults performFiltering(CharSequence constraint)
-        {
+        protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults result = new FilterResults();
 
-            if (constraint != null && constraint.length() > 0)
-            {
-                synchronized (filterLock)
-                {
+            if (constraint != null && constraint.length() > 0) {
+                synchronized (filterLock) {
                     ArrayList<Site> filteredSites = new ArrayList<Site>();
 
-                    for (Site site : sites)
-                    {
+                    for (Site site : sites) {
                         if (site.name.regionMatches(true, 0, constraint.toString(), 0, constraint.length()))
                             filteredSites.add(site);
                     }
@@ -94,10 +88,8 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
                     result.values = filteredSites;
                 }
             }
-            else
-            {
-                synchronized (filterLock)
-                {
+            else {
+                synchronized (filterLock) {
                     result.count = sites.size();
                     result.values = sites;
                 }
@@ -107,8 +99,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         @Override
         @SuppressWarnings("unchecked")
-        protected void publishResults(CharSequence constraint, FilterResults results)
-        {
+        protected void publishResults(CharSequence constraint, FilterResults results) {
             ArrayList<Site> filteredSites = (ArrayList<Site>) results.values;
 
             siteListAdapter.notifyDataSetInvalidated();
@@ -119,19 +110,16 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
     }
 
-    private BroadcastReceiver accountUpdateReceiver = new BroadcastReceiver()
-    {
+    private BroadcastReceiver accountUpdateReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             if (refreshOnUpdateOption != null)
                 refreshOnUpdateOption.setVisibility(View.VISIBLE);
         }
     };
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.sitelist);
@@ -140,14 +128,14 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
         receiver = new RestQueryResultReceiver(new Handler());
         receiver.setReceiver(this);
-        siteListAdapter = new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(),
-                        new SiteFilter());
+        siteListAdapter =
+                new SiteListAdapter(this, R.layout.sitelist_row, R.id.siteName, new ArrayList<Site>(), new SiteFilter());
         siteListAdapter.setOnSiteSelectedListener(this);
         setListAdapter(siteListAdapter);
 
         if (AppUtils.inAuthenticatedRealm(getApplicationContext()))
-            progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "",
-                            getString(R.string.loadingSitesForAuthUser));
+            progressDialog =
+                    ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSitesForAuthUser));
         else
             progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", getString(R.string.loadingSites));
 
@@ -155,25 +143,20 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         startIntentService();
     }
 
-    private void setupSearch()
-    {
+    private void setupSearch() {
         searchSite = (ImageView) findViewById(R.id.searchSite);
         searchText = (EditText) findViewById(R.id.searchText);
         searchText.setVisibility(View.GONE);
         searchText.addTextChangedListener(this);
-        searchSite.setOnClickListener(new View.OnClickListener()
-        {
+        searchSite.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (searchText.getVisibility() == View.GONE)
-                {
+            public void onClick(View v) {
+                if (searchText.getVisibility() == View.GONE) {
                     searchText.setVisibility(View.VISIBLE);
                     searchText.requestFocus();
                     AppUtils.showSoftInput(StackNetworkListActivity.this, searchText);
                 }
-                else
-                {
+                else {
                     searchText.setVisibility(View.GONE);
                     AppUtils.hideSoftInput(StackNetworkListActivity.this, v);
                 }
@@ -181,22 +164,18 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         });
     }
 
-    private void registerAccountUpdateBroadcastReceiver()
-    {
+    private void registerAccountUpdateBroadcastReceiver() {
         IntentFilter filter = new IntentFilter(ACCOUNT_UPDATE_INTENT_FILTER);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(accountUpdateReceiver, filter);
     }
 
-    private void setupSiteListRefreshOption()
-    {
+    private void setupSiteListRefreshOption() {
         refreshOnUpdateOption = (RelativeLayout) findViewById(R.id.refreshOnUpdateOption);
         refreshSites = (ImageView) findViewById(R.id.refreshSites);
-        refreshSites.setOnClickListener(new View.OnClickListener()
-        {
+        refreshSites.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 progressDialog = ProgressDialog.show(StackNetworkListActivity.this, "", "Loading sites");
                 startIntentService();
                 refreshOnUpdateOption.setVisibility(View.GONE);
@@ -204,32 +183,26 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         });
 
         cancelRefreshSites = (ImageView) findViewById(R.id.cancelRefreshSites);
-        cancelRefreshSites.setOnClickListener(new View.OnClickListener()
-        {
+        cancelRefreshSites.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 refreshOnUpdateOption.setVisibility(View.GONE);
             }
         });
     }
 
     @Override
-    public void onStop()
-    {
+    public void onStop() {
         super.onStop();
 
-        try
-        {
+        try {
             unregisterReceiver(accountUpdateReceiver);
         }
-        catch (IllegalArgumentException e)
-        {
+        catch (IllegalArgumentException e) {
         }
     }
 
-    private void startIntentService()
-    {
+    private void startIntentService() {
         intent = new Intent(this, UserIntentService.class);
         intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_SITES);
         intent.putExtra(StringConstants.ME, AppUtils.inAuthenticatedRealm(getApplicationContext()));
@@ -239,13 +212,11 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData)
-    {
+    public void onReceiveResult(int resultCode, Bundle resultData) {
         if (progressDialog != null)
             progressDialog.dismiss();
 
-        switch (resultCode)
-        {
+        switch (resultCode) {
             case UserIntentService.GET_USER_SITES:
                 showSiteList((ArrayList<Site>) resultData.getSerializable(StringConstants.SITES));
                 break;
@@ -261,8 +232,7 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         }
     }
 
-    private void showSiteList(ArrayList<Site> result)
-    {
+    private void showSiteList(ArrayList<Site> result) {
         sites.clear();
         siteListAdapter.clear();
         sites.addAll(result);
@@ -272,13 +242,11 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
             showEmptyItemsView();
     }
 
-    private void showEmptyItemsView()
-    {
+    private void showEmptyItemsView() {
         findViewById(R.id.emptyItems).setVisibility(View.VISIBLE);
     }
 
-    private void showError()
-    {
+    private void showError() {
         View errorView = getLayoutInflater().inflate(R.layout.error, null);
         TextView errorTextView = (TextView) errorView.findViewById(R.id.errorMsg);
         errorTextView.setText("Failed to fetch sites");
@@ -286,12 +254,10 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
     }
 
     @Override
-    public void onSiteSelected(Site site)
-    {
+    public void onSiteSelected(Site site) {
         OperatingSite.setSite(site);
 
-        if (SharedPreferencesUtil.isSet(getApplicationContext(), CHANGE_SITE_HINT, true))
-        {
+        if (SharedPreferencesUtil.isSet(getApplicationContext(), CHANGE_SITE_HINT, true)) {
             Toast.makeText(this, "Use options menu to change site any time.", Toast.LENGTH_LONG).show();
             SharedPreferencesUtil.setBoolean(getApplicationContext(), CHANGE_SITE_HINT, false);
         }
@@ -301,35 +267,29 @@ public class StackNetworkListActivity extends ListActivity implements StackXRest
         startQuestionsActivity();
     }
 
-    private void startMyProfileService()
-    {
+    private void startMyProfileService() {
         if (AppUtils.inAuthenticatedRealm(this))
             startService(new Intent(this, MyProfileService.class));
     }
 
-    private void startGetTagsService()
-    {
+    private void startGetTagsService() {
         startService(new Intent(this, TagsService.class));
     }
 
-    private void startQuestionsActivity()
-    {
+    private void startQuestionsActivity() {
         startActivity(new Intent(this, QuestionsActivity.class));
     }
 
     @Override
-    public void afterTextChanged(Editable s)
-    {
+    public void afterTextChanged(Editable s) {
         siteListAdapter.getFilter().filter(s);
     }
 
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after)
-    {
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
     }
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count)
-    {
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
     }
 }

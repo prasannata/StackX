@@ -29,8 +29,7 @@ import java.util.Map;
 
 import com.prasanna.android.stacknetwork.utils.Validate;
 
-public class SearchCriteria implements Serializable
-{
+public class SearchCriteria implements Serializable {
     private static final long serialVersionUID = -2988724752735247609L;
 
     public static final int DEFAULT_PAGE_SIZE = 15;
@@ -45,8 +44,7 @@ public class SearchCriteria implements Serializable
     public static final String PAGESIZE = "pagesize";
     public static final String SORT = "sort";
 
-    public enum SearchSort
-    {
+    public enum SearchSort {
         ACTIVITY("activity"),
         CREATION("creation"),
         VOTES("votes"),
@@ -54,27 +52,22 @@ public class SearchCriteria implements Serializable
 
         private final String val;
 
-        private SearchSort(String val)
-        {
+        private SearchSort(String val) {
             this.val = val;
         }
 
-        public String getValue()
-        {
+        public String getValue() {
             return val;
         }
 
-        public static SearchSort getEnum(String value)
-        {
+        public static SearchSort getEnum(String value) {
             if (value == null)
                 return null;
 
-            try
-            {
+            try {
                 return valueOf(value.toUpperCase());
             }
-            catch (IllegalArgumentException e)
-            {
+            catch (IllegalArgumentException e) {
                 return null;
             }
         }
@@ -86,82 +79,69 @@ public class SearchCriteria implements Serializable
     private HashSet<String> excludeTags;
     private int page = 1;
 
-    public static SearchCriteria newCriteria(String query)
-    {
+    public static SearchCriteria newCriteria(String query) {
         self = new SoftReference<SearchCriteria>(new SearchCriteria(query));
         return self.get();
     }
 
-    public static SearchCriteria newCriteria()
-    {
+    public static SearchCriteria newCriteria() {
         self = new SoftReference<SearchCriteria>(new SearchCriteria());
         return self.get();
     }
 
-    private SearchCriteria()
-    {
+    private SearchCriteria() {
         criteria = new HashMap<String, String>();
     }
 
-    private SearchCriteria(String query)
-    {
+    private SearchCriteria(String query) {
         criteria = new HashMap<String, String>();
         setQuery(query);
     }
 
-    public SearchCriteria setQuery(String query)
-    {
+    public SearchCriteria setQuery(String query) {
         if (query != null)
             criteria.put(Q, query);
         return this;
     }
 
-    public SearchCriteria removeQuery()
-    {
+    public SearchCriteria removeQuery() {
         criteria.remove(Q);
         return this;
     }
 
-    public SearchCriteria setMinAnswers(int minAns)
-    {
+    public SearchCriteria setMinAnswers(int minAns) {
         if (minAns > 0)
             criteria.put(ANSWERS, String.valueOf(minAns));
         return this;
     }
 
-    public SearchCriteria removeMinAnswers()
-    {
+    public SearchCriteria removeMinAnswers() {
         criteria.remove(ANSWERS);
         return this;
     }
 
-    public SearchCriteria clearAnswered()
-    {
+    public SearchCriteria clearAnswered() {
         criteria.remove(ACCEPTED);
         return this;
     }
 
-    public SearchCriteria mustBeAnswered()
-    {
+    public SearchCriteria mustBeAnswered() {
         criteria.put(ACCEPTED, String.valueOf(true));
         return this;
     }
 
-    public SearchCriteria sortBy(SearchSort searchSort)
-    {
+    public SearchCriteria sortBy(SearchSort searchSort) {
         if (searchSort != null)
             criteria.put(SORT, searchSort.getValue());
         return this;
     }
 
-    public SearchCriteria setPageSize(int pageSize)
-    {
+    public SearchCriteria setPageSize(int pageSize) {
         criteria.put(PAGESIZE, String.valueOf(pageSize));
         return this;
     }
 
-    public SearchCriteria includeTag(String tag)
-    {
+    public SearchCriteria includeTag(String tag) {
         if (includeTags == null)
             includeTags = new HashSet<String>();
 
@@ -171,15 +151,12 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria includeTags(Collection<String> tags)
-    {
-        if (tags != null)
-        {
+    public SearchCriteria includeTags(Collection<String> tags) {
+        if (tags != null) {
             if (includeTags == null)
                 includeTags = new HashSet<String>();
 
-            if (tags.isEmpty())
-            {
+            if (tags.isEmpty()) {
                 includeTags.clear();
                 criteria.remove(TAGGED);
             }
@@ -189,8 +166,7 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria excludeTag(String tag)
-    {
+    public SearchCriteria excludeTag(String tag) {
         if (excludeTags == null)
             excludeTags = new HashSet<String>();
 
@@ -200,15 +176,12 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria excludeTags(Collection<String> tags)
-    {
-        if (tags != null)
-        {
+    public SearchCriteria excludeTags(Collection<String> tags) {
+        if (tags != null) {
             if (excludeTags == null)
                 excludeTags = new HashSet<String>();
 
-            if (tags.isEmpty())
-            {
+            if (tags.isEmpty()) {
                 excludeTags.clear();
                 criteria.remove(NOT_TAGGED);
             }
@@ -218,49 +191,41 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public SearchCriteria addIncludedTagsAsSemiColonDelimitedString(String tags)
-    {
+    public SearchCriteria addIncludedTagsAsSemiColonDelimitedString(String tags) {
         if (tags != null)
             criteria.put(TAGGED, tags);
 
         return this;
     }
 
-    public SearchCriteria addExcludedTagsAsSemiColonDelimitedString(String tags)
-    {
+    public SearchCriteria addExcludedTagsAsSemiColonDelimitedString(String tags) {
         if (tags != null)
             criteria.put(NOT_TAGGED, tags);
 
         return this;
     }
 
-    public String getQuery()
-    {
+    public String getQuery() {
         return criteria.get(Q);
     }
 
-    public boolean isAnswered()
-    {
+    public boolean isAnswered() {
         return criteria.get(ACCEPTED) != null && Boolean.valueOf(criteria.get(ACCEPTED));
     }
 
-    public int getAnswerCount()
-    {
+    public int getAnswerCount() {
         return criteria.get(ANSWERS) == null ? 0 : Integer.valueOf(criteria.get(ANSWERS));
     }
 
-    public String getIncludedTagsAsSemicolonDelimitedString()
-    {
+    public String getIncludedTagsAsSemicolonDelimitedString() {
         return criteria.get(TAGGED);
     }
 
-    public String getExcludedTagsAsSemicolonDelimitedString()
-    {
+    public String getExcludedTagsAsSemicolonDelimitedString() {
         return criteria.get(NOT_TAGGED);
     }
 
-    public SearchCriteria build()
-    {
+    public SearchCriteria build() {
         page = 1;
         criteria.put(PAGE, String.valueOf(page));
 
@@ -276,13 +241,11 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    private String getAsDelimitedString(HashSet<String> tags, String delim)
-    {
+    private String getAsDelimitedString(HashSet<String> tags, String delim) {
         StringBuilder sb = new StringBuilder();
         Iterator<String> iterator = tags.iterator();
 
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             sb.append(iterator.next());
             if (iterator.hasNext())
                 sb.append(delim);
@@ -291,25 +254,21 @@ public class SearchCriteria implements Serializable
         return sb.toString();
     }
 
-    public String getSort()
-    {
+    public String getSort() {
         return criteria.get(SORT);
     }
 
-    public SearchCriteria nextPage()
-    {
+    public SearchCriteria nextPage() {
         criteria.put(PAGE, String.valueOf(++page));
         return this;
     }
 
-    public SearchCriteria queryMustInTitle()
-    {
+    public SearchCriteria queryMustInTitle() {
         criteria.put(TITLE, criteria.get(Q));
         return this;
     }
 
-    public String[] getTaggedArray()
-    {
+    public String[] getTaggedArray() {
         String tags = getIncludedTagsAsSemicolonDelimitedString();
         if (tags == null)
             return null;
@@ -317,8 +276,7 @@ public class SearchCriteria implements Serializable
         return tags.split(";");
     }
 
-    public String[] getNotTaggedArray()
-    {
+    public String[] getNotTaggedArray() {
         String tags = getExcludedTagsAsSemicolonDelimitedString();
         if (tags == null)
             return null;
@@ -326,18 +284,15 @@ public class SearchCriteria implements Serializable
         return tags.split(";");
     }
 
-    public void addCriteria(String name, String value)
-    {
+    public void addCriteria(String name, String value) {
         criteria.put(name, value);
     }
 
-    public Map<String, String> getMap()
-    {
+    public Map<String, String> getMap() {
         return criteria;
     }
 
-    public SearchCriteria clear()
-    {
+    public SearchCriteria clear() {
         if (criteria != null)
             criteria.clear();
 
@@ -351,25 +306,21 @@ public class SearchCriteria implements Serializable
         return this;
     }
 
-    public static SearchCriteria copy(SearchCriteria that)
-    {
-        if (that != null)
-        {
+    public static SearchCriteria copy(SearchCriteria that) {
+        if (that != null) {
             SearchCriteria criteria = new SearchCriteria();
             criteria.setQuery(that.getQuery());
             criteria.setMinAnswers(criteria.getAnswerCount());
             if (criteria.isAnswered())
                 criteria.mustBeAnswered();
             String[] tagArray = that.getTaggedArray();
-            if (tagArray != null)
-            {
+            if (tagArray != null) {
                 for (String tag : tagArray)
                     criteria.includeTag(tag);
             }
 
             tagArray = that.getNotTaggedArray();
-            if (tagArray != null)
-            {
+            if (tagArray != null) {
                 for (String tag : that.getNotTaggedArray())
                     criteria.excludeTag(tag);
             }

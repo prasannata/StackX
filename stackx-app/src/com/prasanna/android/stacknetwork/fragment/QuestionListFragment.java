@@ -46,8 +46,7 @@ import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.utils.TagsViewBuilder;
 import com.prasanna.android.utils.TagsViewBuilder.DefaultOnTagClickListener;
 
-public class QuestionListFragment extends AbstractQuestionListFragment
-{
+public class QuestionListFragment extends AbstractQuestionListFragment {
     private static final String TAG = QuestionListFragment.class.getSimpleName();
     private static final String FRAGMENT_TAG_PREFIX = "fragment_q";
 
@@ -62,29 +61,25 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
     private SearchCriteria criteria;
 
-    private static class OnTagClickListenerImpl extends DefaultOnTagClickListener
-    {
+    private static class OnTagClickListenerImpl extends DefaultOnTagClickListener {
         private final String questionTag;
         private final int intentAction;
 
-        public OnTagClickListenerImpl(int intentAction, String questionTag)
-        {
+        public OnTagClickListenerImpl(int intentAction, String questionTag) {
             this.intentAction = intentAction;
             this.questionTag = questionTag;
         }
 
         @Override
-        public void onTagClick(Context context, String tag)
-        {
+        public void onTagClick(Context context, String tag) {
             if (QuestionsIntentService.GET_QUESTIONS_FOR_TAG != intentAction || questionTag == null
-                            || !questionTag.equals(tag))
+                    || !questionTag.equals(tag))
                 super.onTagClick(context, tag);
         }
 
     }
 
-    public static QuestionListFragment newFragment(int action, String tag, String sort)
-    {
+    public static QuestionListFragment newFragment(int action, String tag, String sort) {
         QuestionListFragment fragment = getFragment(getFragmentTag(tag, sort));
         fragment.sort = sort;
         fragment.action = action;
@@ -92,23 +87,20 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         return fragment;
     }
 
-    public static QuestionListFragment newFragment(int action, String fragmentTag)
-    {
+    public static QuestionListFragment newFragment(int action, String fragmentTag) {
         QuestionListFragment fragment = getFragment(fragmentTag);
         fragment.action = action;
         return fragment;
     }
 
-    public static QuestionListFragment newFragment(String fragmentTag, SearchCriteria searchCriteria)
-    {
+    public static QuestionListFragment newFragment(String fragmentTag, SearchCriteria searchCriteria) {
         QuestionListFragment fragment = getFragment(fragmentTag);
         fragment.criteria = searchCriteria;
         fragment.action = QuestionsIntentService.SEARCH_ADVANCED;
         return fragment;
     }
 
-    public static String getFragmentTag(String tag, String sort)
-    {
+    public static String getFragmentTag(String tag, String sort) {
         String fragmentTag = null;
 
         if (tag != null)
@@ -120,8 +112,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         return fragmentTag;
     }
 
-    private static QuestionListFragment getFragment(String fragmentTag)
-    {
+    private static QuestionListFragment getFragment(String fragmentTag) {
         QuestionListFragment fragment = QuestionsActivity.getFragment(fragmentTag);
         if (fragment == null)
             fragment = new QuestionListFragment();
@@ -131,14 +122,12 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        if (itemsContainer == null)
-        {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (itemsContainer == null) {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter =
-                            new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
-                                            new ArrayList<Question>(), this);
+                    new ItemListAdapter<Question>(getActivity(), R.layout.question_snippet_layout,
+                            new ArrayList<Question>(), this);
         }
 
         if (savedInstanceState != null)
@@ -148,15 +137,12 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (tag != null)
-        {
+        if (tag != null) {
             if ((action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG || action == QuestionsIntentService.GET_FAQ_FOR_TAG)
-                            && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD)
-            {
+                    && getActivity().getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_STANDARD) {
                 getActivity().getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             }
 
@@ -171,20 +157,16 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
+    public void onSaveInstanceState(Bundle outState) {
         outState.putInt(StringConstants.ACTION, action);
         super.onSaveInstanceState(outState);
     }
 
-    private void findActionAndStartService()
-    {
+    private void findActionAndStartService() {
         LogWrapper.d(TAG, "findActionAndStartService");
-        
-        if (!created)
-        {
-            switch (action)
-            {
+
+        if (!created) {
+            switch (action) {
                 case QuestionsIntentService.GET_FRONT_PAGE:
                     getFrontPage();
                     break;
@@ -213,12 +195,10 @@ public class QuestionListFragment extends AbstractQuestionListFragment
 
             created = true;
         }
-        else
-        {
+        else {
             LogWrapper.d(TAG, "Fragment " + tag + " was already created. Restoring");
 
-            if (itemListAdapter != null)
-            {
+            if (itemListAdapter != null) {
                 LogWrapper.d(TAG, "Notifying item list adapter");
 
                 itemListAdapter.notifyDataSetChanged();
@@ -228,8 +208,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    protected void startIntentService()
-    {
+    protected void startIntentService() {
         showProgressBar();
         intent.putExtra(StringConstants.PAGE, ++currentPage);
         intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
@@ -238,89 +217,74 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    protected void buildTagsView(final Question question, final QuestionViewHolder holder)
-    {
+    protected void buildTagsView(final Question question, final QuestionViewHolder holder) {
         TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags, new OnTagClickListenerImpl(action,
-                        tag));
+                tag));
     }
 
     @Override
-    public String getLogTag()
-    {
+    public String getLogTag() {
         return TAG;
     }
 
     @Override
-    public void refresh()
-    {
+    public void refresh() {
         clean();
         removeErrorViewIfShown();
         created = false;
         findActionAndStartService();
     }
 
-    private void stopRunningServiceAndReceiver()
-    {
+    private void stopRunningServiceAndReceiver() {
         if (isServiceRunning())
             getActivity().stopService(intent);
     }
 
-    private void clean()
-    {
+    private void clean() {
         stopRunningServiceAndReceiver();
         itemListAdapter.clear();
         currentPage = 0;
     }
 
-    private void getFrontPage()
-    {
+    private void getFrontPage() {
         intent = getIntentForService(QuestionsIntentService.class, null);
 
-        if (intent != null)
-        {
+        if (intent != null) {
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
             startIntentService();
         }
     }
 
-    private void getSimilarQuestions()
-    {
+    private void getSimilarQuestions() {
         intent = getIntentForService(QuestionsIntentService.class, null);
-        if (intent != null)
-        {
+        if (intent != null) {
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_SIMILAR);
             intent.putExtra(StringConstants.TITLE, getBundle().getString(StringConstants.TITLE));
             startIntentService();
         }
     }
 
-    private void getRelatedQuestions()
-    {
+    private void getRelatedQuestions() {
         intent = getIntentForService(QuestionsIntentService.class, null);
-        if (intent != null)
-        {
+        if (intent != null) {
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_RELATED);
             intent.putExtra(StringConstants.QUESTION_ID, getBundle().getLong(StringConstants.QUESTION_ID, 0));
             startIntentService();
         }
     }
 
-    private void getFaqsForTag()
-    {
+    private void getFaqsForTag() {
         intent = getIntentForService(QuestionsIntentService.class, null);
-        if (intent != null)
-        {
+        if (intent != null) {
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FAQ_FOR_TAG);
             intent.putExtra(StringConstants.TAG, tag);
             startIntentService();
         }
     }
 
-    private void getQuestionsForTag()
-    {
+    private void getQuestionsForTag() {
         intent = getIntentForService(QuestionsIntentService.class, null);
-        if (intent != null)
-        {
+        if (intent != null) {
 
             intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_QUESTIONS_FOR_TAG);
             intent.putExtra(StringConstants.TAG, tag);
@@ -328,23 +292,20 @@ public class QuestionListFragment extends AbstractQuestionListFragment
         }
     }
 
-    private void search(String query)
-    {
+    private void search(String query) {
         clean();
         buildSearchCriteria(query);
         startSearchIntentService();
     }
 
-    private void startSearchIntentService()
-    {
+    private void startSearchIntentService() {
         intent = getIntentForService(QuestionsIntentService.class, null);
         intent.putExtra(StringConstants.ACTION, QuestionsIntentService.SEARCH_ADVANCED);
         intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria);
         startIntentService();
     }
 
-    private void buildSearchCriteria(String query)
-    {
+    private void buildSearchCriteria(String query) {
         criteria = SearchCriteria.newCriteria(query);
 
         if (SharedPreferencesUtil.isSet(getActivity(), SettingsFragment.KEY_PREF_SEARCH_IN_TITLE, false))
@@ -360,8 +321,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment
     }
 
     @Override
-    protected void loadNextPage()
-    {
+    protected void loadNextPage() {
         if (action == QuestionsIntentService.SEARCH || action == QuestionsIntentService.SEARCH_ADVANCED)
             intent.putExtra(StringConstants.SEARCH_CRITERIA, criteria.nextPage());
 

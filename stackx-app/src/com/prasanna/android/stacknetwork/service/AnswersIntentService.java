@@ -27,39 +27,33 @@ import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class AnswersIntentService extends AbstractIntentService
-{
+public class AnswersIntentService extends AbstractIntentService {
     private static final String TAG = AnswersIntentService.class.getSimpleName();
     public static final int GET_ANSWER = 0x601;
     public static final int GET_ANSWERS = 0x502;
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
-    public AnswersIntentService()
-    {
+    public AnswersIntentService() {
         this("UserQuestionsService");
     }
 
-    public AnswersIntentService(String name)
-    {
+    public AnswersIntentService(String name) {
         super(name);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final long id = intent.getLongExtra(StringConstants.ANSWER_ID, -1);
         final String site = intent.getStringExtra(StringConstants.SITE);
         Bundle bundle = new Bundle();
 
-        try
-        {
+        try {
             super.onHandleIntent(intent);
 
-            switch (action)
-            {
+            switch (action) {
                 case GET_ANSWER:
                     bundle.putSerializable(StringConstants.ANSWER, questionService.getAnswer(id, site));
                     receiver.send(GET_ANSWER, bundle);
@@ -71,8 +65,7 @@ public class AnswersIntentService extends AbstractIntentService
             }
 
         }
-        catch (AbstractHttpException e)
-        {
+        catch (AbstractHttpException e) {
             bundle.putSerializable(StringConstants.EXCEPTION, e);
             receiver.send(ERROR, bundle);
         }

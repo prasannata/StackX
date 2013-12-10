@@ -45,12 +45,10 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.TagsViewBuilder;
 import com.prasanna.android.views.QuickActionMenu;
 
-public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question>
-{
+public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question> {
     private final Bundle bundle = new Bundle();
 
-    static class QuestionViewHolder
-    {
+    static class QuestionViewHolder {
         LinearLayout tagsLayout;
         TextView title;
         TextView score;
@@ -63,23 +61,19 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         registerForContextMenu(getListView());
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
-    public View getView(Question item, int position, View convertView, ViewGroup parent)
-    {
+    public View getView(Question item, int position, View convertView, ViewGroup parent) {
         return buildView(convertView, getActivity(), item);
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
-    {
-        if (itemListAdapter != null && itemListAdapter.getCount() > position)
-        {
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        if (itemListAdapter != null && itemListAdapter.getCount() > position) {
             Intent displayQuestionIntent = new Intent(getActivity(), QuestionActivity.class);
             displayQuestionIntent.setAction(StringConstants.QUESTION);
             displayQuestionIntent.putExtra(StringConstants.QUESTION, itemListAdapter.getItem(position));
@@ -90,22 +84,19 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     }
 
     @Override
-    public String getReceiverExtraName()
-    {
+    public String getReceiverExtraName() {
         return StringConstants.QUESTIONS;
     }
 
-    private View buildView(View convertView, final Context context, final Question question)
-    {
+    private View buildView(View convertView, final Context context, final Question question) {
         FrameLayout questionRowLayout = (FrameLayout) convertView;
         QuestionViewHolder holder;
 
-        if (questionRowLayout == null)
-        {
+        if (questionRowLayout == null) {
             holder = new QuestionViewHolder();
 
-            questionRowLayout = (FrameLayout) getActivity().getLayoutInflater().inflate(
-                            R.layout.question_snippet_layout, null);
+            questionRowLayout =
+                    (FrameLayout) getActivity().getLayoutInflater().inflate(R.layout.question_snippet_layout, null);
             holder.tagsLayout = (LinearLayout) questionRowLayout.findViewById(R.id.questionSnippetTags);
             holder.score = (TextView) questionRowLayout.findViewById(R.id.score);
             holder.answerCount = (TextView) questionRowLayout.findViewById(R.id.answerCount);
@@ -127,45 +118,37 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         return questionRowLayout;
     }
 
-    protected void buildTagsView(final Question question, final QuestionViewHolder holder)
-    {
+    protected void buildTagsView(final Question question, final QuestionViewHolder holder) {
         TagsViewBuilder.buildView(getActivity(), holder.tagsLayout, question.tags);
     }
 
     /* Shouldn't I recycle quick action menu as well? Yes, but how? */
-    private void setupQuickActionMenu(final Question question, QuestionViewHolder holder)
-    {
+    private void setupQuickActionMenu(final Question question, QuestionViewHolder holder) {
         final QuickActionMenu quickActionMenu = initQuickActionMenu(question);
-        holder.quickActionImg.setOnClickListener(new View.OnClickListener()
-        {
+        holder.quickActionImg.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 quickActionMenu.show(v);
             }
         });
     }
 
-    protected QuickActionMenu initQuickActionMenu(final Question question)
-    {
+    protected QuickActionMenu initQuickActionMenu(final Question question) {
         StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
         quickActionMenu.addUserProfileItem(question.owner.id, Html.fromHtml(question.owner.displayName).toString());
         return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
-                        .addEmailQuickActionItem(question.title, question.body).build();
+                .addEmailQuickActionItem(question.title, question.body).build();
     }
 
-    protected void setValuesForQuestionView(QuestionViewHolder holder, Question question)
-    {
+    protected void setValuesForQuestionView(QuestionViewHolder holder, Question question) {
         holder.score.setText(AppUtils.formatNumber(question.score));
 
-        if (question.hasAcceptedAnswer)
-        {
+        if (question.hasAcceptedAnswer) {
             holder.answerCountAnswered.setText(AppUtils.formatNumber(question.answerCount));
             holder.answerCountAnswered.setVisibility(View.VISIBLE);
             holder.answerCount.setVisibility(View.GONE);
         }
-        else
-        {
+        else {
             holder.answerCount.setText(AppUtils.formatNumber(question.answerCount));
             holder.answerCount.setVisibility(View.VISIBLE);
             holder.answerCountAnswered.setVisibility(View.GONE);
@@ -174,15 +157,13 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
         holder.title.setText(Html.fromHtml(question.title));
         holder.views.setText("Views:" + AppUtils.formatNumber(question.viewCount));
 
-        if (question.owner.displayName != null)
-        {
+        if (question.owner.displayName != null) {
             holder.owner.setText(DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                            + Html.fromHtml(question.owner.displayName));
+                    + Html.fromHtml(question.owner.displayName));
         }
     }
 
-    public Bundle getBundle()
-    {
+    public Bundle getBundle() {
         return bundle;
     }
 }

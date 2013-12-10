@@ -21,20 +21,18 @@ package com.prasanna.android.http;
 
 import java.io.Serializable;
 
-public interface HttpException extends Serializable
-{
-    public interface Code extends Serializable
-    {
+public interface HttpException extends Serializable {
+    public interface Code extends Serializable {
         int getStatusCode();
 
         String getDescription();
     }
-    
+
     int getStatusCode();
-    
+
     String getStatusDescription();
-    
+
     String getErrorResponse();
-    
+
     Code getCode();
 }

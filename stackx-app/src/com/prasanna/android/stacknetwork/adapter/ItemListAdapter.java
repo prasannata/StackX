@@ -28,24 +28,20 @@ import android.widget.ArrayAdapter;
 
 import com.prasanna.android.stacknetwork.model.Post;
 
-public class ItemListAdapter<T extends Post> extends ArrayAdapter<T>
-{
+public class ItemListAdapter<T extends Post> extends ArrayAdapter<T> {
     private final ListItemView<T> listItemView;
 
-    public interface ListItemView<T>
-    {
+    public interface ListItemView<T> {
         View getView(T item, int position, View convertView, ViewGroup parent);
     }
 
-    public ItemListAdapter(Context context, int textViewResourceId, ArrayList<T> items, ListItemView<T> listItemView)
-    {
+    public ItemListAdapter(Context context, int textViewResourceId, ArrayList<T> items, ListItemView<T> listItemView) {
         super(context, textViewResourceId, items);
         this.listItemView = listItemView;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         return listItemView.getView(getItem(position), position, convertView, parent);
     }
 }

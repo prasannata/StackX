@@ -23,33 +23,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 
-public class RestQueryResultReceiver extends ResultReceiver
-{
-    public interface StackXRestQueryResultReceiver
-    {
+public class RestQueryResultReceiver extends ResultReceiver {
+    public interface StackXRestQueryResultReceiver {
         void onReceiveResult(int resultCode, Bundle resultData);
     }
 
     private StackXRestQueryResultReceiver receiver;
 
-    public RestQueryResultReceiver(Handler handler)
-    {
+    public RestQueryResultReceiver(Handler handler) {
         super(handler);
     }
 
-    public void setReceiver(StackXRestQueryResultReceiver receiver)
-    {
+    public void setReceiver(StackXRestQueryResultReceiver receiver) {
         this.receiver = receiver;
     }
 
-    public StackXRestQueryResultReceiver getReceiver()
-    {
+    public StackXRestQueryResultReceiver getReceiver() {
         return receiver;
     }
-    
+
     @Override
-    protected void onReceiveResult(int resultCode, Bundle resultData)
-    {
+    protected void onReceiveResult(int resultCode, Bundle resultData) {
         receiver.onReceiveResult(resultCode, resultData);
     }
 }

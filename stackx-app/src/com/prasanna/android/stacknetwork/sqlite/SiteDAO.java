@@ -35,16 +35,14 @@ import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.utils.LogWrapper;
 
-public class SiteDAO extends AbstractBaseDao
-{
+public class SiteDAO extends AbstractBaseDao {
     private static final String AUDIT_ENTRY_TYPE = "sites";
 
     public static final String TABLE_NAME = "MY_SITES";
     private static final String TAG = SiteDAO.class.getSimpleName();
     private Context context;
 
-    public static final class SiteTable
-    {
+    public static final class SiteTable {
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_AUDIENCE = "audience";
@@ -57,39 +55,33 @@ public class SiteDAO extends AbstractBaseDao
         public static final String COLUMN_LAST_UPDATE = "last_update";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, "
-                        + COLUMN_API_SITE_PARAMTETER + " text not null unique, " + COLUMN_AUDIENCE + " text not null, "
-                        + COLUMN_SITE_URL + " text not null, " + COLUMN_ICON_URL + " text not null, " + COLUMN_LOGO_URL
-                        + " text not null, " + COLUMN_USER_TYPE + " text not null, " + COLUMN_USER_ID + " long, "
-                        + COLUMN_LAST_UPDATE + " long not null);";
+                + " integer primary key autoincrement, " + COLUMN_NAME + " text not null, "
+                + COLUMN_API_SITE_PARAMTETER + " text not null unique, " + COLUMN_AUDIENCE + " text not null, "
+                + COLUMN_SITE_URL + " text not null, " + COLUMN_ICON_URL + " text not null, " + COLUMN_LOGO_URL
+                + " text not null, " + COLUMN_USER_TYPE + " text not null, " + COLUMN_USER_ID + " long, "
+                + COLUMN_LAST_UPDATE + " long not null);";
 
     }
 
-    public SiteDAO(Context context)
-    {
+    public SiteDAO(Context context) {
         super(context);
         this.context = context;
     }
 
-    public long insert(Site site)
-    {
+    public long insert(Site site) {
         long id = 0L;
 
-        if (site != null)
-        {
+        if (site != null) {
             database.beginTransaction();
-            try
-            {
+            try {
                 id = getDatabase().insert(TABLE_NAME, null, getContentValues(site));
                 insertAuditEntry(AUDIT_ENTRY_TYPE, null);
                 getDatabase().setTransactionSuccessful();
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            finally
-            {
+            finally {
                 database.endTransaction();
             }
         }
@@ -97,32 +89,26 @@ public class SiteDAO extends AbstractBaseDao
         return id;
     }
 
-    public void insert(ArrayList<Site> sites)
-    {
-        if (sites != null)
-        {
+    public void insert(ArrayList<Site> sites) {
+        if (sites != null) {
             getDatabase().beginTransaction();
-            try
-            {
+            try {
                 for (Site site : sites)
                     getDatabase().insert(TABLE_NAME, null, getContentValues(site));
 
                 insertAuditEntry(AUDIT_ENTRY_TYPE, null);
                 getDatabase().setTransactionSuccessful();
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            finally
-            {
+            finally {
                 getDatabase().endTransaction();
             }
         }
     }
 
-    private ContentValues getContentValues(Site site)
-    {
+    private ContentValues getContentValues(Site site) {
         ContentValues values = new ContentValues();
         values.put(SiteTable.COLUMN_NAME, site.name);
         values.put(SiteTable.COLUMN_AUDIENCE, site.audience);
@@ -138,29 +124,24 @@ public class SiteDAO extends AbstractBaseDao
         return values;
     }
 
-    public long getLastUpdateTime()
-    {
+    public long getLastUpdateTime() {
         return getLastUpdateTime(AUDIT_ENTRY_TYPE, null);
     }
 
-    public ArrayList<Site> getSites()
-    {
+    public ArrayList<Site> getSites() {
 
         Cursor cursor = getDatabase().query(TABLE_NAME, null, null, null, null, null, null);
 
-        if (cursor == null || cursor.getCount() == 0)
-        {
+        if (cursor == null || cursor.getCount() == 0) {
             LogWrapper.d(TAG, "No entries");
             return null;
         }
-        try
-        {
+        try {
             cursor.moveToFirst();
 
             ArrayList<Site> registerdSites = new ArrayList<Site>();
             ArrayList<Site> sites = new ArrayList<Site>();
-            while (!cursor.isAfterLast())
-            {
+            while (!cursor.isAfterLast()) {
                 Site site = getSiteObject(cursor);
                 if (site.userType != null && UserType.REGISTERED.equals(site.userType))
                     registerdSites.add(site);
@@ -173,14 +154,12 @@ public class SiteDAO extends AbstractBaseDao
             if (defaultSite != null && sites.indexOf(defaultSite) > 0)
                 sites.remove(defaultSite);
 
-            if (registerdSites.isEmpty())
-            {
+            if (registerdSites.isEmpty()) {
                 if (defaultSite != null && !sites.contains(defaultSite))
                     sites.add(defaultSite);
                 return sites;
             }
-            else
-            {
+            else {
                 ArrayList<Site> sitesWithRegisteredFirst = new ArrayList<Site>();
                 if (defaultSite != null)
                     sitesWithRegisteredFirst.add(defaultSite);
@@ -194,43 +173,36 @@ public class SiteDAO extends AbstractBaseDao
             }
 
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
     }
 
-    public HashMap<String, Site> getLinkSitesMap()
-    {
+    public HashMap<String, Site> getLinkSitesMap() {
         Cursor cursor = getDatabase().query(TABLE_NAME, null, null, null, null, null, null);
 
-        if (cursor == null || cursor.getCount() == 0)
-        {
+        if (cursor == null || cursor.getCount() == 0) {
             LogWrapper.d(TAG, "No entries");
             return null;
         }
 
-        try
-        {
+        try {
             cursor.moveToFirst();
 
             HashMap<String, Site> sites = new HashMap<String, Site>();
-            while (!cursor.isAfterLast())
-            {
+            while (!cursor.isAfterLast()) {
                 Site site = getSiteObject(cursor);
                 sites.put(site.link, site);
                 cursor.moveToNext();
             }
             return sites;
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
     }
 
-    private Site getSiteObject(Cursor cursor)
-    {
+    private Site getSiteObject(Cursor cursor) {
         Site site = new Site();
         site.dbId = cursor.getLong(cursor.getColumnIndex(SiteTable.COLUMN_ID));
         site.name = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_NAME));
@@ -239,8 +211,7 @@ public class SiteDAO extends AbstractBaseDao
         site.link = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_SITE_URL));
         site.iconUrl = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_ICON_URL));
         site.logoUrl = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_LOGO_URL));
-        if (!cursor.isNull(cursor.getColumnIndex(SiteTable.COLUMN_USER_TYPE)))
-        {
+        if (!cursor.isNull(cursor.getColumnIndex(SiteTable.COLUMN_USER_TYPE))) {
             String userType = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_USER_TYPE));
             site.userType = UserType.getEnum(userType);
         }
@@ -249,41 +220,34 @@ public class SiteDAO extends AbstractBaseDao
         return site;
     }
 
-    private ArrayList<WritePermission> getWritePermission(String apiSiteParameter)
-    {
+    private ArrayList<WritePermission> getWritePermission(String apiSiteParameter) {
         WritePermissionDAO dao = new WritePermissionDAO(context);
-        try
-        {
+        try {
             dao.openReadOnly();
             HashMap<ObjectType, WritePermission> permissions = dao.getPermissions(apiSiteParameter);
             if (permissions != null)
                 return new ArrayList<WritePermission>(permissions.values());
         }
-        finally
-        {
+        finally {
             dao.close();
         }
 
         return null;
     }
 
-    public void deleteAll()
-    {
+    public void deleteAll() {
         getDatabase().delete(TABLE_NAME, null, null);
         deleteAuditEntry(AUDIT_ENTRY_TYPE, null);
     }
 
-    public void update(Site site)
-    {
+    public void update(Site site) {
         String whereClause = SiteTable.COLUMN_API_SITE_PARAMTETER + "= ?";
         String[] whereArgs = new String[] { site.apiSiteParameter };
         getDatabase().update(TABLE_NAME, getContentValues(site), whereClause, whereArgs);
     }
 
-    public void updateRegistrationInfo(ArrayList<Account> newAccounts, boolean allRegistered)
-    {
-        for (Account account : newAccounts)
-        {
+    public void updateRegistrationInfo(ArrayList<Account> newAccounts, boolean allRegistered) {
+        for (Account account : newAccounts) {
             String whereClause = SiteTable.COLUMN_SITE_URL + "= ?";
             String[] whereArgs = new String[] { account.siteUrl };
 
@@ -295,203 +259,164 @@ public class SiteDAO extends AbstractBaseDao
                 values.put(SiteTable.COLUMN_USER_TYPE, "");
 
             LogWrapper.d(TAG,
-                            "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
+                    "Update user type for " + account.siteUrl + " to " + values.get(SiteTable.COLUMN_USER_TYPE));
             getDatabase().update(TABLE_NAME, values, whereClause, whereArgs);
         }
     }
 
-    public boolean isRegistered(String site)
-    {
+    public boolean isRegistered(String site) {
         String[] cols = new String[] { SiteTable.COLUMN_API_SITE_PARAMTETER };
         String selection = SiteTable.COLUMN_API_SITE_PARAMTETER + " = ? and " + SiteTable.COLUMN_USER_TYPE + " = ?";
         String[] selectionArgs = { site, UserType.REGISTERED.getValue() };
 
         Cursor cursor = getDatabase().query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
 
-        try
-        {
+        try {
             return cursor != null && cursor.getCount() > 0;
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
     }
 
-    public static void insert(Context context, Site site)
-    {
+    public static void insert(Context context, Site site) {
         SiteDAO dao = new SiteDAO(context);
 
-        try
-        {
+        try {
             dao.open();
             dao.insert(site);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             dao.close();
         }
     }
 
-    public static void insertAll(Context context, ArrayList<Site> sites)
-    {
+    public static void insertAll(Context context, ArrayList<Site> sites) {
         SiteDAO dao = new SiteDAO(context);
 
-        try
-        {
+        try {
             dao.open();
             dao.insert(sites);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             dao.close();
         }
     }
 
-    public static void updateSites(final Context context, final ArrayList<Account> accounts, final boolean allRegistered)
-    {
+    public static void updateSites(final Context context, final ArrayList<Account> accounts, final boolean allRegistered) {
         SiteDAO siteDAO = new SiteDAO(context);
-        try
-        {
+        try {
             siteDAO.open();
             siteDAO.updateRegistrationInfo(accounts, allRegistered);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             siteDAO.close();
         }
     }
 
-    public static HashMap<String, Site> getAll(final Context context)
-    {
+    public static HashMap<String, Site> getAll(final Context context) {
         SiteDAO siteDAO = new SiteDAO(context);
 
-        try
-        {
+        try {
             siteDAO.open();
             return siteDAO.getLinkSitesMap();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             siteDAO.close();
         }
 
         return null;
     }
 
-    public static ArrayList<Site> getSiteList(final Context context)
-    {
+    public static ArrayList<Site> getSiteList(final Context context) {
         SiteDAO siteDAO = new SiteDAO(context);
 
-        try
-        {
+        try {
             siteDAO.open();
             return siteDAO.getSites();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             siteDAO.close();
         }
 
         return null;
     }
 
-    public static long getLastUpdateTime(final Context context)
-    {
+    public static long getLastUpdateTime(final Context context) {
         SiteDAO siteDAO = new SiteDAO(context);
 
-        try
-        {
+        try {
             siteDAO.open();
             return siteDAO.getLastUpdateTime();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             siteDAO.close();
         }
 
         return 0L;
     }
 
-    public static boolean isRegisteredForSite(final Context context, final String site)
-    {
+    public static boolean isRegisteredForSite(final Context context, final String site) {
         SiteDAO siteDAO = new SiteDAO(context);
 
-        try
-        {
+        try {
             siteDAO.open();
             return siteDAO.isRegistered(site);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             siteDAO.close();
         }
 
         return false;
     }
 
-    public static void deleteAll(Context context)
-    {
+    public static void deleteAll(Context context) {
         SiteDAO dao = new SiteDAO(context);
 
-        try
-        {
+        try {
             dao.open();
             dao.deleteAll();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             dao.close();
         }
     }
 
-    public static void updateLastUpdateTime(Context context)
-    {
+    public static void updateLastUpdateTime(Context context) {
         SiteDAO dao = new SiteDAO(context);
 
-        try
-        {
+        try {
             dao.open();
             dao.updateAuditEntry(AUDIT_ENTRY_TYPE, null);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             dao.close();
         }
 

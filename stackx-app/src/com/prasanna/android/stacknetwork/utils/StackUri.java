@@ -19,13 +19,11 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-public class StackUri
-{
+public class StackUri {
     public static final String OAUTH_DIALOG_URL = "https://stackexchange.com/oauth/dialog";
     public static final String STACKX_API_HOST = "https://api.stackexchange.com/2.1";
 
-    public static class QueryParams
-    {
+    public static class QueryParams {
         public static final String SITE = "site";
         public static final String FILTER = "filter";
         public static final String SORT = "sort";
@@ -44,8 +42,7 @@ public class StackUri
         public static final String BODY = "body";
     }
 
-    public static class QueryParamDefaultValues
-    {
+    public static class QueryParamDefaultValues {
         public static final int PAGE_SIZE = 15;
         public static final int ANSWERS_PAGE_SIZE = 10;
         public static final String ORDER = "desc";
@@ -61,8 +58,7 @@ public class StackUri
         public static final String DEFAULT_FILTER = "default";
     }
 
-    public static class Sort
-    {
+    public static class Sort {
         public static final String ACTIVITY = "activity";
         public static final String POPULAR = "popular";
         public static final String NAME = "name";
@@ -71,11 +67,10 @@ public class StackUri
         public static final String WEEK = "week";
         public static final String RELEVANCE = "relevance";
     }
-    
-    public static class Order
-    {
+
+    public static class Order {
         public static final String ASC = "asc";
         public static final String DESC = "desc";
-        
+
     }
 }

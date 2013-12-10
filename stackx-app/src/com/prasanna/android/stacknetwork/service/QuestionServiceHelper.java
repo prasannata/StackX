@@ -42,42 +42,34 @@ import com.prasanna.android.stacknetwork.utils.StackUri.Order;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class QuestionServiceHelper extends AbstractBaseServiceHelper
-{
+public class QuestionServiceHelper extends AbstractBaseServiceHelper {
     private static final String TAG = QuestionServiceHelper.class.getSimpleName();
 
     private static final QuestionServiceHelper questionService = new QuestionServiceHelper();
 
-    protected QuestionServiceHelper()
-    {
+    protected QuestionServiceHelper() {
     }
 
-    public static QuestionServiceHelper getInstance()
-    {
+    public static QuestionServiceHelper getInstance() {
         return questionService;
     }
 
-    public String getQuestionBodyForId(long id, String site)
-    {
+    public String getQuestionBodyForId(long id, String site) {
         String restEndPoint = "questions/" + id;
         String questionBody = null;
         Map<String, String> queryParams = getDefaultQueryParams(site);
 
         JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-        if (questionJsonResponse != null)
-        {
-            try
-            {
+        if (questionJsonResponse != null) {
+            try {
                 JSONArray jsonArray = questionJsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
+                if (jsonArray != null && jsonArray.length() == 1) {
                     JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
                     questionBody = jsonObject.getString(JsonFields.Question.BODY);
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
         }
@@ -85,33 +77,27 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return questionBody;
     }
 
-    public String getQuestionBodyForId(long id)
-    {
+    public String getQuestionBodyForId(long id) {
         return getQuestionBodyForId(id, OperatingSite.getSite().apiSiteParameter);
     }
 
-    public ArrayList<Answer> getAnswersForQuestion(long id, String site, int page)
-    {
+    public ArrayList<Answer> getAnswersForQuestion(long id, String site, int page) {
         ArrayList<Answer> answers = new ArrayList<Answer>();
         String restEndPoint = "questions/" + id + "/answers";
         Map<String, String> queryParams = getDefaultQueryParams(site);
 
         queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
         queryParams.put(StackUri.QueryParams.PAGE_SIZE,
-                        String.valueOf(StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE));
+                String.valueOf(StackUri.QueryParamDefaultValues.ANSWERS_PAGE_SIZE));
         queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.VOTES);
 
         JSONObjectWrapper answersJson = executeHttpGetRequest(restEndPoint, queryParams);
-        if (answersJson != null)
-        {
-            try
-            {
+        if (answersJson != null) {
+            try {
                 JSONArray jsonArray = answersJson.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null)
-                {
-                    for (int i = 0; i < jsonArray.length(); i++)
-                    {
+                if (jsonArray != null) {
+                    for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
                         Answer answer = getSerializedAnswerObject(jsonObject);
                         if (answer.accepted && answers.size() > 0)
@@ -124,23 +110,19 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                         getCommentsForAnswers(answers);
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
         }
         return answers;
     }
 
-    private void getCommentsForAnswers(ArrayList<Answer> answers)
-    {
-        try
-        {
+    private void getCommentsForAnswers(ArrayList<Answer> answers) {
+        try {
             StringBuilder stringBuilder = new StringBuilder();
             HashMap<Long, Answer> idAnswerMap = new HashMap<Long, Answer>();
 
-            for (Answer answer : answers)
-            {
+            for (Answer answer : answers) {
                 stringBuilder.append(answer.id).append(";");
                 idAnswerMap.put(answer.id, answer);
             }
@@ -149,26 +131,20 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
             getCommensAndUpdateAnswer(stringBuilder.toString(), idAnswerMap);
         }
-        catch (AbstractHttpException e)
-        {
+        catch (AbstractHttpException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
     }
 
-    private void getCommensAndUpdateAnswer(String answerIds, HashMap<Long, Answer> idAnswerMap)
-    {
+    private void getCommensAndUpdateAnswer(String answerIds, HashMap<Long, Answer> idAnswerMap) {
         boolean hasMore = true;
         int page = 1;
-        while (hasMore)
-        {
+        while (hasMore) {
             StackXPage<Comment> commentsPage = getComments(StringConstants.ANSWERS, answerIds, page++);
 
-            if (commentsPage != null && commentsPage.items != null)
-            {
-                for (Comment comment : commentsPage.items)
-                {
-                    if (idAnswerMap.containsKey(comment.post_id))
-                    {
+            if (commentsPage != null && commentsPage.items != null) {
+                for (Comment comment : commentsPage.items) {
+                    if (idAnswerMap.containsKey(comment.post_id)) {
                         if (idAnswerMap.get(comment.post_id).comments == null)
                             idAnswerMap.get(comment.post_id).comments = new ArrayList<Comment>();
 
@@ -184,8 +160,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         }
     }
 
-    public StackXPage<Comment> getComments(String parent, String site, String parentIds, int page)
-    {
+    public StackXPage<Comment> getComments(String parent, String site, String parentIds, int page) {
         StackXPage<Comment> commentsPage = null;
 
         String restEndPoint = parent + "/" + parentIds + "/comments";
@@ -197,19 +172,15 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
 
         JSONObjectWrapper commentsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (commentsJsonResponse != null)
-        {
-            try
-            {
+        if (commentsJsonResponse != null) {
+            try {
                 getPageInfo(commentsJsonResponse, commentsPage);
 
                 JSONArray jsonArray = commentsJsonResponse.getJSONArray(JsonFields.ITEMS);
-                for (int count = 0; count < jsonArray.length(); count++)
-                {
+                for (int count = 0; count < jsonArray.length(); count++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(count);
 
-                    if (commentsPage == null)
-                    {
+                    if (commentsPage == null) {
                         commentsPage = new StackXPage<Comment>();
                         commentsPage.items = new ArrayList<Comment>();
                     }
@@ -217,21 +188,18 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
                     commentsPage.items.add(getSerializedCommentObject(JSONObjectWrapper.wrap(jsonObject)));
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
         }
         return commentsPage;
     }
 
-    public StackXPage<Comment> getComments(String parent, String parentIds, int page)
-    {
+    public StackXPage<Comment> getComments(String parent, String parentIds, int page) {
         return getComments(parent, OperatingSite.getSite().apiSiteParameter, parentIds, page);
     }
 
-    public StackXPage<Question> search(String query, int page)
-    {
+    public StackXPage<Question> search(String query, int page) {
         String restEndPoint = "search";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
@@ -244,8 +212,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return getQuestionModel(questionsJsonResponse);
     }
 
-    public StackXPage<Question> advancedSearch(SearchCriteria searchCriteria)
-    {
+    public StackXPage<Question> advancedSearch(SearchCriteria searchCriteria) {
         String restEndPoint = "search/advanced";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
@@ -255,32 +222,26 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
     }
 
     @Override
-    protected String getLogTag()
-    {
+    protected String getLogTag() {
         return TAG;
     }
 
-    public Question getQuestionFullDetails(long id, String site)
-    {
+    public Question getQuestionFullDetails(long id, String site) {
         String restEndPoint = "questions/" + id;
         Question question = null;
         Map<String, String> queryParams = getDefaultQueryParams(site);
         JSONObjectWrapper questionJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
-        if (questionJsonResponse != null)
-        {
-            try
-            {
+        if (questionJsonResponse != null) {
+            try {
                 JSONArray jsonArray = questionJsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
+                if (jsonArray != null && jsonArray.length() == 1) {
                     JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
                     question = getSerializedQuestionObject(jsonObject);
                     question.body = jsonObject.getString(JsonFields.Question.BODY);
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
         }
@@ -288,13 +249,11 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return question;
     }
 
-    public Question getQuestionFullDetails(long id)
-    {
+    public Question getQuestionFullDetails(long id) {
         return getQuestionFullDetails(id, OperatingSite.getSite().apiSiteParameter);
     }
 
-    public StackXPage<Question> getAllQuestions(String sort, int page)
-    {
+    public StackXPage<Question> getAllQuestions(String sort, int page) {
         if (sort == null)
             sort = StackUri.Sort.ACTIVITY;
 
@@ -308,8 +267,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return getQuestionPage(StringConstants.QUESTIONS, queryParams);
     }
 
-    public StackXPage<Question> getRelatedQuestions(long questionId, int page)
-    {
+    public StackXPage<Question> getRelatedQuestions(long questionId, int page) {
         String restEndPoint = "questions/" + questionId + "/related";
         Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
         queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
@@ -321,10 +279,8 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return getQuestionPage(restEndPoint, queryParams);
     }
 
-    public StackXPage<Question> getFaqForTag(String tag, int page)
-    {
-        if (tag != null)
-        {
+    public StackXPage<Question> getFaqForTag(String tag, int page) {
+        if (tag != null) {
             String restEndPoint = "tags/" + tag + "/faq";
             Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 
@@ -338,12 +294,10 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public StackXPage<Question> getQuestionsForTag(String tag, String sort, int page)
-    {
+    public StackXPage<Question> getQuestionsForTag(String tag, String sort, int page) {
         if (sort == null)
             sort = StackUri.Sort.ACTIVITY;
-        if (tag != null)
-        {
+        if (tag != null) {
             String restEndPoint = "search/advanced";
 
             Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
@@ -360,10 +314,8 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public StackXPage<Question> getSimilar(String title, int page)
-    {
-        if (title != null)
-        {
+    public StackXPage<Question> getSimilar(String title, int page) {
+        if (title != null) {
             String restEndPoint = "similar";
             Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
 
@@ -379,8 +331,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    private StackXPage<Question> getQuestionPage(String restEndPoint, Map<String, String> queryParams)
-    {
+    private StackXPage<Question> getQuestionPage(String restEndPoint, Map<String, String> queryParams) {
         JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
         if (questionsJsonResponse != null)
@@ -389,32 +340,26 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper
         return null;
     }
 
-    public Answer getAnswer(long id)
-    {
+    public Answer getAnswer(long id) {
         return getAnswer(id, OperatingSite.getSite().apiSiteParameter);
     }
 
-    public Answer getAnswer(long id, String site)
-    {
+    public Answer getAnswer(long id, String site) {
         String restEndPoint = "answers/" + id;
 
         JSONObjectWrapper jsonObjectWrapper = executeHttpGetRequest(restEndPoint, getDefaultQueryParams(site));
-        if (jsonObjectWrapper != null)
-        {
-            try
-            {
+        if (jsonObjectWrapper != null) {
+            try {
                 JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1)
-                {
+                if (jsonArray != null && jsonArray.length() == 1) {
                     JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
                     Answer answer = getSerializedAnswerObject(jsonObject);
                     answer.body = jsonObject.getString(JsonFields.Question.BODY);
                     return answer;
                 }
             }
-            catch (JSONException e)
-            {
+            catch (JSONException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
         }

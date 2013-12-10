@@ -22,36 +22,30 @@ package com.prasanna.android.views;
 import android.content.Context;
 import android.view.View.OnClickListener;
 
-public class QuickActionItem
-{
+public class QuickActionItem {
     private final String title;
     private final OnClickListener onClickListener;
 
-    public QuickActionItem(String title, OnClickListener onClickListener)
-    {
+    public QuickActionItem(String title, OnClickListener onClickListener) {
         this.title = title;
         this.onClickListener = onClickListener;
     }
 
-    public QuickActionItem(Context context, int titleResId, OnClickListener onClickListener)
-    {
+    public QuickActionItem(Context context, int titleResId, OnClickListener onClickListener) {
         this.title = context.getString(titleResId);
         this.onClickListener = onClickListener;
     }
 
-    public String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
 
-    public OnClickListener getOnClickListener()
-    {
+    public OnClickListener getOnClickListener() {
         return onClickListener;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((title == null) ? 0 : title.hashCode());
@@ -59,8 +53,7 @@ public class QuickActionItem
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -68,8 +61,7 @@ public class QuickActionItem
         if (getClass() != obj.getClass())
             return false;
         QuickActionItem other = (QuickActionItem) obj;
-        if (title == null)
-        {
+        if (title == null) {
             if (other.title != null)
                 return false;
         }

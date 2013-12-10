@@ -36,86 +36,71 @@ import android.preference.PreferenceManager;
 
 import com.prasanna.android.utils.LogWrapper;
 
-public class SharedPreferencesUtil
-{
+public class SharedPreferencesUtil {
     private static final String TAG = SharedPreferencesUtil.class.getSimpleName();
 
-    public static void setBoolean(Context context, String key, boolean on)
-    {
-        if (context != null && key != null)
-        {
+    public static void setBoolean(Context context, String key, boolean on) {
+        if (context != null && key != null) {
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             prefEditor.putBoolean(key, on);
             prefEditor.commit();
         }
     }
 
-    public static boolean isSet(Context context, String name, boolean defaultValue)
-    {
+    public static boolean isSet(Context context, String name, boolean defaultValue) {
         if (context == null || name == null)
             return defaultValue;
 
         return PreferenceManager.getDefaultSharedPreferences(context).getBoolean(name, defaultValue);
     }
 
-    public static void setInt(Context context, String key, int value)
-    {
-        if (context != null && key != null)
-        {
+    public static void setInt(Context context, String key, int value) {
+        if (context != null && key != null) {
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             prefEditor.putInt(key, value);
             prefEditor.commit();
         }
     }
 
-    public static int getInt(Context context, String key, int defaultValue)
-    {
+    public static int getInt(Context context, String key, int defaultValue) {
         if (context != null && key != null)
             return PreferenceManager.getDefaultSharedPreferences(context).getInt(key, defaultValue);
 
         return defaultValue;
     }
 
-    public static void setLong(Context context, String key, long value)
-    {
-        if (context != null && key != null)
-        {
+    public static void setLong(Context context, String key, long value) {
+        if (context != null && key != null) {
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             prefEditor.putLong(key, value);
             prefEditor.commit();
         }
     }
 
-    public static long getLong(Context context, String key, long defaultValue)
-    {
+    public static long getLong(Context context, String key, long defaultValue) {
         if (context != null && key != null)
             return PreferenceManager.getDefaultSharedPreferences(context).getLong(key, defaultValue);
 
         return defaultValue;
     }
 
-    public static void setString(Context context, String key, String value)
-    {
-        if (context != null && key != null)
-        {
+    public static void setString(Context context, String key, String value) {
+        if (context != null && key != null) {
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             prefEditor.putString(key, value);
             prefEditor.commit();
         }
     }
 
-    public static String getString(Context context, String key, String defaultValue)
-    {
+    public static String getString(Context context, String key, String defaultValue) {
         if (context != null && key != null)
             return PreferenceManager.getDefaultSharedPreferences(context).getString(key, defaultValue);
 
         return defaultValue;
     }
 
-    public static void remove(Context context, String key)
-    {
-        if (context != null && key != null)
-        {
+    public static void remove(Context context, String key) {
+        if (context != null && key != null) {
             Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
             prefEditor.remove(key);
             prefEditor.commit();
@@ -132,29 +117,23 @@ public class SharedPreferencesUtil
      * @param fileName
      *            File into which object is written.
      */
-    public static void writeObject(Object object, File directory, String fileName)
-    {
-        if (object != null && directory != null && fileName != null)
-        {
+    public static void writeObject(Object object, File directory, String fileName) {
+        if (object != null && directory != null && fileName != null) {
             if (directory.exists() == false)
                 directory.mkdir();
 
             File cacheFile = new File(directory, fileName);
 
-            if (cacheFile != null)
-            {
-                try
-                {
+            if (cacheFile != null) {
+                try {
                     ObjectOutputStream oo = new ObjectOutputStream(new FileOutputStream(cacheFile));
                     oo.writeObject(object);
                     oo.close();
                 }
-                catch (FileNotFoundException e)
-                {
+                catch (FileNotFoundException e) {
                     LogWrapper.e(TAG, e.getMessage());
                 }
-                catch (IOException e)
-                {
+                catch (IOException e) {
                     LogWrapper.e(TAG, e.getMessage());
                 }
             }
@@ -169,8 +148,7 @@ public class SharedPreferencesUtil
      *            - Directory to read
      * @return
      */
-    public static ArrayList<Object> readObjects(File directory)
-    {
+    public static ArrayList<Object> readObjects(File directory) {
         return readObjects(directory, null);
     }
 
@@ -184,41 +162,33 @@ public class SharedPreferencesUtil
      *            - Maximum depth to recurse
      * @return
      */
-    public static ArrayList<Object> readObjects(File directory, Integer maxDepth)
-    {
+    public static ArrayList<Object> readObjects(File directory, Integer maxDepth) {
         ArrayList<Object> objects = null;
 
-        if (directory != null && directory.isDirectory() && directory.exists() == true)
-        {
+        if (directory != null && directory.isDirectory() && directory.exists() == true) {
             objects = readObjectsInDir(directory, maxDepth);
         }
 
         return objects;
     }
 
-    private static ArrayList<Object> readObjectsInDir(File directory, Integer depth)
-    {
+    private static ArrayList<Object> readObjectsInDir(File directory, Integer depth) {
         ArrayList<Object> objects = null;
 
-        if (depth == null || depth > 0)
-        {
+        if (depth == null || depth > 0) {
             objects = new ArrayList<Object>();
 
             String[] fileNames = directory.list();
 
-            for (String fileName : fileNames)
-            {
+            for (String fileName : fileNames) {
                 File file = new File(directory, fileName);
-                if (file.isDirectory())
-                {
+                if (file.isDirectory()) {
                     ArrayList<Object> childObjects = readObjects(directory, depth != null ? --depth : depth);
-                    if (childObjects != null)
-                    {
+                    if (childObjects != null) {
                         objects.addAll(childObjects);
                     }
                 }
-                else
-                {
+                else {
                     objects.add(readObject(file));
                 }
             }
@@ -226,32 +196,25 @@ public class SharedPreferencesUtil
         return objects;
     }
 
-    public static Object readObject(File file)
-    {
+    public static Object readObject(File file) {
         Object object = null;
 
-        if (file != null && file.exists() == true && file.isFile() == true)
-        {
-            try
-            {
+        if (file != null && file.exists() == true && file.isFile() == true) {
+            try {
                 ObjectInputStream oi = new ObjectInputStream(new FileInputStream(file));
                 object = oi.readObject();
                 oi.close();
             }
-            catch (StreamCorruptedException e)
-            {
+            catch (StreamCorruptedException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            catch (FileNotFoundException e)
-            {
+            catch (FileNotFoundException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            catch (IOException e)
-            {
+            catch (IOException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            catch (ClassNotFoundException e)
-            {
+            catch (ClassNotFoundException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
         }
@@ -264,10 +227,8 @@ public class SharedPreferencesUtil
      * 
      * @param context
      */
-    public static void clear(Context context)
-    {
-        if (context != null)
-        {
+    public static void clear(Context context) {
+        if (context != null) {
             LogWrapper.d(TAG, "Clearing cache");
 
             File cacheDir = context.getCacheDir();
@@ -279,15 +240,13 @@ public class SharedPreferencesUtil
         }
     }
 
-    public static void clearSharedPreferences(Context context)
-    {
+    public static void clearSharedPreferences(Context context) {
         Editor prefEditor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         prefEditor.clear();
         prefEditor.commit();
     }
 
-    public static boolean deleteFile(File file)
-    {
+    public static boolean deleteFile(File file) {
         boolean deleted = false;
 
         if (file != null && file.exists() == true && file.isFile())
@@ -296,10 +255,8 @@ public class SharedPreferencesUtil
         return deleted;
     }
 
-    public static boolean deleteDir(File dir)
-    {
-        if (dir != null && dir.isDirectory())
-        {
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
             for (int i = 0; i < children.length; i++)
                 deleteDir(new File(dir, children[i]));
@@ -313,20 +270,16 @@ public class SharedPreferencesUtil
      * @param cacheDir
      * @return cache size in bytes.
      */
-    public static long size(File cacheDir)
-    {
+    public static long size(File cacheDir) {
         long size = 0;
 
-        if (cacheDir != null && cacheDir.isDirectory())
-        {
+        if (cacheDir != null && cacheDir.isDirectory()) {
             File[] files = cacheDir.listFiles();
 
-            for (File file : files)
-            {
+            for (File file : files) {
                 if (file.isFile())
                     size += file.length();
-                else
-                {
+                else {
                     if (file.isDirectory())
                         size += size(file);
                 }
@@ -342,11 +295,9 @@ public class SharedPreferencesUtil
      * @param cacheDir
      * @return size of the directory
      */
-    public static String getHumanReadableCacheSize(File cacheDir)
-    {
+    public static String getHumanReadableCacheSize(File cacheDir) {
         final int BYTE_UNIT = 1024;
-        final String[] sizeUnit =
-        { "K", "M" };
+        final String[] sizeUnit = { "K", "M" };
         long size = size(cacheDir);
 
         if (size < BYTE_UNIT)

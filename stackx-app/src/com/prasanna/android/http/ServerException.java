@@ -21,31 +21,26 @@ package com.prasanna.android.http;
 
 import java.io.Serializable;
 
-public class ServerException extends AbstractHttpException implements Serializable
-{
+public class ServerException extends AbstractHttpException implements Serializable {
     private static final long serialVersionUID = 653718270475335315L;
     private Code code;
 
-    public ServerException(int statusCode)
-    {
+    public ServerException(int statusCode) {
         this(statusCode, null, null);
     }
 
-    public ServerException(int statusCode, String statusDescription, String errorResponse)
-    {
+    public ServerException(int statusCode, String statusDescription, String errorResponse) {
         super(statusCode, statusDescription, errorResponse);
     }
 
-    public ServerException(Code code)
-    {
+    public ServerException(Code code) {
         super();
-        
+
         this.code = code;
     }
 
     @Override
-    public Code getCode()
-    {
+    public Code getCode() {
         return code;
     }
 }

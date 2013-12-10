@@ -34,19 +34,16 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.utils.LogWrapper;
 
-public class TagsService extends AbstractStackxService
-{
+public class TagsService extends AbstractStackxService {
     private static final String TAG = TagsService.class.getSimpleName();
 
-    private final static class ServiceHandler extends Handler
-    {
+    private final static class ServiceHandler extends Handler {
         private OnHandlerComplete onHandlerComplete;
         private Context context;
         private UserServiceHelper userServiceHelper;
 
         public ServiceHandler(Looper looper, Context context, UserServiceHelper userServiceHelper,
-                        OnHandlerComplete onHandlerComplete)
-        {
+                OnHandlerComplete onHandlerComplete) {
             super(looper);
             this.context = context;
             this.onHandlerComplete = onHandlerComplete;
@@ -54,12 +51,9 @@ public class TagsService extends AbstractStackxService
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
-            try
-            {
-                if (AppUtils.isNetworkAvailable(context) && tagsOlderThanDay())
-                {
+        public void handleMessage(Message msg) {
+            try {
+                if (AppUtils.isNetworkAvailable(context) && tagsOlderThanDay()) {
                     boolean registeredUser = AppUtils.inAuthenticatedRealm(context);
                     String apiSiteParameter = OperatingSite.getSite().apiSiteParameter;
                     LinkedHashSet<Tag> tags = userServiceHelper.getTags(apiSiteParameter, 100, registeredUser);
@@ -70,71 +64,59 @@ public class TagsService extends AbstractStackxService
                     persistTags(tags);
                 }
             }
-            catch (AbstractHttpException e)
-            {
+            catch (AbstractHttpException e) {
                 LogWrapper.e(TAG, "Error fetching tags: " + e.getMessage());
             }
 
             onHandlerComplete.onHandleMessageFinish(msg);
         }
 
-        private boolean tagsOlderThanDay()
-        {
+        private boolean tagsOlderThanDay() {
             long MILLISECONDS_IN_DAY = 86400000L;
             long lastUpdateTime = 0L;
 
             TagDAO tagDAO = new TagDAO(context);
-            try
-            {
+            try {
                 tagDAO.open();
                 lastUpdateTime = tagDAO.getLastUpdateTime(OperatingSite.getSite().apiSiteParameter);
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.d(TAG, e.getMessage());
             }
-            finally
-            {
+            finally {
                 tagDAO.close();
             }
 
             return (System.currentTimeMillis() - lastUpdateTime >= MILLISECONDS_IN_DAY);
         }
 
-        private void persistTags(LinkedHashSet<Tag> result)
-        {
+        private void persistTags(LinkedHashSet<Tag> result) {
             TagDAO tagDao = new TagDAO(context);
 
-            try
-            {
+            try {
                 tagDao.open();
                 tagDao.deleteTagsFromServerForSite(OperatingSite.getSite().apiSiteParameter);
                 tagDao.insert(OperatingSite.getSite().apiSiteParameter, result);
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            finally
-            {
+            finally {
                 tagDao.close();
             }
         }
     }
 
     @Override
-    protected Handler getServiceHandler(Looper looper)
-    {
+    protected Handler getServiceHandler(Looper looper) {
         return new ServiceHandler(looper, getApplicationContext(), UserServiceHelper.getInstance(),
-                        new OnHandlerComplete()
-                        {
-                            @Override
-                            public void onHandleMessageFinish(Message message, Object... args)
-                            {
-                                TagsService.this.stopSelf(message.arg1);
-                                setRunning(false);
-                                notifyWaitingObjectsOnComplete();
-                            }
-                        });
+                new OnHandlerComplete() {
+                    @Override
+                    public void onHandleMessageFinish(Message message, Object... args) {
+                        TagsService.this.stopSelf(message.arg1);
+                        setRunning(false);
+                        notifyWaitingObjectsOnComplete();
+                    }
+                });
     }
 }

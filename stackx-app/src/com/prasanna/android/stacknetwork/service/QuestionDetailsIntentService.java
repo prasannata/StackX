@@ -35,8 +35,7 @@ import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class QuestionDetailsIntentService extends AbstractIntentService
-{
+public class QuestionDetailsIntentService extends AbstractIntentService {
     private static final String TAG = QuestionDetailsIntentService.class.getSimpleName();
 
     private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
@@ -47,42 +46,34 @@ public class QuestionDetailsIntentService extends AbstractIntentService
     public static final int RESULT_CODE_ANSWERS = 0x04;
     public static final int RESULT_CODE_Q_CACHED = 0x05;
 
-    public QuestionDetailsIntentService()
-    {
+    public QuestionDetailsIntentService() {
         this(TAG);
     }
 
-    public QuestionDetailsIntentService(String name)
-    {
+    public QuestionDetailsIntentService(String name) {
         super(name);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
-        try
-        {
+        try {
             super.onHandleIntent(intent);
             handleIntent(intent, receiver);
         }
-        catch (AbstractHttpException e)
-        {
+        catch (AbstractHttpException e) {
             Bundle bundle = new Bundle();
             bundle.putSerializable(StringConstants.EXCEPTION, e);
             receiver.send(ERROR, bundle);
         }
     }
 
-    private void handleIntent(Intent intent, ResultReceiver receiver)
-    {
+    private void handleIntent(Intent intent, ResultReceiver receiver) {
         final String action = intent.getAction();
 
-        if (action != null)
-        {
-            if (action.equals(StringConstants.ANSWERS))
-            {
+        if (action != null) {
+            if (action.equals(StringConstants.ANSWERS)) {
                 long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0L);
                 int page = intent.getIntExtra(StringConstants.PAGE, 0);
                 final String site = intent.getStringExtra(StringConstants.SITE);
@@ -90,22 +81,19 @@ public class QuestionDetailsIntentService extends AbstractIntentService
                 if (questionId > 0 && page > 0)
                     getAnswersForQuestion(receiver, site, questionId, page);
             }
-            else
-            {
+            else {
                 getQuestionDetail(receiver, intent);
             }
         }
     }
 
-    private void getAnswersForQuestion(final ResultReceiver receiver, String site, long questionId, int page)
-    {
+    private void getAnswersForQuestion(final ResultReceiver receiver, String site, long questionId, int page) {
         ArrayList<Answer> answers = getAnswersAndSend(receiver, site, questionId, page);
 
         QuestionsCache.getInstance().updateAnswersForQuestion(questionId, answers);
     }
 
-    private void getQuestionDetail(ResultReceiver receiver, Intent intent)
-    {
+    private void getQuestionDetail(ResultReceiver receiver, Intent intent) {
         long questionId = intent.getLongExtra(StringConstants.QUESTION_ID, 0);
         final String site = intent.getStringExtra(StringConstants.SITE);
 
@@ -114,20 +102,16 @@ public class QuestionDetailsIntentService extends AbstractIntentService
         if (!intent.getBooleanExtra(StringConstants.REFRESH, false))
             question = QuestionsCache.getInstance().get(questionId);
 
-        if (question != null)
-        {
+        if (question != null) {
             LogWrapper.d(TAG, "Question " + questionId + " recovered from cache.");
             sendSerializable(receiver, RESULT_CODE_Q_CACHED, StringConstants.QUESTION, question);
         }
-        else
-        {
-            if (StringConstants.QUESTION.equals(intent.getAction()))
-            {
+        else {
+            if (StringConstants.QUESTION.equals(intent.getAction())) {
                 question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
                 getQuestionAndAnswers(site, receiver, question);
             }
-            else
-            {
+            else {
                 LogWrapper.d(TAG, "Get question for " + questionId + " in " + site);
                 question = getQuestionMetaAndBodyAndSend(site, receiver, questionId);
             }
@@ -136,8 +120,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService
         }
     }
 
-    private void getQuestionAndAnswers(String site, ResultReceiver receiver, Question question)
-    {
+    private void getQuestionAndAnswers(String site, ResultReceiver receiver, Question question) {
         question.body = questionService.getQuestionBodyForId(question.id);
         sendSerializable(receiver, RESULT_CODE_Q_BODY, StringConstants.BODY, question.body);
 
@@ -147,41 +130,34 @@ public class QuestionDetailsIntentService extends AbstractIntentService
             question.answers = getAnswersAndSend(receiver, site, question.id, 1);
     }
 
-    private void getCommentsAndSend(String site, ResultReceiver receiver, Question question)
-    {
-        try
-        {
+    private void getCommentsAndSend(String site, ResultReceiver receiver, Question question) {
+        try {
             StackXPage<Comment> commentsPage =
-                            questionService.getComments(StringConstants.QUESTIONS, site, String.valueOf(question.id), 1);
-            if (commentsPage != null)
-            {
+                    questionService.getComments(StringConstants.QUESTIONS, site, String.valueOf(question.id), 1);
+            if (commentsPage != null) {
                 question.comments = commentsPage.items;
                 sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
             }
         }
-        catch (AbstractHttpException e)
-        {
+        catch (AbstractHttpException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
     }
 
-    private Question getQuestionMetaAndBodyAndSend(String site, ResultReceiver receiver, long questionId)
-    {
+    private Question getQuestionMetaAndBodyAndSend(String site, ResultReceiver receiver, long questionId) {
         Question question = questionService.getQuestionFullDetails(questionId, site);
         sendSerializable(receiver, RESULT_CODE_Q, StringConstants.QUESTION, question);
         getCommentsAndSend(site, receiver, question);
         return question;
     }
 
-    private ArrayList<Answer> getAnswersAndSend(final ResultReceiver receiver, String site, long questionId, int page)
-    {
+    private ArrayList<Answer> getAnswersAndSend(final ResultReceiver receiver, String site, long questionId, int page) {
         ArrayList<Answer> answers = questionService.getAnswersForQuestion(questionId, site, page);
         sendSerializable(receiver, RESULT_CODE_ANSWERS, StringConstants.ANSWERS, answers);
         return answers;
     }
 
-    private void sendSerializable(ResultReceiver receiver, int resultCode, String key, Serializable value)
-    {
+    private void sendSerializable(ResultReceiver receiver, int resultCode, String key, Serializable value) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(key, value);
         receiver.send(resultCode, bundle);

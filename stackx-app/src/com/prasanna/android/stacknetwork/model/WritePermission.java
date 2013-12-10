@@ -21,8 +21,7 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class WritePermission implements Serializable, Comparable<WritePermission>
-{
+public class WritePermission implements Serializable, Comparable<WritePermission> {
     private static final long serialVersionUID = -1311818798901923216L;
 
     public static final String PREF_LAST_COMMENT_WRITE = "pref_last_comment_write";
@@ -30,35 +29,29 @@ public class WritePermission implements Serializable, Comparable<WritePermission
     public static final String PREF_SECS_BETWEEN_ANSWER_WRITE = "pref_secs_between_answer_write";
     public static final String PREF_SECS_BETWEEN_COMMENT_WRITE = "pref_secs_between_comment_write";
 
-    public enum ObjectType
-    {
+    public enum ObjectType {
         ANSWER("answer"),
         COMMENT("comment"),
         QUESTION("question");
 
         private final String value;
 
-        ObjectType(String value)
-        {
+        ObjectType(String value) {
             this.value = value;
         }
 
-        public String getValue()
-        {
+        public String getValue() {
             return value;
         }
 
-        public static ObjectType getEnum(String value)
-        {
+        public static ObjectType getEnum(String value) {
             if (value == null)
                 return null;
 
-            try
-            {
+            try {
                 return valueOf(value.toUpperCase());
             }
-            catch (IllegalArgumentException e)
-            {
+            catch (IllegalArgumentException e) {
             }
 
             return null;
@@ -73,27 +66,26 @@ public class WritePermission implements Serializable, Comparable<WritePermission
     public int minSecondsBetweenActions = -1;
     public ObjectType objectType;
     public long userId;
-    
+
     @Override
-    public int compareTo(WritePermission another)
-    {
+    public int compareTo(WritePermission another) {
         int EQUAL = 0;
         int NOT_EQUAL = -1;
-        
-        if(another == null)
+
+        if (another == null)
             return NOT_EQUAL;
-        
-        if(canAdd != another.canAdd)
+
+        if (canAdd != another.canAdd)
             return NOT_EQUAL;
-        if(canDelete != another.canDelete)
+        if (canDelete != another.canDelete)
             return NOT_EQUAL;
-        if(canEdit != another.canEdit)
+        if (canEdit != another.canEdit)
             return NOT_EQUAL;
-        if(maxDailyActions != another.maxDailyActions)
+        if (maxDailyActions != another.maxDailyActions)
             return NOT_EQUAL;
-        if(minSecondsBetweenActions != another.minSecondsBetweenActions)
+        if (minSecondsBetweenActions != another.minSecondsBetweenActions)
             return NOT_EQUAL;
-        
+
         return EQUAL;
     }
 }

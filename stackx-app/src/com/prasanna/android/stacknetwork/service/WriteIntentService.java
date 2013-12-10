@@ -28,27 +28,23 @@ import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class WriteIntentService extends AbstractIntentService
-{
+public class WriteIntentService extends AbstractIntentService {
     private static final String TAG = WriteIntentService.class.getSimpleName();
 
     public static final int ACTION_ADD_COMMENT = 0x901;
     public static final int ACTION_EDIT_COMMENT = 0x902;
     public static final int ACTION_DEL_COMMENT = 0x903;
 
-    public WriteIntentService()
-    {
+    public WriteIntentService() {
         this(TAG);
     }
 
-    public WriteIntentService(String name)
-    {
+    public WriteIntentService(String name) {
         super(name);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final long postId = intent.getLongExtra(StringConstants.POST_ID, -1);
         final int viewPagerPosition = intent.getIntExtra(StringConstants.VIEW_PAGER_POSITION, -1);
@@ -56,12 +52,10 @@ public class WriteIntentService extends AbstractIntentService
         final String body = intent.getStringExtra(StringConstants.BODY);
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
 
-        try
-        {
+        try {
             super.onHandleIntent(intent);
 
-            switch (action)
-            {
+            switch (action) {
                 case ACTION_ADD_COMMENT:
                     sendComment(postId, viewPagerPosition, body, receiver);
                     break;
@@ -76,8 +70,7 @@ public class WriteIntentService extends AbstractIntentService
                     break;
             }
         }
-        catch (AbstractHttpException e)
-        {
+        catch (AbstractHttpException e) {
             Bundle bundle = new Bundle();
             bundle.putInt(StringConstants.REQUEST_CODE, action);
             bundle.putSerializable(StringConstants.EXCEPTION, e);
@@ -86,8 +79,7 @@ public class WriteIntentService extends AbstractIntentService
     }
 
     private void sendComment(final long postId, final int viewPagerPosition, final String body,
-                    final ResultReceiver receiver)
-    {
+            final ResultReceiver receiver) {
         Bundle resultData = new Bundle();
         Comment comment = WriteServiceHelper.getInstance().addComment(postId, body);
         resultData.putLong(StringConstants.POST_ID, postId);
@@ -96,16 +88,14 @@ public class WriteIntentService extends AbstractIntentService
         receiver.send(ACTION_ADD_COMMENT, resultData);
     }
 
-    private void editComment(long commentId, String editedText, ResultReceiver receiver)
-    {
+    private void editComment(long commentId, String editedText, ResultReceiver receiver) {
         Bundle resultData = new Bundle();
         Comment comment = WriteServiceHelper.getInstance().editComment(commentId, editedText);
         resultData.putSerializable(StringConstants.COMMENT, comment);
         receiver.send(ACTION_EDIT_COMMENT, resultData);
     }
 
-    private void deleteComment(long commentId, ResultReceiver receiver)
-    {
+    private void deleteComment(long commentId, ResultReceiver receiver) {
         WriteServiceHelper.getInstance().deleteComment(commentId);
         Bundle resultData = new Bundle();
         resultData.putSerializable(StringConstants.COMMENT_ID, commentId);

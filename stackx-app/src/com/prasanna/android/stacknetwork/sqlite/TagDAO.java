@@ -32,33 +32,28 @@ import android.database.SQLException;
 import com.prasanna.android.stacknetwork.model.Tag;
 import com.prasanna.android.utils.LogWrapper;
 
-public class TagDAO extends AbstractBaseDao
-{
+public class TagDAO extends AbstractBaseDao {
     private static final String TAG = TagDAO.class.getSimpleName();
     public static final String TABLE_NAME = "TAGS";
     public static final String AUDIT_ENTRY_TYPE = "tag";
 
-    public static final class TagsTable
-    {
+    public static final class TagsTable {
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_VALUE = "value";
         public static final String COLUMN_SITE = "site";
         public static final String COLUMN_LOCAL_ADD = "local_add";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null, " + COLUMN_SITE
-                        + " text not null, " + COLUMN_LOCAL_ADD + " integer DEFAULT 0);";
+                + " integer primary key autoincrement, " + COLUMN_VALUE + " text not null, " + COLUMN_SITE
+                + " text not null, " + COLUMN_LOCAL_ADD + " integer DEFAULT 0);";
     }
 
-    public TagDAO(Context context)
-    {
+    public TagDAO(Context context) {
         super(context);
     }
 
-    public void insert(String site, String tag, boolean isLocalAdd)
-    {
-        if (site != null && tag != null)
-        {
+    public void insert(String site, String tag, boolean isLocalAdd) {
+        if (site != null && tag != null) {
             LogWrapper.d(TAG, "inserting " + tag + " into DB for site " + site);
 
             ContentValues values = new ContentValues();
@@ -69,18 +64,14 @@ public class TagDAO extends AbstractBaseDao
         }
     }
 
-    public boolean insert(String site, HashSet<Tag> tags)
-    {
-        if (tags != null && !tags.isEmpty())
-        {
+    public boolean insert(String site, HashSet<Tag> tags) {
+        if (tags != null && !tags.isEmpty()) {
             LogWrapper.d(TAG, "inserting tags into DB for site " + site);
 
-            try
-            {
+            try {
                 database.beginTransaction();
 
-                for (Tag tag : tags)
-                {
+                for (Tag tag : tags) {
                     ContentValues values = new ContentValues();
                     values.put(TagsTable.COLUMN_VALUE, tag.name);
                     values.put(TagsTable.COLUMN_SITE, site);
@@ -92,12 +83,10 @@ public class TagDAO extends AbstractBaseDao
                 database.setTransactionSuccessful();
                 return true;
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.e(TABLE_NAME, "insert failed: " + e.getMessage());
             }
-            finally
-            {
+            finally {
                 database.endTransaction();
             }
         }
@@ -105,57 +94,48 @@ public class TagDAO extends AbstractBaseDao
         return false;
     }
 
-    public long getLastUpdateTime(String site)
-    {
+    public long getLastUpdateTime(String site) {
         return getLastUpdateTime(AUDIT_ENTRY_TYPE, site);
     }
 
-    public LinkedHashSet<Tag> getTagSet(String site)
-    {
+    public LinkedHashSet<Tag> getTagSet(String site) {
         Cursor cursor = getCursor(site);
 
         if (cursor == null)
             return null;
-        
-        try
-        {
+
+        try {
             LinkedHashSet<Tag> tags = new LinkedHashSet<Tag>();
             getTagCollection(cursor, tags);
             return tags;
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
 
     }
 
-    public ArrayList<String> getTagStringList(String site)
-    {
+    public ArrayList<String> getTagStringList(String site) {
         Cursor cursor = getCursor(site);
 
         if (cursor == null || cursor.getCount() == 0)
             return null;
-        
-        try
-        {
+
+        try {
             ArrayList<String> tags = new ArrayList<String>();
             getTagStringCollection(cursor, tags);
             return tags;
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
 
     }
 
-    private void getTagStringCollection(Cursor cursor, ArrayList<String> tags)
-    {
+    private void getTagStringCollection(Cursor cursor, ArrayList<String> tags) {
         cursor.moveToFirst();
 
-        while (!cursor.isAfterLast())
-        {
+        while (!cursor.isAfterLast()) {
             Tag tag = new Tag(cursor.getString(cursor.getColumnIndex(TagsTable.COLUMN_VALUE)));
             tag.local = cursor.getInt(cursor.getColumnIndex(TagsTable.COLUMN_LOCAL_ADD)) == 1;
             if (!tags.contains(tag.name))
@@ -164,8 +144,7 @@ public class TagDAO extends AbstractBaseDao
         }
     }
 
-    private Cursor getCursor(String site)
-    {
+    private Cursor getCursor(String site) {
         String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = TagsTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { site };
@@ -175,8 +154,7 @@ public class TagDAO extends AbstractBaseDao
         return cursor;
     }
 
-    public LinkedHashSet<Tag> getTags(String site, boolean includeLocalTags)
-    {
+    public LinkedHashSet<Tag> getTags(String site, boolean includeLocalTags) {
         String[] cols = new String[] { TagsTable.COLUMN_VALUE, TagsTable.COLUMN_LOCAL_ADD };
         String selection = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
         String[] selectionArgs = { site, includeLocalTags ? "1" : "0" };
@@ -191,12 +169,10 @@ public class TagDAO extends AbstractBaseDao
         return tags;
     }
 
-    private void getTagCollection(Cursor cursor, Collection<Tag> destination)
-    {
+    private void getTagCollection(Cursor cursor, Collection<Tag> destination) {
         cursor.moveToFirst();
 
-        while (!cursor.isAfterLast())
-        {
+        while (!cursor.isAfterLast()) {
             Tag tag = new Tag(cursor.getString(cursor.getColumnIndex(TagsTable.COLUMN_VALUE)));
             tag.local = cursor.getInt(cursor.getColumnIndex(TagsTable.COLUMN_LOCAL_ADD)) == 1;
             destination.add(tag);
@@ -204,14 +180,12 @@ public class TagDAO extends AbstractBaseDao
         }
     }
 
-    public void deleteAll()
-    {
+    public void deleteAll() {
         database.delete(TABLE_NAME, null, null);
         deleteAuditEntry(AUDIT_ENTRY_TYPE, null);
     }
 
-    public void deleteTagsFromServerForSite(String site)
-    {
+    public void deleteTagsFromServerForSite(String site) {
         String whereClause = TagsTable.COLUMN_SITE + " = ? and " + TagsTable.COLUMN_LOCAL_ADD + " = ?";
         String[] whereArgs = { site, "0" };
 
@@ -219,58 +193,46 @@ public class TagDAO extends AbstractBaseDao
         deleteAuditEntry(AUDIT_ENTRY_TYPE, site);
     }
 
-    public static ArrayList<String> get(Context context, String site)
-    {
+    public static ArrayList<String> get(Context context, String site) {
         TagDAO tagDao = new TagDAO(context);
-        try
-        {
+        try {
             tagDao.open();
             return tagDao.getTagStringList(site);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             tagDao.close();
         }
         return null;
     }
 
-    public static LinkedHashSet<Tag> getTagSet(Context context, String site)
-    {
+    public static LinkedHashSet<Tag> getTagSet(Context context, String site) {
         TagDAO tagDao = new TagDAO(context);
-        try
-        {
+        try {
             tagDao.open();
             return tagDao.getTagSet(site);
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             tagDao.close();
         }
         return null;
     }
 
-    public static void purge(Context context)
-    {
+    public static void purge(Context context) {
         TagDAO tagDAO = new TagDAO(context);
-        try
-        {
+        try {
             tagDAO.open();
             tagDAO.deleteAll();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             tagDAO.close();
         }
     }

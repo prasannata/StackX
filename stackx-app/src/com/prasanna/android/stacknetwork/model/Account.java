@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
@@ -23,21 +23,19 @@ import java.io.Serializable;
 
 import com.prasanna.android.stacknetwork.model.User.UserType;
 
-public class Account extends IdentifiableItem implements Serializable
-{
+public class Account extends IdentifiableItem implements Serializable {
     private static final long serialVersionUID = 5454221525646765113L;
 
     public long userId;
-    
+
     public String siteName;
-    
+
     public String siteUrl;
-    
+
     public UserType userType;
-    
+
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (id ^ (id >>> 32));
@@ -46,8 +44,7 @@ public class Account extends IdentifiableItem implements Serializable
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -57,8 +54,7 @@ public class Account extends IdentifiableItem implements Serializable
         Account other = (Account) obj;
         if (id != other.id)
             return false;
-        if (siteUrl == null)
-        {
+        if (siteUrl == null) {
             if (other.siteUrl != null)
                 return false;
         }
@@ -66,6 +62,5 @@ public class Account extends IdentifiableItem implements Serializable
             return false;
         return true;
     }
-    
-    
+
 }

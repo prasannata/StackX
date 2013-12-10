@@ -27,11 +27,13 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
@@ -40,8 +42,7 @@ import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class OAuthActivity extends Activity
-{
+public class OAuthActivity extends Activity {
     private static final String TAG = OAuthActivity.class.getName();
     private static final String YAHOO_LOGIN_URL = "https://login.yahoo.com";
     private static final String PROGRESS_BAR_TEXT = "to stackexchange.com...";
@@ -50,47 +51,43 @@ public class OAuthActivity extends Activity
     private ProgressDialog progressDialog;
     private String oauthUrl;
 
-    private class OAuthWebViewClient extends WebViewClient
-    {
+    private class OAuthWebViewClient extends WebViewClient {
         @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error)
-        {
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+            if (error != null) {
+                Log.e(TAG, error.toString());
+            }
+
             handler.proceed();
         }
 
         @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url)
-        {
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
             LogWrapper.d(TAG, url);
 
-            if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL))
-            {
+            if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL)) {
                 deleteStoredTags();
+
                 AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
                 AlarmUtils.cancelPeriodicAccountSync(getApplicationContext());
-
                 cacheAccessToken(url);
                 AlarmUtils.activatePeriodicAccountSync(getApplicationContext());
                 startSiteListActivity(view);
                 OAuthActivity.this.finish();
             }
-            else
-            {
+            else {
                 view.loadUrl(url);
             }
             return true;
         }
 
         @Override
-        public void onPageFinished(WebView view, String url)
-        {
-            if (oauthUrl != null && url.startsWith(StackUri.OAUTH_DIALOG_URL) && progressDialog != null)
-            {
+        public void onPageFinished(WebView view, String url) {
+            if (oauthUrl != null && url.startsWith(StackUri.OAUTH_DIALOG_URL) && progressDialog != null) {
                 progressDialog.dismiss();
                 progressDialog = null;
             }
-            else
-            {
+            else {
                 /*
                  * Yahoo's login page does not seem to support horizontal
                  * scrolling inside webview, so enabling wide view port. Not
@@ -103,47 +100,40 @@ public class OAuthActivity extends Activity
         }
     }
 
-    private void startSiteListActivity(WebView view)
-    {
+    private void startSiteListActivity(WebView view) {
         Intent listStackNetworkIntent = new Intent(view.getContext(), StackNetworkListActivity.class);
         listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         listStackNetworkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(listStackNetworkIntent);
     }
 
-    private void cacheAccessToken(String url)
-    {
+    private void cacheAccessToken(String url) {
         Uri uri = Uri.parse(url);
         String accessToken = uri.getFragment();
-        if (accessToken != null)
-        {
+        if (accessToken != null) {
             String[] nameValuePair = accessToken.split("=");
             if (nameValuePair != null && nameValuePair.length == 2
-                            && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN))
-            {
+                    && nameValuePair[0].equals(StringConstants.ACCESS_TOKEN)) {
                 AppUtils.setAccessToken(getApplicationContext(), nameValuePair[1]);
             }
         }
     }
 
-    private void deleteStoredTags()
-    {
+    private void deleteStoredTags() {
         TagDAO tagDAO = new TagDAO(this);
 
-        try
-        {
+        try {
             tagDAO.open();
             tagDAO.deleteAll();
         }
-        finally
-        {
+        finally {
             tagDAO.close();
         }
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         progressDialog = ProgressDialog.show(OAuthActivity.this, "", PROGRESS_BAR_TEXT);
@@ -154,7 +144,7 @@ public class OAuthActivity extends Activity
         uriBuilder.appendQueryParameter(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
         uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
         uriBuilder.appendQueryParameter(StackUri.QueryParams.REDIRECT_URI,
-                        StackUri.QueryParamDefaultValues.REDIRECT_URI);
+                StackUri.QueryParamDefaultValues.REDIRECT_URI);
 
         oauthUrl = uriBuilder.build().toString();
 
@@ -163,9 +153,10 @@ public class OAuthActivity extends Activity
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private WebView initWebview()
-    {
-        WebView webview = (WebView) findViewById(R.id.web_view);
+    private WebView initWebview() {
+        final WebView webview = (WebView) findViewById(R.id.web_view);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.webviewProgress);
+
         webview.setVerticalScrollBarEnabled(true);
         webview.setHorizontalScrollBarEnabled(true);
         webview.getSettings().setJavaScriptEnabled(true);
@@ -175,14 +166,17 @@ public class OAuthActivity extends Activity
         webview.getSettings().setSavePassword(false);
         webview.getSettings().setBlockNetworkImage(false);
         webview.getSettings().setUseWideViewPort(false);
-        webview.setWebChromeClient(new WebChromeClient()
-        {
-            public void onProgressChanged(WebView view, int progress)
-            {
+        webview.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
                 setTitle("Loading...");
-                setProgress(progress * 100);
-                if (progress == 100)
-                {
+
+                if (progress < 100 && progressBar.getVisibility() == ProgressBar.GONE) {
+                    progressBar.setVisibility(ProgressBar.VISIBLE);
+                }
+
+                progressBar.setProgress(progress);
+                if (progress == 100) {
+                    progressBar.setVisibility(ProgressBar.GONE);
                     setTitle(LOGIN);
                 }
             }

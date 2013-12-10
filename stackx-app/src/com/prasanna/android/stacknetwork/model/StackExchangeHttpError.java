@@ -15,20 +15,19 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class StackExchangeHttpError implements Serializable
-{
+public class StackExchangeHttpError implements Serializable {
     private static final long serialVersionUID = -1307230035475965256L;
-    
+
     public int id = -1;
-    
+
     public String name;
-    
+
     public String message;
 
 }

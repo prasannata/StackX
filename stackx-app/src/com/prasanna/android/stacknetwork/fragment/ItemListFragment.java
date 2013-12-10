@@ -50,8 +50,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
 public abstract class ItemListFragment<T extends Post> extends ListFragment implements OnScrollListener,
-                StackXRestQueryResultReceiver
-{
+        StackXRestQueryResultReceiver {
     private static final String TAG = ItemListFragment.class.getSimpleName();
 
     private boolean activityCreated = false;
@@ -77,16 +76,14 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     protected abstract String getLogTag();
 
     @Override
-    public void onAttach(Activity activity)
-    {
+    public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         applicationContext = activity.getApplicationContext();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (resultReceiver == null)
@@ -100,20 +97,17 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (!activityCreated)
-        {
+        if (!activityCreated) {
             getListView().addFooterView(getProgressBar());
             setListAdapter(itemListAdapter);
             getListView().setOnScrollListener(this);
             activityCreated = true;
         }
 
-        if (savedInstanceState != null)
-        {
+        if (savedInstanceState != null) {
             items = (ArrayList<T>) savedInstanceState.getSerializable(StringConstants.ITEMS);
             if (items != null)
                 itemListAdapter.addAll(items);
@@ -121,41 +115,33 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
-        if (itemListAdapter != null)
-        {
+        if (itemListAdapter != null) {
             if (itemListAdapter.getCount() > 0)
                 itemListAdapter.notifyDataSetChanged();
-            else
-            {
+            else {
                 if (items != null && !items.isEmpty())
                     itemListAdapter.addAll(items);
             }
         }
     }
 
-    protected boolean isServiceRunning()
-    {
+    protected boolean isServiceRunning() {
         return serviceRunning;
     }
 
-    protected void showProgressBar()
-    {
+    protected void showProgressBar() {
         getProgressBar().setVisibility(View.VISIBLE);
     }
 
-    protected void dismissProgressBar()
-    {
+    protected void dismissProgressBar() {
         getProgressBar().setVisibility(View.GONE);
     }
 
-    protected Intent getIntentForService(Class<?> clazz, String action)
-    {
-        if (!serviceRunning)
-        {
+    protected Intent getIntentForService(Class<?> clazz, String action) {
+        if (!serviceRunning) {
             Intent intentForService = new Intent(applicationContext, clazz);
             if (action != null)
                 intentForService.setAction(action);
@@ -165,10 +151,8 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
         return null;
     }
 
-    protected void startService(Intent intent)
-    {
-        if (!isServiceRunning() && intent != null)
-        {
+    protected void startService(Intent intent) {
+        if (!isServiceRunning() && intent != null) {
             getActivity().startService(intent);
             serviceRunning = true;
         }
@@ -176,29 +160,24 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
             dismissProgressBar();
     }
 
-    protected void stopService(Intent intent)
-    {
-        if (intent != null)
-        {
+    protected void stopService(Intent intent) {
+        if (intent != null) {
             getActivity().stopService(intent);
             serviceRunning = false;
         }
     }
 
-    protected ViewGroup getParentLayout()
-    {
+    protected ViewGroup getParentLayout() {
         return itemsContainer;
     }
 
-    public void refresh()
-    {
+    public void refresh() {
         removeErrorViewIfShown();
 
         startIntentService();
     }
 
-    protected void removeErrorViewIfShown()
-    {
+    protected void removeErrorViewIfShown() {
         if (getListView().getVisibility() == View.GONE)
             getListView().setVisibility(View.VISIBLE);
 
@@ -209,42 +188,35 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onReceiveResult(int resultCode, Bundle resultData)
-    {
+    public void onReceiveResult(int resultCode, Bundle resultData) {
         serviceRunning = false;
 
         dismissProgressBar();
 
         if (resultCode == AbstractIntentService.ERROR)
             onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
-        else
-        {
+        else {
             currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
-            if (currentPageObject != null)
-            {
+            if (currentPageObject != null) {
                 pages.add(currentPageObject);
                 displayItems(currentPageObject.items);
             }
         }
     }
 
-    private void displayItems(ArrayList<T> newItems)
-    {
-        if (itemListAdapter != null && newItems != null)
-        {
+    private void displayItems(ArrayList<T> newItems) {
+        if (itemListAdapter != null && newItems != null) {
             if (items == null)
                 items = new ArrayList<T>();
 
             items.addAll(newItems);
-            if (items.isEmpty())
-            {
+            if (items.isEmpty()) {
                 if (emptyItemsTextView == null)
                     emptyItemsTextView = (TextView) itemsContainer.findViewById(R.id.emptyItems);
 
                 emptyItemsTextView.setVisibility(View.VISIBLE);
             }
-            else
-            {
+            else {
                 itemListAdapter.addAll(newItems);
                 if (emptyItemsTextView != null && View.VISIBLE == emptyItemsTextView.getVisibility())
                     emptyItemsTextView.setVisibility(View.GONE);
@@ -252,8 +224,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
         }
     }
 
-    private void onHttpError(HttpException e)
-    {
+    private void onHttpError(HttpException e) {
         LogWrapper.d(TAG, "Http error " + e.getStatusCode() + " " + e.getErrorResponse());
 
         if (activityCreated)
@@ -262,31 +233,26 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
         View errorLayout = getParentLayout().findViewById(R.id.errorLayout);
         if (errorLayout == null)
             getParentLayout().addView(AppUtils.getErrorView(applicationContext, e));
-        else
-        {
+        else {
             TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
             textView.setText(AppUtils.getStackXErrorMsg(e));
         }
     }
 
     @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount)
-    {
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
-                        && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1))
-        {
+                && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1)) {
             if (currentPageObject != null && currentPageObject.hasMore)
                 loadNextPage();
         }
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState)
-    {
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
 
-    protected ProgressBar getProgressBar()
-    {
+    protected ProgressBar getProgressBar() {
         if (progressBar == null)
             progressBar = (ProgressBar) LayoutInflater.from(applicationContext).inflate(R.layout.progress_bar, null);
         return progressBar;

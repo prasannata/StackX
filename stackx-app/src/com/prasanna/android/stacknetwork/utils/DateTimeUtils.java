@@ -19,82 +19,73 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
-public class DateTimeUtils
-{
+public class DateTimeUtils {
     private static final String JUST_NOW = "just now";
     private static final String AGO = "ago";
-    
+
     public static final String SECOND = "s";
     public static final String MINUTE = "m";
     public static final String HOUR = "h";
     public static final String DAY = "d";
     public static final String MONTH = "M";
     public static final String YEAR = "y";
-    
+
     public static final int SECONDS_IN_MIN = 60;
     public static final int SECONDS_IN_HOUR = 3600;
     public static final int SECONDS_IN_DAY = 3600 * 24;
     public static final int DAYS_IN_MONTH = 30;
     public static final int MONTHS_IN_YEAR = 12;
 
-    public static String getElapsedDurationSince(long seconds)
-    {
-	String unit = SECOND;
-	String residueUnit = null;
+    public static String getElapsedDurationSince(long seconds) {
+        String unit = SECOND;
+        String residueUnit = null;
 
-	long currentTimeInSeconds = System.currentTimeMillis() / 1000;
-	long elapsedTimeInSeconds = currentTimeInSeconds - seconds;
+        long currentTimeInSeconds = System.currentTimeMillis() / 1000;
+        long elapsedTimeInSeconds = currentTimeInSeconds - seconds;
 
-	int count = 0;
-	int residue = 0;
+        int count = 0;
+        int residue = 0;
 
-	if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR)
-	{
-	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
-	    unit = MINUTE;
-	}
-	else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY)
-	{
-	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
-	    unit = HOUR;
-	}
-	else if (elapsedTimeInSeconds > SECONDS_IN_DAY)
-	{
-	    count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
-	    if (count > DAYS_IN_MONTH)
-	    {
+        if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR) {
+            count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
+            unit = MINUTE;
+        }
+        else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY) {
+            count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
+            unit = HOUR;
+        }
+        else if (elapsedTimeInSeconds > SECONDS_IN_DAY) {
+            count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
+            if (count > DAYS_IN_MONTH) {
 
-		residue = count % DAYS_IN_MONTH;
-		count /= DAYS_IN_MONTH;
+                residue = count % DAYS_IN_MONTH;
+                count /= DAYS_IN_MONTH;
 
-		if (count > MONTHS_IN_YEAR)
-		{
-		    residue = count % MONTHS_IN_YEAR;
-		    count /= MONTHS_IN_YEAR;
-		    unit = YEAR;
-		    residueUnit = MONTH;
-		}
-		else
-		{
-		    unit = MONTH;
-		    residueUnit = DAY;
-		}
-	    }
-	    else
-	    {
-		unit = DAY;
-	    }
-	}
+                if (count > MONTHS_IN_YEAR) {
+                    residue = count % MONTHS_IN_YEAR;
+                    count /= MONTHS_IN_YEAR;
+                    unit = YEAR;
+                    residueUnit = MONTH;
+                }
+                else {
+                    unit = MONTH;
+                    residueUnit = DAY;
+                }
+            }
+            else {
+                unit = DAY;
+            }
+        }
 
-	if (count == 0)
+        if (count == 0)
             return JUST_NOW;
-	
-	String duration = new String(count + unit);
 
-	if (residue > 0)
-	    duration += " " + residue + residueUnit;
+        String duration = new String(count + unit);
 
-	duration += " " + AGO;
-	return duration;
+        if (residue > 0)
+            duration += " " + residue + residueUnit;
+
+        duration += " " + AGO;
+        return duration;
     }
 }

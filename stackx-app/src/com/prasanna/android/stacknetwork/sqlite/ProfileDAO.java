@@ -30,14 +30,12 @@ import android.graphics.BitmapFactory;
 import com.prasanna.android.stacknetwork.model.User;
 import com.prasanna.android.utils.LogWrapper;
 
-public class ProfileDAO extends AbstractBaseDao
-{
+public class ProfileDAO extends AbstractBaseDao {
     public static final String TABLE_NAME = "USER_PROFILE";
 
     private static final String TAG = ProfileDAO.class.getSimpleName();
 
-    public static final class ProfileTable
-    {
+    public static final class ProfileTable {
         public static final String COLUMN_ID = "_id";
         public static final String COLUMN_SITE = "site";
         public static final String COLUMN_ME = "me";
@@ -59,27 +57,24 @@ public class ProfileDAO extends AbstractBaseDao
         public static final String COLUMN_LAST_UPDATE = "last_update";
 
         protected static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + COLUMN_ID
-                        + " integer primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
-                        + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
-                        + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
-                        + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT
-                        + " integer not null, " + COLUMN_UPVOTE_COUNT + " integer not null, " + COLUMN_DOWNVOTE_COUNT
-                        + " integer not null, " + COLUMN_ACCEPT_RATE + " integer not null, " + COLUMN_REPUTATION
-                        + " integer not null, " + COLUMN_VIEWS + " integer not null, " + COLUMN_REG_DATE
-                        + " long not null, " + COLUMN_LAST_ACCESS + " long not null, " + COLUMN_PROFILE_IMAGE_LINK
-                        + " text, " + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE + " long not null);";
+                + " integer primary key autoincrement, " + COLUMN_SITE + " text not null, " + COLUMN_ME
+                + " integer DEFAULT 0, " + COLUMN_DISPLAY_NAME + " text not null, " + COLUMN_GOLD_BADGES
+                + " int not null, " + COLUMN_SILVER_BADGES + " int not null, " + COLUMN_BRONZE_BADGES
+                + " int not null, " + COLUMN_QUESTION_COUNT + " integer not null, " + COLUMN_ANSWER_COUNT
+                + " integer not null, " + COLUMN_UPVOTE_COUNT + " integer not null, " + COLUMN_DOWNVOTE_COUNT
+                + " integer not null, " + COLUMN_ACCEPT_RATE + " integer not null, " + COLUMN_REPUTATION
+                + " integer not null, " + COLUMN_VIEWS + " integer not null, " + COLUMN_REG_DATE + " long not null, "
+                + COLUMN_LAST_ACCESS + " long not null, " + COLUMN_PROFILE_IMAGE_LINK + " text, "
+                + COLUMN_PROFILE_IMAGE + " BLOB, " + COLUMN_LAST_UPDATE + " long not null);";
 
     }
 
-    public ProfileDAO(Context context)
-    {
+    public ProfileDAO(Context context) {
         super(context);
     }
 
-    public void insert(String site, User user, boolean me)
-    {
-        if (site != null && user != null)
-        {
+    public void insert(String site, User user, boolean me) {
+        if (site != null && user != null) {
             LogWrapper.d(TAG, "Inserting user " + user.id + " to db");
 
             ContentValues values = new ContentValues();
@@ -87,8 +82,7 @@ public class ProfileDAO extends AbstractBaseDao
             values.put(ProfileTable.COLUMN_SITE, site);
             values.put(ProfileTable.COLUMN_ME, me);
             values.put(ProfileTable.COLUMN_DISPLAY_NAME, user.displayName);
-            if (user.badgeCounts != null && user.badgeCounts.length == 3)
-            {
+            if (user.badgeCounts != null && user.badgeCounts.length == 3) {
                 values.put(ProfileTable.COLUMN_GOLD_BADGES, user.badgeCounts[0]);
                 values.put(ProfileTable.COLUMN_SILVER_BADGES, user.badgeCounts[1]);
                 values.put(ProfileTable.COLUMN_BRONZE_BADGES, user.badgeCounts[2]);
@@ -104,8 +98,7 @@ public class ProfileDAO extends AbstractBaseDao
             values.put(ProfileTable.COLUMN_LAST_ACCESS, user.lastAccessTime);
             values.put(ProfileTable.COLUMN_PROFILE_IMAGE_LINK, user.profileImageLink);
 
-            if (user.avatar != null)
-            {
+            if (user.avatar != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 user.avatar.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 values.put(ProfileTable.COLUMN_PROFILE_IMAGE, stream.toByteArray());
@@ -117,10 +110,8 @@ public class ProfileDAO extends AbstractBaseDao
         }
     }
 
-    public void updateMyAvatar(String site, Bitmap avatar)
-    {
-        if (site != null && avatar != null)
-        {
+    public void updateMyAvatar(String site, Bitmap avatar) {
+        if (site != null && avatar != null) {
             String whereClause = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
             String[] whereArgs = { "1", site };
 
@@ -133,8 +124,7 @@ public class ProfileDAO extends AbstractBaseDao
         }
     }
 
-    public User getMe(String site)
-    {
+    public User getMe(String site) {
         String selection = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { "1", site };
 
@@ -143,19 +133,16 @@ public class ProfileDAO extends AbstractBaseDao
             return null;
 
         LogWrapper.d(TAG, "Me retrieved from DB");
-        try
-        {
+        try {
             return getUser(cursor);
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
 
     }
 
-    public User getProfile(long userId, String site)
-    {
+    public User getProfile(long userId, String site) {
         String selection = ProfileTable.COLUMN_ID + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
         String[] selectionArgs = { String.valueOf(userId), site };
 
@@ -164,19 +151,16 @@ public class ProfileDAO extends AbstractBaseDao
             return null;
 
         LogWrapper.d(TAG, "User retrieved from DB");
-        try
-        {
+        try {
             return getUser(cursor);
         }
-        finally
-        {
+        finally {
             cursor.close();
         }
 
     }
 
-    private User getUser(Cursor cursor)
-    {
+    private User getUser(Cursor cursor) {
         cursor.moveToFirst();
 
         User user = new User();
@@ -203,37 +187,31 @@ public class ProfileDAO extends AbstractBaseDao
         return user;
     }
 
-    public void deleteAll()
-    {
+    public void deleteAll() {
         database.delete(TABLE_NAME, null, null);
     }
 
-    public void deleteMe(String site)
-    {
+    public void deleteMe(String site) {
         String whereClause = ProfileTable.COLUMN_ME + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
         String[] whereArgs = { "1", site };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
     }
 
-    public void deleteUser(long userId, String site)
-    {
+    public void deleteUser(long userId, String site) {
         String whereClause = ProfileTable.COLUMN_ID + " = ? and " + ProfileTable.COLUMN_SITE + " = ?";
         String[] whereArgs = { String.valueOf(userId), site };
 
         database.delete(TABLE_NAME, whereClause, whereArgs);
     }
 
-    public static void purge(Context context)
-    {
+    public static void purge(Context context) {
         ProfileDAO profileDao = new ProfileDAO(context);
-        try
-        {
+        try {
             profileDao.open();
             profileDao.deleteAll();
         }
-        finally
-        {
+        finally {
             profileDao.close();
         }
     }

@@ -49,8 +49,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.utils.TagsViewBuilder;
 
-public class QuestionFragment extends Fragment implements OnCommentChangeListener
-{
+public class QuestionFragment extends Fragment implements OnCommentChangeListener {
     private static final String TAG = QuestionFragment.class.getSimpleName();
 
     private FrameLayout parentLayout;
@@ -64,8 +63,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     private String STR_VIEWS;
     private String STR_COMMENTS;
 
-    public static QuestionFragment newFragment()
-    {
+    public static QuestionFragment newFragment() {
         QuestionFragment questionFragment = new QuestionFragment();
         questionFragment.setRetainInstance(true);
         questionFragment.setHasOptionsMenu(true);
@@ -73,8 +71,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     }
 
     @Override
-    public void onAttach(Activity activity)
-    {
+    public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         if (!(activity instanceof OnShowCommentsListener))
@@ -84,8 +81,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (parentLayout == null)
             createView(inflater);
 
@@ -95,16 +91,13 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         return parentLayout;
     }
 
-    private void createView(LayoutInflater inflater)
-    {
+    private void createView(LayoutInflater inflater) {
         parentLayout = (FrameLayout) inflater.inflate(R.layout.question, null);
         questionTitleLayout = parentLayout.findViewById(R.id.questionTitleLayout);
         ctxMenuImage = (ImageView) parentLayout.findViewById(R.id.questionOptionsContextMenu);
-        ctxMenuImage.setOnClickListener(new View.OnClickListener()
-        {
+        ctxMenuImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 if (quickActionMenu == null)
                     quickActionMenu = initQuickActionMenu();
 
@@ -116,41 +109,35 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         STR_VIEWS = getString(R.string.views);
         STR_COMMENTS = getString(R.string.comments);
 
-        if (question != null)
-        {
+        if (question != null) {
             getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
             displayQuestion();
         }
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         displayQuestion();
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
+    public void onSaveInstanceState(Bundle outState) {
         if (question != null)
             outState.putSerializable(StringConstants.QUESTION, question);
 
         super.onSaveInstanceState(outState);
     }
 
-    private void displayQuestion()
-    {
-        if (question != null)
-        {
+    private void displayQuestion() {
+        if (question != null) {
             if (questionTitleLayout.getVisibility() == View.INVISIBLE)
                 questionTitleLayout.setVisibility(View.VISIBLE);
 
@@ -176,34 +163,30 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
             displayBody(question.body);
 
             TagsViewBuilder.buildView(getActivity(), (LinearLayout) parentLayout.findViewById(R.id.questionTags),
-                            question.tags);
+                    question.tags);
         }
     }
 
-    private StackXQuickActionMenu initQuickActionMenu()
-    {
+    private StackXQuickActionMenu initQuickActionMenu() {
         StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
         quickActionMenu.addCommentsItem(onShowCommentsListener).addUserProfileItem(question.owner.id,
-                        Html.fromHtml(question.owner.displayName).toString());
+                Html.fromHtml(question.owner.displayName).toString());
         return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
-                        .addEmailQuickActionItem(question.title, question.body);
+                .addEmailQuickActionItem(question.title, question.body);
     }
 
-    private void setupTextViewForAnswerCount()
-    {
+    private void setupTextViewForAnswerCount() {
         TextView answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
         TextView answerCountAnsweredView = (TextView) parentLayout.findViewById(R.id.answerCountAnswered);
 
-        if (question.hasAcceptedAnswer)
-        {
+        if (question.hasAcceptedAnswer) {
             answerCountAnsweredView.setVisibility(View.VISIBLE);
             answerCountAnsweredView.setText(AppUtils.formatNumber(question.answerCount));
 
             answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
             answerCountView.setVisibility(View.GONE);
         }
-        else
-        {
+        else {
             answerCountView.setVisibility(View.VISIBLE);
             answerCountView.setText(AppUtils.formatNumber(question.answerCount));
 
@@ -212,17 +195,14 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         }
     }
 
-    private String getTimeAndOwnerDisplay(String acceptRate)
-    {
+    private String getTimeAndOwnerDisplay(String acceptRate) {
         return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-                        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
-                        + AppUtils.formatReputation(question.owner.reputation) + "]";
+                + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
+                + AppUtils.formatReputation(question.owner.reputation) + "]";
     }
 
-    private void displayNumComments()
-    {
-        if (question.comments != null)
-        {
+    private void displayNumComments() {
+        if (question.comments != null) {
             TextView textView = (TextView) parentLayout.findViewById(R.id.questionComments);
             textView.setText(STR_COMMENTS + ":" + String.valueOf(question.comments.size()));
             textView.setVisibility(question.comments.isEmpty() ? View.GONE : View.VISIBLE);
@@ -230,20 +210,16 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         }
     }
 
-    public void displayBody(String text)
-    {
-        if (text != null && parentLayout != null)
-        {
+    public void displayBody(String text) {
+        if (text != null && parentLayout != null) {
             question.body = text;
             final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
 
-            if (isAdded() && questionBodyLayout != null)
-            {
+            if (isAdded() && questionBodyLayout != null) {
                 questionBodyLayout.removeAllViews();
                 ArrayList<View> views = MarkdownFormatter.parse(getActivity(), question.body);
 
-                if (views != null)
-                {
+                if (views != null) {
                     for (final View questionBodyTextView : views)
                         questionBodyLayout.addView(questionBodyTextView);
                 }
@@ -251,27 +227,22 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         }
     }
 
-    public void setQuestion(Question question)
-    {
+    public void setQuestion(Question question) {
         this.question = question;
     }
 
-    public void setComments(ArrayList<Comment> comments)
-    {
-        if (question != null)
-        {
+    public void setComments(ArrayList<Comment> comments) {
+        if (question != null) {
             question.comments = comments;
             if (parentLayout != null)
                 displayNumComments();
         }
     }
 
-    public void setAndDisplay(Question question)
-    {
+    public void setAndDisplay(Question question) {
         setQuestion(question);
 
-        if (parentLayout != null)
-        {
+        if (parentLayout != null) {
             if (isAdded())
                 getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
 
@@ -279,20 +250,17 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         }
     }
 
-    public void enableNavigationBack(OnClickListener clickListener)
-    {
+    public void enableNavigationBack(OnClickListener clickListener) {
         backIv.setVisibility(View.VISIBLE);
         backIv.setOnClickListener(clickListener);
     }
 
     @Override
-    public void onCommentAdd(Comment comment)
-    {
+    public void onCommentAdd(Comment comment) {
         // One reply to comments come here, add new comment is directly handled
         // by QuestionAcitivy. So no need to initialize comments if null because
         // it can never be null here.
-        if (comment != null)
-        {
+        if (comment != null) {
             if (question.comments == null)
                 question.comments = new ArrayList<Comment>();
 
@@ -302,17 +270,13 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     }
 
     @Override
-    public void onCommentUpdate(Comment comment)
-    {
-        if (question.comments != null)
-        {
+    public void onCommentUpdate(Comment comment) {
+        if (question.comments != null) {
             LogWrapper.d(TAG, "Removing comment: " + comment.id);
 
             Iterator<Comment> iterator = question.comments.iterator();
-            while (iterator.hasNext())
-            {
-                if (iterator.next().id == comment.id)
-                {
+            while (iterator.hasNext()) {
+                if (iterator.next().id == comment.id) {
                     LogWrapper.d(TAG, "comment " + comment.id + " edited");
                     removeQuestionFromCache();
                     break;
@@ -324,17 +288,13 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     }
 
     @Override
-    public void onCommentDelete(long commentId)
-    {
-        if (question.comments != null)
-        {
+    public void onCommentDelete(long commentId) {
+        if (question.comments != null) {
             LogWrapper.d(TAG, "Removing comment: " + commentId);
 
             Iterator<Comment> iterator = question.comments.iterator();
-            while (iterator.hasNext())
-            {
-                if (iterator.next().id == commentId)
-                {
+            while (iterator.hasNext()) {
+                if (iterator.next().id == commentId) {
                     LogWrapper.d(TAG, "comment " + commentId + " removed");
                     iterator.remove();
                     break;
@@ -347,30 +307,24 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         displayNumComments();
     }
 
-    private void updateCacheWithNewCommentIfExists(Comment comment)
-    {
-        if (QuestionsCache.getInstance().containsKey(question.id))
-        {
+    private void updateCacheWithNewCommentIfExists(Comment comment) {
+        if (QuestionsCache.getInstance().containsKey(question.id)) {
             Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
 
             if (cachedQuestion.comments == null)
                 cachedQuestion.comments = new ArrayList<Comment>();
 
-            if (!cachedQuestion.comments.contains(comment))
-            {
+            if (!cachedQuestion.comments.contains(comment)) {
                 cachedQuestion.comments.add(comment);
                 QuestionsCache.getInstance().add(question.id, cachedQuestion);
             }
         }
     }
 
-    private void updateCacheIfNeeded()
-    {
-        if (QuestionsCache.getInstance().containsKey(question.id))
-        {
+    private void updateCacheIfNeeded() {
+        if (QuestionsCache.getInstance().containsKey(question.id)) {
             Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
-            if (cachedQuestion != null)
-            {
+            if (cachedQuestion != null) {
                 cachedQuestion.comments = question.comments;
                 QuestionsCache.getInstance().add(question.id, cachedQuestion);
             }
@@ -379,8 +333,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
         }
     }
 
-    private void removeQuestionFromCache()
-    {
+    private void removeQuestionFromCache() {
         if (QuestionsCache.getInstance().containsKey(question.id))
             QuestionsCache.getInstance().remove(question.id);
     }

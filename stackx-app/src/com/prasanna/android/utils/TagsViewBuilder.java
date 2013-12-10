@@ -31,18 +31,14 @@ import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-public class TagsViewBuilder
-{
-    public interface OnTagClickListener
-    {
+public class TagsViewBuilder {
+    public interface OnTagClickListener {
         void onTagClick(Context context, String tag);
     }
 
-    public static class DefaultOnTagClickListener implements OnTagClickListener
-    {
+    public static class DefaultOnTagClickListener implements OnTagClickListener {
         @Override
-        public void onTagClick(Context context, String tag)
-        {
+        public void onTagClick(Context context, String tag) {
             Intent questionsIntent = new Intent(context, QuestionsActivity.class);
             questionsIntent.setAction(StringConstants.TAG);
             questionsIntent.putExtra(StringConstants.TAG, tag);
@@ -50,33 +46,28 @@ public class TagsViewBuilder
         }
     }
 
-    public static LinearLayout buildView(Context context, LinearLayout parentLayout, String[] tags)
-    {
+    public static LinearLayout buildView(Context context, LinearLayout parentLayout, String[] tags) {
         return build(context, parentLayout, tags, new DefaultOnTagClickListener());
     }
 
     public static LinearLayout buildView(Context context, LinearLayout parentLayout, String[] tags,
-                    OnTagClickListener onTagClickListener)
-    {
+            OnTagClickListener onTagClickListener) {
         return build(context, parentLayout, tags, onTagClickListener);
     }
 
     private static LinearLayout build(final Context context, final LinearLayout parentLayout, final String[] tags,
-                    OnTagClickListener onTagClickListener)
-    {
+            OnTagClickListener onTagClickListener) {
         if (parentLayout.getChildCount() > 0)
             parentLayout.removeAllViews();
 
         int screenWidth = context.getResources().getDisplayMetrics().widthPixels - 20;
         LinearLayout rowLayout = createNewRowForTags(context, 0);
 
-        if (tags != null && tags.length > 0)
-        {
-            for (int i = 0; i < tags.length; i++)
-            {
+        if (tags != null && tags.length > 0) {
+            for (int i = 0; i < tags.length; i++) {
                 LinearLayout.LayoutParams params =
-                                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(3, 0, 3, 0);
                 TextView tagTextView = ((TextView) LayoutInflater.from(context).inflate(R.layout.tags_layout, null));
                 tagTextView.setText(tags[i]);
@@ -84,8 +75,7 @@ public class TagsViewBuilder
                 tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 rowLayout.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-                if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > screenWidth)
-                {
+                if ((tagTextView.getMeasuredWidth() + rowLayout.getMeasuredWidth()) > screenWidth) {
                     parentLayout.addView(rowLayout);
                     rowLayout = createNewRowForTags(context, 3);
                 }
@@ -101,25 +91,21 @@ public class TagsViewBuilder
     }
 
     private static void setOnClickListenerForTextView(final Context context, final TextView tagTextView,
-                    final String tag, final OnTagClickListener onTagClickListener)
-    {
-        tagTextView.setOnClickListener(new View.OnClickListener()
-        {
+            final String tag, final OnTagClickListener onTagClickListener) {
+        tagTextView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 onTagClickListener.onTagClick(context, tag);
             }
         });
     }
 
-    private static LinearLayout createNewRowForTags(Context context, int topMargin)
-    {
+    private static LinearLayout createNewRowForTags(Context context, int topMargin) {
         LinearLayout rowLayout = new LinearLayout(context);
         rowLayout.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams layoutParams =
-                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.topMargin = topMargin;
         rowLayout.setLayoutParams(layoutParams);
         return rowLayout;

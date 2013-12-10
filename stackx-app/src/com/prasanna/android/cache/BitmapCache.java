@@ -23,18 +23,15 @@ import android.graphics.Bitmap;
 
 import com.prasanna.android.stacknetwork.utils.LruCache;
 
-public class BitmapCache extends LruCache<String, Bitmap>
-{
+public class BitmapCache extends LruCache<String, Bitmap> {
     private static int CACHE_SIZE = 5;
     private static final BitmapCache INSTANCE = new BitmapCache();
 
-    private BitmapCache()
-    {
+    private BitmapCache() {
         super(CACHE_SIZE);
     }
 
-    public static BitmapCache getInstance()
-    {
+    public static BitmapCache getInstance() {
         return INSTANCE;
     }
 }

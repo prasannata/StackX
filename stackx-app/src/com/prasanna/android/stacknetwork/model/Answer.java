@@ -15,15 +15,14 @@
 
     You should have received a copy of the GNU General Public License
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Answer extends Post implements Serializable
-{
+public class Answer extends Post implements Serializable {
     private static final long serialVersionUID = -307252373087687685L;
 
     public long questionId = -1;
@@ -35,10 +34,9 @@ public class Answer extends Post implements Serializable
     public ArrayList<Comment> comments;
 
     public final PostType postType = PostType.ANSWER;
-    
+
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + (int) (id ^ (id >>> 32));
@@ -47,8 +45,7 @@ public class Answer extends Post implements Serializable
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)

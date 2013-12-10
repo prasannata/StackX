@@ -34,38 +34,31 @@ import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class UserProfileActivity extends AbstractUserActionBarActivity
-{
+public class UserProfileActivity extends AbstractUserActionBarActivity {
     private static final String[] PAGES = { "Profile", "Questions", "Answers", "Favorites" };
 
     private ProfileViewPageAdapter profileViewPageAdapter;
     private ViewPager viewPager;
     private Site site;
 
-    public static class ProfileViewPageAdapter extends FragmentPagerAdapter
-    {
-        public ProfileViewPageAdapter(FragmentManager fm)
-        {
+    public static class ProfileViewPageAdapter extends FragmentPagerAdapter {
+        public ProfileViewPageAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
-        public int getCount()
-        {
+        public int getCount() {
             return PAGES.length;
         }
 
         @Override
-        public CharSequence getPageTitle(int position)
-        {
+        public CharSequence getPageTitle(int position) {
             return PAGES[position];
         }
 
         @Override
-        public Fragment getItem(int position)
-        {
-            switch (position)
-            {
+        public Fragment getItem(int position) {
+            switch (position) {
                 case 0:
                     return new UserProfileFragment();
                 case 1:
@@ -82,8 +75,7 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    public void onCreate(android.os.Bundle savedInstanceState)
-    {
+    public void onCreate(android.os.Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         site = (Site) getIntent().getSerializableExtra(StringConstants.SITE);
 
@@ -98,15 +90,13 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
         indicator.setViewPager(viewPager);
     }
 
-    protected void setActionBarTitleAndIcon()
-    {
+    protected void setActionBarTitleAndIcon() {
         setActionBarTitle(site.name);
         setActionBarHomeIcon(site);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         boolean ret = super.onCreateOptionsMenu(menu);
 
         if (getIntent().getBooleanExtra(StringConstants.ME, false))
@@ -116,16 +106,14 @@ public class UserProfileActivity extends AbstractUserActionBarActivity
     }
 
     @Override
-    public void refresh()
-    {
+    public void refresh() {
         finish();
         getIntent().putExtra(StringConstants.REFRESH, true);
         startActivity(getIntent());
     }
 
     @Override
-    protected boolean shouldSearchViewBeEnabled()
-    {
+    protected boolean shouldSearchViewBeEnabled() {
         return false;
     }
 }

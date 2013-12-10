@@ -21,22 +21,19 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
-public class Tag implements Serializable
-{
+public class Tag implements Serializable {
     private static final long serialVersionUID = -3081057353160392392L;
 
     public final String name;
 
     public boolean local = false;
-    
-    public Tag(String name)
-    {
+
+    public Tag(String name) {
         this.name = name;
     }
-    
+
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((name == null) ? 0 : name.hashCode());
@@ -44,8 +41,7 @@ public class Tag implements Serializable
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -53,8 +49,7 @@ public class Tag implements Serializable
         if (getClass() != obj.getClass())
             return false;
         Tag other = (Tag) obj;
-        if (name == null)
-        {
+        if (name == null) {
             if (other.name != null)
                 return false;
         }

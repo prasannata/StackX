@@ -46,8 +46,7 @@ import com.prasanna.android.stacknetwork.utils.StackXIntentAction.UserIntentActi
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public class UserIntentService extends AbstractIntentService
-{
+public class UserIntentService extends AbstractIntentService {
     private static final String TAG = UserIntentService.class.getSimpleName();
     public static final int GET_USER_PROFILE = 0x1;
     public static final int GET_USER_QUESTIONS = 0x2;
@@ -60,19 +59,16 @@ public class UserIntentService extends AbstractIntentService
 
     private UserServiceHelper userService = UserServiceHelper.getInstance();
 
-    public UserIntentService()
-    {
+    public UserIntentService() {
         this(TAG);
     }
 
-    public UserIntentService(String name)
-    {
+    public UserIntentService(String name) {
         super(name);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
         final int action = intent.getIntExtra(StringConstants.ACTION, -1);
         final int page = intent.getIntExtra(StringConstants.PAGE, 1);
@@ -80,12 +76,10 @@ public class UserIntentService extends AbstractIntentService
         final long userId = intent.getLongExtra(StringConstants.USER_ID, -1);
         final Bundle bundle = new Bundle();
 
-        try
-        {
+        try {
             super.onHandleIntent(intent);
 
-            switch (action)
-            {
+            switch (action) {
                 case GET_USER_PROFILE:
                     String site = intent.getStringExtra(StringConstants.SITE);
                     boolean refresh = intent.getBooleanExtra(StringConstants.REFRESH, false);
@@ -111,7 +105,7 @@ public class UserIntentService extends AbstractIntentService
                     break;
                 case GET_USER_SITES:
                     bundle.putSerializable(StringConstants.SITES,
-                                    getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
+                            getUserSites(receiver, intent.getBooleanExtra(StringConstants.AUTHENTICATED, me)));
                     receiver.send(GET_USER_SITES, bundle);
                     break;
                 case GET_USER_FAVORITES:
@@ -127,24 +121,19 @@ public class UserIntentService extends AbstractIntentService
             }
 
         }
-        catch (AbstractHttpException e)
-        {
-            if (receiver != null)
-            {
+        catch (AbstractHttpException e) {
+            if (receiver != null) {
                 bundle.putSerializable(StringConstants.EXCEPTION, e);
                 receiver.send(ERROR, bundle);
             }
         }
     }
 
-    private StackXPage<User> getUserDetail(boolean me, long userId, boolean refresh, String site, int page)
-    {
-        if (me)
-        {
+    private StackXPage<User> getUserDetail(boolean me, long userId, boolean refresh, String site, int page) {
+        if (me) {
             final ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
             StackXPage<User> userPage = null;
-            try
-            {
+            try {
                 profileDAO.open();
                 User myProfile = null;
                 if (!refresh)
@@ -152,8 +141,7 @@ public class UserIntentService extends AbstractIntentService
 
                 if (myProfile == null)
                     userPage = getUserProfile(profileDAO, site);
-                else
-                {
+                else {
                     if (AppUtils.aHalfAnHourSince(myProfile.lastUpdateTime))
                         syncUserProfile(site);
 
@@ -162,12 +150,10 @@ public class UserIntentService extends AbstractIntentService
                     userPage.items.add(myProfile);
                 }
             }
-            catch (SQLException e)
-            {
+            catch (SQLException e) {
                 LogWrapper.e(TAG, e.getMessage());
             }
-            finally
-            {
+            finally {
                 profileDAO.close();
             }
 
@@ -177,33 +163,26 @@ public class UserIntentService extends AbstractIntentService
             return userService.getUserById(userId, site);
     }
 
-    private void syncUserProfile(final String site)
-    {
-        AppUtils.runOnBackgroundThread(new Runnable()
-        {
+    private void syncUserProfile(final String site) {
+        AppUtils.runOnBackgroundThread(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 ProfileDAO profileDAO = new ProfileDAO(getApplicationContext());
-                try
-                {
+                try {
                     profileDAO.open();
                     getUserProfile(profileDAO, site);
                 }
-                catch (SQLException e)
-                {
+                catch (SQLException e) {
                     LogWrapper.e(TAG, e.getMessage());
                 }
-                finally
-                {
+                finally {
                     profileDAO.close();
                 }
             }
         });
     }
 
-    private HashMap<String, Account> getUserAccounts(boolean me, StackXPage<User> userDetail)
-    {
+    private HashMap<String, Account> getUserAccounts(boolean me, StackXPage<User> userDetail) {
         if (me)
             return getMyAccounts();
 
@@ -213,19 +192,16 @@ public class UserIntentService extends AbstractIntentService
         return null;
     }
 
-    private HashMap<String, Account> getMyAccounts()
-    {
+    private HashMap<String, Account> getMyAccounts() {
         long accountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
-        if (accountId != -1)
-        {
+        if (accountId != -1) {
             ArrayList<Account> accounts = UserAccountsDAO.get(getApplicationContext(), accountId);
 
             if (accounts == null)
                 return userService.getMyAccount();
 
             HashMap<String, Account> accountsMap = new HashMap<String, Account>();
-            if (accounts != null)
-            {
+            if (accounts != null) {
                 for (Account account : accounts)
                     accountsMap.put(account.siteUrl, account);
             }
@@ -236,37 +212,31 @@ public class UserIntentService extends AbstractIntentService
         return null;
     }
 
-    private StackXPage<Question> getQuestions(boolean me, long userId, int page)
-    {
+    private StackXPage<Question> getQuestions(boolean me, long userId, int page) {
         return me ? userService.getMyQuestions(page) : userService.getQuestionsByUser(userId, page);
     }
 
-    private StackXPage<Answer> getAnswers(boolean me, long userId, int page)
-    {
+    private StackXPage<Answer> getAnswers(boolean me, long userId, int page) {
         return me ? userService.getMyAnswers(page) : userService.getAnswersByUser(userId, page);
     }
 
-    private StackXPage<Question> getFavorites(boolean me, long userId, int page)
-    {
+    private StackXPage<Question> getFavorites(boolean me, long userId, int page) {
         return me ? userService.getMyFavorites(page) : userService.getFavoritesByUser(userId, page);
     }
 
-    private void getUnreadInboxItems(Intent intent)
-    {
+    private void getUnreadInboxItems(Intent intent) {
         int totalNewMsgs = 0;
         int page = intent.getIntExtra(StringConstants.PAGE, 1);
         StackXPage<InboxItem> pageObj = userService.getUnreadItemsInInbox(page);
 
-        if (pageObj != null && pageObj != null && !pageObj.items.isEmpty())
-        {
+        if (pageObj != null && pageObj != null && !pageObj.items.isEmpty()) {
             LogWrapper.d(TAG, "New unread inbox items found. Notifying reeiver");
             totalNewMsgs += pageObj.items.size();
             broadcastUnreadItemsCount(totalNewMsgs, pageObj);
         }
     }
 
-    private void broadcastUnreadItemsCount(int totalNewMsgs, StackXPage<InboxItem> unreadInboxItems)
-    {
+    private void broadcastUnreadItemsCount(int totalNewMsgs, StackXPage<InboxItem> unreadInboxItems) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(UserIntentAction.NEW_MSG.getAction());
         broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -274,8 +244,7 @@ public class UserIntentService extends AbstractIntentService
         sendBroadcast(broadcastIntent);
     }
 
-    private ArrayList<Site> getUserSites(ResultReceiver receiver, boolean forAuthenicatedUser)
-    {
+    private ArrayList<Site> getUserSites(ResultReceiver receiver, boolean forAuthenicatedUser) {
         ArrayList<Site> sites = getSites();
 
         if (sites != null && !sites.isEmpty())
@@ -289,25 +258,21 @@ public class UserIntentService extends AbstractIntentService
         LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
         HashMap<String, Account> linkAccountsMap = userService.getMyAccount();
 
-        if (linkAccountsMap != null && linkSitesMap != null)
-        {
+        if (linkAccountsMap != null && linkSitesMap != null) {
             long accountId = SharedPreferencesUtil.getLong(getApplicationContext(), StringConstants.ACCOUNT_ID, -1);
-            if (accountId == -1 && !linkAccountsMap.isEmpty())
-            {
+            if (accountId == -1 && !linkAccountsMap.isEmpty()) {
                 accountId = linkAccountsMap.values().iterator().next().id;
 
                 LogWrapper.d(TAG, "Setting account id in shared preferences: " + accountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNT_ID, accountId);
                 SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.ACCOUNTS_LAST_UPDATED,
-                                System.currentTimeMillis());
+                        System.currentTimeMillis());
                 DbRequestThreadExecutor.persistAccounts(getApplicationContext(),
-                                new ArrayList<Account>(linkAccountsMap.values()));
+                        new ArrayList<Account>(linkAccountsMap.values()));
             }
 
-            for (String siteUrl : linkAccountsMap.keySet())
-            {
-                if (linkSitesMap.containsKey(siteUrl))
-                {
+            for (String siteUrl : linkAccountsMap.keySet()) {
+                if (linkSitesMap.containsKey(siteUrl)) {
                     LogWrapper.d("Usertype for " + siteUrl, linkAccountsMap.get(siteUrl).userType.name());
 
                     Site site = linkSitesMap.get(siteUrl);
@@ -326,36 +291,30 @@ public class UserIntentService extends AbstractIntentService
         return persistAndGetList(regSitesFirstMap);
     }
 
-    private ArrayList<Site> getSites()
-    {
+    private ArrayList<Site> getSites() {
         SiteDAO siteDAO = new SiteDAO(getApplicationContext());
 
-        try
-        {
+        try {
             siteDAO.open();
             return siteDAO.getSites();
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             siteDAO.close();
         }
 
         return null;
     }
 
-    private ArrayList<Site> persistAndGetList(LinkedHashMap<String, Site> linkSitesMap)
-    {
+    private ArrayList<Site> persistAndGetList(LinkedHashMap<String, Site> linkSitesMap) {
         ArrayList<Site> sites = new ArrayList<Site>(linkSitesMap.values());
         DbRequestThreadExecutor.persistSites(getApplicationContext(), sites);
         return sites;
     }
 
-    private void deauthenticateApp(String accessToken)
-    {
+    private void deauthenticateApp(String accessToken) {
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(UserIntentAction.LOGOUT.getAction());
         broadcastIntent.putExtra(UserIntentAction.LOGOUT.getAction(), userService.logout(accessToken));
@@ -363,11 +322,9 @@ public class UserIntentService extends AbstractIntentService
         sendBroadcast(broadcastIntent);
     }
 
-    protected StackXPage<User> getUserProfile(final ProfileDAO profileDAO, String site)
-    {
+    protected StackXPage<User> getUserProfile(final ProfileDAO profileDAO, String site) {
         StackXPage<User> userPage = userService.getMe(site);
-        if (userPage != null && userPage.items != null && !userPage.items.isEmpty())
-        {
+        if (userPage != null && userPage.items != null && !userPage.items.isEmpty()) {
             profileDAO.deleteMe(site);
             profileDAO.insert(site, userPage.items.get(0), true);
             SharedPreferencesUtil.setLong(getApplicationContext(), StringConstants.USER_ID, userPage.items.get(0).id);

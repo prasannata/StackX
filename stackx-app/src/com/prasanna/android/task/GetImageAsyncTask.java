@@ -26,8 +26,7 @@ import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.http.ClientException;
 import com.prasanna.android.http.SecureHttpHelper;
 
-public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
-{
+public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
     private final AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl;
 
     /**
@@ -36,27 +35,21 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
      *            Completion notifier to be invoked. Will be invoked from the UI
      *            thread.
      */
-    public GetImageAsyncTask(AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl)
-    {
+    public GetImageAsyncTask(AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl) {
         this.imageFetchAsyncTaskCompleteNotiferImpl = imageFetchAsyncTaskCompleteNotiferImpl;
     }
 
     @Override
-    protected Bitmap doInBackground(String... urls)
-    {
-        if (urls != null && urls.length == 1)
-        {
+    protected Bitmap doInBackground(String... urls) {
+        if (urls != null && urls.length == 1) {
             Bitmap bitmap = BitmapCache.getInstance().get(urls[0]);
 
-            if (bitmap == null)
-            {
-                try
-                {
+            if (bitmap == null) {
+                try {
                     bitmap = SecureHttpHelper.getInstance().getImage((String) urls[0]);
                     BitmapCache.getInstance().add(urls[0], bitmap);
                 }
-                catch (ClientException e)
-                {
+                catch (ClientException e) {
                 }
             }
 
@@ -67,8 +60,7 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap>
     }
 
     @Override
-    protected void onPostExecute(Bitmap bitmap)
-    {
+    protected void onPostExecute(Bitmap bitmap) {
         if (imageFetchAsyncTaskCompleteNotiferImpl != null)
             imageFetchAsyncTaskCompleteNotiferImpl.notifyOnCompletion(bitmap);
     }

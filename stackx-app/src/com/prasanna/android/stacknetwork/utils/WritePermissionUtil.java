@@ -29,31 +29,25 @@ import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.utils.LogWrapper;
 
-public class WritePermissionUtil
-{
+public class WritePermissionUtil {
     private static final String TAG = WritePermissionUtil.class.getSimpleName();
 
-    public static boolean canAdd(Context context, String site, ObjectType objectType)
-    {
+    public static boolean canAdd(Context context, String site, ObjectType objectType) {
         WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-        try
-        {
+        try {
             // Only check if add comment is available
             writePermissionDAO.open();
-            HashMap<ObjectType, WritePermission> writePermissions = writePermissionDAO.getPermissions(OperatingSite
-                            .getSite().apiSiteParameter);
-            if (writePermissions != null)
-            {
+            HashMap<ObjectType, WritePermission> writePermissions =
+                    writePermissionDAO.getPermissions(OperatingSite.getSite().apiSiteParameter);
+            if (writePermissions != null) {
                 WritePermission writePermission = writePermissions.get(ObjectType.COMMENT);
                 return (writePermission != null && writePermission.canAdd);
             }
         }
-        catch (SQLException e)
-        {
+        catch (SQLException e) {
             LogWrapper.e(TAG, e.getMessage());
         }
-        finally
-        {
+        finally {
             writePermissionDAO.close();
         }
 

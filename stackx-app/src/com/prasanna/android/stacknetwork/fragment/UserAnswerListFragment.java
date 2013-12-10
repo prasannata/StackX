@@ -46,8 +46,7 @@ import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.QuickActionMenu;
 
-public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer>
-{
+public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer> {
     private static final String TAG = UserAnswerListFragment.class.getSimpleName();
     private static final int ANSWER_PREVIEW_LEN = 200;
     private static final String ANS_CONTNUES = "...";
@@ -56,8 +55,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     private int page = 1;
     private Intent intent;
 
-    private static class ViewHolder
-    {
+    private static class ViewHolder {
         TextView itemTitle;
         TextView answerScore;
         TextView answerTime;
@@ -66,14 +64,11 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
-        if (itemsContainer == null)
-        {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (itemsContainer == null) {
             itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
             itemListAdapter =
-                            new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet,
-                                            new ArrayList<Answer>(), this);
+                    new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet, new ArrayList<Answer>(), this);
 
             itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
         }
@@ -81,17 +76,15 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    protected void startIntentService()
-    {
+    protected void startIntentService() {
         showProgressBar();
 
         intent = getIntentForService(UserIntentService.class, null);
-        if (intent != null)
-        {
+        if (intent != null) {
             intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
             intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
             intent.putExtra(StringConstants.USER_ID, getActivity().getIntent()
-                            .getLongExtra(StringConstants.USER_ID, 0L));
+                    .getLongExtra(StringConstants.USER_ID, 0L));
             intent.putExtra(StringConstants.PAGE, page++);
             intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
@@ -100,14 +93,12 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    public String getReceiverExtraName()
-    {
+    public String getReceiverExtraName() {
         return StringConstants.ANSWERS;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState) {
         registerForContextMenu(getListView());
 
         super.onActivityCreated(savedInstanceState);
@@ -116,8 +107,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume() {
         super.onResume();
 
         if (itemListAdapter != null && itemListAdapter.getCount() == 0)
@@ -125,24 +115,20 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    protected String getLogTag()
-    {
+    protected String getLogTag() {
         return TAG;
     }
 
     @Override
-    protected ViewGroup getParentLayout()
-    {
+    protected ViewGroup getParentLayout() {
         return itemsContainer;
     }
 
     @Override
-    public View getView(final Answer answer, int position, View convertView, ViewGroup parent)
-    {
+    public View getView(final Answer answer, int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
-        if (convertView == null)
-        {
+        if (convertView == null) {
             convertView = getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
             viewHolder = new ViewHolder();
             viewHolder.itemTitle = (TextView) convertView.findViewById(R.id.itemTitle);
@@ -163,13 +149,11 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
             viewHolder.answerScore.setTextColor(Color.DKGRAY);
         viewHolder.answerTime.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
 
-        if (answer.body != null)
-        {
+        if (answer.body != null) {
             String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "");
             answerBody = answerBody.replaceAll("\\<*p>", "");
 
-            if (answerBody.length() > ANSWER_PREVIEW_LEN)
-            {
+            if (answerBody.length() > ANSWER_PREVIEW_LEN) {
                 answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
                 viewHolder.answerBody.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
             }
@@ -182,29 +166,24 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     /* Shouldn't I recycle quick action menu as well? Yes, but how? */
-    private void setupQuickActionMenu(final Answer answer, ViewHolder holder)
-    {
+    private void setupQuickActionMenu(final Answer answer, ViewHolder holder) {
         final QuickActionMenu quickActionMenu = initQuickActionMenu(answer);
-        holder.quickActionMenuImg.setOnClickListener(new View.OnClickListener()
-        {
+        holder.quickActionMenuImg.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 quickActionMenu.show(v);
             }
         });
     }
 
-    protected QuickActionMenu initQuickActionMenu(final Answer answer)
-    {
+    protected QuickActionMenu initQuickActionMenu(final Answer answer) {
         return new StackXQuickActionMenu(getActivity()).addSimilarQuestionsItem(answer.title)
-                        .addRelatedQuickActionItem(answer.questionId)
-                        .addEmailQuickActionItem(answer.title, answer.body).build();
+                .addRelatedQuickActionItem(answer.questionId).addEmailQuickActionItem(answer.title, answer.body)
+                .build();
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, int position, long id)
-    {
+    public void onListItemClick(ListView l, View v, int position, long id) {
         Intent intent = new Intent(getActivity(), QuestionActivity.class);
         intent.setAction(StringConstants.QUESTION_ID);
         intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
@@ -213,8 +192,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     }
 
     @Override
-    protected void loadNextPage()
-    {
+    protected void loadNextPage() {
         startIntentService();
     }
 }
