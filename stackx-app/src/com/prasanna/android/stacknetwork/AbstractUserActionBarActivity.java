@@ -76,7 +76,7 @@ public abstract class AbstractUserActionBarActivity extends Activity {
       OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
 
       if (OperatingSite.getSite() == null) {
-        startSiteListActivity();
+        startActivity(new Intent(this, StackNetworkListActivity.class));
         finish();
       }
     }
@@ -121,7 +121,7 @@ public abstract class AbstractUserActionBarActivity extends Activity {
       }
     });
 
-    AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(fetchImageAsyncTask, siteIconUrl);
+    AsyncTaskExecutor.getInstance().executeInThreadPoolExecutor(fetchImageAsyncTask, siteIconUrl);
   }
 
   @Override
@@ -256,7 +256,7 @@ public abstract class AbstractUserActionBarActivity extends Activity {
         startActivity(userInboxIntent);
         return true;
       case R.id.menu_option_change_site:
-        startSiteListActivity();
+        startActivity(new Intent(this, StackNetworkListActivity.class));
         return true;
       case R.id.menu_option_settings:
         startActivity(new Intent(this, SettingsActivity.class));
@@ -264,10 +264,6 @@ public abstract class AbstractUserActionBarActivity extends Activity {
     }
 
     return false;
-  }
-
-  private void startSiteListActivity() {
-    startActivity(new Intent(this, StackNetworkListActivity.class));
   }
 
   private void showSearchFilterOptions(MenuItem item) {

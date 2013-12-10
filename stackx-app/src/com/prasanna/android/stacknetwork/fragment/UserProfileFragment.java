@@ -289,7 +289,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
         };
 
-    AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(
+    AsyncTaskExecutor.getInstance().executeInThreadPoolExecutor(
         new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl), user.profileImageLink);
   }
 

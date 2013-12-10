@@ -31,7 +31,7 @@ public class AsyncTaskExecutor {
     return INSTANCE;
   }
 
-  public <P, S, R> AsyncTask<P, S, R> executeAsyncTaskInThreadPoolExecutor(AsyncTask<P, S, R> task, P... args) {
+  public <P, S, R> AsyncTask<P, S, R> executeInThreadPoolExecutor(AsyncTask<P, S, R> task, P... args) {
     if (task != null)
       return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, args);
 
