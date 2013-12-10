@@ -22,19 +22,19 @@ package com.prasanna.android.task;
 import android.os.AsyncTask;
 
 public class AsyncTaskExecutor {
-    private static final AsyncTaskExecutor INSTANCE = new AsyncTaskExecutor();
+  private static final AsyncTaskExecutor INSTANCE = new AsyncTaskExecutor();
 
-    private AsyncTaskExecutor() {
-    }
+  private AsyncTaskExecutor() {
+  }
 
-    public static AsyncTaskExecutor getInstance() {
-        return INSTANCE;
-    }
+  public static AsyncTaskExecutor getInstance() {
+    return INSTANCE;
+  }
 
-    public <P, S, R> AsyncTask<P, S, R> executeAsyncTaskInThreadPoolExecutor(AsyncTask<P, S, R> task, P... args) {
-        if (task != null)
-            return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, args);
+  public <P, S, R> AsyncTask<P, S, R> executeAsyncTaskInThreadPoolExecutor(AsyncTask<P, S, R> task, P... args) {
+    if (task != null)
+      return task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, args);
 
-        return null;
-    }
+    return null;
+  }
 }

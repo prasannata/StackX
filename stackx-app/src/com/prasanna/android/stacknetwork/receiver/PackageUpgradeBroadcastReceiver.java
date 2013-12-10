@@ -27,12 +27,11 @@ import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 
 public class PackageUpgradeBroadcastReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_PACKAGE_REPLACED.equals(intent.getAction())) {
-            if (AppUtils.inAuthenticatedRealm(context)
-                    && !AlarmUtils.isAccountSyncAlarmSet(context.getApplicationContext()))
-                AlarmUtils.activatePeriodicAccountSync(context.getApplicationContext());
-        }
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    if (Intent.ACTION_PACKAGE_REPLACED.equals(intent.getAction())) {
+      if (AppUtils.inAuthenticatedRealm(context) && !AlarmUtils.isAccountSyncAlarmSet(context.getApplicationContext()))
+        AlarmUtils.activatePeriodicAccountSync(context.getApplicationContext());
     }
+  }
 }

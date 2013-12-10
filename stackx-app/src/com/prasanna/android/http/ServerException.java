@@ -22,25 +22,25 @@ package com.prasanna.android.http;
 import java.io.Serializable;
 
 public class ServerException extends AbstractHttpException implements Serializable {
-    private static final long serialVersionUID = 653718270475335315L;
-    private Code code;
+  private static final long serialVersionUID = 653718270475335315L;
+  private Code code;
 
-    public ServerException(int statusCode) {
-        this(statusCode, null, null);
-    }
+  public ServerException(int statusCode) {
+    this(statusCode, null, null);
+  }
 
-    public ServerException(int statusCode, String statusDescription, String errorResponse) {
-        super(statusCode, statusDescription, errorResponse);
-    }
+  public ServerException(int statusCode, String statusDescription, String errorResponse) {
+    super(statusCode, statusDescription, errorResponse);
+  }
 
-    public ServerException(Code code) {
-        super();
+  public ServerException(Code code) {
+    super();
 
-        this.code = code;
-    }
+    this.code = code;
+  }
 
-    @Override
-    public Code getCode() {
-        return code;
-    }
+  @Override
+  public Code getCode() {
+    return code;
+  }
 }

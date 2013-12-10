@@ -14,67 +14,67 @@ import android.os.Message;
 import android.os.Process;
 
 public abstract class AbstractStackxService extends Service {
-    private static boolean isRunning = false;
-    private Looper serviceLooper;
-    private Handler serviceHandler;
+  private static boolean isRunning = false;
+  private Looper serviceLooper;
+  private Handler serviceHandler;
 
-    protected abstract Handler getServiceHandler(Looper looper);
+  protected abstract Handler getServiceHandler(Looper looper);
 
-    private static List<Object> toNotifyObjects = Collections.synchronizedList(new ArrayList<Object>());
+  private static List<Object> toNotifyObjects = Collections.synchronizedList(new ArrayList<Object>());
 
-    public interface OnHandlerComplete {
-        void onHandleMessageFinish(Message message, Object... args);
+  public interface OnHandlerComplete {
+    void onHandleMessageFinish(Message message, Object... args);
+  }
+
+  public static boolean isRunning() {
+    return isRunning;
+  }
+
+  protected static synchronized void setRunning(boolean running) {
+    isRunning = running;
+  }
+
+  @Override
+  public IBinder onBind(Intent intent) {
+    return null;
+  }
+
+  @Override
+  public void onCreate() {
+    HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
+    thread.start();
+
+    serviceLooper = thread.getLooper();
+    serviceHandler = getServiceHandler(serviceLooper);
+  }
+
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    setRunning(true);
+
+    Message msg = serviceHandler.obtainMessage();
+    msg.arg1 = startId;
+    serviceHandler.sendMessage(msg);
+
+    return START_NOT_STICKY;
+  }
+
+  public static boolean registerForCompleteNotification(Object object) {
+    if (object != null && isRunning()) {
+      toNotifyObjects.add(object);
+      return true;
     }
 
-    public static boolean isRunning() {
-        return isRunning;
+    return false;
+  }
+
+  protected void notifyWaitingObjectsOnComplete() {
+    for (Object object : toNotifyObjects) {
+      synchronized (object) {
+        object.notify();
+      }
     }
 
-    protected static synchronized void setRunning(boolean running) {
-        isRunning = running;
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public void onCreate() {
-        HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-
-        serviceLooper = thread.getLooper();
-        serviceHandler = getServiceHandler(serviceLooper);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        setRunning(true);
-
-        Message msg = serviceHandler.obtainMessage();
-        msg.arg1 = startId;
-        serviceHandler.sendMessage(msg);
-
-        return START_NOT_STICKY;
-    }
-
-    public static boolean registerForCompleteNotification(Object object) {
-        if (object != null && isRunning()) {
-            toNotifyObjects.add(object);
-            return true;
-        }
-
-        return false;
-    }
-
-    protected void notifyWaitingObjectsOnComplete() {
-        for (Object object : toNotifyObjects) {
-            synchronized (object) {
-                object.notify();
-            }
-        }
-
-        toNotifyObjects.clear();
-    }
+    toNotifyObjects.clear();
+  }
 }

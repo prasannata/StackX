@@ -22,38 +22,38 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 
 public class SearchCriteriaDomain implements Serializable {
-    private static final long serialVersionUID = 8151064092604079290L;
+  private static final long serialVersionUID = 8151064092604079290L;
 
-    public long id = 0L;
-    public String name;
-    public long created = 0L;
-    public long lastModified = 0L;
-    public long lastRun = 0L;
-    public int runCount = 0;
-    public boolean tab = false;
-    public String site;
-    public SearchCriteria searchCriteria;
+  public long id = 0L;
+  public String name;
+  public long created = 0L;
+  public long lastModified = 0L;
+  public long lastRun = 0L;
+  public int runCount = 0;
+  public boolean tab = false;
+  public String site;
+  public SearchCriteria searchCriteria;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        SearchCriteriaDomain other = (SearchCriteriaDomain) obj;
-        if (id != other.id)
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    SearchCriteriaDomain other = (SearchCriteriaDomain) obj;
+    if (id != other.id)
+      return false;
+    return true;
+  }
 
 }

@@ -28,33 +28,33 @@ import com.prasanna.android.stacknetwork.model.Site;
 
 public class ActivityStartHelper {
 
-    public static void startRelatedQuestionActivity(Context currentActivity, long questionId) {
-        Intent questionsIntent = new Intent(currentActivity, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.RELATED);
-        questionsIntent.putExtra(StringConstants.QUESTION_ID, questionId);
-        currentActivity.startActivity(questionsIntent);
-    }
+  public static void startRelatedQuestionActivity(Context currentActivity, long questionId) {
+    Intent questionsIntent = new Intent(currentActivity, QuestionsActivity.class);
+    questionsIntent.setAction(StringConstants.RELATED);
+    questionsIntent.putExtra(StringConstants.QUESTION_ID, questionId);
+    currentActivity.startActivity(questionsIntent);
+  }
 
-    public static void startSimilarQuestionActivity(Context currentActivity, String title) {
-        Intent questionsIntent = new Intent(currentActivity, QuestionsActivity.class);
-        questionsIntent.setAction(StringConstants.SIMILAR);
-        questionsIntent.putExtra(StringConstants.TITLE, title);
-        currentActivity.startActivity(questionsIntent);
-    }
+  public static void startSimilarQuestionActivity(Context currentActivity, String title) {
+    Intent questionsIntent = new Intent(currentActivity, QuestionsActivity.class);
+    questionsIntent.setAction(StringConstants.SIMILAR);
+    questionsIntent.putExtra(StringConstants.TITLE, title);
+    currentActivity.startActivity(questionsIntent);
+  }
 
-    public static void startEmailActivity(Context currentActivity, String subject, String body) {
-        Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
-        currentActivity.startActivity(Intent.createChooser(emailIntent, ""));
-    }
+  public static void startEmailActivity(Context currentActivity, String subject, String body) {
+    Intent emailIntent = IntentUtils.createEmailIntent(subject, body);
+    currentActivity.startActivity(Intent.createChooser(emailIntent, ""));
+  }
 
-    public static void startUserProfileActivityForDefaultSite(Context currentActivity, long userId) {
-        startUserProfileActivity(currentActivity, userId, OperatingSite.getSite());
-    }
+  public static void startUserProfileActivityForDefaultSite(Context currentActivity, long userId) {
+    startUserProfileActivity(currentActivity, userId, OperatingSite.getSite());
+  }
 
-    public static void startUserProfileActivity(Context currentActivity, long userId, Site site) {
-        Intent userProfileIntent = new Intent(currentActivity, UserProfileActivity.class);
-        userProfileIntent.putExtra(StringConstants.USER_ID, userId);
-        userProfileIntent.putExtra(StringConstants.SITE, site);
-        currentActivity.startActivity(userProfileIntent);
-    }
+  public static void startUserProfileActivity(Context currentActivity, long userId, Site site) {
+    Intent userProfileIntent = new Intent(currentActivity, UserProfileActivity.class);
+    userProfileIntent.putExtra(StringConstants.USER_ID, userId);
+    userProfileIntent.putExtra(StringConstants.SITE, site);
+    currentActivity.startActivity(userProfileIntent);
+  }
 }

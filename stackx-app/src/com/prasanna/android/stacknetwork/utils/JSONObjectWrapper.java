@@ -26,137 +26,137 @@ import org.json.JSONObject;
 import com.prasanna.android.utils.LogWrapper;
 
 public class JSONObjectWrapper {
-    private static final String TAG = JSONObjectWrapper.class.getSimpleName();
-    public static final int ERROR = -1;
-    private final JSONObject jsonObject;
+  private static final String TAG = JSONObjectWrapper.class.getSimpleName();
+  public static final int ERROR = -1;
+  private final JSONObject jsonObject;
 
-    public static JSONObjectWrapper wrap(JSONObject jsonObject) {
-        JSONObjectWrapper wrap = null;
+  public static JSONObjectWrapper wrap(JSONObject jsonObject) {
+    JSONObjectWrapper wrap = null;
 
-        if (jsonObject != null) {
-            wrap = new JSONObjectWrapper(jsonObject);
-        }
-
-        return wrap;
+    if (jsonObject != null) {
+      wrap = new JSONObjectWrapper(jsonObject);
     }
 
-    public JSONObjectWrapper(JSONObject jsonObject) {
-        if (jsonObject == null)
-            throw new IllegalArgumentException("Constructor argument cannot be null");
+    return wrap;
+  }
 
-        this.jsonObject = jsonObject;
+  public JSONObjectWrapper(JSONObject jsonObject) {
+    if (jsonObject == null)
+      throw new IllegalArgumentException("Constructor argument cannot be null");
+
+    this.jsonObject = jsonObject;
+  }
+
+  public JSONObjectWrapper getJSONObject(String name) {
+    if (jsonObject.has(name)) {
+      try {
+        return new JSONObjectWrapper(jsonObject.getJSONObject(name));
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
 
-    public JSONObjectWrapper getJSONObject(String name) {
-        if (jsonObject.has(name)) {
-            try {
-                return new JSONObjectWrapper(jsonObject.getJSONObject(name));
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
+    return null;
+  }
 
-        return null;
+  public JSONArray getJSONArray(String name) {
+    if (jsonObject.has(name)) {
+      try {
+        return jsonObject.getJSONArray(name);
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
 
-    public JSONArray getJSONArray(String name) {
-        if (jsonObject.has(name)) {
-            try {
-                return jsonObject.getJSONArray(name);
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
+    return null;
+  }
 
-        return null;
+  public long getLong(String name) {
+    if (jsonObject.has(name)) {
+      try {
+        return jsonObject.getLong(name);
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
 
-    public long getLong(String name) {
-        if (jsonObject.has(name)) {
-            try {
-                return jsonObject.getLong(name);
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
+    return ERROR;
+  }
 
-        return ERROR;
+  public int getInt(String name, int defaultValue) {
+    if (jsonObject.has(name)) {
+      try {
+        return jsonObject.getInt(name);
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
 
-    public int getInt(String name, int defaultValue) {
-        if (jsonObject.has(name)) {
-            try {
-                return jsonObject.getInt(name);
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
+    return defaultValue;
+  }
 
-        return defaultValue;
+  public int getInt(String name) {
+    return getInt(name, ERROR);
+  }
+
+  public double getDouble(String name) {
+    if (jsonObject.has(name)) {
+      try {
+        return jsonObject.getDouble(name);
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
 
-    public int getInt(String name) {
-        return getInt(name, ERROR);
+    return ERROR;
+  }
+
+  public boolean getBoolean(String name) {
+    if (jsonObject.has(name)) {
+      try {
+        return jsonObject.getBoolean(name);
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
 
-    public double getDouble(String name) {
-        if (jsonObject.has(name)) {
-            try {
-                return jsonObject.getDouble(name);
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
+    return false;
+  }
 
-        return ERROR;
+  public String getString(String name) {
+    if (jsonObject.has(name)) {
+      try {
+        return jsonObject.getString(name);
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
     }
+    return null;
+  }
 
-    public boolean getBoolean(String name) {
-        if (jsonObject.has(name)) {
-            try {
-                return jsonObject.getBoolean(name);
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
+  public boolean isErrorResponse() {
+    return has(StringConstants.ERROR);
+  }
 
-        return false;
-    }
+  public boolean has(String name) {
+    if (jsonObject != null)
+      return jsonObject.has(name);
 
-    public String getString(String name) {
-        if (jsonObject.has(name)) {
-            try {
-                return jsonObject.getString(name);
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-        }
-        return null;
-    }
+    return false;
+  }
 
-    public boolean isErrorResponse() {
-        return has(StringConstants.ERROR);
-    }
+  @Override
+  public String toString() {
+    if (jsonObject != null)
+      return jsonObject.toString();
 
-    public boolean has(String name) {
-        if (jsonObject != null)
-            return jsonObject.has(name);
-
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        if (jsonObject != null)
-            return jsonObject.toString();
-
-        return null;
-    }
+    return null;
+  }
 }

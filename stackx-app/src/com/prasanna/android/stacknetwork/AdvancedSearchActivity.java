@@ -37,157 +37,157 @@ import com.prasanna.android.task.AsyncTaskCompletionNotifier;
 import com.prasanna.android.utils.LogWrapper;
 
 public class AdvancedSearchActivity extends AbstractUserActionBarActivity implements OnRunSearchListener {
-    private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
-    private SearchQuestionListFragment questionListFragment;
-    private SearchCriteriaFragment searchCriteriaFragment;
+  private static final String TAG = AdvancedSearchActivity.class.getSimpleName();
+  private SearchQuestionListFragment questionListFragment;
+  private SearchCriteriaFragment searchCriteriaFragment;
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.advanced_search);
-        searchCriteriaFragment =
-                (SearchCriteriaFragment) getFragmentManager().findFragmentById(R.id.searchCriteriaFragment);
-        questionListFragment =
-                (SearchQuestionListFragment) getFragmentManager().findFragmentById(R.id.questionListFragment);
+    setContentView(R.layout.advanced_search);
+    searchCriteriaFragment =
+        (SearchCriteriaFragment) getFragmentManager().findFragmentById(R.id.searchCriteriaFragment);
+    questionListFragment =
+        (SearchQuestionListFragment) getFragmentManager().findFragmentById(R.id.questionListFragment);
 
-        if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
-            searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
-                    StringConstants.SEARCH_CRITERIA));
-    }
+    if (StringConstants.SEARCH_CRITERIA.equals(getIntent().getAction()))
+      searchCriteriaFragment.loadCriteria((SearchCriteriaDomain) getIntent().getSerializableExtra(
+          StringConstants.SEARCH_CRITERIA));
+  }
 
-    private void showOrHideQuestionListFragment(Configuration configuration) {
-        if (!searchCriteriaFragment.isRemoving() && !questionListFragment.isRemoving()) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                if (questionListFragment.hasResults()) {
-                    getActionBar().setDisplayHomeAsUpEnabled(true);
-                    ft.hide(searchCriteriaFragment);
-                    ft.show(questionListFragment);
-                    AppUtils.hideSoftInput(this, getWindow().getCurrentFocus());
-                }
-                else {
-                    getActionBar().setDisplayHomeAsUpEnabled(false);
-                    ft.show(searchCriteriaFragment);
-                    ft.hide(questionListFragment);
-                }
-            }
-            else {
-                getActionBar().setDisplayHomeAsUpEnabled(false);
-                ft.show(searchCriteriaFragment);
-                if (questionListFragment.hasResults())
-                    ft.show(questionListFragment);
-                else
-                    ft.hide(questionListFragment);
-            }
-
-            // Why not commit? While in SearchCriteriaFragment, change
-            // orientation to landscape, launch SearchCriteriaListActivity.
-            // While in SearchCriteriaListActivity, change orientation back to
-            // portrait and press back. IllegalStateException is thrown saying
-            // commit cannot be performed after onSaveInstanceState has been
-            // called. Hence, commitAllowingStateLoss. But not convinced this is
-            // ok.
-            ft.commitAllowingStateLoss();
+  private void showOrHideQuestionListFragment(Configuration configuration) {
+    if (!searchCriteriaFragment.isRemoving() && !questionListFragment.isRemoving()) {
+      FragmentTransaction ft = getFragmentManager().beginTransaction();
+      if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (questionListFragment.hasResults()) {
+          getActionBar().setDisplayHomeAsUpEnabled(true);
+          ft.hide(searchCriteriaFragment);
+          ft.show(questionListFragment);
+          AppUtils.hideSoftInput(this, getWindow().getCurrentFocus());
         }
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean ret = super.onPrepareOptionsMenu(menu);
-
-        menu.removeItem(R.id.menu_refresh);
-        menu.removeItem(R.id.menu_advanced_search);
-
-        return ret & true;
-    }
-
-    @Override
-    protected void onStart() {
-        LogWrapper.d(TAG, "onStart");
-
-        super.onStart();
-
-        showOrHideQuestionListFragment(getResources().getConfiguration());
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-
-        showOrHideQuestionListFragment(newConfig);
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_save) {
-            searchCriteriaFragment.saveCriteria(getSaveCriteriaTaskCompletionNotifier());
-            return true;
+        else {
+          getActionBar().setDisplayHomeAsUpEnabled(false);
+          ft.show(searchCriteriaFragment);
+          ft.hide(questionListFragment);
         }
+      }
+      else {
+        getActionBar().setDisplayHomeAsUpEnabled(false);
+        ft.show(searchCriteriaFragment);
+        if (questionListFragment.hasResults())
+          ft.show(questionListFragment);
+        else
+          ft.hide(questionListFragment);
+      }
 
-        return super.onOptionsItemSelected(item);
+      // Why not commit? While in SearchCriteriaFragment, change
+      // orientation to landscape, launch SearchCriteriaListActivity.
+      // While in SearchCriteriaListActivity, change orientation back to
+      // portrait and press back. IllegalStateException is thrown saying
+      // commit cannot be performed after onSaveInstanceState has been
+      // called. Hence, commitAllowingStateLoss. But not convinced this is
+      // ok.
+      ft.commitAllowingStateLoss();
+    }
+  }
+
+  @Override
+  public boolean onPrepareOptionsMenu(Menu menu) {
+    boolean ret = super.onPrepareOptionsMenu(menu);
+
+    menu.removeItem(R.id.menu_refresh);
+    menu.removeItem(R.id.menu_advanced_search);
+
+    return ret & true;
+  }
+
+  @Override
+  protected void onStart() {
+    LogWrapper.d(TAG, "onStart");
+
+    super.onStart();
+
+    showOrHideQuestionListFragment(getResources().getConfiguration());
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+
+    showOrHideQuestionListFragment(newConfig);
+
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == R.id.menu_save) {
+      searchCriteriaFragment.saveCriteria(getSaveCriteriaTaskCompletionNotifier());
+      return true;
     }
 
-    private AsyncTaskCompletionNotifier<Boolean> getSaveCriteriaTaskCompletionNotifier() {
-        return new AsyncTaskCompletionNotifier<Boolean>() {
-            @Override
-            public void notifyOnCompletion(Boolean result) {
-                if (result) {
-                    setActionBarTitle(searchCriteriaFragment.getCriteriaName());
-                    Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
-                }
-                else
-                    Toast.makeText(AdvancedSearchActivity.this, "Cannot save criteria", Toast.LENGTH_LONG).show();
-            }
-        };
-    }
+    return super.onOptionsItemSelected(item);
+  }
 
-    @Override
-    protected void refresh() {
-        throw new UnsupportedOperationException("Refresh not supported for " + TAG);
-    }
-
-    @Override
-    protected boolean shouldSearchViewBeEnabled() {
-        return false;
-    }
-
-    @Override
-    public void onRunSearch(SearchCriteria searchCriteria, boolean savedCriteria) {
-        runSearchAndShowResults(searchCriteria, false, savedCriteria);
-    }
-
-    @Override
-    protected boolean onActionBarHomeButtonClick(MenuItem menuItem) {
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-                && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible()) {
-            if (!getFragmentManager().popBackStackImmediate()) {
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.show(searchCriteriaFragment);
-                ft.hide(questionListFragment);
-                ft.commit();
-            }
-
-            return true;
-        }
-
-        return super.onActionBarHomeButtonClick(menuItem);
-    }
-
-    private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack, boolean savedCriteria) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-
-        ft.show(questionListFragment);
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            ft.hide(searchCriteriaFragment);
-            ft.addToBackStack(null);
+  private AsyncTaskCompletionNotifier<Boolean> getSaveCriteriaTaskCompletionNotifier() {
+    return new AsyncTaskCompletionNotifier<Boolean>() {
+      @Override
+      public void notifyOnCompletion(Boolean result) {
+        if (result) {
+          setActionBarTitle(searchCriteriaFragment.getCriteriaName());
+          Toast.makeText(AdvancedSearchActivity.this, "Search criteria saved", Toast.LENGTH_SHORT).show();
         }
         else
-            searchCriteriaFragment.updateViewForDualPane(getResources().getConfiguration().orientation);
+          Toast.makeText(AdvancedSearchActivity.this, "Cannot save criteria", Toast.LENGTH_LONG).show();
+      }
+    };
+  }
 
+  @Override
+  protected void refresh() {
+    throw new UnsupportedOperationException("Refresh not supported for " + TAG);
+  }
+
+  @Override
+  protected boolean shouldSearchViewBeEnabled() {
+    return false;
+  }
+
+  @Override
+  public void onRunSearch(SearchCriteria searchCriteria, boolean savedCriteria) {
+    runSearchAndShowResults(searchCriteria, false, savedCriteria);
+  }
+
+  @Override
+  protected boolean onActionBarHomeButtonClick(MenuItem menuItem) {
+    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
+        && searchCriteriaFragment.isAdded() && !searchCriteriaFragment.isVisible()) {
+      if (!getFragmentManager().popBackStackImmediate()) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.show(searchCriteriaFragment);
+        ft.hide(questionListFragment);
         ft.commit();
+      }
 
-        questionListFragment.search(searchCriteria, savedCriteria);
+      return true;
     }
+
+    return super.onActionBarHomeButtonClick(menuItem);
+  }
+
+  private void runSearchAndShowResults(SearchCriteria searchCriteria, boolean addToBackStack, boolean savedCriteria) {
+    FragmentTransaction ft = getFragmentManager().beginTransaction();
+
+    ft.show(questionListFragment);
+    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+      ft.hide(searchCriteriaFragment);
+      ft.addToBackStack(null);
+    }
+    else
+      searchCriteriaFragment.updateViewForDualPane(getResources().getConfiguration().orientation);
+
+    ft.commit();
+
+    questionListFragment.search(searchCriteria, savedCriteria);
+  }
 }

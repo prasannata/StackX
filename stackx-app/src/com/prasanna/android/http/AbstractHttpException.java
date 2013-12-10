@@ -20,53 +20,53 @@
 package com.prasanna.android.http;
 
 public abstract class AbstractHttpException extends RuntimeException implements HttpException {
-    private String errorResponse;
-    private int statusCode;
-    private String statusDescription;
+  private String errorResponse;
+  private int statusCode;
+  private String statusDescription;
 
-    private static final long serialVersionUID = 7575439728639763037L;
+  private static final long serialVersionUID = 7575439728639763037L;
 
-    public AbstractHttpException() {
-        super();
-    }
+  public AbstractHttpException() {
+    super();
+  }
 
-    public AbstractHttpException(String message) {
-        this(0, null, message);
-    }
+  public AbstractHttpException(String message) {
+    this(0, null, message);
+  }
 
-    public AbstractHttpException(int statusCode) {
-        this(statusCode, null);
-    }
+  public AbstractHttpException(int statusCode) {
+    this(statusCode, null);
+  }
 
-    public AbstractHttpException(int statusCode, String errorResponse) {
-        this(statusCode, null, errorResponse);
-    }
+  public AbstractHttpException(int statusCode, String errorResponse) {
+    this(statusCode, null, errorResponse);
+  }
 
-    public AbstractHttpException(int statusCode, String statusDescription, String errorResponse) {
-        super(errorResponse);
+  public AbstractHttpException(int statusCode, String statusDescription, String errorResponse) {
+    super(errorResponse);
 
-        this.statusCode = statusCode;
-        this.statusDescription = statusDescription;
-        this.errorResponse = errorResponse;
-    }
+    this.statusCode = statusCode;
+    this.statusDescription = statusDescription;
+    this.errorResponse = errorResponse;
+  }
 
-    public AbstractHttpException(Throwable throwable) {
-        super(throwable);
-    }
+  public AbstractHttpException(Throwable throwable) {
+    super(throwable);
+  }
 
-    @Override
-    public String getErrorResponse() {
-        return errorResponse;
-    }
+  @Override
+  public String getErrorResponse() {
+    return errorResponse;
+  }
 
-    @Override
-    public int getStatusCode() {
-        return statusCode;
-    }
+  @Override
+  public int getStatusCode() {
+    return statusCode;
+  }
 
-    @Override
-    public String getStatusDescription() {
-        return statusDescription;
-    }
+  @Override
+  public String getStatusDescription() {
+    return statusDescription;
+  }
 
 }

@@ -23,72 +23,72 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Question extends Post implements Serializable {
-    private static final long serialVersionUID = -4722553914475051236L;
+  private static final long serialVersionUID = -4722553914475051236L;
 
-    public static Question copyMetaDeta(Question that) {
-        if (that == null)
-            return null;
+  public static Question copyMetaDeta(Question that) {
+    if (that == null)
+      return null;
 
-        Question question = new Question();
-        question.id = that.id;
-        question.title = that.title;
-        question.score = that.score;
-        question.creationDate = that.creationDate;
-        question.body = that.body;
-        question.link = that.link;
-        question.viewCount = that.viewCount;
-        question.answerCount = that.answerCount;
-        question.relativeLink = that.relativeLink;
-        question.answered = that.answered;
-        question.hasAcceptedAnswer = that.hasAcceptedAnswer;
-        if (that.tags != null) {
-            question.tags = new String[that.tags.length];
-            for (int i = 0; i < that.tags.length; i++)
-                question.tags[i] = that.tags[i];
-        }
-        question.owner = User.copyShallowUser(that.owner);
-        return question;
+    Question question = new Question();
+    question.id = that.id;
+    question.title = that.title;
+    question.score = that.score;
+    question.creationDate = that.creationDate;
+    question.body = that.body;
+    question.link = that.link;
+    question.viewCount = that.viewCount;
+    question.answerCount = that.answerCount;
+    question.relativeLink = that.relativeLink;
+    question.answered = that.answered;
+    question.hasAcceptedAnswer = that.hasAcceptedAnswer;
+    if (that.tags != null) {
+      question.tags = new String[that.tags.length];
+      for (int i = 0; i < that.tags.length; i++)
+        question.tags[i] = that.tags[i];
     }
+    question.owner = User.copyShallowUser(that.owner);
+    return question;
+  }
 
-    public int viewCount;
+  public int viewCount;
 
-    public int answerCount;
+  public int answerCount;
 
-    public int votes;
+  public int votes;
 
-    public String[] tags;
+  public String[] tags;
 
-    public String relativeLink;
+  public String relativeLink;
 
-    public ArrayList<Answer> answers;
+  public ArrayList<Answer> answers;
 
-    public ArrayList<Comment> comments;
+  public ArrayList<Comment> comments;
 
-    public boolean answered;
+  public boolean answered;
 
-    public boolean hasAcceptedAnswer = false;
+  public boolean hasAcceptedAnswer = false;
 
-    public final PostType postType = PostType.QUESTION;
+  public final PostType postType = PostType.QUESTION;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Answer other = (Answer) obj;
-        if (id != other.id)
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Answer other = (Answer) obj;
+    if (id != other.id)
+      return false;
+    return true;
+  }
 }

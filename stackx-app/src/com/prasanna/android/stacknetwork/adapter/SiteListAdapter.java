@@ -40,117 +40,117 @@ import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 
 public class SiteListAdapter extends ArrayAdapter<Site> {
-    private OnSiteSelectedListener onSiteSelectedListener;
-    private Filter filter;
+  private OnSiteSelectedListener onSiteSelectedListener;
+  private Filter filter;
 
-    public interface OnSiteSelectedListener {
-        void onSiteSelected(Site site);
+  public interface OnSiteSelectedListener {
+    void onSiteSelected(Site site);
+  }
+
+  public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> sites,
+      Filter filter) {
+    super(context, layoutResourceId, textViewResourceId, sites);
+    this.filter = filter;
+  }
+
+  static class ViewHolder {
+    TextView siteNameView;
+    TextView siteAudience;
+    TextView registeredView;
+    ImageView writePermissionView;
+    ImageView defaultSiteOpt;
+  }
+
+  @Override
+  public View getView(final int position, View convertView, ViewGroup parent) {
+    ViewHolder holder;
+
+    if (convertView == null) {
+      convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
+      holder = new ViewHolder();
+      holder.siteNameView = (TextView) convertView.findViewById(R.id.siteName);
+      holder.siteAudience = (TextView) convertView.findViewById(R.id.siteAudience);
+      holder.registeredView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
+      holder.writePermissionView = (ImageView) convertView.findViewById(R.id.writePermissionEnabled);
+      holder.defaultSiteOpt = (ImageView) convertView.findViewById(R.id.isDefaultSite);
+      convertView.setTag(holder);
     }
+    else
+      holder = (ViewHolder) convertView.getTag();
 
-    public SiteListAdapter(Context context, int layoutResourceId, int textViewResourceId, ArrayList<Site> sites,
-            Filter filter) {
-        super(context, layoutResourceId, textViewResourceId, sites);
-        this.filter = filter;
-    }
+    Site site = getItem(position);
+    holder.siteNameView.setText(Html.fromHtml(site.name));
+    if (site.audience != null)
+      holder.siteAudience.setText(Html.fromHtml(site.audience));
 
-    static class ViewHolder {
-        TextView siteNameView;
-        TextView siteAudience;
-        TextView registeredView;
-        ImageView writePermissionView;
-        ImageView defaultSiteOpt;
-    }
+    if (site.userType != null && site.userType.equals(UserType.REGISTERED))
+      holder.registeredView.setVisibility(View.VISIBLE);
+    else
+      holder.registeredView.setVisibility(View.GONE);
 
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+    holder.writePermissionView.setVisibility(View.GONE);
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.sitelist_row, null);
-            holder = new ViewHolder();
-            holder.siteNameView = (TextView) convertView.findViewById(R.id.siteName);
-            holder.siteAudience = (TextView) convertView.findViewById(R.id.siteAudience);
-            holder.registeredView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
-            holder.writePermissionView = (ImageView) convertView.findViewById(R.id.writePermissionEnabled);
-            holder.defaultSiteOpt = (ImageView) convertView.findViewById(R.id.isDefaultSite);
-            convertView.setTag(holder);
+    if (site.writePermissions != null) {
+      for (WritePermission permission : site.writePermissions) {
+        if (permission.objectType != null && ObjectType.COMMENT.equals(permission.objectType)) {
+          if (permission.canAdd & permission.canDelete & permission.canEdit) {
+            holder.writePermissionView.setVisibility(View.VISIBLE);
+            break;
+          }
         }
-        else
-            holder = (ViewHolder) convertView.getTag();
+      }
+    }
 
-        Site site = getItem(position);
-        holder.siteNameView.setText(Html.fromHtml(site.name));
-        if (site.audience != null)
-            holder.siteAudience.setText(Html.fromHtml(site.audience));
+    setViewAndListenerForDefaultSiteOption(position, holder);
+    setOnClickForSite(position, convertView);
+    return convertView;
+  }
 
-        if (site.userType != null && site.userType.equals(UserType.REGISTERED))
-            holder.registeredView.setVisibility(View.VISIBLE);
-        else
-            holder.registeredView.setVisibility(View.GONE);
+  private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder) {
+    final Site defaultSite = AppUtils.getDefaultSite(getContext());
+    if (isDefaultSite(defaultSite, position))
+      holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
+    else
+      holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
 
-        holder.writePermissionView.setVisibility(View.GONE);
+    holder.defaultSiteOpt.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Site item = getItem(position);
 
-        if (site.writePermissions != null) {
-            for (WritePermission permission : site.writePermissions) {
-                if (permission.objectType != null && ObjectType.COMMENT.equals(permission.objectType)) {
-                    if (permission.canAdd & permission.canDelete & permission.canEdit) {
-                        holder.writePermissionView.setVisibility(View.VISIBLE);
-                        break;
-                    }
-                }
-            }
+        if (isDefaultSite(defaultSite, position)) {
+          holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
+          AppUtils.clearDefaultSite(getContext());
         }
+        else {
+          holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
+          AppUtils.setDefaultSite(getContext(), item);
+          notifyDataSetChanged();
+          Toast.makeText(getContext(), item.name + " set as default site.", Toast.LENGTH_LONG).show();
+        }
+      }
+    });
+  }
 
-        setViewAndListenerForDefaultSiteOption(position, holder);
-        setOnClickForSite(position, convertView);
-        return convertView;
-    }
+  private boolean isDefaultSite(Site defaultSite, final int position) {
+    return defaultSite != null && defaultSite.name != null && defaultSite.name.equals(getItem(position).name);
+  }
 
-    private void setViewAndListenerForDefaultSiteOption(final int position, final ViewHolder holder) {
-        final Site defaultSite = AppUtils.getDefaultSite(getContext());
-        if (isDefaultSite(defaultSite, position))
-            holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
-        else
-            holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
+  private void setOnClickForSite(final int position, View layoutForSites) {
+    layoutForSites.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        if (onSiteSelectedListener != null)
+          onSiteSelectedListener.onSiteSelected(getItem(position));
+      }
+    });
+  }
 
-        holder.defaultSiteOpt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Site item = getItem(position);
+  @Override
+  public Filter getFilter() {
+    return filter;
+  }
 
-                if (isDefaultSite(defaultSite, position)) {
-                    holder.defaultSiteOpt.setImageResource(R.drawable.circle_white);
-                    AppUtils.clearDefaultSite(getContext());
-                }
-                else {
-                    holder.defaultSiteOpt.setImageResource(R.drawable.circle_delft);
-                    AppUtils.setDefaultSite(getContext(), item);
-                    notifyDataSetChanged();
-                    Toast.makeText(getContext(), item.name + " set as default site.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    private boolean isDefaultSite(Site defaultSite, final int position) {
-        return defaultSite != null && defaultSite.name != null && defaultSite.name.equals(getItem(position).name);
-    }
-
-    private void setOnClickForSite(final int position, View layoutForSites) {
-        layoutForSites.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (onSiteSelectedListener != null)
-                    onSiteSelectedListener.onSiteSelected(getItem(position));
-            }
-        });
-    }
-
-    @Override
-    public Filter getFilter() {
-        return filter;
-    }
-
-    public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener) {
-        this.onSiteSelectedListener = onSiteSelectedListener;
-    }
+  public void setOnSiteSelectedListener(OnSiteSelectedListener onSiteSelectedListener) {
+    this.onSiteSelectedListener = onSiteSelectedListener;
+  }
 }

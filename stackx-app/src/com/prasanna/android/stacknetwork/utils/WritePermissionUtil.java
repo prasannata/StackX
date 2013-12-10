@@ -30,27 +30,27 @@ import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.utils.LogWrapper;
 
 public class WritePermissionUtil {
-    private static final String TAG = WritePermissionUtil.class.getSimpleName();
+  private static final String TAG = WritePermissionUtil.class.getSimpleName();
 
-    public static boolean canAdd(Context context, String site, ObjectType objectType) {
-        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-        try {
-            // Only check if add comment is available
-            writePermissionDAO.open();
-            HashMap<ObjectType, WritePermission> writePermissions =
-                    writePermissionDAO.getPermissions(OperatingSite.getSite().apiSiteParameter);
-            if (writePermissions != null) {
-                WritePermission writePermission = writePermissions.get(ObjectType.COMMENT);
-                return (writePermission != null && writePermission.canAdd);
-            }
-        }
-        catch (SQLException e) {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        finally {
-            writePermissionDAO.close();
-        }
-
-        return false;
+  public static boolean canAdd(Context context, String site, ObjectType objectType) {
+    WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
+    try {
+      // Only check if add comment is available
+      writePermissionDAO.open();
+      HashMap<ObjectType, WritePermission> writePermissions =
+          writePermissionDAO.getPermissions(OperatingSite.getSite().apiSiteParameter);
+      if (writePermissions != null) {
+        WritePermission writePermission = writePermissions.get(ObjectType.COMMENT);
+        return (writePermission != null && writePermission.canAdd);
+      }
     }
+    catch (SQLException e) {
+      LogWrapper.e(TAG, e.getMessage());
+    }
+    finally {
+      writePermissionDAO.close();
+    }
+
+    return false;
+  }
 }

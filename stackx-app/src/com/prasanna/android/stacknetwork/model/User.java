@@ -25,96 +25,96 @@ import java.util.ArrayList;
 import android.graphics.Bitmap;
 
 public class User extends IdentifiableItem implements Serializable {
-    public static enum UserType {
-        REGISTERED("registered"),
-        UNREGISTERED("unregistered"),
-        MODERATOR("moderator"),
-        DOES_NOT_EXIST("does_not_exist");
+  public static enum UserType {
+    REGISTERED("registered"),
+    UNREGISTERED("unregistered"),
+    MODERATOR("moderator"),
+    DOES_NOT_EXIST("does_not_exist");
 
-        private final String value;
+    private final String value;
 
-        UserType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public static UserType toEnum(String value) {
-            UserType userType = null;
-
-            if (value != null) {
-                try {
-                    for (UserType type : UserType.values()) {
-                        if (type.getValue().equals(value)) {
-                            userType = type;
-                            break;
-                        }
-                    }
-                }
-                catch (IllegalArgumentException e) {
-                    userType = null;
-                }
-            }
-            return userType;
-        }
-
-        public static UserType getEnum(String userType) {
-            if (userType == null)
-                return null;
-
-            try {
-                return valueOf(userType.toUpperCase());
-            }
-            catch (IllegalArgumentException e) {
-                return null;
-            }
-        }
+    UserType(String value) {
+      this.value = value;
     }
 
-    public static User copyShallowUser(User that) {
-        if (that == null)
-            return null;
-
-        User user = new User();
-        user.id = that.id;
-        user.acceptRate = that.acceptRate;
-        user.displayName = that.displayName;
-        user.reputation = that.reputation;
-        user.link = that.link;
-        return user;
+    public String getValue() {
+      return value;
     }
 
-    private static final long serialVersionUID = -5427063287288616795L;
+    public static UserType toEnum(String value) {
+      UserType userType = null;
 
-    public long accountId = 0L;
+      if (value != null) {
+        try {
+          for (UserType type : UserType.values()) {
+            if (type.getValue().equals(value)) {
+              userType = type;
+              break;
+            }
+          }
+        }
+        catch (IllegalArgumentException e) {
+          userType = null;
+        }
+      }
+      return userType;
+    }
 
-    public String displayName = "";
+    public static UserType getEnum(String userType) {
+      if (userType == null)
+        return null;
 
-    public Bitmap avatar;
+      try {
+        return valueOf(userType.toUpperCase());
+      }
+      catch (IllegalArgumentException e) {
+        return null;
+      }
+    }
+  }
 
-    public String profileImageLink;
+  public static User copyShallowUser(User that) {
+    if (that == null)
+      return null;
 
-    public int reputation = -1;
+    User user = new User();
+    user.id = that.id;
+    user.acceptRate = that.acceptRate;
+    user.displayName = that.displayName;
+    user.reputation = that.reputation;
+    user.link = that.link;
+    return user;
+  }
 
-    public int[] badgeCounts;
+  private static final long serialVersionUID = -5427063287288616795L;
 
-    public int acceptRate = 0;
+  public long accountId = 0L;
 
-    public int questionCount = 0;
+  public String displayName = "";
 
-    public int answerCount = 0;
+  public Bitmap avatar;
 
-    public int upvoteCount = 0;
+  public String profileImageLink;
 
-    public int downvoteCount = 0;
+  public int reputation = -1;
 
-    public int profileViews = 0;
+  public int[] badgeCounts;
 
-    public long lastAccessTime = 0L;
+  public int acceptRate = 0;
 
-    public ArrayList<Account> accounts;
+  public int questionCount = 0;
 
-    public long lastUpdateTime;
+  public int answerCount = 0;
+
+  public int upvoteCount = 0;
+
+  public int downvoteCount = 0;
+
+  public int profileViews = 0;
+
+  public long lastAccessTime = 0L;
+
+  public ArrayList<Account> accounts;
+
+  public long lastUpdateTime;
 }

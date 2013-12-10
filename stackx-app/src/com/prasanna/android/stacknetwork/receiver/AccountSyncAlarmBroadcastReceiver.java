@@ -28,13 +28,13 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.utils.LogWrapper;
 
 public class AccountSyncAlarmBroadcastReceiver extends BroadcastReceiver {
-    private static final String TAG = AccountSyncAlarmBroadcastReceiver.class.getSimpleName();
+  private static final String TAG = AccountSyncAlarmBroadcastReceiver.class.getSimpleName();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        LogWrapper.d(TAG, "Alarm receiver invoked");
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    LogWrapper.d(TAG, "Alarm receiver invoked");
 
-        if (AppUtils.inAuthenticatedRealm(context))
-            context.startService(new Intent(context, AccountSyncService.class));
-    }
+    if (AppUtils.inAuthenticatedRealm(context))
+      context.startService(new Intent(context, AccountSyncService.class));
+  }
 }

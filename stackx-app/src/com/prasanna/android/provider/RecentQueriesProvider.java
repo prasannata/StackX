@@ -22,10 +22,10 @@ package com.prasanna.android.provider;
 import android.content.SearchRecentSuggestionsProvider;
 
 public class RecentQueriesProvider extends SearchRecentSuggestionsProvider {
-    public final static String AUTHORITY = "com.prasanna.android.provider.RecentQueriesProvider";
-    public final static int MODE = DATABASE_MODE_QUERIES;
+  public final static String AUTHORITY = "com.prasanna.android.provider.RecentQueriesProvider";
+  public final static int MODE = DATABASE_MODE_QUERIES;
 
-    public RecentQueriesProvider() {
-        setupSuggestions(AUTHORITY, MODE);
-    }
+  public RecentQueriesProvider() {
+    setupSuggestions(AUTHORITY, MODE);
+  }
 }

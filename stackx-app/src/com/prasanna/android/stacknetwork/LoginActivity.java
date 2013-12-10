@@ -33,59 +33,58 @@ import com.prasanna.android.stacknetwork.utils.DialogBuilder;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 
 public class LoginActivity extends Activity {
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        if (AppUtils.isFirstRun(getApplicationContext())) {
-            setContentView(R.layout.main);
-            setupLogin();
-            setupSkipLogin();
+    if (AppUtils.isFirstRun(getApplicationContext())) {
+      setContentView(R.layout.main);
+      setupLogin();
+      setupSkipLogin();
+    }
+    else {
+      Intent intent;
+      OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+
+      if (OperatingSite.getSite() != null)
+        intent = new Intent(this, QuestionsActivity.class);
+      else
+        intent = new Intent(this, StackNetworkListActivity.class);
+
+      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(intent);
+    }
+  }
+
+  private void setupLogin() {
+    Button loginButton = (Button) findViewById(R.id.login_button);
+    loginButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View view) {
+        AppUtils.setFirstRunComplete(LoginActivity.this);
+        Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
+        startActivity(oAuthIntent);
+      }
+    });
+  }
+
+  private void setupSkipLogin() {
+    TextView skipLoginTextView = (TextView) findViewById(R.id.skipLogin);
+    skipLoginTextView.setOnClickListener(new View.OnClickListener() {
+      private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          if (DialogInterface.BUTTON_POSITIVE == which) {
+            Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG).show();
+            AppUtils.setFirstRunComplete(LoginActivity.this);
+            startActivity(new Intent(LoginActivity.this, StackNetworkListActivity.class));
+          }
         }
-        else {
-            Intent intent;
-            OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+      };
 
-            if (OperatingSite.getSite() != null)
-                intent = new Intent(this, QuestionsActivity.class);
-            else
-                intent = new Intent(this, StackNetworkListActivity.class);
-
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        }
-    }
-
-    private void setupLogin() {
-        Button loginButton = (Button) findViewById(R.id.login_button);
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                AppUtils.setFirstRunComplete(LoginActivity.this);
-                Intent oAuthIntent = new Intent(view.getContext(), OAuthActivity.class);
-                startActivity(oAuthIntent);
-            }
-        });
-    }
-
-    private void setupSkipLogin() {
-        TextView skipLoginTextView = (TextView) findViewById(R.id.skipLogin);
-        skipLoginTextView.setOnClickListener(new View.OnClickListener() {
-            private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (DialogInterface.BUTTON_POSITIVE == which) {
-                        Toast.makeText(LoginActivity.this, "Login option is available in settings", Toast.LENGTH_LONG)
-                                .show();
-                        AppUtils.setFirstRunComplete(LoginActivity.this);
-                        startActivity(new Intent(LoginActivity.this, StackNetworkListActivity.class));
-                    }
-                }
-            };
-
-            public void onClick(View view) {
-                DialogBuilder.yesNoDialog(LoginActivity.this, R.string.noLoginWarn, dialogClickListener).show();
-            }
-        });
-    }
+      public void onClick(View view) {
+        DialogBuilder.yesNoDialog(LoginActivity.this, R.string.noLoginWarn, dialogClickListener).show();
+      }
+    });
+  }
 }

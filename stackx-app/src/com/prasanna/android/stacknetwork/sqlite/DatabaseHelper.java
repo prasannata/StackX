@@ -31,39 +31,39 @@ import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO.UserAccountsTabl
 import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO.WritePermissionTable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    public static final String TABLE_AUDIT = "AUDIT";
+  public static final String TABLE_AUDIT = "AUDIT";
 
-    private static final String DATABASE_NAME = "stackx.db";
-    private static final int DATABASE_VERSION = 1;
+  private static final String DATABASE_NAME = "stackx.db";
+  private static final int DATABASE_VERSION = 1;
 
-    public static final class AuditTable {
-        public static final String COLUMN_ID = "_id";
-        public static final String COLUMN_TYPE = "type";
-        public static final String COLUMN_SITE = "site";
-        public static final String COLUMN_LAST_UPDATE_TIME = "last_update_time";
+  public static final class AuditTable {
+    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_SITE = "site";
+    public static final String COLUMN_LAST_UPDATE_TIME = "last_update_time";
 
-        private static final String CREATE_TABLE = "create table " + TABLE_AUDIT + "(" + COLUMN_ID
-                + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE + " text, "
-                + COLUMN_LAST_UPDATE_TIME + " long not null);";
-    }
+    private static final String CREATE_TABLE = "create table " + TABLE_AUDIT + "(" + COLUMN_ID
+        + " integer primary key autoincrement, " + COLUMN_TYPE + " text not null, " + COLUMN_SITE + " text, "
+        + COLUMN_LAST_UPDATE_TIME + " long not null);";
+  }
 
-    public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
+  public DatabaseHelper(Context context) {
+    super(context, DATABASE_NAME, null, DATABASE_VERSION);
+  }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SiteTable.CREATE_TABLE);
-        db.execSQL(TagsTable.CREATE_TABLE);
-        db.execSQL(AuditTable.CREATE_TABLE);
-        db.execSQL(WritePermissionTable.CREATE_TABLE);
-        db.execSQL(ProfileTable.CREATE_TABLE);
-        db.execSQL(UserAccountsTable.CREATE_TABLE);
-        db.execSQL(SearchCriteriaTable.CREATE_TABLE);
-    }
+  @Override
+  public void onCreate(SQLiteDatabase db) {
+    db.execSQL(SiteTable.CREATE_TABLE);
+    db.execSQL(TagsTable.CREATE_TABLE);
+    db.execSQL(AuditTable.CREATE_TABLE);
+    db.execSQL(WritePermissionTable.CREATE_TABLE);
+    db.execSQL(ProfileTable.CREATE_TABLE);
+    db.execSQL(UserAccountsTable.CREATE_TABLE);
+    db.execSQL(SearchCriteriaTable.CREATE_TABLE);
+  }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO Auto-generated method stub
-    }
+  @Override
+  public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    // TODO Auto-generated method stub
+  }
 }

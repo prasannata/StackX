@@ -22,12 +22,12 @@ package com.prasanna.android.stacknetwork.utils;
 import android.content.Intent;
 
 public class IntentUtils {
-    public static Intent createEmailIntent(String subject, String body) {
-        String type = "plain/text";
-        Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-        emailIntent.setType(type);
-        emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
-        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
-        return emailIntent;
-    }
+  public static Intent createEmailIntent(String subject, String body) {
+    String type = "plain/text";
+    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+    emailIntent.setType(type);
+    emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+    emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, body);
+    return emailIntent;
+  }
 }

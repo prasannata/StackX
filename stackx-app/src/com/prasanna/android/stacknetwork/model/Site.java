@@ -25,70 +25,70 @@ import java.util.ArrayList;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 
 public class Site implements Serializable {
-    private static final long serialVersionUID = 7057957647981597410L;
+  private static final long serialVersionUID = 7057957647981597410L;
 
-    public long dbId;
+  public long dbId;
 
-    public String name;
+  public String name;
 
-    public String apiSiteParameter;
+  public String apiSiteParameter;
 
-    public String audience;
+  public String audience;
 
-    public String link;
+  public String link;
 
-    public int headerResId;
+  public int headerResId;
 
-    public String logoUrl;
+  public String logoUrl;
 
-    public String iconUrl;
+  public String iconUrl;
 
-    public String faviconUrl;
+  public String faviconUrl;
 
-    public UserType userType = UserType.DOES_NOT_EXIST;
+  public UserType userType = UserType.DOES_NOT_EXIST;
 
-    public ArrayList<WritePermission> writePermissions;
+  public ArrayList<WritePermission> writePermissions;
 
-    public long userId = -1;
+  public long userId = -1;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((apiSiteParameter == null) ? 0 : apiSiteParameter.hashCode());
-        result = prime * result + ((link == null) ? 0 : link.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((apiSiteParameter == null) ? 0 : apiSiteParameter.hashCode());
+    result = prime * result + ((link == null) ? 0 : link.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Site other = (Site) obj;
+    if (apiSiteParameter == null) {
+      if (other.apiSiteParameter != null)
+        return false;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Site other = (Site) obj;
-        if (apiSiteParameter == null) {
-            if (other.apiSiteParameter != null)
-                return false;
-        }
-        else if (!apiSiteParameter.equals(other.apiSiteParameter))
-            return false;
-        if (link == null) {
-            if (other.link != null)
-                return false;
-        }
-        else if (!link.equals(other.link))
-            return false;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        }
-        else if (!name.equals(other.name))
-            return false;
-        return true;
+    else if (!apiSiteParameter.equals(other.apiSiteParameter))
+      return false;
+    if (link == null) {
+      if (other.link != null)
+        return false;
     }
+    else if (!link.equals(other.link))
+      return false;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    }
+    else if (!name.equals(other.name))
+      return false;
+    return true;
+  }
 
 }

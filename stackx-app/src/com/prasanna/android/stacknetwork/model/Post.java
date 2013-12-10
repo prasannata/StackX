@@ -22,45 +22,45 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 
 public class Post extends IdentifiableItem implements Serializable {
-    private static final long serialVersionUID = -7850382261881073395L;
+  private static final long serialVersionUID = -7850382261881073395L;
 
-    public enum PostType {
-        QUESTION("question"),
-        ANSWER("answer");
+  public enum PostType {
+    QUESTION("question"),
+    ANSWER("answer");
 
-        private final String value;
+    private final String value;
 
-        PostType(String value) {
-            this.value = value;
-        }
-
-        public static PostType getEnum(String string) {
-            PostType postType = null;
-
-            if (string != null) {
-                try {
-                    postType = valueOf(string.toUpperCase());
-                }
-                catch (IllegalArgumentException e) {
-                    postType = null;
-                }
-
-            }
-            return postType;
-        }
-
-        public String getValue() {
-            return value;
-        }
+    PostType(String value) {
+      this.value = value;
     }
 
-    public PostType postType;
+    public static PostType getEnum(String string) {
+      PostType postType = null;
 
-    public int score = 0;
+      if (string != null) {
+        try {
+          postType = valueOf(string.toUpperCase());
+        }
+        catch (IllegalArgumentException e) {
+          postType = null;
+        }
 
-    public String title;
+      }
+      return postType;
+    }
 
-    public String body;
+    public String getValue() {
+      return value;
+    }
+  }
 
-    public User owner;
+  public PostType postType;
+
+  public int score = 0;
+
+  public String title;
+
+  public String body;
+
+  public User owner;
 }

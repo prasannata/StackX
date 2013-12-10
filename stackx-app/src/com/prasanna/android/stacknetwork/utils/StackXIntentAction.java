@@ -20,38 +20,38 @@
 package com.prasanna.android.stacknetwork.utils;
 
 public class StackXIntentAction {
-    public interface IntentAction {
-        String getAction();
+  public interface IntentAction {
+    String getAction();
+  }
+
+  public enum UserIntentAction implements IntentAction {
+    LOGOUT("com.prasanna.stacknetwork.logout"),
+    NEW_MSG("com.prasanna.stacknetwork.newMsg"),
+    TOTAL_NEW_MSGS("com.prasanna.stacknetwork.newMsgTotal");
+
+    private final String action;
+
+    private UserIntentAction(String action) {
+      this.action = action;
     }
 
-    public enum UserIntentAction implements IntentAction {
-        LOGOUT("com.prasanna.stacknetwork.logout"),
-        NEW_MSG("com.prasanna.stacknetwork.newMsg"),
-        TOTAL_NEW_MSGS("com.prasanna.stacknetwork.newMsgTotal");
+    public String getAction() {
+      return action;
+    }
+  }
 
-        private final String action;
+  public enum ErrorIntentAction implements IntentAction {
+    HTTP_ERROR("com.prasanna.stacknetwork.http.error");
 
-        private UserIntentAction(String action) {
-            this.action = action;
-        }
+    private final String action;
 
-        public String getAction() {
-            return action;
-        }
+    private ErrorIntentAction(String action) {
+      this.action = action;
     }
 
-    public enum ErrorIntentAction implements IntentAction {
-        HTTP_ERROR("com.prasanna.stacknetwork.http.error");
-
-        private final String action;
-
-        private ErrorIntentAction(String action) {
-            this.action = action;
-        }
-
-        @Override
-        public String getAction() {
-            return action;
-        }
+    @Override
+    public String getAction() {
+      return action;
     }
+  }
 }

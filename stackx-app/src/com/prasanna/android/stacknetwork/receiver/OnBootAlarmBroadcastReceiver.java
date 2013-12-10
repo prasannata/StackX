@@ -28,15 +28,15 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.utils.LogWrapper;
 
 public class OnBootAlarmBroadcastReceiver extends BroadcastReceiver {
-    private static final String TAG = OnBootAlarmBroadcastReceiver.class.getSimpleName();
+  private static final String TAG = OnBootAlarmBroadcastReceiver.class.getSimpleName();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        LogWrapper.d(TAG, "Alarm receiver invoked");
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    LogWrapper.d(TAG, "Alarm receiver invoked");
 
-        if (AppUtils.inAuthenticatedRealm(context)) {
-            AlarmUtils.setInboxRefreshAlarm(context.getApplicationContext());
-            AlarmUtils.activatePeriodicAccountSync(context.getApplicationContext());
-        }
+    if (AppUtils.inAuthenticatedRealm(context)) {
+      AlarmUtils.setInboxRefreshAlarm(context.getApplicationContext());
+      AlarmUtils.activatePeriodicAccountSync(context.getApplicationContext());
     }
+  }
 }

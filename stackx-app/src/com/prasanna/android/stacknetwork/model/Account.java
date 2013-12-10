@@ -24,43 +24,43 @@ import java.io.Serializable;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 
 public class Account extends IdentifiableItem implements Serializable {
-    private static final long serialVersionUID = 5454221525646765113L;
+  private static final long serialVersionUID = 5454221525646765113L;
 
-    public long userId;
+  public long userId;
 
-    public String siteName;
+  public String siteName;
 
-    public String siteUrl;
+  public String siteUrl;
 
-    public UserType userType;
+  public UserType userType;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + ((siteUrl == null) ? 0 : siteUrl.hashCode());
-        return result;
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    result = prime * result + ((siteUrl == null) ? 0 : siteUrl.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Account other = (Account) obj;
+    if (id != other.id)
+      return false;
+    if (siteUrl == null) {
+      if (other.siteUrl != null)
+        return false;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Account other = (Account) obj;
-        if (id != other.id)
-            return false;
-        if (siteUrl == null) {
-            if (other.siteUrl != null)
-                return false;
-        }
-        else if (!siteUrl.equals(other.siteUrl))
-            return false;
-        return true;
-    }
+    else if (!siteUrl.equals(other.siteUrl))
+      return false;
+    return true;
+  }
 
 }

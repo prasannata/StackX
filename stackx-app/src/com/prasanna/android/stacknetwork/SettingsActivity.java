@@ -28,25 +28,25 @@ import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
 import com.prasanna.android.utils.LogWrapper;
 
 public class SettingsActivity extends Activity {
-    private static final String TAG = SettingsActivity.class.getSimpleName();
+  private static final String TAG = SettingsActivity.class.getSimpleName();
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, getSettingsFragment()).commit();
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    getFragmentManager().beginTransaction().replace(android.R.id.content, getSettingsFragment()).commit();
+  }
+
+  private SettingsFragment getSettingsFragment() {
+    SettingsFragment settingsFragment = new SettingsFragment();
+
+    try {
+      PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+      settingsFragment.setAppVersionName(packageInfo.versionName);
+      settingsFragment.setAppVersionCode(packageInfo.versionCode);
     }
-
-    private SettingsFragment getSettingsFragment() {
-        SettingsFragment settingsFragment = new SettingsFragment();
-
-        try {
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            settingsFragment.setAppVersionName(packageInfo.versionName);
-            settingsFragment.setAppVersionCode(packageInfo.versionCode);
-        }
-        catch (NameNotFoundException e) {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        return settingsFragment;
+    catch (NameNotFoundException e) {
+      LogWrapper.e(TAG, e.getMessage());
     }
+    return settingsFragment;
+  }
 }

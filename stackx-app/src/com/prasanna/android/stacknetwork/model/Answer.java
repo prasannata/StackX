@@ -23,40 +23,40 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Answer extends Post implements Serializable {
-    private static final long serialVersionUID = -307252373087687685L;
+  private static final long serialVersionUID = -307252373087687685L;
 
-    public long questionId = -1;
+  public long questionId = -1;
 
-    public String relativeLink;
+  public String relativeLink;
 
-    public boolean accepted;
+  public boolean accepted;
 
-    public ArrayList<Comment> comments;
+  public ArrayList<Comment> comments;
 
-    public final PostType postType = PostType.ANSWER;
+  public final PostType postType = PostType.ANSWER;
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (id ^ (id >>> 32));
-        result = prime * result + (int) (questionId ^ (questionId >>> 32));
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (id ^ (id >>> 32));
+    result = prime * result + (int) (questionId ^ (questionId >>> 32));
+    return result;
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Answer other = (Answer) obj;
-        if (id != other.id)
-            return false;
-        if (questionId != other.questionId)
-            return false;
-        return true;
-    }
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Answer other = (Answer) obj;
+    if (id != other.id)
+      return false;
+    if (questionId != other.questionId)
+      return false;
+    return true;
+  }
 }

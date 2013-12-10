@@ -20,7 +20,7 @@
 package com.prasanna.android.listener;
 
 public interface FlingActionListener {
-    void flingedToRight();
+  void flingedToRight();
 
-    void flingedToLeft();
+  void flingedToLeft();
 }

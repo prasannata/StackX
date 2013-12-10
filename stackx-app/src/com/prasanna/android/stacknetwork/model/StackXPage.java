@@ -23,10 +23,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class StackXPage<T extends IdentifiableItem> implements Serializable {
-    private static final long serialVersionUID = 7047575779061924898L;
+  private static final long serialVersionUID = 7047575779061924898L;
 
-    public ArrayList<T> items;
-    public boolean hasMore = false;
-    public int quota_remaining = 0;
-    public int quota_max = 0;
+  public ArrayList<T> items;
+  public boolean hasMore = false;
+  public int quota_remaining = 0;
+  public int quota_max = 0;
 }

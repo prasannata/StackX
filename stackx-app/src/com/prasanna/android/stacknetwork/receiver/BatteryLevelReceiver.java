@@ -27,12 +27,12 @@ import android.widget.Toast;
 import com.prasanna.android.utils.LogWrapper;
 
 public class BatteryLevelReceiver extends BroadcastReceiver {
-    private static final String TAG = BatteryLevelReceiver.class.getSimpleName();
+  private static final String TAG = BatteryLevelReceiver.class.getSimpleName();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        LogWrapper.d(TAG, "onReceive: " + intent.getAction());
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    LogWrapper.d(TAG, "onReceive: " + intent.getAction());
 
-        Toast.makeText(context, "Battery low", Toast.LENGTH_LONG).show();
-    }
+    Toast.makeText(context, "Battery low", Toast.LENGTH_LONG).show();
+  }
 }

@@ -47,152 +47,150 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.views.QuickActionMenu;
 
 public class UserAnswerListFragment extends ItemListFragment<Answer> implements ListItemView<Answer> {
-    private static final String TAG = UserAnswerListFragment.class.getSimpleName();
-    private static final int ANSWER_PREVIEW_LEN = 200;
-    private static final String ANS_CONTNUES = "...";
-    private static final String MULTIPLE_NEW_LINES_AT_END = "[\\s]+$";
+  private static final String TAG = UserAnswerListFragment.class.getSimpleName();
+  private static final int ANSWER_PREVIEW_LEN = 200;
+  private static final String ANS_CONTNUES = "...";
+  private static final String MULTIPLE_NEW_LINES_AT_END = "[\\s]+$";
 
-    private int page = 1;
-    private Intent intent;
+  private int page = 1;
+  private Intent intent;
 
-    private static class ViewHolder {
-        TextView itemTitle;
-        TextView answerScore;
-        TextView answerTime;
-        TextView answerBody;
-        ImageView quickActionMenuImg;
+  private static class ViewHolder {
+    TextView itemTitle;
+    TextView answerScore;
+    TextView answerTime;
+    TextView answerBody;
+    ImageView quickActionMenuImg;
+  }
+
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    if (itemsContainer == null) {
+      itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
+      itemListAdapter =
+          new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet, new ArrayList<Answer>(), this);
+
+      itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
+    }
+    return itemsContainer;
+  }
+
+  @Override
+  protected void startIntentService() {
+    showProgressBar();
+
+    intent = getIntentForService(UserIntentService.class, null);
+    if (intent != null) {
+      intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
+      intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+      intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+      intent.putExtra(StringConstants.PAGE, page++);
+      intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+
+      startService(intent);
+    }
+  }
+
+  @Override
+  public String getReceiverExtraName() {
+    return StringConstants.ANSWERS;
+  }
+
+  @Override
+  public void onActivityCreated(Bundle savedInstanceState) {
+    registerForContextMenu(getListView());
+
+    super.onActivityCreated(savedInstanceState);
+
+    registerForContextMenu(getListView());
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    if (itemListAdapter != null && itemListAdapter.getCount() == 0)
+      startIntentService();
+  }
+
+  @Override
+  protected String getLogTag() {
+    return TAG;
+  }
+
+  @Override
+  protected ViewGroup getParentLayout() {
+    return itemsContainer;
+  }
+
+  @Override
+  public View getView(final Answer answer, int position, View convertView, ViewGroup parent) {
+    ViewHolder viewHolder;
+
+    if (convertView == null) {
+      convertView = getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
+      viewHolder = new ViewHolder();
+      viewHolder.itemTitle = (TextView) convertView.findViewById(R.id.itemTitle);
+      viewHolder.answerScore = (TextView) convertView.findViewById(R.id.answerScore);
+      viewHolder.answerTime = (TextView) convertView.findViewById(R.id.answerTime);
+      viewHolder.answerBody = (TextView) convertView.findViewById(R.id.answerBodyPreview);
+      viewHolder.quickActionMenuImg = (ImageView) convertView.findViewById(R.id.itemContextMenu);
+      convertView.setTag(viewHolder);
+    }
+    else
+      viewHolder = (ViewHolder) convertView.getTag();
+
+    viewHolder.itemTitle.setText(Html.fromHtml(answer.title));
+    viewHolder.answerScore.setText(AppUtils.formatNumber(answer.score));
+    if (answer.accepted)
+      viewHolder.answerScore.setTextColor(getResources().getColor(R.color.ledGreen));
+    else
+      viewHolder.answerScore.setTextColor(Color.DKGRAY);
+    viewHolder.answerTime.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
+
+    if (answer.body != null) {
+      String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "");
+      answerBody = answerBody.replaceAll("\\<*p>", "");
+
+      if (answerBody.length() > ANSWER_PREVIEW_LEN) {
+        answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
+        viewHolder.answerBody.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
+      }
+      else
+        viewHolder.answerBody.setText(Html.fromHtml(answerBody));
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (itemsContainer == null) {
-            itemsContainer = (LinearLayout) inflater.inflate(R.layout.list_view, null);
-            itemListAdapter =
-                    new ItemListAdapter<Answer>(getActivity(), R.layout.answer_snippet, new ArrayList<Answer>(), this);
+    setupQuickActionMenu(answer, viewHolder);
+    return convertView;
+  }
 
-            itemsContainer.removeView(itemsContainer.findViewById(R.id.scoreAndAns));
-        }
-        return itemsContainer;
-    }
+  /* Shouldn't I recycle quick action menu as well? Yes, but how? */
+  private void setupQuickActionMenu(final Answer answer, ViewHolder holder) {
+    final QuickActionMenu quickActionMenu = initQuickActionMenu(answer);
+    holder.quickActionMenuImg.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        quickActionMenu.show(v);
+      }
+    });
+  }
 
-    @Override
-    protected void startIntentService() {
-        showProgressBar();
+  protected QuickActionMenu initQuickActionMenu(final Answer answer) {
+    return new StackXQuickActionMenu(getActivity()).addSimilarQuestionsItem(answer.title)
+        .addRelatedQuickActionItem(answer.questionId).addEmailQuickActionItem(answer.title, answer.body).build();
+  }
 
-        intent = getIntentForService(UserIntentService.class, null);
-        if (intent != null) {
-            intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_ANSWERS);
-            intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
-            intent.putExtra(StringConstants.USER_ID, getActivity().getIntent()
-                    .getLongExtra(StringConstants.USER_ID, 0L));
-            intent.putExtra(StringConstants.PAGE, page++);
-            intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+  @Override
+  public void onListItemClick(ListView l, View v, int position, long id) {
+    Intent intent = new Intent(getActivity(), QuestionActivity.class);
+    intent.setAction(StringConstants.QUESTION_ID);
+    intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
+    intent.putExtra(StringConstants.SITE, OperatingSite.getSite().apiSiteParameter);
+    startActivity(intent);
+  }
 
-            startService(intent);
-        }
-    }
-
-    @Override
-    public String getReceiverExtraName() {
-        return StringConstants.ANSWERS;
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        registerForContextMenu(getListView());
-
-        super.onActivityCreated(savedInstanceState);
-
-        registerForContextMenu(getListView());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (itemListAdapter != null && itemListAdapter.getCount() == 0)
-            startIntentService();
-    }
-
-    @Override
-    protected String getLogTag() {
-        return TAG;
-    }
-
-    @Override
-    protected ViewGroup getParentLayout() {
-        return itemsContainer;
-    }
-
-    @Override
-    public View getView(final Answer answer, int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
-
-        if (convertView == null) {
-            convertView = getActivity().getLayoutInflater().inflate(R.layout.answer_snippet, null);
-            viewHolder = new ViewHolder();
-            viewHolder.itemTitle = (TextView) convertView.findViewById(R.id.itemTitle);
-            viewHolder.answerScore = (TextView) convertView.findViewById(R.id.answerScore);
-            viewHolder.answerTime = (TextView) convertView.findViewById(R.id.answerTime);
-            viewHolder.answerBody = (TextView) convertView.findViewById(R.id.answerBodyPreview);
-            viewHolder.quickActionMenuImg = (ImageView) convertView.findViewById(R.id.itemContextMenu);
-            convertView.setTag(viewHolder);
-        }
-        else
-            viewHolder = (ViewHolder) convertView.getTag();
-
-        viewHolder.itemTitle.setText(Html.fromHtml(answer.title));
-        viewHolder.answerScore.setText(AppUtils.formatNumber(answer.score));
-        if (answer.accepted)
-            viewHolder.answerScore.setTextColor(getResources().getColor(R.color.ledGreen));
-        else
-            viewHolder.answerScore.setTextColor(Color.DKGRAY);
-        viewHolder.answerTime.setText(DateTimeUtils.getElapsedDurationSince(answer.creationDate));
-
-        if (answer.body != null) {
-            String answerBody = answer.body.replaceAll(MULTIPLE_NEW_LINES_AT_END, "");
-            answerBody = answerBody.replaceAll("\\<*p>", "");
-
-            if (answerBody.length() > ANSWER_PREVIEW_LEN) {
-                answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
-                viewHolder.answerBody.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
-            }
-            else
-                viewHolder.answerBody.setText(Html.fromHtml(answerBody));
-        }
-
-        setupQuickActionMenu(answer, viewHolder);
-        return convertView;
-    }
-
-    /* Shouldn't I recycle quick action menu as well? Yes, but how? */
-    private void setupQuickActionMenu(final Answer answer, ViewHolder holder) {
-        final QuickActionMenu quickActionMenu = initQuickActionMenu(answer);
-        holder.quickActionMenuImg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                quickActionMenu.show(v);
-            }
-        });
-    }
-
-    protected QuickActionMenu initQuickActionMenu(final Answer answer) {
-        return new StackXQuickActionMenu(getActivity()).addSimilarQuestionsItem(answer.title)
-                .addRelatedQuickActionItem(answer.questionId).addEmailQuickActionItem(answer.title, answer.body)
-                .build();
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        Intent intent = new Intent(getActivity(), QuestionActivity.class);
-        intent.setAction(StringConstants.QUESTION_ID);
-        intent.putExtra(StringConstants.QUESTION_ID, itemListAdapter.getItem(position).questionId);
-        intent.putExtra(StringConstants.SITE, OperatingSite.getSite().apiSiteParameter);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void loadNextPage() {
-        startIntentService();
-    }
+  @Override
+  protected void loadNextPage() {
+    startIntentService();
+  }
 }

@@ -47,111 +47,111 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
 public class LogoutActivity extends Activity {
-    private static final String TAG = LogoutActivity.class.getSimpleName();
+  private static final String TAG = LogoutActivity.class.getSimpleName();
 
-    private Intent deauthAppIntent;
+  private Intent deauthAppIntent;
 
-    private ProgressDialog progressDialog;
+  private ProgressDialog progressDialog;
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            progressDialog.dismiss();
-
-            StackExchangeHttpError error =
-                    (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT.getAction());
-
-            processLogoutResponse(error);
-        }
-
-    };
-
-    private SharedPreferences sharedPreferences;
-
+  private BroadcastReceiver receiver = new BroadcastReceiver() {
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onReceive(Context context, Intent intent) {
+      progressDialog.dismiss();
 
-        setContentView(new LinearLayout(this));
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
-        registerReceiver();
-        startIntentService(accessToken);
+      StackExchangeHttpError error =
+          (StackExchangeHttpError) intent.getSerializableExtra(UserIntentAction.LOGOUT.getAction());
+
+      processLogoutResponse(error);
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        try {
-            unregisterReceiver(receiver);
-        }
-        catch (IllegalArgumentException e) {
-            LogWrapper.d(TAG, e.getMessage());
-        }
+  };
+
+  private SharedPreferences sharedPreferences;
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    setContentView(new LinearLayout(this));
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    String accessToken = sharedPreferences.getString(StringConstants.ACCESS_TOKEN, null);
+    registerReceiver();
+    startIntentService(accessToken);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    try {
+      unregisterReceiver(receiver);
     }
-
-    private void startIntentService(String accessToken) {
-        progressDialog = ProgressDialog.show(LogoutActivity.this, "", "Logging out");
-
-        deauthAppIntent = new Intent(this, UserIntentService.class);
-        deauthAppIntent.putExtra(StringConstants.ACTION, UserIntentService.DEAUTH_APP);
-        deauthAppIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
-        startService(deauthAppIntent);
+    catch (IllegalArgumentException e) {
+      LogWrapper.d(TAG, e.getMessage());
     }
+  }
 
-    private void registerReceiver() {
-        IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.getAction());
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        registerReceiver(receiver, filter);
+  private void startIntentService(String accessToken) {
+    progressDialog = ProgressDialog.show(LogoutActivity.this, "", "Logging out");
+
+    deauthAppIntent = new Intent(this, UserIntentService.class);
+    deauthAppIntent.putExtra(StringConstants.ACTION, UserIntentService.DEAUTH_APP);
+    deauthAppIntent.putExtra(StringConstants.ACCESS_TOKEN, accessToken);
+    startService(deauthAppIntent);
+  }
+
+  private void registerReceiver() {
+    IntentFilter filter = new IntentFilter(UserIntentAction.LOGOUT.getAction());
+    filter.addCategory(Intent.CATEGORY_DEFAULT);
+    registerReceiver(receiver, filter);
+  }
+
+  private void startLoginActivity() {
+    Intent intent = new Intent(this, StackNetworkListActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
+  }
+
+  private void processLogoutResponse(StackExchangeHttpError error) {
+    if (error != null && error.id == -1) {
+      Editor editor = sharedPreferences.edit();
+      editor.remove(StringConstants.ACCESS_TOKEN);
+      editor.commit();
+
+      AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
+      AlarmUtils.cancelPeriodicAccountSync(getApplicationContext());
+
+      AppUtils.clearSharedPreferences(getApplicationContext());
+      AppUtils.setFirstRunComplete(getApplicationContext());
+
+      clearDatabase();
+
+      SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
+
+      clearCookies();
+      startLoginActivity();
     }
-
-    private void startLoginActivity() {
-        Intent intent = new Intent(this, StackNetworkListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+    else if (error != null && error.id > 0) {
+      LogWrapper.d(TAG, "Logout failed with " + error.message);
+      finish();
     }
-
-    private void processLogoutResponse(StackExchangeHttpError error) {
-        if (error != null && error.id == -1) {
-            Editor editor = sharedPreferences.edit();
-            editor.remove(StringConstants.ACCESS_TOKEN);
-            editor.commit();
-
-            AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
-            AlarmUtils.cancelPeriodicAccountSync(getApplicationContext());
-
-            AppUtils.clearSharedPreferences(getApplicationContext());
-            AppUtils.setFirstRunComplete(getApplicationContext());
-
-            clearDatabase();
-
-            SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
-
-            clearCookies();
-            startLoginActivity();
-        }
-        else if (error != null && error.id > 0) {
-            LogWrapper.d(TAG, "Logout failed with " + error.message);
-            finish();
-        }
-        else {
-            LogWrapper.d(TAG, "Logout failed for unknown reason");
-            finish();
-        }
+    else {
+      LogWrapper.d(TAG, "Logout failed for unknown reason");
+      finish();
     }
+  }
 
-    private void clearDatabase() {
-        SiteDAO.deleteAll(getApplicationContext());
-        TagDAO.purge(getApplicationContext());
-        WritePermissionDAO.deleteAll(getApplicationContext());
-        ProfileDAO.purge(getApplicationContext());
-    }
+  private void clearDatabase() {
+    SiteDAO.deleteAll(getApplicationContext());
+    TagDAO.purge(getApplicationContext());
+    WritePermissionDAO.deleteAll(getApplicationContext());
+    ProfileDAO.purge(getApplicationContext());
+  }
 
-    private void clearCookies() {
-        CookieSyncManager.createInstance(getApplicationContext());
-        CookieManager cookieManager = CookieManager.getInstance();
-        cookieManager.removeAllCookie();
-    }
+  private void clearCookies() {
+    CookieSyncManager.createInstance(getApplicationContext());
+    CookieManager cookieManager = CookieManager.getInstance();
+    cookieManager.removeAllCookie();
+  }
 }

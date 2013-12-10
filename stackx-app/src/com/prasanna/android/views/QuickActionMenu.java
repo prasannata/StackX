@@ -37,85 +37,85 @@ import android.widget.TextView;
 import com.prasanna.android.stacknetwork.R;
 
 public class QuickActionMenu {
-    private final Context context;
-    private ListView listView;
-    private ActionItemAdapter actionItemAdapter;
-    private PopupWindow popupWindow;
-    private View rootView;
+  private final Context context;
+  private ListView listView;
+  private ActionItemAdapter actionItemAdapter;
+  private PopupWindow popupWindow;
+  private View rootView;
 
-    private class ActionItemAdapter extends ArrayAdapter<QuickActionItem> {
-        public ActionItemAdapter(Context context, int textViewResourceId) {
-            super(context, textViewResourceId);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView view = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.quick_action_item, null);
-            view.setText(getItem(position).getTitle());
-            return view;
-        }
+  private class ActionItemAdapter extends ArrayAdapter<QuickActionItem> {
+    public ActionItemAdapter(Context context, int textViewResourceId) {
+      super(context, textViewResourceId);
     }
 
-    public QuickActionMenu(Context context) {
-        this.context = context;
-
-        rootView = initPopupWindow();
-        setupPopupWindowView();
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      TextView view = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.quick_action_item, null);
+      view.setText(getItem(position).getTitle());
+      return view;
     }
+  }
 
-    private View initPopupWindow() {
-        View v = LayoutInflater.from(context).inflate(R.layout.quick_action_popup, null);
-        popupWindow = new PopupWindow(context);
-        popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
-        popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-        popupWindow.setTouchable(true);
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(new BitmapDrawable(context.getResources()));
-        popupWindow.setContentView(v);
-        return v;
-    }
+  public QuickActionMenu(Context context) {
+    this.context = context;
 
-    private void setupPopupWindowView() {
-        actionItemAdapter = new ActionItemAdapter(context, R.layout.quick_action_item);
-        listView = (ListView) rootView.findViewById(R.id.quickActionItemlist);
-        listView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                actionItemAdapter.getItem(position).getOnClickListener().onClick(view);
-                dismiss();
-            }
-        });
-        listView.setAdapter(actionItemAdapter);
-    }
+    rootView = initPopupWindow();
+    setupPopupWindowView();
+  }
 
-    public void addActionItem(QuickActionItem quickActionItem) {
-        actionItemAdapter.add(quickActionItem);
-        actionItemAdapter.notifyDataSetChanged();
-    }
+  private View initPopupWindow() {
+    View v = LayoutInflater.from(context).inflate(R.layout.quick_action_popup, null);
+    popupWindow = new PopupWindow(context);
+    popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+    popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+    popupWindow.setTouchable(true);
+    popupWindow.setFocusable(true);
+    popupWindow.setOutsideTouchable(true);
+    popupWindow.setBackgroundDrawable(new BitmapDrawable(context.getResources()));
+    popupWindow.setContentView(v);
+    return v;
+  }
 
-    public void removeActionItem(QuickActionItem quickActionItem) {
-        actionItemAdapter.remove(quickActionItem);
-        actionItemAdapter.notifyDataSetChanged();
-    }
+  private void setupPopupWindowView() {
+    actionItemAdapter = new ActionItemAdapter(context, R.layout.quick_action_item);
+    listView = (ListView) rootView.findViewById(R.id.quickActionItemlist);
+    listView.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        actionItemAdapter.getItem(position).getOnClickListener().onClick(view);
+        dismiss();
+      }
+    });
+    listView.setAdapter(actionItemAdapter);
+  }
 
-    public void show(View anchor) {
-        int[] anchorLocation = new int[2];
-        int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
-        anchor.getLocationOnScreen(anchorLocation);
+  public void addActionItem(QuickActionItem quickActionItem) {
+    actionItemAdapter.add(quickActionItem);
+    actionItemAdapter.notifyDataSetChanged();
+  }
 
-        if (anchorLocation[1] > (screenHeight / 2 + 150))
-            popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, anchorLocation[0],
-                    anchorLocation[1] - rootView.getHeight());
-        else
-            popupWindow.showAsDropDown(anchor);
-    }
+  public void removeActionItem(QuickActionItem quickActionItem) {
+    actionItemAdapter.remove(quickActionItem);
+    actionItemAdapter.notifyDataSetChanged();
+  }
 
-    public void setOnDismissListener(OnDismissListener onDismissListener) {
-        popupWindow.setOnDismissListener(onDismissListener);
-    }
+  public void show(View anchor) {
+    int[] anchorLocation = new int[2];
+    int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+    anchor.getLocationOnScreen(anchorLocation);
 
-    public void dismiss() {
-        popupWindow.dismiss();
-    }
+    if (anchorLocation[1] > (screenHeight / 2 + 150))
+      popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, anchorLocation[0],
+          anchorLocation[1] - rootView.getHeight());
+    else
+      popupWindow.showAsDropDown(anchor);
+  }
+
+  public void setOnDismissListener(OnDismissListener onDismissListener) {
+    popupWindow.setOnDismissListener(onDismissListener);
+  }
+
+  public void dismiss() {
+    popupWindow.dismiss();
+  }
 }

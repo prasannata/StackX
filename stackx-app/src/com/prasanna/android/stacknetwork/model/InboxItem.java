@@ -22,59 +22,59 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 
 public class InboxItem extends Post implements Serializable {
-    public static enum ItemType {
-        COMMENT("comment"),
-        CHAT_MESSAGE("chat message"),
-        NEW_ANSWER("answer"),
-        CAREERS_MESSAGE("career message"),
-        CAREERS_INVITATIONS("career invite"),
-        META_QUESTION("meta question"),
-        POST_NOTICE("post notice"),
-        MODERATOR_MESSAGE("message from moderator");
+  public static enum ItemType {
+    COMMENT("comment"),
+    CHAT_MESSAGE("chat message"),
+    NEW_ANSWER("answer"),
+    CAREERS_MESSAGE("career message"),
+    CAREERS_INVITATIONS("career invite"),
+    META_QUESTION("meta question"),
+    POST_NOTICE("post notice"),
+    MODERATOR_MESSAGE("message from moderator");
 
-        private final String repr;
+    private final String repr;
 
-        ItemType(String repr) {
-            this.repr = repr;
-        }
-
-        public static ItemType getValue(String string) {
-            ItemType itemType = null;
-
-            if (string != null) {
-                try {
-                    itemType = valueOf(string.toUpperCase());
-                }
-                catch (IllegalArgumentException e) {
-                    itemType = null;
-                }
-
-            }
-            return itemType;
-        }
-
-        public String getNotificationTitle(int count) {
-            String plural = (count > 1) ? "s" : "";
-
-            return count + " new " + getRepr() + plural;
-        }
-
-        public String getRepr() {
-            return repr;
-        }
+    ItemType(String repr) {
+      this.repr = repr;
     }
 
-    private static final long serialVersionUID = 7015749387787062217L;
+    public static ItemType getValue(String string) {
+      ItemType itemType = null;
 
-    public long questionId = -1;
+      if (string != null) {
+        try {
+          itemType = valueOf(string.toUpperCase());
+        }
+        catch (IllegalArgumentException e) {
+          itemType = null;
+        }
 
-    public long answerId = -1;
+      }
+      return itemType;
+    }
 
-    public long commentId;
+    public String getNotificationTitle(int count) {
+      String plural = (count > 1) ? "s" : "";
 
-    public ItemType itemType;
+      return count + " new " + getRepr() + plural;
+    }
 
-    public Site site;
+    public String getRepr() {
+      return repr;
+    }
+  }
 
-    public boolean unread = false;
+  private static final long serialVersionUID = 7015749387787062217L;
+
+  public long questionId = -1;
+
+  public long answerId = -1;
+
+  public long commentId;
+
+  public ItemType itemType;
+
+  public Site site;
+
+  public boolean unread = false;
 }

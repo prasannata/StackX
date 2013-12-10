@@ -48,383 +48,383 @@ import com.prasanna.android.stacknetwork.utils.StackUri.Sort;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class QuestionsActivity extends AbstractUserActionBarActivity implements OnTagSelectListener {
-    private static final String TAB_TITLE_ACTIVE = "Active";
-    private static final String TAB_TITLE_NEW = "New";
-    private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
-    private static final String TAB_TITLE_FAQ = "FAQ";
-    private static final String LAST_SELECTED_TAB = "last_selected_tab";
+  private static final String TAB_TITLE_ACTIVE = "Active";
+  private static final String TAB_TITLE_NEW = "New";
+  private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
+  private static final String TAB_TITLE_FAQ = "FAQ";
+  private static final String LAST_SELECTED_TAB = "last_selected_tab";
 
-    private static QuestionsActivity self;
+  private static QuestionsActivity self;
 
-    private boolean showTagsFragment = false;
-    private TagListFragment tagListFragment;
-    private String intentAction;
-    private String tag;
-    private int action;
+  private boolean showTagsFragment = false;
+  private TagListFragment tagListFragment;
+  private String intentAction;
+  private String tag;
+  private int action;
 
-    public static QuestionListFragment getFragment(String fragmentTag) {
-        if (self != null)
-            return (QuestionListFragment) self.getFragmentManager().findFragmentByTag(fragmentTag);
+  public static QuestionListFragment getFragment(String fragmentTag) {
+    if (self != null)
+      return (QuestionListFragment) self.getFragmentManager().findFragmentByTag(fragmentTag);
+    else
+      return null;
+  }
+
+  public class TabListener implements ActionBar.TabListener {
+    private final QuestionListFragment fragment;
+
+    public TabListener(QuestionListFragment fragment) {
+      this.fragment = fragment;
+    }
+
+    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+      Fragment existingFragment = getFragmentManager().findFragmentByTag(fragment.fragmentTag);
+      ft.setCustomAnimations(R.anim.slide_in_left, 0);
+
+      if (existingFragment == null)
+        ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
+      else
+        ft.attach(existingFragment);
+    }
+
+    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+      ft.setCustomAnimations(0, R.anim.slide_out_left);
+      ft.remove(fragment);
+    }
+
+    public void onTabReselected(Tab tab, FragmentTransaction ft) {
+    }
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    self = this;
+
+    setContentView(R.layout.fragment_container);
+
+    if (savedInstanceState != null) {
+      action = savedInstanceState.getInt(StringConstants.ACTION, 0);
+
+      if (action != 0) {
+        if (action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG)
+          showLastTagQuestionListFragment(savedInstanceState);
         else
-            return null;
+          showFrontPageForSite();
+
+        int lastSelectedTab = savedInstanceState.getInt(LAST_SELECTED_TAB, 0);
+        if (lastSelectedTab > 0)
+          getActionBar().setSelectedNavigationItem(lastSelectedTab);
+      }
     }
+  }
 
-    public class TabListener implements ActionBar.TabListener {
-        private final QuestionListFragment fragment;
+  private void showFrontPageForSite() {
+    showTagsFragment = true;
+    getActionBar().setDisplayHomeAsUpEnabled(true);
+    setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
+  }
 
-        public TabListener(QuestionListFragment fragment) {
-            this.fragment = fragment;
+  private void showLastTagQuestionListFragment(Bundle savedInstanceState) {
+    showTagsFragment = true;
+    getActionBar().setDisplayHomeAsUpEnabled(true);
+    setupActionBarTabs(action, savedInstanceState.getString(StringConstants.TAG), false);
+  }
+
+  private void setupActionBarTabs(int action, String tag, boolean frontPage) {
+    getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+    this.action = action;
+    this.tag = tag;
+
+    createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY), true);
+    createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION), false);
+    createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES), false);
+
+    if (!frontPage) {
+      createTab(TAB_TITLE_FAQ, QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null),
+          false);
+    }
+    else {
+      HashMap<String, SearchCriteria> customTabs =
+          DbRequestThreadExecutor.getSearchesMarkedForTab(getApplicationContext(),
+              OperatingSite.getSite().apiSiteParameter);
+
+      if (customTabs != null) {
+        for (String key : customTabs.keySet())
+          createTab(key, QuestionListFragment.newFragment(key, customTabs.get(key)), false);
+      }
+    }
+  }
+
+  private void createTab(String title, QuestionListFragment fragment, boolean setSelected) {
+    Tab tab = getActionBar().newTab();
+    tab.setText(title).setTabListener(new TabListener(fragment));
+    getActionBar().addTab(tab, setSelected);
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    removeTagListFragment();
+
+    if (getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
+      outState.putInt(LAST_SELECTED_TAB, getActionBar().getSelectedNavigationIndex());
+
+    outState.putInt(StringConstants.ACTION, action);
+    outState.putString(StringConstants.TAG, tag);
+
+    super.onSaveInstanceState(outState);
+  }
+
+  private void removeTagListFragment() {
+    if (tagListFragment != null) {
+      FragmentTransaction ft = getFragmentManager().beginTransaction();
+      ft.remove(tagListFragment);
+      ft.commit();
+      tagListFragment = null;
+    }
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    if (getActionBar().getTabCount() == 0)
+      showFragmentForIntentAction();
+    else {
+      Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+      if (fragment != null) {
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.show(fragment);
+        ft.commit();
+      }
+      else {
+        if (getIntent().getAction() == null || StringConstants.TAG.equals(getIntent().getAction())) {
+          getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+          getActionBar().setDisplayHomeAsUpEnabled(true);
+          getActionBar().setSelectedNavigationItem(0);
         }
+      }
+    }
+  }
 
-        public void onTabSelected(Tab tab, FragmentTransaction ft) {
-            Fragment existingFragment = getFragmentManager().findFragmentByTag(fragment.fragmentTag);
-            ft.setCustomAnimations(R.anim.slide_in_left, 0);
+  private void showFragmentForIntentAction() {
+    intentAction = getIntent().getAction();
 
-            if (existingFragment == null)
-                ft.add(R.id.fragmentContainer, fragment, fragment.fragmentTag);
-            else
-                ft.attach(existingFragment);
-        }
+    if (Intent.ACTION_SEARCH.equals(intentAction))
+      showSearchFragment();
+    else if (StringConstants.SIMILAR.equals(intentAction))
+      showSimilarQuestionListFragment();
+    else if (StringConstants.RELATED.equals(intentAction))
+      showRelatedQuestionListFragment();
+    else if (StringConstants.TAG.equals(intentAction))
+      showTagQuestionListFragment();
+    else
+      showFrontPageForSite();
+  }
 
-        public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-            ft.setCustomAnimations(0, R.anim.slide_out_left);
-            ft.remove(fragment);
-        }
+  private void showSearchFragment() {
+    String query = getIntent().getStringExtra(SearchManager.QUERY);
+    saveSearchQuery(query);
 
-        public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        }
+    String fragmentTag = "search -" + query;
+    QuestionListFragment questionListFragment = getFragment(fragmentTag);
+
+    if (questionListFragment == null)
+      questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null);
+
+    replaceFragment(questionListFragment, fragmentTag, false);
+  }
+
+  private void saveSearchQuery(String query) {
+    SearchRecentSuggestions suggestions =
+        new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY, RecentQueriesProvider.MODE);
+    suggestions.saveRecentQuery(query, null);
+  }
+
+  private void showSimilarQuestionListFragment() {
+    String title = getIntent().getStringExtra(StringConstants.TITLE);
+    String fragmentTag = QuestionsIntentService.GET_SIMILAR + "-" + title.hashCode();
+    setActionBarTitle(getString(R.string.similar) + " to " + title);
+
+    QuestionListFragment questionListFragment = getFragment(fragmentTag);
+    if (questionListFragment == null) {
+      questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, fragmentTag);
+      questionListFragment.getBundle().putString(StringConstants.TITLE, title);
+      replaceFragment(questionListFragment, fragmentTag, false);
+    }
+  }
+
+  private void showRelatedQuestionListFragment() {
+    long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
+    String fragmentTag = QuestionsIntentService.GET_RELATED + "-" + questionId;
+
+    QuestionListFragment questionListFragment = getFragment(fragmentTag);
+    if (questionListFragment == null) {
+      questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, fragmentTag);
+      questionListFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
+      replaceFragment(questionListFragment, fragmentTag, false);
+    }
+  }
+
+  private void showTagQuestionListFragment() {
+    String tag = getIntent().getStringExtra(StringConstants.TAG);
+    setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
+  }
+
+  @Override
+  public void onBackPressed() {
+    if (!hideTagFragmentIfShown())
+      super.onBackPressed();
+  }
+
+  private boolean hideTagFragmentIfShown() {
+    Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
+
+    if (currentFragment instanceof TagListFragment) {
+      hideTagFragment();
+      toggleDisplayForTags(false);
+      return true;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    return false;
+  }
 
-        self = this;
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    boolean ret = super.onCreateOptionsMenu(menu);
 
-        setContentView(R.layout.fragment_container);
+    if (menu != null && intentAction != null && StringConstants.TAG.equals(intentAction))
+      menu.findItem(R.id.menu_new_label).setVisible(true);
 
-        if (savedInstanceState != null) {
-            action = savedInstanceState.getInt(StringConstants.ACTION, 0);
+    return ret;
+  }
 
-            if (action != 0) {
-                if (action == QuestionsIntentService.GET_QUESTIONS_FOR_TAG)
-                    showLastTagQuestionListFragment(savedInstanceState);
-                else
-                    showFrontPageForSite();
-
-                int lastSelectedTab = savedInstanceState.getInt(LAST_SELECTED_TAB, 0);
-                if (lastSelectedTab > 0)
-                    getActionBar().setSelectedNavigationItem(lastSelectedTab);
-            }
-        }
-    }
-
-    private void showFrontPageForSite() {
-        showTagsFragment = true;
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        setupActionBarTabs(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
-    }
-
-    private void showLastTagQuestionListFragment(Bundle savedInstanceState) {
-        showTagsFragment = true;
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        setupActionBarTabs(action, savedInstanceState.getString(StringConstants.TAG), false);
-    }
-
-    private void setupActionBarTabs(int action, String tag, boolean frontPage) {
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        this.action = action;
-        this.tag = tag;
-
-        createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY), true);
-        createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION), false);
-        createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES), false);
-
-        if (!frontPage) {
-            createTab(TAB_TITLE_FAQ,
-                    QuestionListFragment.newFragment(QuestionsIntentService.GET_FAQ_FOR_TAG, tag, null), false);
-        }
-        else {
-            HashMap<String, SearchCriteria> customTabs =
-                    DbRequestThreadExecutor.getSearchesMarkedForTab(getApplicationContext(),
-                            OperatingSite.getSite().apiSiteParameter);
-
-            if (customTabs != null) {
-                for (String key : customTabs.keySet())
-                    createTab(key, QuestionListFragment.newFragment(key, customTabs.get(key)), false);
-            }
-        }
-    }
-
-    private void createTab(String title, QuestionListFragment fragment, boolean setSelected) {
-        Tab tab = getActionBar().newTab();
-        tab.setText(title).setTabListener(new TabListener(fragment));
-        getActionBar().addTab(tab, setSelected);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        removeTagListFragment();
-
-        if (getActionBar().getNavigationMode() == ActionBar.NAVIGATION_MODE_TABS)
-            outState.putInt(LAST_SELECTED_TAB, getActionBar().getSelectedNavigationIndex());
-
-        outState.putInt(StringConstants.ACTION, action);
-        outState.putString(StringConstants.TAG, tag);
-
-        super.onSaveInstanceState(outState);
-    }
-
-    private void removeTagListFragment() {
-        if (tagListFragment != null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.remove(tagListFragment);
-            ft.commit();
-            tagListFragment = null;
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (getActionBar().getTabCount() == 0)
-            showFragmentForIntentAction();
-        else {
-            Fragment fragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
-            if (fragment != null) {
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.show(fragment);
-                ft.commit();
-            }
-            else {
-                if (getIntent().getAction() == null || StringConstants.TAG.equals(getIntent().getAction())) {
-                    getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-                    getActionBar().setDisplayHomeAsUpEnabled(true);
-                    getActionBar().setSelectedNavigationItem(0);
-                }
-            }
-        }
-    }
-
-    private void showFragmentForIntentAction() {
-        intentAction = getIntent().getAction();
-
-        if (Intent.ACTION_SEARCH.equals(intentAction))
-            showSearchFragment();
-        else if (StringConstants.SIMILAR.equals(intentAction))
-            showSimilarQuestionListFragment();
-        else if (StringConstants.RELATED.equals(intentAction))
-            showRelatedQuestionListFragment();
-        else if (StringConstants.TAG.equals(intentAction))
-            showTagQuestionListFragment();
-        else
-            showFrontPageForSite();
-    }
-
-    private void showSearchFragment() {
-        String query = getIntent().getStringExtra(SearchManager.QUERY);
-        saveSearchQuery(query);
-
-        String fragmentTag = "search -" + query;
-        QuestionListFragment questionListFragment = getFragment(fragmentTag);
-
-        if (questionListFragment == null)
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.SEARCH, query, null);
-
-        replaceFragment(questionListFragment, fragmentTag, false);
-    }
-
-    private void saveSearchQuery(String query) {
-        SearchRecentSuggestions suggestions =
-                new SearchRecentSuggestions(this, RecentQueriesProvider.AUTHORITY, RecentQueriesProvider.MODE);
-        suggestions.saveRecentQuery(query, null);
-    }
-
-    private void showSimilarQuestionListFragment() {
-        String title = getIntent().getStringExtra(StringConstants.TITLE);
-        String fragmentTag = QuestionsIntentService.GET_SIMILAR + "-" + title.hashCode();
-        setActionBarTitle(getString(R.string.similar) + " to " + title);
-
-        QuestionListFragment questionListFragment = getFragment(fragmentTag);
-        if (questionListFragment == null) {
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_SIMILAR, fragmentTag);
-            questionListFragment.getBundle().putString(StringConstants.TITLE, title);
-            replaceFragment(questionListFragment, fragmentTag, false);
-        }
-    }
-
-    private void showRelatedQuestionListFragment() {
-        long questionId = getIntent().getLongExtra(StringConstants.QUESTION_ID, 0);
-        String fragmentTag = QuestionsIntentService.GET_RELATED + "-" + questionId;
-
-        QuestionListFragment questionListFragment = getFragment(fragmentTag);
-        if (questionListFragment == null) {
-            questionListFragment = QuestionListFragment.newFragment(QuestionsIntentService.GET_RELATED, fragmentTag);
-            questionListFragment.getBundle().putLong(StringConstants.QUESTION_ID, questionId);
-            replaceFragment(questionListFragment, fragmentTag, false);
-        }
-    }
-
-    private void showTagQuestionListFragment() {
-        String tag = getIntent().getStringExtra(StringConstants.TAG);
-        setupActionBarTabs(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!hideTagFragmentIfShown())
-            super.onBackPressed();
-    }
-
-    private boolean hideTagFragmentIfShown() {
-        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.fragmentContainer);
-
-        if (currentFragment instanceof TagListFragment) {
-            hideTagFragment();
-            toggleDisplayForTags(false);
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        boolean ret = super.onCreateOptionsMenu(menu);
-
-        if (menu != null && intentAction != null && StringConstants.TAG.equals(intentAction))
-            menu.findItem(R.id.menu_new_label).setVisible(true);
-
-        return ret;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (intentAction != null && StringConstants.TAG.equals(intentAction)) {
-            if (item.getItemId() == R.id.menu_new_label) {
-                insertTagToDb();
-                return true;
-            }
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void insertTagToDb() {
-        TagDAO tagDAO = new TagDAO(this);
-        String tagLabel = getIntent().getStringExtra(StringConstants.TAG);
-        try {
-            tagDAO.open();
-            tagDAO.insert(OperatingSite.getSite().apiSiteParameter, tagLabel, true);
-
-            Toast.makeText(this, tagLabel + " added to your tags", Toast.LENGTH_LONG).show();
-            SharedPreferencesUtil.setBoolean(this, TagListFragment.TAGS_DIRTY, true);
-        }
-        catch (SQLException e) {
-            Toast.makeText(this, "Failed to add " + tagLabel + " to your tags", Toast.LENGTH_LONG).show();
-        }
-        finally {
-            tagDAO.close();
-        }
-    }
-
-    @Override
-    public void refresh() {
-        QuestionListFragment questionsFragment =
-                (QuestionListFragment) getFragmentManager().findFragmentById(R.id.fragmentContainer);
-        questionsFragment.refresh();
-    }
-
-    @Override
-    protected boolean shouldSearchViewBeEnabled() {
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (intentAction != null && StringConstants.TAG.equals(intentAction)) {
+      if (item.getItemId() == R.id.menu_new_label) {
+        insertTagToDb();
         return true;
+      }
     }
 
-    @Override
-    protected boolean onActionBarHomeButtonClick(MenuItem menuItem) {
-        if (showTagsFragment && menuItem.getItemId() == android.R.id.home) {
-            tagListFragment = (TagListFragment) getFragmentManager().findFragmentByTag(StringConstants.TAGS);
+    return super.onOptionsItemSelected(item);
+  }
 
-            if (tagListFragment == null) {
-                tagListFragment = TagListFragment.newFragment(this);
-                addAndHideFragment(tagListFragment, StringConstants.TAGS);
-            }
-            else
-                tagListFragment.setOnTagSelectListener(this);
+  private void insertTagToDb() {
+    TagDAO tagDAO = new TagDAO(this);
+    String tagLabel = getIntent().getStringExtra(StringConstants.TAG);
+    try {
+      tagDAO.open();
+      tagDAO.insert(OperatingSite.getSite().apiSiteParameter, tagLabel, true);
 
-            toggleDisplayForTags(true);
-            showTagFragment();
-            return true;
-        }
+      Toast.makeText(this, tagLabel + " added to your tags", Toast.LENGTH_LONG).show();
+      SharedPreferencesUtil.setBoolean(this, TagListFragment.TAGS_DIRTY, true);
+    }
+    catch (SQLException e) {
+      Toast.makeText(this, "Failed to add " + tagLabel + " to your tags", Toast.LENGTH_LONG).show();
+    }
+    finally {
+      tagDAO.close();
+    }
+  }
 
-        return super.onActionBarHomeButtonClick(menuItem);
+  @Override
+  public void refresh() {
+    QuestionListFragment questionsFragment =
+        (QuestionListFragment) getFragmentManager().findFragmentById(R.id.fragmentContainer);
+    questionsFragment.refresh();
+  }
+
+  @Override
+  protected boolean shouldSearchViewBeEnabled() {
+    return true;
+  }
+
+  @Override
+  protected boolean onActionBarHomeButtonClick(MenuItem menuItem) {
+    if (showTagsFragment && menuItem.getItemId() == android.R.id.home) {
+      tagListFragment = (TagListFragment) getFragmentManager().findFragmentByTag(StringConstants.TAGS);
+
+      if (tagListFragment == null) {
+        tagListFragment = TagListFragment.newFragment(this);
+        addAndHideFragment(tagListFragment, StringConstants.TAGS);
+      }
+      else
+        tagListFragment.setOnTagSelectListener(this);
+
+      toggleDisplayForTags(true);
+      showTagFragment();
+      return true;
     }
 
-    private void toggleDisplayForTags(boolean forTags) {
-        getActionBar().setDisplayHomeAsUpEnabled(!forTags);
+    return super.onActionBarHomeButtonClick(menuItem);
+  }
 
-        if (forTags) {
-            getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            setActionBarTitle(StringConstants.TAGS);
-        }
-        else
-            getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+  private void toggleDisplayForTags(boolean forTags) {
+    getActionBar().setDisplayHomeAsUpEnabled(!forTags);
 
-        actionBarMenu.findItem(R.id.menu_search).setVisible(!forTags);
-        actionBarMenu.findItem(R.id.menu_refresh).setVisible(!forTags);
+    if (forTags) {
+      getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+      setActionBarTitle(StringConstants.TAGS);
     }
+    else
+      getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-    @Override
-    public void onFrontPageSelected() {
-        hideTagFragment();
-        setupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
+    actionBarMenu.findItem(R.id.menu_search).setVisible(!forTags);
+    actionBarMenu.findItem(R.id.menu_refresh).setVisible(!forTags);
+  }
+
+  @Override
+  public void onFrontPageSelected() {
+    hideTagFragment();
+    setupTabsForTag(QuestionsIntentService.GET_FRONT_PAGE, OperatingSite.getSite().name, true);
+  }
+
+  @Override
+  public void onTagSelected(String tag) {
+    hideTagFragment();
+    setupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
+  }
+
+  private void addAndHideFragment(TagListFragment fragment, String fragmentTag) {
+    FragmentTransaction ft = getFragmentManager().beginTransaction();
+    ft.add(R.id.fragmentContainer, fragment, fragmentTag);
+    ft.hide(fragment);
+    ft.commit();
+  }
+
+  private void setupTabsForTag(int action, String newTag, boolean frontPage) {
+    toggleDisplayForTags(false);
+
+    if (tag == null || !tag.equals(newTag)) {
+      getActionBar().removeAllTabs();
+      setupActionBarTabs(action, newTag, frontPage);
     }
+  }
 
-    @Override
-    public void onTagSelected(String tag) {
-        hideTagFragment();
-        setupTabsForTag(QuestionsIntentService.GET_QUESTIONS_FOR_TAG, tag, false);
-    }
+  private void showTagFragment() {
+    FragmentTransaction ft = getFragmentManager().beginTransaction();
+    ft.setCustomAnimations(R.anim.slide_in_left, 0);
+    ft.show(tagListFragment);
+    ft.commit();
+  }
 
-    private void addAndHideFragment(TagListFragment fragment, String fragmentTag) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.add(R.id.fragmentContainer, fragment, fragmentTag);
-        ft.hide(fragment);
-        ft.commit();
-    }
+  private void hideTagFragment() {
+    FragmentTransaction ft = getFragmentManager().beginTransaction();
+    ft.setCustomAnimations(0, R.anim.slide_out_left);
+    ft.hide(tagListFragment);
+    ft.commit();
+    getFragmentManager().executePendingTransactions();
+  }
 
-    private void setupTabsForTag(int action, String newTag, boolean frontPage) {
-        toggleDisplayForTags(false);
-
-        if (tag == null || !tag.equals(newTag)) {
-            getActionBar().removeAllTabs();
-            setupActionBarTabs(action, newTag, frontPage);
-        }
-    }
-
-    private void showTagFragment() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.slide_in_left, 0);
-        ft.show(tagListFragment);
-        ft.commit();
-    }
-
-    private void hideTagFragment() {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(0, R.anim.slide_out_left);
-        ft.hide(tagListFragment);
-        ft.commit();
-        getFragmentManager().executePendingTransactions();
-    }
-
-    private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack) {
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-        ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
-        if (addToBackStack)
-            ft.addToBackStack(fragmentTag);
-        ft.commit();
-    }
+  private void replaceFragment(Fragment fragment, String fragmentTag, boolean addToBackStack) {
+    FragmentTransaction ft = getFragmentManager().beginTransaction();
+    ft.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+    ft.replace(R.id.fragmentContainer, fragment, fragmentTag);
+    if (addToBackStack)
+      ft.addToBackStack(fragmentTag);
+    ft.commit();
+  }
 }

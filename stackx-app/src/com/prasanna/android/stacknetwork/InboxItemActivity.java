@@ -50,220 +50,220 @@ import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class InboxItemActivity extends AbstractUserActionBarActivity implements StackXRestQueryResultReceiver {
-    private RestQueryResultReceiver receiver;
-    private InboxItem item;
-    private Comment comment;
-    private View postTitleLayout;
-    private StackXQuickActionMenu stackXQuickActionMenu;
+  private RestQueryResultReceiver receiver;
+  private InboxItem item;
+  private Comment comment;
+  private View postTitleLayout;
+  private StackXQuickActionMenu stackXQuickActionMenu;
 
-    @Override
-    public void onCreate(android.os.Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        item = (InboxItem) getIntent().getSerializableExtra(StringConstants.INBOX_ITEM);
+  @Override
+  public void onCreate(android.os.Bundle savedInstanceState) {
+    requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+    item = (InboxItem) getIntent().getSerializableExtra(StringConstants.INBOX_ITEM);
 
-        super.onCreate(savedInstanceState);
+    super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.inbox_item_detail);
+    setContentView(R.layout.inbox_item_detail);
 
-        stackXQuickActionMenu = new StackXQuickActionMenu(this);
-        receiver = new RestQueryResultReceiver(new Handler());
-        receiver.setReceiver(this);
-        postTitleLayout = findViewById(R.id.postTitleLayout);
+    stackXQuickActionMenu = new StackXQuickActionMenu(this);
+    receiver = new RestQueryResultReceiver(new Handler());
+    receiver.setReceiver(this);
+    postTitleLayout = findViewById(R.id.postTitleLayout);
 
-        setupQuickActionMenuClick();
-        showInboxItem();
-        getPostDetail();
+    setupQuickActionMenuClick();
+    showInboxItem();
+    getPostDetail();
+  }
+
+  private void setupQuickActionMenuClick() {
+    final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
+    imageView.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        stackXQuickActionMenu.build().show(v);
+      }
+    });
+  }
+
+  private void showInboxItem() {
+    TextView textView = (TextView) findViewById(R.id.postTitle);
+    textView.setText(Html.fromHtml(item.title));
+
+    textView = (TextView) findViewById(R.id.postType);
+    switch (item.itemType) {
+      case COMMENT:
+        if (item.questionId != -1)
+          textView.setText(item.itemType.getRepr() + " on question");
+        else
+          textView.setText(item.itemType.getRepr() + " on answer");
+        break;
+      case NEW_ANSWER:
+      default:
+        textView.setText(item.itemType.getRepr());
+        break;
     }
 
-    private void setupQuickActionMenuClick() {
-        final ImageView imageView = (ImageView) findViewById(R.id.quickActionMenu);
-        imageView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stackXQuickActionMenu.build().show(v);
-            }
-        });
+    if (item.site != null) {
+      textView = (TextView) findViewById(R.id.postSite);
+      textView.setText("Asked in " + Html.fromHtml(item.site.name));
+    }
+  }
+
+  private void getPostDetail() {
+    setProgressBarIndeterminateVisibility(true);
+
+    Intent intent = new Intent(this, PostIntentService.class);
+    intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
+    if (item.itemType.equals(ItemType.NEW_ANSWER)) {
+      intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
+      intent.putExtra(StringConstants.POST_ID, item.answerId);
+    }
+    else {
+      intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST_COMMENT);
+      intent.putExtra(StringConstants.COMMENT_ID, item.commentId);
     }
 
-    private void showInboxItem() {
-        TextView textView = (TextView) findViewById(R.id.postTitle);
-        textView.setText(Html.fromHtml(item.title));
+    intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+    startService(intent);
+  }
 
-        textView = (TextView) findViewById(R.id.postType);
-        switch (item.itemType) {
-            case COMMENT:
-                if (item.questionId != -1)
-                    textView.setText(item.itemType.getRepr() + " on question");
-                else
-                    textView.setText(item.itemType.getRepr() + " on answer");
-                break;
-            case NEW_ANSWER:
-            default:
-                textView.setText(item.itemType.getRepr());
-                break;
+  @Override
+  protected void setActionBarTitleAndIcon() {
+    if (item == null || item.site == null)
+      super.setActionBarTitleAndIcon();
+
+    setActionBarTitle(item.title);
+    setActionBarHomeIcon(item.site);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    boolean ret = super.onCreateOptionsMenu(menu);
+
+    if (menu != null)
+      menu.removeItem(R.id.menu_refresh);
+
+    return ret & true;
+  }
+
+  @Override
+  protected void refresh() {
+    throw new UnsupportedOperationException("Refersh not supported");
+  }
+
+  @Override
+  protected boolean shouldSearchViewBeEnabled() {
+    return false;
+  }
+
+  @Override
+  public void onReceiveResult(int resultCode, Bundle resultData) {
+    setProgressBarIndeterminateVisibility(false);
+
+    switch (resultCode) {
+      case PostIntentService.GET_POST:
+        showPostDetail((Post) resultData.getSerializable(StringConstants.POST));
+        break;
+      case PostIntentService.GET_POST_COMMENT:
+        comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
+        if (comment != null) {
+          boolean commentOnAnswer = isCommentOnAnswer();
+          showPostDetail(comment);
+          if (commentOnAnswer)
+            startGetAnswerService();
         }
+        else
+          showPostBody(item.body);
+        break;
+      case AnswersIntentService.GET_ANSWER:
+        setupOnClickForViewMyAnswer((Answer) resultData.getSerializable(StringConstants.ANSWER));
+        break;
+      case AnswersIntentService.ERROR:
+        break;
 
-        if (item.site != null) {
-            textView = (TextView) findViewById(R.id.postSite);
-            textView.setText("Asked in " + Html.fromHtml(item.site.name));
-        }
+    }
+  }
+
+  private void startGetAnswerService() {
+    Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
+    getAnswerIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
+    getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
+    getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
+    getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
+    startService(getAnswerIntent);
+    setProgressBarIndeterminateVisibility(true);
+  }
+
+  private boolean isCommentOnAnswer() {
+    return comment.type != null && comment.type.equals(PostType.ANSWER);
+  }
+
+  private void showPostDetail(Post stackXItem) {
+    TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
+    textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
+        + Html.fromHtml(stackXItem.owner.displayName));
+
+    stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
+        .toString(), item.site);
+
+    setupOnClickForViewQuestion(item.questionId);
+    showPostBody(stackXItem.body);
+  }
+
+  protected void showPostBody(String body) {
+    ArrayList<View> views = MarkdownFormatter.parse(this, body);
+    if (views != null) {
+      LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
+      for (final View view : views)
+        postBodyLayout.addView(view);
+    }
+  }
+
+  private void setupOnClickForViewMyAnswer(Answer answer) {
+    final LinearLayout postContextLayout = (LinearLayout) findViewById(R.id.postContext);
+    ArrayList<View> views = MarkdownFormatter.parse(this, answer.body);
+
+    if (views != null) {
+      for (final View view : views)
+        postContextLayout.addView(view);
     }
 
-    private void getPostDetail() {
-        setProgressBarIndeterminateVisibility(true);
+    addViewAnswerToQuickActionMenu(postContextLayout);
+    setupOnClickForViewQuestion(answer.questionId);
+  }
 
-        Intent intent = new Intent(this, PostIntentService.class);
-        intent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
-        if (item.itemType.equals(ItemType.NEW_ANSWER)) {
-            intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
-            intent.putExtra(StringConstants.POST_ID, item.answerId);
+  private void addViewAnswerToQuickActionMenu(final LinearLayout postContextLayout) {
+    stackXQuickActionMenu.addItem(R.string.answer, new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (postContextLayout.getVisibility() == View.VISIBLE) {
+          postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
+              android.R.anim.slide_out_right));
+          postContextLayout.setVisibility(View.GONE);
         }
         else {
-            intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST_COMMENT);
-            intent.putExtra(StringConstants.COMMENT_ID, item.commentId);
+          postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
+              android.R.anim.slide_in_left));
+          postContextLayout.setVisibility(View.VISIBLE);
         }
+      }
+    });
+  }
 
-        intent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
-        startService(intent);
-    }
+  private void setupOnClickForViewQuestion(final long questionId) {
+    postTitleLayout.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startQuestionDetailActivity(questionId);
+      }
+    });
+  }
 
-    @Override
-    protected void setActionBarTitleAndIcon() {
-        if (item == null || item.site == null)
-            super.setActionBarTitleAndIcon();
-
-        setActionBarTitle(item.title);
-        setActionBarHomeIcon(item.site);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        boolean ret = super.onCreateOptionsMenu(menu);
-
-        if (menu != null)
-            menu.removeItem(R.id.menu_refresh);
-
-        return ret & true;
-    }
-
-    @Override
-    protected void refresh() {
-        throw new UnsupportedOperationException("Refersh not supported");
-    }
-
-    @Override
-    protected boolean shouldSearchViewBeEnabled() {
-        return false;
-    }
-
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        setProgressBarIndeterminateVisibility(false);
-
-        switch (resultCode) {
-            case PostIntentService.GET_POST:
-                showPostDetail((Post) resultData.getSerializable(StringConstants.POST));
-                break;
-            case PostIntentService.GET_POST_COMMENT:
-                comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
-                if (comment != null) {
-                    boolean commentOnAnswer = isCommentOnAnswer();
-                    showPostDetail(comment);
-                    if (commentOnAnswer)
-                        startGetAnswerService();
-                }
-                else
-                    showPostBody(item.body);
-                break;
-            case AnswersIntentService.GET_ANSWER:
-                setupOnClickForViewMyAnswer((Answer) resultData.getSerializable(StringConstants.ANSWER));
-                break;
-            case AnswersIntentService.ERROR:
-                break;
-
-        }
-    }
-
-    private void startGetAnswerService() {
-        Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
-        getAnswerIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
-        getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
-        getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
-        getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
-        startService(getAnswerIntent);
-        setProgressBarIndeterminateVisibility(true);
-    }
-
-    private boolean isCommentOnAnswer() {
-        return comment.type != null && comment.type.equals(PostType.ANSWER);
-    }
-
-    private void showPostDetail(Post stackXItem) {
-        TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
-        textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
-                + Html.fromHtml(stackXItem.owner.displayName));
-
-        stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
-                .toString(), item.site);
-
-        setupOnClickForViewQuestion(item.questionId);
-        showPostBody(stackXItem.body);
-    }
-
-    protected void showPostBody(String body) {
-        ArrayList<View> views = MarkdownFormatter.parse(this, body);
-        if (views != null) {
-            LinearLayout postBodyLayout = (LinearLayout) findViewById(R.id.postBody);
-            for (final View view : views)
-                postBodyLayout.addView(view);
-        }
-    }
-
-    private void setupOnClickForViewMyAnswer(Answer answer) {
-        final LinearLayout postContextLayout = (LinearLayout) findViewById(R.id.postContext);
-        ArrayList<View> views = MarkdownFormatter.parse(this, answer.body);
-
-        if (views != null) {
-            for (final View view : views)
-                postContextLayout.addView(view);
-        }
-
-        addViewAnswerToQuickActionMenu(postContextLayout);
-        setupOnClickForViewQuestion(answer.questionId);
-    }
-
-    private void addViewAnswerToQuickActionMenu(final LinearLayout postContextLayout) {
-        stackXQuickActionMenu.addItem(R.string.answer, new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (postContextLayout.getVisibility() == View.VISIBLE) {
-                    postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
-                            android.R.anim.slide_out_right));
-                    postContextLayout.setVisibility(View.GONE);
-                }
-                else {
-                    postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
-                            android.R.anim.slide_in_left));
-                    postContextLayout.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-    }
-
-    private void setupOnClickForViewQuestion(final long questionId) {
-        postTitleLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startQuestionDetailActivity(questionId);
-            }
-        });
-    }
-
-    private void startQuestionDetailActivity(long questionId) {
-        Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
-        displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
-        displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, questionId);
-        displayQuestionIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
-        startActivity(displayQuestionIntent);
-    }
+  private void startQuestionDetailActivity(long questionId) {
+    Intent displayQuestionIntent = new Intent(InboxItemActivity.this, QuestionActivity.class);
+    displayQuestionIntent.setAction(StringConstants.QUESTION_ID);
+    displayQuestionIntent.putExtra(StringConstants.QUESTION_ID, questionId);
+    displayQuestionIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
+    startActivity(displayQuestionIntent);
+  }
 }

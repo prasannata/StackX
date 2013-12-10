@@ -25,82 +25,74 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 @RunWith(RobolectricTestRunner.class)
-public class LoginActivityTest extends AbstractBaseActivityTest
-{
-    private LoginActivity loginActivity;
+public class LoginActivityTest extends AbstractBaseActivityTest {
+  private LoginActivity loginActivity;
 
-    @Before
-    public void setup()
-    {
-        loginActivity = new LoginActivity();
-        loginActivity.onCreate(null);
-    }
+  @Before
+  public void setup() {
+    loginActivity = new LoginActivity();
+    loginActivity.onCreate(null);
+  }
 
-    @Test
-    public void login()
-    {
-        loginActivity = new LoginActivity();
-        assertTrue(AppUtils.isFirstRun(loginActivity));
+  @Test
+  public void login() {
+    loginActivity = new LoginActivity();
+    assertTrue(AppUtils.isFirstRun(loginActivity));
 
-        loginActivity.onCreate(null);
-        Button loginButton = (Button) loginActivity.findViewById(R.id.login_button);
-        assertNotNull(loginButton);
+    loginActivity.onCreate(null);
+    Button loginButton = (Button) loginActivity.findViewById(R.id.login_button);
+    assertNotNull(loginButton);
 
-        loginButton.performClick();
-        assertThat(loginActivity, new StartedMatcher(OAuthActivity.class));
-        assertFalse(AppUtils.isFirstRun(loginActivity));
-    }
+    loginButton.performClick();
+    assertThat(loginActivity, new StartedMatcher(OAuthActivity.class));
+    assertFalse(AppUtils.isFirstRun(loginActivity));
+  }
 
-    @Test
-    public void loginScreenNotShowAfterFirstRun()
-    {
-        loginActivity = new LoginActivity();
-        AppUtils.setFirstRunComplete(loginActivity);
-        assertFalse(AppUtils.isFirstRun(loginActivity));
-        loginActivity.onCreate(null);
-        assertThat(loginActivity, new StartedMatcher(StackNetworkListActivity.class));
-    }
+  @Test
+  public void loginScreenNotShowAfterFirstRun() {
+    loginActivity = new LoginActivity();
+    AppUtils.setFirstRunComplete(loginActivity);
+    assertFalse(AppUtils.isFirstRun(loginActivity));
+    loginActivity.onCreate(null);
+    assertThat(loginActivity, new StartedMatcher(StackNetworkListActivity.class));
+  }
 
-    @Test
-    public void loginScreenNotShowAfterFirstRunWithDefaulSiteSet()
-    {
-        loginActivity = new LoginActivity();
-        AppUtils.setFirstRunComplete(loginActivity);
-        AppUtils.setDefaultSite(loginActivity, getSite("Stack Overflow", "stackOverflow", false, false));
-        assertFalse(AppUtils.isFirstRun(loginActivity));
-        loginActivity.onCreate(null);
-        assertThat(loginActivity, new StartedMatcher(QuestionsActivity.class));
-    }
+  @Test
+  public void loginScreenNotShowAfterFirstRunWithDefaulSiteSet() {
+    loginActivity = new LoginActivity();
+    AppUtils.setFirstRunComplete(loginActivity);
+    AppUtils.setDefaultSite(loginActivity, getSite("Stack Overflow", "stackOverflow", false, false));
+    assertFalse(AppUtils.isFirstRun(loginActivity));
+    loginActivity.onCreate(null);
+    assertThat(loginActivity, new StartedMatcher(QuestionsActivity.class));
+  }
 
-    @Test
-    public void skipLogin()
-    {
-        TextView skipLogin = (TextView) loginActivity.findViewById(R.id.skipLogin);
-        assertNotNull(skipLogin);
-        skipLogin.performClick();
-        ShadowAlertDialog dialog = Robolectric.shadowOf(ShadowAlertDialog.getLatestAlertDialog());
-        assertEquals(loginActivity.getString(R.string.noLoginWarn), dialog.getMessage());
-        assertTrue(dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
-        assertThat(loginActivity, new StartedMatcher(StackNetworkListActivity.class));
-    }
+  @Test
+  public void skipLogin() {
+    TextView skipLogin = (TextView) loginActivity.findViewById(R.id.skipLogin);
+    assertNotNull(skipLogin);
+    skipLogin.performClick();
+    ShadowAlertDialog dialog = Robolectric.shadowOf(ShadowAlertDialog.getLatestAlertDialog());
+    assertEquals(loginActivity.getString(R.string.noLoginWarn), dialog.getMessage());
+    assertTrue(dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick());
+    assertThat(loginActivity, new StartedMatcher(StackNetworkListActivity.class));
+  }
 
-    @Test
-    public void skipLoginAndCancel()
-    {
-        ShadowActivity shadowActivity = Robolectric.shadowOf(loginActivity);
+  @Test
+  public void skipLoginAndCancel() {
+    ShadowActivity shadowActivity = Robolectric.shadowOf(loginActivity);
 
-        TextView skipLogin = (TextView) loginActivity.findViewById(R.id.skipLogin);
-        assertNotNull(skipLogin);
-        skipLogin.performClick();
-        ShadowAlertDialog dialog = Robolectric.shadowOf(ShadowAlertDialog.getLatestAlertDialog());
-        assertEquals(loginActivity.getString(R.string.noLoginWarn), dialog.getMessage());
-        assertTrue(dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick());
-        assertNull(shadowActivity.getNextStartedActivity());
-    }
-    
-    @After
-    public void cleanup()
-    {
-        SharedPreferencesUtil.clear(loginActivity);
-    }
+    TextView skipLogin = (TextView) loginActivity.findViewById(R.id.skipLogin);
+    assertNotNull(skipLogin);
+    skipLogin.performClick();
+    ShadowAlertDialog dialog = Robolectric.shadowOf(ShadowAlertDialog.getLatestAlertDialog());
+    assertEquals(loginActivity.getString(R.string.noLoginWarn), dialog.getMessage());
+    assertTrue(dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick());
+    assertNull(shadowActivity.getNextStartedActivity());
+  }
+
+  @After
+  public void cleanup() {
+    SharedPreferencesUtil.clear(loginActivity);
+  }
 }

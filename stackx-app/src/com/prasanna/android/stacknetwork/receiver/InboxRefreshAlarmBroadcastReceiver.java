@@ -31,25 +31,25 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
 public class InboxRefreshAlarmBroadcastReceiver extends BroadcastReceiver {
-    private static final String TAG = InboxRefreshAlarmBroadcastReceiver.class.getSimpleName();
+  private static final String TAG = InboxRefreshAlarmBroadcastReceiver.class.getSimpleName();
 
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        LogWrapper.d(TAG, "Alarm receiver invoked");
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    LogWrapper.d(TAG, "Alarm receiver invoked");
 
-        checkForNewMessages(context);
+    checkForNewMessages(context);
+  }
+
+  private void checkForNewMessages(Context context) {
+    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN)) {
+      LogWrapper.d(TAG, "Checking inbox for updates");
+
+      Intent fetchInboxIntent = new Intent(context, UserIntentService.class);
+      fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_UNREAD_INBOX);
+      fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), Boolean.TRUE);
+
+      context.startService(fetchInboxIntent);
     }
-
-    private void checkForNewMessages(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        if (sharedPreferences.contains(StringConstants.ACCESS_TOKEN)) {
-            LogWrapper.d(TAG, "Checking inbox for updates");
-
-            Intent fetchInboxIntent = new Intent(context, UserIntentService.class);
-            fetchInboxIntent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_UNREAD_INBOX);
-            fetchInboxIntent.putExtra(UserIntentAction.NEW_MSG.getAction(), Boolean.TRUE);
-
-            context.startService(fetchInboxIntent);
-        }
-    }
+  }
 }

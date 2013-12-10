@@ -5,18 +5,14 @@ import java.lang.reflect.InvocationTargetException;
 import org.junit.runner.notification.RunNotifier;
 import org.mockito.runners.MockitoJUnitRunner;
 
-public class StackXMockitoRunner extends MockitoJUnitRunner
-{
-    public StackXMockitoRunner(Class<?> klass) throws InvocationTargetException
-    {
-        super(klass);
-    }
+public class StackXMockitoRunner extends MockitoJUnitRunner {
+  public StackXMockitoRunner(Class<?> klass) throws InvocationTargetException {
+    super(klass);
+  }
 
-    @Override
-    public void run(RunNotifier notifier)
-    {
-        super.run(notifier);
-    }
-    
-    
+  @Override
+  public void run(RunNotifier notifier) {
+    super.run(notifier);
+  }
+
 }

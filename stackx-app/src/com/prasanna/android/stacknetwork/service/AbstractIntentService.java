@@ -31,31 +31,31 @@ import com.prasanna.android.stacknetwork.utils.StackXIntentAction.ErrorIntentAct
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public abstract class AbstractIntentService extends IntentService {
-    public static final int ERROR = -1;
+  public static final int ERROR = -1;
 
-    public AbstractIntentService(String name) {
-        super(name);
-    }
+  public AbstractIntentService(String name) {
+    super(name);
+  }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (!AppUtils.isNetworkAvailable(getApplicationContext()))
-            throw new ClientException(ClientException.ClientErrorCode.NO_NETWORK);
-    }
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    if (!AppUtils.isNetworkAvailable(getApplicationContext()))
+      throw new ClientException(ClientException.ClientErrorCode.NO_NETWORK);
+  }
 
-    protected void broadcastHttpErrorIntent(StackXError error) {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(StringConstants.ERROR, error);
-        sendBroadcast(broadcastIntent);
-    }
+  protected void broadcastHttpErrorIntent(StackXError error) {
+    Intent broadcastIntent = new Intent();
+    broadcastIntent.setAction(ErrorIntentAction.HTTP_ERROR.getAction());
+    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+    broadcastIntent.putExtra(StringConstants.ERROR, error);
+    sendBroadcast(broadcastIntent);
+  }
 
-    protected void broadcastSerializableExtra(String action, String extraName, Serializable extra) {
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction(action);
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        broadcastIntent.putExtra(extraName, extra);
-        sendBroadcast(broadcastIntent);
-    }
+  protected void broadcastSerializableExtra(String action, String extraName, Serializable extra) {
+    Intent broadcastIntent = new Intent();
+    broadcastIntent.setAction(action);
+    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+    broadcastIntent.putExtra(extraName, extra);
+    sendBroadcast(broadcastIntent);
+  }
 }

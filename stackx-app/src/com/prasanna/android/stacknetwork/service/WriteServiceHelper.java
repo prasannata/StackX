@@ -43,77 +43,77 @@ import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
 import com.prasanna.android.utils.LogWrapper;
 
 public class WriteServiceHelper extends AbstractBaseServiceHelper {
-    private static final String TAG = WriteServiceHelper.class.getSimpleName();
+  private static final String TAG = WriteServiceHelper.class.getSimpleName();
 
-    private static final WriteServiceHelper INSTANCE = new WriteServiceHelper();
+  private static final WriteServiceHelper INSTANCE = new WriteServiceHelper();
 
-    protected WriteServiceHelper() {
+  protected WriteServiceHelper() {
+  }
+
+  public static WriteServiceHelper getInstance() {
+    return INSTANCE;
+  }
+
+  @Override
+  protected String getLogTag() {
+    return TAG;
+  }
+
+  public Comment addComment(long postId, String body) {
+    return writeComment("/posts/" + postId + "/comments/add", body);
+  }
+
+  public Comment editComment(long commentId, String editedText) {
+    return writeComment("/comments/" + commentId + "/edit", editedText);
+  }
+
+  private Comment writeComment(String restEndPoint, String body) {
+    List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER, QueryParamDefaultValues.ITEM_DETAIL_FILTER));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.BODY, body));
+
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
+    requestHeaders.put(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+
+    try {
+      JSONObjectWrapper jsonObject =
+          executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
+      JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
+      if (jsonArray != null && jsonArray.length() == 1)
+        return getSerializedCommentObject(JSONObjectWrapper.wrap(jsonArray.getJSONObject(0)));
     }
-
-    public static WriteServiceHelper getInstance() {
-        return INSTANCE;
+    catch (UnsupportedEncodingException e) {
+      throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
     }
-
-    @Override
-    protected String getLogTag() {
-        return TAG;
+    catch (JSONException e) {
+      LogWrapper.e(TAG, e.getMessage());
     }
+    return null;
+  }
 
-    public Comment addComment(long postId, String body) {
-        return writeComment("/posts/" + postId + "/comments/add", body);
+  private List<BasicNameValuePair> getBasicNameValuePartListForWriteComment() {
+    List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.getAccessToken(null)));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
+    return parameters;
+  }
+
+  public void deleteComment(long commentId) {
+    String restEndPoint = "/comments/" + commentId + "/delete";
+
+    List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
+
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
+
+    try {
+      executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
     }
-
-    public Comment editComment(long commentId, String editedText) {
-        return writeComment("/comments/" + commentId + "/edit", editedText);
+    catch (UnsupportedEncodingException e) {
+      throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
     }
-
-    private Comment writeComment(String restEndPoint, String body) {
-        List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER, QueryParamDefaultValues.ITEM_DETAIL_FILTER));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.BODY, body));
-
-        Map<String, String> requestHeaders = new HashMap<String, String>();
-        requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
-        requestHeaders.put(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
-
-        try {
-            JSONObjectWrapper jsonObject =
-                    executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
-            JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
-            if (jsonArray != null && jsonArray.length() == 1)
-                return getSerializedCommentObject(JSONObjectWrapper.wrap(jsonArray.getJSONObject(0)));
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
-        }
-        catch (JSONException e) {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        return null;
-    }
-
-    private List<BasicNameValuePair> getBasicNameValuePartListForWriteComment() {
-        List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.getAccessToken(null)));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
-        parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
-        return parameters;
-    }
-
-    public void deleteComment(long commentId) {
-        String restEndPoint = "/comments/" + commentId + "/delete";
-
-        List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
-
-        Map<String, String> requestHeaders = new HashMap<String, String>();
-        requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
-
-        try {
-            executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
-        }
-    }
+  }
 }

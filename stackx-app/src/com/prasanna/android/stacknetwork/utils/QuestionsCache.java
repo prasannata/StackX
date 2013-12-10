@@ -25,28 +25,28 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Question;
 
 public class QuestionsCache extends LruCache<Long, Question> {
-    private static int CACHE_SIZE = 15;
-    private static final QuestionsCache INSTANCE = new QuestionsCache();
+  private static int CACHE_SIZE = 15;
+  private static final QuestionsCache INSTANCE = new QuestionsCache();
 
-    private QuestionsCache() {
-        super(CACHE_SIZE);
-    }
+  private QuestionsCache() {
+    super(CACHE_SIZE);
+  }
 
-    public static QuestionsCache getInstance() {
-        return INSTANCE;
-    }
+  public static QuestionsCache getInstance() {
+    return INSTANCE;
+  }
 
-    public void updateAnswersForQuestion(Long questionId, ArrayList<Answer> answers) {
-        if (answers != null && containsKey(questionId)) {
-            Question question = get(questionId);
-            if (question != null) {
-                if (question.answers == null) {
-                    question.answers = new ArrayList<Answer>();
-                }
-
-                question.answers.addAll(answers);
-                add(questionId, question);
-            }
+  public void updateAnswersForQuestion(Long questionId, ArrayList<Answer> answers) {
+    if (answers != null && containsKey(questionId)) {
+      Question question = get(questionId);
+      if (question != null) {
+        if (question.answers == null) {
+          question.answers = new ArrayList<Answer>();
         }
+
+        question.answers.addAll(answers);
+        add(questionId, question);
+      }
     }
+  }
 }

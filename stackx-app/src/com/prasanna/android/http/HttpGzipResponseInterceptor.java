@@ -36,66 +36,66 @@ import org.apache.http.protocol.HttpContext;
 import com.prasanna.android.utils.LogWrapper;
 
 public class HttpGzipResponseInterceptor implements HttpResponseInterceptor {
-    private final String TAG = HttpGzipResponseInterceptor.class.getSimpleName();
-    private final Class<? extends HttpEntityWrapper> entityWrapper;
-    private final String contentEncoding;
+  private final String TAG = HttpGzipResponseInterceptor.class.getSimpleName();
+  private final Class<? extends HttpEntityWrapper> entityWrapper;
+  private final String contentEncoding;
 
-    static class GzipDecompressingEntity extends HttpEntityWrapper {
-        public GzipDecompressingEntity(final HttpEntity entity) {
-            super(entity);
-        }
-
-        @Override
-        public InputStream getContent() throws IOException, IllegalStateException {
-            return new GZIPInputStream(wrappedEntity.getContent());
-        }
-
-        @Override
-        public long getContentLength() {
-            return -1;
-        }
-    }
-
-    public HttpGzipResponseInterceptor(final String contentEncoding,
-            final Class<? extends HttpEntityWrapper> entityWrapper) {
-        this.contentEncoding = contentEncoding;
-        this.entityWrapper = entityWrapper;
+  static class GzipDecompressingEntity extends HttpEntityWrapper {
+    public GzipDecompressingEntity(final HttpEntity entity) {
+      super(entity);
     }
 
     @Override
-    public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
-        HttpEntity entity = response.getEntity();
-        Header encodingHeader = entity.getContentEncoding();
-        if (encodingHeader != null) {
-            HeaderElement[] codecs = encodingHeader.getElements();
-            for (int i = 0; i < codecs.length; i++) {
-                if (codecs[i].getName().equalsIgnoreCase(contentEncoding)) {
-                    try {
-                        entityWrapper.getConstructor(HttpEntity.class).newInstance(entity);
-                        response.setEntity(new GzipDecompressingEntity(entity));
-                        return;
-                    }
-                    catch (IllegalArgumentException e) {
-                        LogWrapper.e(TAG, e.getMessage());
-                    }
-                    catch (SecurityException e) {
-                        LogWrapper.e(TAG, e.getMessage());
-                    }
-                    catch (InstantiationException e) {
-                        LogWrapper.e(TAG, e.getMessage());
-                    }
-                    catch (IllegalAccessException e) {
-                        LogWrapper.e(TAG, e.getMessage());
-                    }
-                    catch (InvocationTargetException e) {
-                        LogWrapper.e(TAG, e.getMessage());
-                    }
-                    catch (NoSuchMethodException e) {
-                        LogWrapper.e(TAG, e.getMessage());
-                    }
-                }
-            }
-        }
+    public InputStream getContent() throws IOException, IllegalStateException {
+      return new GZIPInputStream(wrappedEntity.getContent());
     }
+
+    @Override
+    public long getContentLength() {
+      return -1;
+    }
+  }
+
+  public HttpGzipResponseInterceptor(final String contentEncoding,
+      final Class<? extends HttpEntityWrapper> entityWrapper) {
+    this.contentEncoding = contentEncoding;
+    this.entityWrapper = entityWrapper;
+  }
+
+  @Override
+  public void process(HttpResponse response, HttpContext context) throws HttpException, IOException {
+    HttpEntity entity = response.getEntity();
+    Header encodingHeader = entity.getContentEncoding();
+    if (encodingHeader != null) {
+      HeaderElement[] codecs = encodingHeader.getElements();
+      for (int i = 0; i < codecs.length; i++) {
+        if (codecs[i].getName().equalsIgnoreCase(contentEncoding)) {
+          try {
+            entityWrapper.getConstructor(HttpEntity.class).newInstance(entity);
+            response.setEntity(new GzipDecompressingEntity(entity));
+            return;
+          }
+          catch (IllegalArgumentException e) {
+            LogWrapper.e(TAG, e.getMessage());
+          }
+          catch (SecurityException e) {
+            LogWrapper.e(TAG, e.getMessage());
+          }
+          catch (InstantiationException e) {
+            LogWrapper.e(TAG, e.getMessage());
+          }
+          catch (IllegalAccessException e) {
+            LogWrapper.e(TAG, e.getMessage());
+          }
+          catch (InvocationTargetException e) {
+            LogWrapper.e(TAG, e.getMessage());
+          }
+          catch (NoSuchMethodException e) {
+            LogWrapper.e(TAG, e.getMessage());
+          }
+        }
+      }
+    }
+  }
 
 }

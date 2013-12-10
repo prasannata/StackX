@@ -23,16 +23,16 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 public class GetImageAsyncTaskCompleteNotifierImpl implements AsyncTaskCompletionNotifier<Bitmap> {
-    private final ImageView imageView;
+  private final ImageView imageView;
 
-    public GetImageAsyncTaskCompleteNotifierImpl(ImageView imageView) {
-        this.imageView = imageView;
-    }
+  public GetImageAsyncTaskCompleteNotifierImpl(ImageView imageView) {
+    this.imageView = imageView;
+  }
 
-    public void notifyOnCompletion(Bitmap result) {
-        if (result != null && imageView != null) {
-            imageView.setImageBitmap(result);
-        }
+  public void notifyOnCompletion(Bitmap result) {
+    if (result != null && imageView != null) {
+      imageView.setImageBitmap(result);
     }
+  }
 
 }

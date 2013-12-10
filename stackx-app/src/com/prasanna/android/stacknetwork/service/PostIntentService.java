@@ -28,51 +28,51 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
 public class PostIntentService extends IntentService {
-    private static final String TAG = PostIntentService.class.getSimpleName();
+  private static final String TAG = PostIntentService.class.getSimpleName();
 
-    public static final int GET_POST = 0x01;
-    public static final int GET_POST_COMMENT = 0x02;
+  public static final int GET_POST = 0x01;
+  public static final int GET_POST_COMMENT = 0x02;
 
-    public PostIntentService() {
-        this(TAG);
+  public PostIntentService() {
+    this(TAG);
+  }
+
+  public PostIntentService(String name) {
+    super(name);
+  }
+
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
+    int action = intent.getIntExtra(StringConstants.ACTION, 0);
+    long postId = intent.getLongExtra(StringConstants.POST_ID, 0);
+    final String site = intent.getStringExtra(StringConstants.SITE);
+
+    switch (action) {
+      case GET_POST:
+        getPost(postId, site, receiver);
+        break;
+      case GET_POST_COMMENT:
+        getComment(intent, site, receiver);
+        break;
+      default:
+        LogWrapper.d(TAG, "Unknown action:" + action);
+        break;
     }
+  }
 
-    public PostIntentService(String name) {
-        super(name);
+  private void getComment(Intent intent, String site, final ResultReceiver receiver) {
+    long commentId = intent.getLongExtra(StringConstants.COMMENT_ID, 0);
+    Bundle bundle = new Bundle();
+    bundle.putSerializable(StringConstants.COMMENT, PostServiceHelper.getInstance().getComment(commentId, site));
+    receiver.send(GET_POST_COMMENT, bundle);
+  }
+
+  private void getPost(long postId, String site, ResultReceiver receiver) {
+    if (postId > 0) {
+      Bundle bundle = new Bundle();
+      bundle.putSerializable(StringConstants.POST, PostServiceHelper.getInstance().getPost(postId, site));
+      receiver.send(GET_POST, bundle);
     }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
-        int action = intent.getIntExtra(StringConstants.ACTION, 0);
-        long postId = intent.getLongExtra(StringConstants.POST_ID, 0);
-        final String site = intent.getStringExtra(StringConstants.SITE);
-
-        switch (action) {
-            case GET_POST:
-                getPost(postId, site, receiver);
-                break;
-            case GET_POST_COMMENT:
-                getComment(intent, site, receiver);
-                break;
-            default:
-                LogWrapper.d(TAG, "Unknown action:" + action);
-                break;
-        }
-    }
-
-    private void getComment(Intent intent, String site, final ResultReceiver receiver) {
-        long commentId = intent.getLongExtra(StringConstants.COMMENT_ID, 0);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(StringConstants.COMMENT, PostServiceHelper.getInstance().getComment(commentId, site));
-        receiver.send(GET_POST_COMMENT, bundle);
-    }
-
-    private void getPost(long postId, String site, ResultReceiver receiver) {
-        if (postId > 0) {
-            Bundle bundle = new Bundle();
-            bundle.putSerializable(StringConstants.POST, PostServiceHelper.getInstance().getPost(postId, site));
-            receiver.send(GET_POST, bundle);
-        }
-    }
+  }
 }

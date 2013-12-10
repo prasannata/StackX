@@ -42,107 +42,107 @@ import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.utils.LogWrapper;
 
 public class DbRequestThreadExecutor {
-    private static final String TAG = DbRequestThreadExecutor.class.getSimpleName();
+  private static final String TAG = DbRequestThreadExecutor.class.getSimpleName();
 
-    public static void persistSites(final Context context, final ArrayList<Site> sites) {
-        AppUtils.runOnBackgroundThread(new Runnable() {
-            @Override
-            public void run() {
-                SiteDAO.insertAll(context, sites);
-            }
-        });
+  public static void persistSites(final Context context, final ArrayList<Site> sites) {
+    AppUtils.runOnBackgroundThread(new Runnable() {
+      @Override
+      public void run() {
+        SiteDAO.insertAll(context, sites);
+      }
+    });
+  }
+
+  public static void persistAccounts(final Context context, final ArrayList<Account> accounts) {
+    AppUtils.runOnBackgroundThread(new Runnable() {
+      @Override
+      public void run() {
+        UserAccountsDAO.insertAll(context, accounts);
+      }
+    });
+  }
+
+  public static void persistPermissions(final Context context, final Site site,
+      final ArrayList<WritePermission> permissions) {
+    AppUtils.runOnBackgroundThread(new Runnable() {
+      @Override
+      public void run() {
+        persistPermissionsInCurrentThread(context, site, permissions);
+      }
+    });
+  }
+
+  public static void persistPermissionsInCurrentThread(final Context context, final Site site,
+      final ArrayList<WritePermission> permissions) {
+    WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
+
+    try {
+      writePermissionDAO.open();
+      writePermissionDAO.insert(site, permissions);
+
+      for (WritePermission permission : permissions) {
+        if (permission.objectType != null)
+          switchOnObjectType(context, permission);
+      }
+    }
+    catch (SQLException e) {
+      LogWrapper.e(TAG, e.getMessage());
+    }
+    finally {
+      writePermissionDAO.close();
+    }
+  }
+
+  private static void switchOnObjectType(final Context context, final WritePermission permission) {
+    switch (permission.objectType) {
+      case ANSWER:
+        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
+            permission.minSecondsBetweenActions);
+        break;
+      case COMMENT:
+        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
+            permission.minSecondsBetweenActions);
+        break;
+      case QUESTION:
+        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
+            permission.minSecondsBetweenActions);
+        break;
+      default:
+        break;
+    }
+  }
+
+  public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site) {
+    HashMap<String, SearchCriteria> searchCriterias = null;
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    Callable<HashMap<String, SearchCriteria>> callable = new Callable<HashMap<String, SearchCriteria>>() {
+      @Override
+      public HashMap<String, SearchCriteria> call() throws Exception {
+        ArrayList<SearchCriteriaDomain> criteriaForCustomTabs =
+            SearchCriteriaDAO.getCriteriaForCustomTabs(context, site);
+        if (criteriaForCustomTabs != null) {
+          HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
+          for (SearchCriteriaDomain searchCriteriaDomain : criteriaForCustomTabs)
+            searchCriterias.put(searchCriteriaDomain.name, searchCriteriaDomain.searchCriteria);
+          return searchCriterias;
+        }
+
+        return null;
+      }
+    };
+
+    try {
+      Future<HashMap<String, SearchCriteria>> future = executor.submit(callable);
+      searchCriterias = future.get();
+      executor.shutdown();
+    }
+    catch (InterruptedException e) {
+      LogWrapper.e(TAG, e.getMessage());
+    }
+    catch (ExecutionException e) {
+      LogWrapper.e(TAG, e.getMessage());
     }
 
-    public static void persistAccounts(final Context context, final ArrayList<Account> accounts) {
-        AppUtils.runOnBackgroundThread(new Runnable() {
-            @Override
-            public void run() {
-                UserAccountsDAO.insertAll(context, accounts);
-            }
-        });
-    }
-
-    public static void persistPermissions(final Context context, final Site site,
-            final ArrayList<WritePermission> permissions) {
-        AppUtils.runOnBackgroundThread(new Runnable() {
-            @Override
-            public void run() {
-                persistPermissionsInCurrentThread(context, site, permissions);
-            }
-        });
-    }
-
-    public static void persistPermissionsInCurrentThread(final Context context, final Site site,
-            final ArrayList<WritePermission> permissions) {
-        WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-
-        try {
-            writePermissionDAO.open();
-            writePermissionDAO.insert(site, permissions);
-
-            for (WritePermission permission : permissions) {
-                if (permission.objectType != null)
-                    switchOnObjectType(context, permission);
-            }
-        }
-        catch (SQLException e) {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        finally {
-            writePermissionDAO.close();
-        }
-    }
-
-    private static void switchOnObjectType(final Context context, final WritePermission permission) {
-        switch (permission.objectType) {
-            case ANSWER:
-                SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
-                        permission.minSecondsBetweenActions);
-                break;
-            case COMMENT:
-                SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
-                        permission.minSecondsBetweenActions);
-                break;
-            case QUESTION:
-                SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
-                        permission.minSecondsBetweenActions);
-                break;
-            default:
-                break;
-        }
-    }
-
-    public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site) {
-        HashMap<String, SearchCriteria> searchCriterias = null;
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Callable<HashMap<String, SearchCriteria>> callable = new Callable<HashMap<String, SearchCriteria>>() {
-            @Override
-            public HashMap<String, SearchCriteria> call() throws Exception {
-                ArrayList<SearchCriteriaDomain> criteriaForCustomTabs =
-                        SearchCriteriaDAO.getCriteriaForCustomTabs(context, site);
-                if (criteriaForCustomTabs != null) {
-                    HashMap<String, SearchCriteria> searchCriterias = new HashMap<String, SearchCriteria>();
-                    for (SearchCriteriaDomain searchCriteriaDomain : criteriaForCustomTabs)
-                        searchCriterias.put(searchCriteriaDomain.name, searchCriteriaDomain.searchCriteria);
-                    return searchCriterias;
-                }
-
-                return null;
-            }
-        };
-
-        try {
-            Future<HashMap<String, SearchCriteria>> future = executor.submit(callable);
-            searchCriterias = future.get();
-            executor.shutdown();
-        }
-        catch (InterruptedException e) {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-        catch (ExecutionException e) {
-            LogWrapper.e(TAG, e.getMessage());
-        }
-
-        return searchCriterias;
-    }
+    return searchCriterias;
+  }
 }

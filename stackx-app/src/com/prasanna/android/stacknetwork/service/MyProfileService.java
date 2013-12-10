@@ -36,58 +36,57 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
 public class MyProfileService extends AbstractStackxService {
-    private static final String TAG = TagsService.class.getSimpleName();
+  private static final String TAG = TagsService.class.getSimpleName();
 
-    private final static class ServiceHandler extends Handler {
-        private OnHandlerComplete onHandlerComplete;
-        private Context context;
+  private final static class ServiceHandler extends Handler {
+    private OnHandlerComplete onHandlerComplete;
+    private Context context;
 
-        public ServiceHandler(Looper looper, Context context, OnHandlerComplete onHandlerComplete) {
-            super(looper);
-            this.context = context;
-            this.onHandlerComplete = onHandlerComplete;
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            ProfileDAO profileDAO = new ProfileDAO(context);
-
-            try {
-                profileDAO.open();
-                User me = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
-
-                if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR) {
-                    StackXPage<User> userPage =
-                            UserServiceHelper.getInstance().getMe(OperatingSite.getSite().apiSiteParameter);
-                    if (userPage != null && userPage.items != null && !userPage.items.isEmpty()) {
-                        profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
-                        profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
-                        SharedPreferencesUtil.setLong(context, StringConstants.USER_ID, userPage.items.get(0).id);
-                    }
-                }
-            }
-            catch (SQLException e) {
-                LogWrapper.e(TAG, e.getMessage());
-            }
-            catch (AbstractHttpException e) {
-                LogWrapper.e(TAG, e.getMessage());
-            }
-            finally {
-                profileDAO.close();
-            }
-
-            onHandlerComplete.onHandleMessageFinish(msg);
-        }
+    public ServiceHandler(Looper looper, Context context, OnHandlerComplete onHandlerComplete) {
+      super(looper);
+      this.context = context;
+      this.onHandlerComplete = onHandlerComplete;
     }
 
     @Override
-    protected Handler getServiceHandler(Looper looper) {
-        return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete() {
-            @Override
-            public void onHandleMessageFinish(Message message, Object... args) {
-                setRunning(false);
-                MyProfileService.this.stopSelf(message.arg1);
-            }
-        });
+    public void handleMessage(Message msg) {
+      ProfileDAO profileDAO = new ProfileDAO(context);
+
+      try {
+        profileDAO.open();
+        User me = profileDAO.getMe(OperatingSite.getSite().apiSiteParameter);
+
+        if (me == null || System.currentTimeMillis() - me.lastUpdateTime > IntegerConstants.MS_IN_AN_HOUR) {
+          StackXPage<User> userPage = UserServiceHelper.getInstance().getMe(OperatingSite.getSite().apiSiteParameter);
+          if (userPage != null && userPage.items != null && !userPage.items.isEmpty()) {
+            profileDAO.deleteMe(OperatingSite.getSite().apiSiteParameter);
+            profileDAO.insert(OperatingSite.getSite().apiSiteParameter, userPage.items.get(0), true);
+            SharedPreferencesUtil.setLong(context, StringConstants.USER_ID, userPage.items.get(0).id);
+          }
+        }
+      }
+      catch (SQLException e) {
+        LogWrapper.e(TAG, e.getMessage());
+      }
+      catch (AbstractHttpException e) {
+        LogWrapper.e(TAG, e.getMessage());
+      }
+      finally {
+        profileDAO.close();
+      }
+
+      onHandlerComplete.onHandleMessageFinish(msg);
     }
+  }
+
+  @Override
+  protected Handler getServiceHandler(Looper looper) {
+    return new ServiceHandler(looper, getApplicationContext(), new OnHandlerComplete() {
+      @Override
+      public void onHandleMessageFinish(Message message, Object... args) {
+        setRunning(false);
+        MyProfileService.this.stopSelf(message.arg1);
+      }
+    });
+  }
 }

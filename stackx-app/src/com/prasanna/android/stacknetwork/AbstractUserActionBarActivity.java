@@ -52,250 +52,248 @@ import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
 
 public abstract class AbstractUserActionBarActivity extends Activity {
-    private boolean showingSearchFilters = false;
-    private PopupWindow popupWindow;
-    private SearchView searchView;
-    private Site site;
+  private boolean showingSearchFilters = false;
+  private PopupWindow popupWindow;
+  private SearchView searchView;
+  private Site site;
 
-    protected Menu actionBarMenu;
+  protected Menu actionBarMenu;
 
-    protected abstract void refresh();
+  protected abstract void refresh();
 
-    protected abstract boolean shouldSearchViewBeEnabled();
+  protected abstract boolean shouldSearchViewBeEnabled();
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        loadDefaultSite();
-        initializeActionBar();
+    loadDefaultSite();
+    initializeActionBar();
+  }
+
+  private void loadDefaultSite() {
+    if (OperatingSite.getSite() == null) {
+      OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+
+      if (OperatingSite.getSite() == null) {
+        startSiteListActivity();
+        finish();
+      }
     }
 
-    private void loadDefaultSite() {
-        if (OperatingSite.getSite() == null) {
-            OperatingSite.setSite(AppUtils.getDefaultSite(getApplicationContext()));
+    site = OperatingSite.getSite();
+  }
 
-            if (OperatingSite.getSite() == null) {
-                startSiteListActivity();
-                finish();
-            }
+  private void initializeActionBar() {
+    getActionBar().setHomeButtonEnabled(false);
+    setActionBarTitleAndIcon();
+  }
+
+  protected void setActionBarTitleAndIcon() {
+    if (OperatingSite.getSite() != null) {
+      setActionBarTitle(OperatingSite.getSite().name);
+      setActionBarHomeIcon(OperatingSite.getSite());
+    }
+  }
+
+  protected void setActionBarTitle(String title) {
+    getActionBar().setTitle(Html.fromHtml(title));
+  }
+
+  protected void setActionBarHomeIcon(Site site) {
+    if (BitmapCache.getInstance().containsKey(site.name))
+      setActionBarHomeIcon(BitmapCache.getInstance().get(site.name));
+    else
+      loadIcon(site.name, site.iconUrl);
+  }
+
+  protected void setActionBarHomeIcon(Bitmap result) {
+    getActionBar().setIcon(new BitmapDrawable(getResources(), result));
+    getActionBar().setHomeButtonEnabled(true);
+  }
+
+  private void loadIcon(final String site, final String siteIconUrl) {
+    GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>() {
+      @Override
+      public void notifyOnCompletion(Bitmap result) {
+        setActionBarHomeIcon(result);
+        BitmapCache.getInstance().add(site, result);
+      }
+    });
+
+    AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(fetchImageAsyncTask, siteIconUrl);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+
+    AppUtils.loadAccessToken(getApplicationContext());
+    OperatingSite.setSite(site);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.action_menu, menu);
+
+    if (shouldSearchViewBeEnabled())
+      setupSearchItem(menu);
+    else {
+      menu.removeItem(R.id.menu_search);
+      menu.removeItem(R.id.menu_search_filter);
+    }
+
+    if (!AppUtils.inAuthenticatedRealm(getApplicationContext()))
+      setupActionBarForAnyUser(menu);
+
+    this.actionBarMenu = menu;
+    getActionBar().setHomeButtonEnabled(true);
+
+    return true;
+  }
+
+  private void setupActionBarForAnyUser(Menu menu) {
+    menu.removeItem(R.id.menu_my_profile);
+    menu.removeItem(R.id.menu_my_inbox);
+  }
+
+  private void setupSearchItem(final Menu menu) {
+    searchView = setupSearchMenuItemAndGetActionView(menu);
+    setupSearchActionView(menu);
+    setupPopupForSearchOptions();
+  }
+
+  private void setupSearchActionView(final Menu menu) {
+    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+    searchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
+      @Override
+      public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus && popupWindow.isShowing()) {
+          popupWindow.dismiss();
+          menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
+          showingSearchFilters = false;
         }
+      }
+    });
+  }
 
-        site = OperatingSite.getSite();
-    }
+  private SearchView setupSearchMenuItemAndGetActionView(final Menu menu) {
+    MenuItem searchItem = menu.findItem(R.id.menu_search);
+    searchItem.setOnActionExpandListener(new OnActionExpandListener() {
+      @Override
+      public boolean onMenuItemActionExpand(MenuItem item) {
+        menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.findItem(R.id.menu_search_filter).setVisible(true);
+        return true;
+      }
 
-    private void initializeActionBar() {
-        getActionBar().setHomeButtonEnabled(false);
-        setActionBarTitleAndIcon();
-    }
+      @Override
+      public boolean onMenuItemActionCollapse(MenuItem item) {
+        menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.findItem(R.id.menu_search_filter).setVisible(false);
+        if (popupWindow.isShowing())
+          popupWindow.dismiss();
+        menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
 
-    protected void setActionBarTitleAndIcon() {
-        if (OperatingSite.getSite() != null) {
-            setActionBarTitle(OperatingSite.getSite().name);
-            setActionBarHomeIcon(OperatingSite.getSite());
-        }
-    }
+        showingSearchFilters = false;
+        return true;
+      }
+    });
 
-    protected void setActionBarTitle(String title) {
-        getActionBar().setTitle(Html.fromHtml(title));
-    }
+    return ((SearchView) searchItem.getActionView());
+  }
 
-    protected void setActionBarHomeIcon(Site site) {
-        if (BitmapCache.getInstance().containsKey(site.name))
-            setActionBarHomeIcon(BitmapCache.getInstance().get(site.name));
-        else
-            loadIcon(site.name, site.iconUrl);
-    }
+  private void setupPopupForSearchOptions() {
+    RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
+    popupWindow =
+        new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
-    protected void setActionBarHomeIcon(Bitmap result) {
-        getActionBar().setIcon(new BitmapDrawable(getResources(), result));
-        getActionBar().setHomeButtonEnabled(true);
-    }
+    setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
+        SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
 
-    private void loadIcon(final String site, final String siteIconUrl) {
-        GetImageAsyncTask fetchImageAsyncTask = new GetImageAsyncTask(new AsyncTaskCompletionNotifier<Bitmap>() {
-            @Override
-            public void notifyOnCompletion(Bitmap result) {
-                setActionBarHomeIcon(result);
-                BitmapCache.getInstance().add(site, result);
-            }
-        });
+    setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyAnsweredCB),
+        SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
 
-        AsyncTaskExecutor.getInstance().executeAsyncTaskInThreadPoolExecutor(fetchImageAsyncTask, siteIconUrl);
-    }
+    setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyWithAnswersCB),
+        SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
 
-    @Override
-    public void onResume() {
-        super.onResume();
+  }
 
-        AppUtils.loadAccessToken(getApplicationContext());
-        OperatingSite.setSite(site);
-    }
+  private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName) {
+    checkBox.setChecked(SharedPreferencesUtil.isSet(getApplicationContext(), prefName, false));
+    checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        SharedPreferencesUtil.setBoolean(getApplicationContext(), prefName, isChecked);
+      }
+    });
+  }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.action_menu, menu);
-
-        if (shouldSearchViewBeEnabled())
-            setupSearchItem(menu);
-        else {
-            menu.removeItem(R.id.menu_search);
-            menu.removeItem(R.id.menu_search_filter);
-        }
-
-        if (!AppUtils.inAuthenticatedRealm(getApplicationContext()))
-            setupActionBarForAnyUser(menu);
-
-        this.actionBarMenu = menu;
-        getActionBar().setHomeButtonEnabled(true);
-
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        return onActionBarHomeButtonClick(item);
+      case R.id.menu_refresh:
+        refresh();
+        return true;
+      case R.id.menu_search_filter:
+        showSearchFilterOptions(item);
+        return true;
+      case R.id.menu_advanced_search:
+        startActivity(new Intent(this, AdvancedSearchActivity.class));
+        return true;
+      case R.id.menu_my_profile:
+        Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
+        userProfileIntent.putExtra(StringConstants.SITE, OperatingSite.getSite());
+        userProfileIntent.putExtra(StringConstants.ME, true);
+        startActivity(userProfileIntent);
+        return true;
+      case R.id.menu_my_inbox:
+        Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
+        userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, AppUtils.getAccessToken(getApplicationContext()));
+        startActivity(userInboxIntent);
+        return true;
+      case R.id.menu_option_change_site:
+        startSiteListActivity();
+        return true;
+      case R.id.menu_option_settings:
+        startActivity(new Intent(this, SettingsActivity.class));
         return true;
     }
 
-    private void setupActionBarForAnyUser(Menu menu) {
-        menu.removeItem(R.id.menu_my_profile);
-        menu.removeItem(R.id.menu_my_inbox);
+    return false;
+  }
+
+  private void startSiteListActivity() {
+    startActivity(new Intent(this, StackNetworkListActivity.class));
+  }
+
+  private void showSearchFilterOptions(MenuItem item) {
+    if (showingSearchFilters) {
+      item.setIcon(R.drawable.expand);
+      popupWindow.dismiss();
+      showingSearchFilters = false;
+      searchView.requestFocus();
     }
-
-    private void setupSearchItem(final Menu menu) {
-        searchView = setupSearchMenuItemAndGetActionView(menu);
-        setupSearchActionView(menu);
-        setupPopupForSearchOptions();
+    else {
+      item.setIcon(R.drawable.navigation_collapse);
+      searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+      popupWindow.showAsDropDown(searchView, 300, 0);
+      showingSearchFilters = true;
+      searchView.clearFocus();
     }
+  }
 
-    private void setupSearchActionView(final Menu menu) {
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnQueryTextFocusChangeListener(new OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus && popupWindow.isShowing()) {
-                    popupWindow.dismiss();
-                    menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
-                    showingSearchFilters = false;
-                }
-            }
-        });
-    }
+  protected boolean onActionBarHomeButtonClick(MenuItem item) {
+    if (this instanceof QuestionsActivity)
+      finish();
 
-    private SearchView setupSearchMenuItemAndGetActionView(final Menu menu) {
-        MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchItem.setOnActionExpandListener(new OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                menu.findItem(R.id.menu_search_filter).setVisible(true);
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                menu.findItem(R.id.menu_search_filter).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-                menu.findItem(R.id.menu_search_filter).setVisible(false);
-                if (popupWindow.isShowing())
-                    popupWindow.dismiss();
-                menu.findItem(R.id.menu_search_filter).setIcon(R.drawable.expand);
-
-                showingSearchFilters = false;
-                return true;
-            }
-        });
-
-        return ((SearchView) searchItem.getActionView());
-    }
-
-    private void setupPopupForSearchOptions() {
-        RelativeLayout popupLayout = (RelativeLayout) getLayoutInflater().inflate(R.layout.search_options, null);
-        popupWindow =
-                new PopupWindow(popupLayout, RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchInTitleCB),
-                SettingsFragment.KEY_PREF_SEARCH_IN_TITLE);
-
-        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyAnsweredCB),
-                SettingsFragment.KEY_PREF_SEARCH_ONLY_ANSWERED);
-
-        setupSearchPrefCheckBox((CheckBox) popupLayout.findViewById(R.id.searchOnlyWithAnswersCB),
-                SettingsFragment.KEY_PREF_SEARCH_ONLY_WITH_ANSWERS);
-
-    }
-
-    private void setupSearchPrefCheckBox(final CheckBox checkBox, final String prefName) {
-        checkBox.setChecked(SharedPreferencesUtil.isSet(getApplicationContext(), prefName, false));
-        checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferencesUtil.setBoolean(getApplicationContext(), prefName, isChecked);
-            }
-        });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                return onActionBarHomeButtonClick(item);
-            case R.id.menu_refresh:
-                refresh();
-                return true;
-            case R.id.menu_search_filter:
-                showSearchFilterOptions(item);
-                return true;
-            case R.id.menu_advanced_search:
-                startActivity(new Intent(this, AdvancedSearchActivity.class));
-                return true;
-            case R.id.menu_my_profile:
-                Intent userProfileIntent = new Intent(getApplicationContext(), UserProfileActivity.class);
-                userProfileIntent.putExtra(StringConstants.SITE, OperatingSite.getSite());
-                userProfileIntent.putExtra(StringConstants.ME, true);
-                startActivity(userProfileIntent);
-                return true;
-            case R.id.menu_my_inbox:
-                Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
-                userInboxIntent
-                        .putExtra(StringConstants.ACCESS_TOKEN, AppUtils.getAccessToken(getApplicationContext()));
-                startActivity(userInboxIntent);
-                return true;
-            case R.id.menu_option_change_site:
-                startSiteListActivity();
-                return true;
-            case R.id.menu_option_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-        }
-
-        return false;
-    }
-
-    private void startSiteListActivity() {
-        startActivity(new Intent(this, StackNetworkListActivity.class));
-    }
-
-    private void showSearchFilterOptions(MenuItem item) {
-        if (showingSearchFilters) {
-            item.setIcon(R.drawable.expand);
-            popupWindow.dismiss();
-            showingSearchFilters = false;
-            searchView.requestFocus();
-        }
-        else {
-            item.setIcon(R.drawable.navigation_collapse);
-            searchView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            popupWindow.showAsDropDown(searchView, 300, 0);
-            showingSearchFilters = true;
-            searchView.clearFocus();
-        }
-    }
-
-    protected boolean onActionBarHomeButtonClick(MenuItem item) {
-        if (this instanceof QuestionsActivity)
-            finish();
-
-        Intent intent = new Intent(this, QuestionsActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        return true;
-    }
+    Intent intent = new Intent(this, QuestionsActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
+    return true;
+  }
 }

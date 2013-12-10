@@ -33,121 +33,120 @@ import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.utils.LogWrapper;
 
 public class PostServiceHelper extends AbstractBaseServiceHelper {
-    private static final String TAG = PostIntentService.class.getSimpleName();
-    private static final PostServiceHelper postService = new PostServiceHelper();
+  private static final String TAG = PostIntentService.class.getSimpleName();
+  private static final PostServiceHelper postService = new PostServiceHelper();
 
-    public static PostServiceHelper getInstance() {
-        return postService;
-    }
+  public static PostServiceHelper getInstance() {
+    return postService;
+  }
 
-    private PostServiceHelper() {
-    }
+  private PostServiceHelper() {
+  }
 
-    @Override
-    protected String getLogTag() {
-        return TAG;
-    }
+  @Override
+  protected String getLogTag() {
+    return TAG;
+  }
 
-    public Post getPost(long id, String site) {
-        String restEndPoint = "/posts/" + id;
-        Map<String, String> queryParams = getDefaultQueryParams(site);
-        JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
+  public Post getPost(long id, String site) {
+    String restEndPoint = "/posts/" + id;
+    Map<String, String> queryParams = getDefaultQueryParams(site);
+    JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-        if (jsonResponse != null) {
-            try {
-                JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
+    if (jsonResponse != null) {
+      try {
+        JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                if (jsonArray != null && jsonArray.length() == 1) {
-                    JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+        if (jsonArray != null && jsonArray.length() == 1) {
+          JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
 
-                    if (jsonObject != null) {
-                        Post post = new Post();
-                        post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
-                        post.body = jsonObject.getString(JsonFields.Post.BODY);
-                        post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
-                        String postType = jsonObject.getString(JsonFields.Post.POST_TYPE);
-                        if (postType != null)
-                            post.postType = PostType.getEnum(postType);
-                        post.score = jsonObject.getInt(JsonFields.Post.SCORE);
-                        post.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
-                        return post;
-                    }
-                }
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
-
+          if (jsonObject != null) {
+            Post post = new Post();
+            post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
+            post.body = jsonObject.getString(JsonFields.Post.BODY);
+            post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
+            String postType = jsonObject.getString(JsonFields.Post.POST_TYPE);
+            if (postType != null)
+              post.postType = PostType.getEnum(postType);
+            post.score = jsonObject.getInt(JsonFields.Post.SCORE);
+            post.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
+            return post;
+          }
         }
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
 
-        return null;
     }
 
-    public Post getPostComment(long id, String site) {
-        String restEndPoint = "/posts/" + id;
-        Map<String, String> queryParams = getDefaultQueryParams(site);
-        JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
+    return null;
+  }
 
-        if (jsonResponse != null) {
-            try {
-                JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
+  public Post getPostComment(long id, String site) {
+    String restEndPoint = "/posts/" + id;
+    Map<String, String> queryParams = getDefaultQueryParams(site);
+    JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-                if (jsonArray != null && jsonArray.length() == 1) {
-                    JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+    if (jsonResponse != null) {
+      try {
+        JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                    if (jsonObject != null) {
-                        Post post = new Post();
-                        post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
-                        post.body = jsonObject.getString(JsonFields.Post.BODY);
-                        post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
-                        post.score = jsonObject.getInt(JsonFields.Post.SCORE);
-                        post.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
-                        return post;
-                    }
-                }
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
+        if (jsonArray != null && jsonArray.length() == 1) {
+          JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
 
+          if (jsonObject != null) {
+            Post post = new Post();
+            post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
+            post.body = jsonObject.getString(JsonFields.Post.BODY);
+            post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
+            post.score = jsonObject.getInt(JsonFields.Post.SCORE);
+            post.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
+            return post;
+          }
         }
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
 
-        return null;
     }
 
-    public Comment getComment(long id, String site) {
-        String restEndPoint = "/comments/" + id;
-        Map<String, String> queryParams = getDefaultQueryParams(site);
-        queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
-        JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
+    return null;
+  }
 
-        if (jsonResponse != null) {
-            try {
-                JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
+  public Comment getComment(long id, String site) {
+    String restEndPoint = "/comments/" + id;
+    Map<String, String> queryParams = getDefaultQueryParams(site);
+    queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
+    JSONObjectWrapper jsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-                if (jsonArray != null && jsonArray.length() == 1) {
-                    JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+    if (jsonResponse != null) {
+      try {
+        JSONArray jsonArray = jsonResponse.getJSONArray(JsonFields.ITEMS);
 
-                    if (jsonObject != null) {
-                        Comment comment = new Comment();
-                        comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
-                        comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
-                        comment.body = jsonObject.getString(JsonFields.Post.BODY);
-                        comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
-                        comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
-                        comment.owner =
-                                getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
-                        comment.type = PostType.getEnum(jsonObject.getString(JsonFields.Comment.POST_TYPE));
-                        return comment;
-                    }
-                }
-            }
-            catch (JSONException e) {
-                LogWrapper.d(TAG, e.getMessage());
-            }
+        if (jsonArray != null && jsonArray.length() == 1) {
+          JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
 
+          if (jsonObject != null) {
+            Comment comment = new Comment();
+            comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
+            comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
+            comment.body = jsonObject.getString(JsonFields.Post.BODY);
+            comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
+            comment.score = jsonObject.getInt(JsonFields.Comment.SCORE);
+            comment.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Post.OWNER));
+            comment.type = PostType.getEnum(jsonObject.getString(JsonFields.Comment.POST_TYPE));
+            return comment;
+          }
         }
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
 
-        return null;
     }
+
+    return null;
+  }
 }

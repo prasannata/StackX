@@ -27,33 +27,33 @@ import android.os.AsyncTask;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 
 public class ReadObjectAsyncTask extends AsyncTask<Void, Void, ArrayList<Object>> {
-    private final File directory;
-    private final String fileName;
-    private final AsyncTaskCompletionNotifier<ArrayList<Object>> notifier;
+  private final File directory;
+  private final String fileName;
+  private final AsyncTaskCompletionNotifier<ArrayList<Object>> notifier;
 
-    public ReadObjectAsyncTask(File directory, String fileName, AsyncTaskCompletionNotifier<ArrayList<Object>> notifier) {
-        this.directory = directory;
-        this.fileName = fileName;
-        this.notifier = notifier;
-    }
+  public ReadObjectAsyncTask(File directory, String fileName, AsyncTaskCompletionNotifier<ArrayList<Object>> notifier) {
+    this.directory = directory;
+    this.fileName = fileName;
+    this.notifier = notifier;
+  }
 
-    @Override
-    protected ArrayList<Object> doInBackground(Void... params) {
-        if (fileName == null) {
-            return SharedPreferencesUtil.readObjects(directory);
-        }
-        else {
-            ArrayList<Object> objects = new ArrayList<Object>();
-            objects.add(SharedPreferencesUtil.readObject(new File(directory, fileName)));
-            return objects;
-        }
+  @Override
+  protected ArrayList<Object> doInBackground(Void... params) {
+    if (fileName == null) {
+      return SharedPreferencesUtil.readObjects(directory);
     }
+    else {
+      ArrayList<Object> objects = new ArrayList<Object>();
+      objects.add(SharedPreferencesUtil.readObject(new File(directory, fileName)));
+      return objects;
+    }
+  }
 
-    @Override
-    protected void onPostExecute(ArrayList<Object> objects) {
-        if (notifier != null) {
-            notifier.notifyOnCompletion(objects);
-        }
+  @Override
+  protected void onPostExecute(ArrayList<Object> objects) {
+    if (notifier != null) {
+      notifier.notifyOnCompletion(objects);
     }
+  }
 
 }
