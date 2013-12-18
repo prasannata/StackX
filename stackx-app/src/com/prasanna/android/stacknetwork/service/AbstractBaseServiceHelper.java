@@ -33,7 +33,6 @@ import com.prasanna.android.http.SecureHttpHelper;
 import com.prasanna.android.http.SecureHttpHelper.HttpResponseBodyParser;
 import com.prasanna.android.http.SecureHttpHelper.HttpResponseParseException;
 import com.prasanna.android.stacknetwork.model.Answer;
-import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.IdentifiableItem;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXPage;
@@ -192,17 +191,6 @@ public abstract class AbstractBaseServiceHelper {
 
     answer.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Answer.OWNER));
     return answer;
-  }
-
-  protected Comment getSerializedCommentObject(JSONObjectWrapper jsonObject) throws JSONException {
-    Comment comment = new Comment();
-    comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
-    comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
-    comment.body = jsonObject.getString(JsonFields.Comment.BODY);
-    comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
-    comment.score = jsonObject.getInt(JsonFields.Comment.SCORE, 0);
-    comment.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Comment.OWNER));
-    return comment;
   }
 
   protected String[] getTags(JSONObjectWrapper jsonObject) throws JSONException {

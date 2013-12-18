@@ -53,7 +53,6 @@ public class StringConstants {
   public static final String USER_ID = "user_id";
 
   public static final String PAGE = "page";
-  public static final String OAUTH_REDIRECT_URL = "http://oauth.prasanna.stackx.com";
   public static final String FRONT_PAGE = "Front page";
 
   public static final String TAGS = "tags";

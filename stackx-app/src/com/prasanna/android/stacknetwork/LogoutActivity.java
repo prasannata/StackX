@@ -30,7 +30,6 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.widget.LinearLayout;
 
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
@@ -126,10 +125,9 @@ public class LogoutActivity extends Activity {
       AppUtils.setFirstRunComplete(getApplicationContext());
 
       clearDatabase();
-
-      SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
-
-      clearCookies();
+      CookieManager.getInstance().removeAllCookie();
+      
+      SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);    
       startLoginActivity();
     }
     else if (error != null && error.id > 0) {
@@ -144,14 +142,8 @@ public class LogoutActivity extends Activity {
 
   private void clearDatabase() {
     SiteDAO.deleteAll(getApplicationContext());
-    TagDAO.purge(getApplicationContext());
+    TagDAO.deleteAll(getApplicationContext());
     WritePermissionDAO.deleteAll(getApplicationContext());
-    ProfileDAO.purge(getApplicationContext());
-  }
-
-  private void clearCookies() {
-    CookieSyncManager.createInstance(getApplicationContext());
-    CookieManager cookieManager = CookieManager.getInstance();
-    cookieManager.removeAllCookie();
+    ProfileDAO.deleteAll(getApplicationContext());
   }
 }

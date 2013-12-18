@@ -65,7 +65,7 @@ public class OAuthActivity extends Activity {
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
       LogWrapper.d(TAG, url);
 
-      if (url.startsWith(StringConstants.OAUTH_REDIRECT_URL)) {
+      if (url.startsWith(StackUri.QueryParamDefaultValues.REDIRECT_URI)) {
         deleteStoredTags();
 
         AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
@@ -74,8 +74,10 @@ public class OAuthActivity extends Activity {
         AlarmUtils.activatePeriodicAccountSync(getApplicationContext());
         startSiteListActivity(view);
         OAuthActivity.this.finish();
-      }
-      else {
+      } else if (url.endsWith("response_type%3dtoken%26state%3d")
+          && url.startsWith("https://stackexchange.com/%2foauth%2fdialog%3fclient_id%3d202")) {
+        view.loadUrl(oauthUrl);
+      } else {
         view.loadUrl(url);
       }
       return true;
@@ -86,8 +88,7 @@ public class OAuthActivity extends Activity {
       if (oauthUrl != null && url.startsWith(StackUri.OAUTH_DIALOG_URL) && progressDialog != null) {
         progressDialog.dismiss();
         progressDialog = null;
-      }
-      else {
+      } else {
         /*
          * Yahoo's login page does not seem to support horizontal scrolling
          * inside webview, so enabling wide view port. Note good.
@@ -124,8 +125,7 @@ public class OAuthActivity extends Activity {
     try {
       tagDAO.open();
       tagDAO.deleteAll();
-    }
-    finally {
+    } finally {
       tagDAO.close();
     }
   }
@@ -140,11 +140,10 @@ public class OAuthActivity extends Activity {
 
     Builder uriBuilder = Uri.parse(StackUri.OAUTH_DIALOG_URL).buildUpon();
     uriBuilder.appendQueryParameter(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
-    uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
     uriBuilder.appendQueryParameter(StackUri.QueryParams.REDIRECT_URI, StackUri.QueryParamDefaultValues.REDIRECT_URI);
+    uriBuilder.appendQueryParameter(StackUri.QueryParams.SCOPE, StackUri.QueryParamDefaultValues.SCOPE);
 
     oauthUrl = uriBuilder.build().toString();
-
     AppUtils.clearDefaultSite(getApplicationContext());
     webview.loadUrl(oauthUrl);
   }

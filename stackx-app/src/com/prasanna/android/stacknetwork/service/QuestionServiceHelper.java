@@ -184,7 +184,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
             commentsPage.items = new ArrayList<Comment>();
           }
 
-          commentsPage.items.add(getSerializedCommentObject(JSONObjectWrapper.wrap(jsonObject)));
+          commentsPage.items.add(Comment.parse(JSONObjectWrapper.wrap(jsonObject)));
         }
       }
       catch (JSONException e) {

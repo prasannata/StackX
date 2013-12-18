@@ -10,5 +10,4 @@ public class IdentifiableItem implements Serializable {
   public String link;
 
   public long creationDate;
-
 }

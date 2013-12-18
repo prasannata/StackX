@@ -54,7 +54,7 @@ public class StackUri {
     public static final String CLIENT_ID = "202";
     public static final String KEY = "Nt8I5NbbbzXXPPVwE0ujRg((";
     public static final String SCOPE = "read_inbox,no_expiry,write_access";
-    public static final String REDIRECT_URI = "http://oauth.prasanna.stackx.com";
+    public static final String REDIRECT_URI = "https://stackexchange.com/oauth/login_success";
     public static final String DEFAULT_FILTER = "default";
   }
 

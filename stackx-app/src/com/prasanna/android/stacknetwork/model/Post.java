@@ -21,8 +21,16 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
+import com.prasanna.android.utils.LogWrapper;
+
 public class Post extends IdentifiableItem implements Serializable {
   private static final long serialVersionUID = -7850382261881073395L;
+  private static final String TAG = Post.class.getSimpleName();
 
   public enum PostType {
     QUESTION("question"),
@@ -63,4 +71,34 @@ public class Post extends IdentifiableItem implements Serializable {
   public String body;
 
   public User owner;
+  
+  public static Post parse(final JSONObjectWrapper jsonObjectWrapper) {
+
+    if (jsonObjectWrapper == null)
+      return null;
+
+    try {
+      JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+
+      if (jsonArray != null && jsonArray.length() == 1) {
+        JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+
+        if (jsonObject != null) {
+          Post post = new Post();
+          post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
+          post.body = jsonObject.getString(JsonFields.Post.BODY);
+          post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
+          post.postType = PostType.getEnum(jsonObject.getString(JsonFields.Post.POST_TYPE));
+          post.score = jsonObject.getInt(JsonFields.Post.SCORE);
+          post.owner = User.parseAsSnippet(jsonObject.getJSONObject(JsonFields.Post.OWNER));
+          return post;
+        }
+      }
+    }
+    catch (JSONException e) {
+      LogWrapper.d(TAG, e.getMessage());
+    }
+
+    return null;
+  }
 }

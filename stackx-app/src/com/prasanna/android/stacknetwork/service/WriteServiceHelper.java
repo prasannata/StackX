@@ -81,7 +81,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper {
           executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
       JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
       if (jsonArray != null && jsonArray.length() == 1)
-        return getSerializedCommentObject(JSONObjectWrapper.wrap(jsonArray.getJSONObject(0)));
+        return Comment.parse(JSONObjectWrapper.wrap(jsonArray.getJSONObject(0)));
     }
     catch (UnsupportedEncodingException e) {
       throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);

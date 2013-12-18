@@ -223,7 +223,7 @@ public class TagDAO extends AbstractBaseDao {
     return null;
   }
 
-  public static void purge(Context context) {
+  public static void deleteAll(Context context) {
     TagDAO tagDAO = new TagDAO(context);
     try {
       tagDAO.open();

@@ -21,8 +21,16 @@ package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
+import com.prasanna.android.utils.LogWrapper;
+
 public class Comment extends Post implements Serializable {
   private static final long serialVersionUID = 4507419037482371574L;
+  private static final String TAG = Comment.class.getSimpleName();
 
   public long post_id;
 
@@ -53,4 +61,39 @@ public class Comment extends Post implements Serializable {
     return true;
   }
 
+  public static Comment parseCommentItem(final JSONObjectWrapper jsonObjectWrapper) {
+    if (jsonObjectWrapper != null) {
+      try {
+        JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+
+        if (jsonArray != null && jsonArray.length() == 1) {
+          JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+
+          return parse(jsonObject);
+        }
+      }
+      catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
+
+    }
+
+    return null;
+  }
+
+  public static Comment parse(JSONObjectWrapper jsonObject) {
+    if (jsonObject != null) {
+      Comment comment = new Comment();
+      comment.id = jsonObject.getLong(JsonFields.Comment.COMMENT_ID);
+      comment.post_id = jsonObject.getLong(JsonFields.Comment.POST_ID);
+      comment.body = jsonObject.getString(JsonFields.Post.BODY);
+      comment.creationDate = jsonObject.getLong(JsonFields.Comment.CREATION_DATE);
+      comment.score = jsonObject.getInt(JsonFields.Comment.SCORE, 0);
+      comment.owner = User.parseAsSnippet(jsonObject.getJSONObject(JsonFields.Post.OWNER));
+      comment.type = PostType.getEnum(jsonObject.getString(JsonFields.Comment.POST_TYPE));
+      return comment;
+    }
+
+    return null;
+  }
 }

@@ -24,6 +24,9 @@ import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 
+import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
+
 public class User extends IdentifiableItem implements Serializable {
   public static enum UserType {
     REGISTERED("registered"),
@@ -83,6 +86,21 @@ public class User extends IdentifiableItem implements Serializable {
     user.displayName = that.displayName;
     user.reputation = that.reputation;
     user.link = that.link;
+    return user;
+  }
+
+  public static User parseAsSnippet(final JSONObjectWrapper jsonObjectWrapper) {
+    User user = null;
+
+    if (jsonObjectWrapper != null) {
+      user = new User();
+      user.id = jsonObjectWrapper.getLong(JsonFields.User.USER_ID);
+      user.displayName = jsonObjectWrapper.getString(JsonFields.User.DISPLAY_NAME);
+      user.reputation = jsonObjectWrapper.getInt(JsonFields.User.REPUTATION);
+      user.profileImageLink = jsonObjectWrapper.getString(JsonFields.User.PROFILE_IMAGE);
+      user.acceptRate = jsonObjectWrapper.getInt(JsonFields.User.ACCEPT_RATE);
+    }
+
     return user;
   }
 
