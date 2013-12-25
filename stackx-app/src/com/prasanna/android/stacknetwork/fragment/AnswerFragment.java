@@ -26,8 +26,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,7 +130,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
 
       String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
       textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
-      textView.setText(getAutherDisplayText(acceptRate));
+      textView.setText(getOwnerDisplayText(acceptRate));
 
       displayNumComments();
 
@@ -150,8 +148,11 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
 
   private StackXQuickActionMenu initQuickActionMenu() {
     StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
-    return quickActionMenu.addCommentsItem(onShowCommentsListener).addUserProfileItem(answer.owner.id,
-        Html.fromHtml(answer.owner.displayName).toString());
+    quickActionMenu.addCommentsItem(onShowCommentsListener);
+    if (answer.owner.isRegistered()) {
+      quickActionMenu.addUserProfileItem(answer.owner.id, Html.fromHtml(answer.owner.displayName).toString());
+    }
+    return quickActionMenu;
   }
 
   private void displayNumComments() {
@@ -160,8 +161,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
     if (answer.comments != null && !answer.comments.isEmpty()) {
       textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
       textView.setVisibility(View.VISIBLE);
-    }
-    else
+    } else
       textView.setVisibility(View.GONE);
   }
 
@@ -221,11 +221,14 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
 
   }
 
-  private String getAutherDisplayText(String acceptRate) {
-    Spanned authorName =
-        answer.owner.displayName != null ? Html.fromHtml(answer.owner.displayName) : new SpannableString("");
-    return DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by " + authorName + " [" + acceptRate
-        + AppUtils.formatReputation(answer.owner.reputation) + "]";
+  private String getOwnerDisplayText(String acceptRate) {
+    String ownerText =
+        DateTimeUtils.getElapsedDurationSince(answer.creationDate) + " by "
+            + Html.fromHtml(answer.owner.getDisplayName());
+    if (answer.owner.isRegistered()) {
+      ownerText += " [" + acceptRate + AppUtils.formatReputation(answer.owner.reputation) + "]";
+    }
+    return ownerText;
   }
 
   private void gotoQuestionPage(final ImageView questionViewAction, final LinearLayout layout) {

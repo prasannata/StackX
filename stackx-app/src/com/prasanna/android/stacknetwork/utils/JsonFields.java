@@ -84,6 +84,7 @@ public class JsonFields {
     public static final String VIEW_COUNT = "view_count";
     public static final String LAST_ACCESS_DATE = "last_access_date";
     public static final String BADGE_COUNTS = "badge_counts";
+    public static final String USER_TYPE = "user_type";
   }
 
   public static class Account {

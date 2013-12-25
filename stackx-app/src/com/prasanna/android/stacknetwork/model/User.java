@@ -45,22 +45,15 @@ public class User extends IdentifiableItem implements Serializable {
     }
 
     public static UserType toEnum(String value) {
-      UserType userType = null;
-
       if (value != null) {
-        try {
-          for (UserType type : UserType.values()) {
-            if (type.getValue().equals(value)) {
-              userType = type;
-              break;
-            }
+        for (UserType type : UserType.values()) {
+          if (type.getValue().equals(value)) {
+            return type;
           }
         }
-        catch (IllegalArgumentException e) {
-          userType = null;
-        }
       }
-      return userType;
+      
+      return null;
     }
 
     public static UserType getEnum(String userType) {
@@ -69,8 +62,7 @@ public class User extends IdentifiableItem implements Serializable {
 
       try {
         return valueOf(userType.toUpperCase());
-      }
-      catch (IllegalArgumentException e) {
+      } catch (IllegalArgumentException e) {
         return null;
       }
     }
@@ -82,6 +74,7 @@ public class User extends IdentifiableItem implements Serializable {
 
     User user = new User();
     user.id = that.id;
+    user.type = that.type;
     user.acceptRate = that.acceptRate;
     user.displayName = that.displayName;
     user.reputation = that.reputation;
@@ -95,6 +88,7 @@ public class User extends IdentifiableItem implements Serializable {
     if (jsonObjectWrapper != null) {
       user = new User();
       user.id = jsonObjectWrapper.getLong(JsonFields.User.USER_ID);
+      user.type = UserType.toEnum(jsonObjectWrapper.getString(JsonFields.User.USER_TYPE));
       user.displayName = jsonObjectWrapper.getString(JsonFields.User.DISPLAY_NAME);
       user.reputation = jsonObjectWrapper.getInt(JsonFields.User.REPUTATION);
       user.profileImageLink = jsonObjectWrapper.getString(JsonFields.User.PROFILE_IMAGE);
@@ -109,6 +103,8 @@ public class User extends IdentifiableItem implements Serializable {
   public long accountId = 0L;
 
   public String displayName = "";
+
+  public UserType type = null;
 
   public Bitmap avatar;
 
@@ -135,4 +131,12 @@ public class User extends IdentifiableItem implements Serializable {
   public ArrayList<Account> accounts;
 
   public long lastUpdateTime;
+  
+  public String getDisplayName() {
+    return displayName == null ? "Unknown" : displayName;
+  }
+  
+  public boolean isRegistered() {
+    return type != null && (type.equals(UserType.REGISTERED) || type.equals(UserType.MODERATOR));
+  }
 }

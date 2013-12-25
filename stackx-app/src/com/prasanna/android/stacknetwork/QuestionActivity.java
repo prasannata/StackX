@@ -175,10 +175,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     if (viewPager.getCurrentItem() == 0) {
       displayPostCommentFragment("Comment on question by " + question.owner.displayName, question.id, 0, question.id
           + "-comment", defaultText);
-    }
-    else {
+    } else {
       Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
-      displayPostCommentFragment("Comment on answer by " + answer.owner.displayName, answer.id,
+      displayPostCommentFragment("Comment on answer by " + answer.owner.getDisplayName(), answer.id,
           viewPager.getCurrentItem(), answer.id + "-comment", defaultText);
     }
   }
@@ -223,8 +222,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
       intent.putExtra(StringConstants.QUESTION_ID, questionId);
       intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
       startService(intent);
-    }
-    else {
+    } else {
       Question metaDetails = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
 
       if (metaDetails != null)
@@ -360,8 +358,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         lastPostCommentFragment.setSendError(e.getErrorResponse());
       else if (postCommentFragment != null)
         postCommentFragment.setSendError(e.getErrorResponse());
-    }
-    else
+    } else
       AppUtils.getErrorView(this, e);
   }
 
@@ -375,8 +372,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
       question.comments.add(comment);
       questionFragment.setComments(question.comments);
-    }
-    else {
+    } else {
       AnswerFragment answerFragment =
           (AnswerFragment) getFragmentManager().findFragmentByTag(getViewPagerFragmentTag(viewPagerPosition));
       answerFragment.onCommentAdd(comment);

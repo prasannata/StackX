@@ -176,7 +176,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   private void showUserDetail() {
     if (user != null && profileHomeLayout != null) {
       if (isAdded())
-        getActivity().getActionBar().setTitle(Html.fromHtml(user.displayName) + "'s profile");
+        getActivity().getActionBar().setTitle(Html.fromHtml(user.getDisplayName()) + "'s profile");
 
       profileHomeLayout.findViewById(R.id.userProfile).setVisibility(View.VISIBLE);
 
@@ -188,7 +188,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
   private void showProfileInfo() {
     TextView textView = (TextView) profileHomeLayout.findViewById(R.id.profileDisplayName);
-    textView.setText(Html.fromHtml(user.displayName));
+    textView.setText(Html.fromHtml(user.getDisplayName()));
 
     textView = (TextView) profileHomeLayout.findViewById(R.id.registerDate);
     textView.setText(getString(R.string.registered) + " " + DateTimeUtils.getElapsedDurationSince(user.creationDate));

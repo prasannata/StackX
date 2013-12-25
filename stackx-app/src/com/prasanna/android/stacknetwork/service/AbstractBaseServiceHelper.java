@@ -37,6 +37,7 @@ import com.prasanna.android.stacknetwork.model.IdentifiableItem;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
+import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
@@ -90,6 +91,7 @@ public abstract class AbstractBaseServiceHelper {
       if (userJsonObject != null) {
         user = new User();
         user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
+        user.type = UserType.toEnum(userJsonObject.getString(JsonFields.User.USER_TYPE));
         user.accountId = userJsonObject.getLong(JsonFields.User.ACCOUNT_ID);
         user.displayName = userJsonObject.getString(JsonFields.User.DISPLAY_NAME);
         user.reputation = userJsonObject.getInt(JsonFields.User.REPUTATION);
@@ -170,6 +172,7 @@ public abstract class AbstractBaseServiceHelper {
     if (userJsonObject != null) {
       user = new User();
       user.id = userJsonObject.getLong(JsonFields.User.USER_ID);
+      user.type = UserType.toEnum(userJsonObject.getString(JsonFields.User.USER_TYPE));
       user.displayName = userJsonObject.getString(JsonFields.User.DISPLAY_NAME);
       user.reputation = userJsonObject.getInt(JsonFields.User.REPUTATION);
       user.profileImageLink = userJsonObject.getString(JsonFields.User.PROFILE_IMAGE);

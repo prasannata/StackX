@@ -51,8 +51,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return new JSONObjectWrapper(jsonObject.getJSONObject(name));
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -64,8 +63,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return jsonObject.getJSONArray(name);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -77,8 +75,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return jsonObject.getLong(name);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -90,8 +87,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return jsonObject.getInt(name);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -107,8 +103,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return jsonObject.getDouble(name);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -120,8 +115,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return jsonObject.getBoolean(name);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -133,8 +127,7 @@ public class JSONObjectWrapper {
     if (jsonObject.has(name)) {
       try {
         return jsonObject.getString(name);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }

@@ -131,11 +131,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     try {
       writePermissionDAO.open();
       writePermissions = writePermissionDAO.getPermissions(OperatingSite.getSite().apiSiteParameter);
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       LogWrapper.d(TAG, e.getMessage());
-    }
-    finally {
+    } finally {
       writePermissionDAO.close();
     }
   }
@@ -172,8 +170,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
       holder.commentEditOptions = (LinearLayout) commentLayout.findViewById(R.id.commentEditOptions);
 
       commentLayout.setTag(holder);
-    }
-    else
+    } else
       holder = (CommentViewHolder) commentLayout.getTag();
 
     holder.id = comment.id;
@@ -181,7 +178,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     holder.title.setText("");
     holder.title.append(Html.fromHtml(comment.body));
     holder.owner.setText(DateTimeUtils.getElapsedDurationSince(comment.creationDate) + " by "
-        + Html.fromHtml(comment.owner.displayName));
+        + Html.fromHtml(comment.owner.getDisplayName()));
 
     if (AppUtils.inAuthenticatedRealm(getActivity()))
       setupCommentWriteOptions(comment, position, holder);
@@ -189,8 +186,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     if (selectedViewForReply != null && selectedViewForReply.id == comment.id) {
       selectedViewForReply.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
       selectedViewForReply.replyToComment.setVisibility(View.GONE);
-    }
-    else {
+    } else {
       holder.viewGroup.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
       if (!isMyComment(comment))
         holder.replyToComment.setVisibility(View.VISIBLE);
@@ -232,8 +228,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         selectedViewForReply.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
         LogWrapper.d(TAG, "Select comment for reply: " + selectedViewForReply.id);
 
-        displayPostCommentFragment(comment.post_id, comment.id, "@" + comment.owner.displayName.replaceAll("\\s", "")
-            + " ", false, addCommentResultReceiver);
+        String draftText =
+            comment.owner.isRegistered() ? "@" + comment.owner.getDisplayName().replaceAll("\\s", "") : "";
+        displayPostCommentFragment(comment.post_id, comment.id, draftText, false, addCommentResultReceiver);
         getListView().smoothScrollToPositionFromTop(position, 0);
       }
     });

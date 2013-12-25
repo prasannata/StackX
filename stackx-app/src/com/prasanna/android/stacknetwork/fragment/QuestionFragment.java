@@ -170,7 +170,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
   private StackXQuickActionMenu initQuickActionMenu() {
     StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
     quickActionMenu.addCommentsItem(onShowCommentsListener).addUserProfileItem(question.owner.id,
-        Html.fromHtml(question.owner.displayName).toString());
+        Html.fromHtml(question.owner.getDisplayName()).toString());
     return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
         .addEmailQuickActionItem(question.title, question.body);
   }
@@ -197,7 +197,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
   private String getTimeAndOwnerDisplay(String acceptRate) {
     return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
-        + Html.fromHtml(question.owner.displayName) + " [" + acceptRate
+        + Html.fromHtml(question.owner.getDisplayName()) + " [" + acceptRate
         + AppUtils.formatReputation(question.owner.reputation) + "]";
   }
 

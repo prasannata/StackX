@@ -117,8 +117,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     if (item.itemType.equals(ItemType.NEW_ANSWER)) {
       intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST);
       intent.putExtra(StringConstants.POST_ID, item.answerId);
-    }
-    else {
+    } else {
       intent.putExtra(StringConstants.ACTION, PostIntentService.GET_POST_COMMENT);
       intent.putExtra(StringConstants.COMMENT_ID, item.commentId);
     }
@@ -171,8 +170,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
           showPostDetail(comment);
           if (commentOnAnswer)
             startGetAnswerService();
-        }
-        else
+        } else
           showPostBody(item.body);
         break;
       case AnswersIntentService.GET_ANSWER:
@@ -201,10 +199,12 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
   private void showPostDetail(Post stackXItem) {
     TextView textView = (TextView) findViewById(R.id.responseUserAndTime);
     textView.setText(DateTimeUtils.getElapsedDurationSince(stackXItem.creationDate) + " by "
-        + Html.fromHtml(stackXItem.owner.displayName));
+        + Html.fromHtml(stackXItem.owner.getDisplayName()));
 
-    stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
-        .toString(), item.site);
+    if (stackXItem.owner.isRegistered()) {
+      stackXQuickActionMenu.addUserProfileItem(stackXItem.owner.id, Html.fromHtml(stackXItem.owner.displayName)
+          .toString(), item.site);
+    }
 
     setupOnClickForViewQuestion(item.questionId);
     showPostBody(stackXItem.body);
@@ -240,8 +240,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
           postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
               android.R.anim.slide_out_right));
           postContextLayout.setVisibility(View.GONE);
-        }
-        else {
+        } else {
           postContextLayout.startAnimation(AnimationUtils.loadAnimation(InboxItemActivity.this,
               android.R.anim.slide_in_left));
           postContextLayout.setVisibility(View.VISIBLE);
