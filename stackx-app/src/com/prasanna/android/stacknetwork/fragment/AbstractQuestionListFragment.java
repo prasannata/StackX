@@ -42,7 +42,7 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.utils.TagsViewBuilder;
+import com.prasanna.android.stacknetwork.utils.TagsViewBuilder;
 import com.prasanna.android.views.QuickActionMenu;
 
 public abstract class AbstractQuestionListFragment extends ItemListFragment<Question> implements ListItemView<Question> {

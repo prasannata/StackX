@@ -42,9 +42,9 @@ import com.prasanna.android.stacknetwork.service.QuestionsIntentService;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.TagsViewBuilder;
+import com.prasanna.android.stacknetwork.utils.TagsViewBuilder.DefaultOnTagClickListener;
 import com.prasanna.android.utils.LogWrapper;
-import com.prasanna.android.utils.TagsViewBuilder;
-import com.prasanna.android.utils.TagsViewBuilder.DefaultOnTagClickListener;
 
 public class QuestionListFragment extends AbstractQuestionListFragment {
   private static final String TAG = QuestionListFragment.class.getSimpleName();

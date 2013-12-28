@@ -17,7 +17,7 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.utils;
+package com.prasanna.android.stacknetwork.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.QuestionsActivity;
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.utils.StringConstants;
 
 public class TagsViewBuilder {
   public interface OnTagClickListener {

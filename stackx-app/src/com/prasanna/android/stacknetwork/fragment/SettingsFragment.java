@@ -152,8 +152,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
         try {
           startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.amazon.com/gp/mas/dl/android?p="
               + packageName)));
-        }
-        catch (ActivityNotFoundException anfe) {
+        } catch (ActivityNotFoundException anfe) {
           Toast.makeText(getActivity(), "Amazon AppStore not found", Toast.LENGTH_SHORT).show();
         }
       }
@@ -161,8 +160,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
       private void openPlayStore(String packageName) {
         try {
           startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
-        }
-        catch (ActivityNotFoundException anfe) {
+        } catch (ActivityNotFoundException anfe) {
           startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id="
               + packageName)));
         }
@@ -222,10 +220,7 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
       @Override
       public boolean onPreferenceClick(Preference preference) {
         accountActionPref.getDialog().dismiss();
-
-        AlertDialog yesNoDialog = DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener);
-        yesNoDialog.show();
-
+        DialogBuilder.yesNoDialog(getActivity(), R.string.logoutMsg, dialogClickListener).show();
         return true;
       }
     });

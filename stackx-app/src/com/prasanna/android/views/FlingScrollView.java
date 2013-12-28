@@ -25,7 +25,6 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ScrollView;
 
-import com.prasanna.android.listener.FlingActionListener;
 import com.prasanna.android.utils.LogWrapper;
 
 public class FlingScrollView extends ScrollView {
@@ -33,6 +32,11 @@ public class FlingScrollView extends ScrollView {
   public FlingActionListener flingActionListener;
 
   private static final String TAG = FlingScrollView.class.getSimpleName();
+  public static interface FlingActionListener {
+    void flingedToRight();
+
+    void flingedToLeft();
+  }
 
   private GestureDetector.OnGestureListener sogl = new GestureDetector.OnGestureListener() {
     private static final int SWIPE_THRESHOLD_VELOCITY = 50;

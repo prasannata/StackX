@@ -46,8 +46,8 @@ import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.stacknetwork.utils.TagsViewBuilder;
 import com.prasanna.android.utils.LogWrapper;
-import com.prasanna.android.utils.TagsViewBuilder;
 
 public class QuestionFragment extends Fragment implements OnCommentChangeListener {
   private static final String TAG = QuestionFragment.class.getSimpleName();
