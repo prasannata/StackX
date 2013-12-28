@@ -252,7 +252,7 @@ public abstract class AbstractUserActionBarActivity extends Activity {
         return true;
       case R.id.menu_my_inbox:
         Intent userInboxIntent = new Intent(getApplicationContext(), UserInboxActivity.class);
-        userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, AppUtils.getAccessToken(getApplicationContext()));
+        userInboxIntent.putExtra(StringConstants.ACCESS_TOKEN, AppUtils.loadAccessToken(getApplicationContext()));
         startActivity(userInboxIntent);
         return true;
       case R.id.menu_option_change_site:

@@ -57,15 +57,11 @@ public class AppUtils {
     }
   }
 
-  public static String getAccessToken(Context context) {
+  public static String loadAccessToken(Context context) {
     if (userAccessToken == null)
       userAccessToken = SharedPreferencesUtil.getString(context, StringConstants.ACCESS_TOKEN, null);
 
     return userAccessToken;
-  }
-
-  public static void loadAccessToken(Context context) {
-    getAccessToken(context);
   }
 
   public static void clearSharedPreferences(Context context) {
@@ -131,7 +127,7 @@ public class AppUtils {
   }
 
   public static boolean inAuthenticatedRealm(Context context) {
-    return getAccessToken(context) == null ? false : true;
+    return loadAccessToken(context) == null ? false : true;
   }
 
   public static boolean inRegisteredSite(Context context) {
@@ -143,7 +139,7 @@ public class AppUtils {
     Map<String, String> queryParams = new HashMap<String, String>();
     queryParams.put(StackUri.QueryParams.CLIENT_ID, StackUri.QueryParamDefaultValues.CLIENT_ID);
 
-    String accessToken = getAccessToken(null);
+    String accessToken = loadAccessToken(null);
     if (accessToken != null) {
       queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);
       queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);

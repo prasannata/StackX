@@ -94,7 +94,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper {
 
   private List<BasicNameValuePair> getBasicNameValuePartListForWriteComment() {
     List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-    parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.getAccessToken(null)));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.loadAccessToken(null)));
     parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
     parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
     parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
