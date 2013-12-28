@@ -199,7 +199,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
 
     HtmlTextView tv = (HtmlTextView) parentLayout.findViewById(R.id.qTitle);
     tv.setText(answer.title);
-    tv.setOnClickListener(new View.OnClickListener() {
+    layout.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         gotoQuestionPage(questionViewAction, layout);

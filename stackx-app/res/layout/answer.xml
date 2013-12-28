@@ -61,7 +61,6 @@
             android:id="@+id/answerCommentsCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/answerScore"
             android:layout_marginLeft="3dp"
             android:textColor="@color/black"
             android:textIsSelectable="false"
@@ -99,6 +98,7 @@
         android:layout_gravity="bottom|left"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="7dp"
+        android:background="@drawable/selector_highlight"
         android:src="@drawable/dark_32x32_question_mark" />
 
     <LinearLayout
@@ -127,7 +127,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.1"
-            android:src="@drawable/dark_24x24_cancel" />
+            android:background="@drawable/selector_highlight"
+            android:src="@drawable/dark_32x32_cancel" />
     </LinearLayout>
 
 </FrameLayout>
