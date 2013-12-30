@@ -17,13 +17,11 @@
     along with StackX.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.prasanna.android.stacknetwork.utils;
+package com.prasanna.android.cache;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 
-import com.prasanna.android.cache.LRU;
 
 public class LruCache<K, T> {
   private final int size;
@@ -37,11 +35,6 @@ public class LruCache<K, T> {
   public void add(K key, T value) {
     if (key != null && value != null)
       lru.put(key, new SoftReference<T>(value));
-  }
-
-  public void addWeak(K key, T value) {
-    if (key != null && value != null)
-      lru.put(key, new WeakReference<T>(value));
   }
 
   public T get(K key) {

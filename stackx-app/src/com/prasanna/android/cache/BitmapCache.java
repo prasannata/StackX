@@ -21,7 +21,6 @@ package com.prasanna.android.cache;
 
 import android.graphics.Bitmap;
 
-import com.prasanna.android.stacknetwork.utils.LruCache;
 
 public class BitmapCache extends LruCache<String, Bitmap> {
   private static int CACHE_SIZE = 5;
