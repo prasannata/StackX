@@ -23,12 +23,12 @@
             android:layout_margin="5dp"
             android:layout_weight="0.9"
             android:cursorVisible="true"
-            android:hint="@string/inboxSearchHint"
+            android:hint="@string/inboxSearchHint"            
             android:inputType="text"
             android:padding="5dp"
             android:textColor="@color/black"
             android:textCursorDrawable="@null"
-            android:textSize="20sp" />
+            android:textSize="15sp" />
 
         <Button
             android:id="@+id/clearTextAndFocus"
