@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -20,25 +20,37 @@
 package com.prasanna.android.stacknetwork;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prasanna.android.cache.BitmapCache;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.InboxItem;
@@ -51,18 +63,88 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
+import com.prasanna.android.task.AsyncTaskCompletionNotifier;
+import com.prasanna.android.task.AsyncTaskExecutor;
+import com.prasanna.android.task.GetImageAsyncTask;
 
 public class UserInboxActivity extends AbstractUserActionBarActivity implements OnScrollListener,
     StackXRestQueryResultReceiver, ListItemView<InboxItem> {
+
   private ProgressBar progressBar;
   private ListView listView;
+  private MultiAutoCompleteTextView searchInputText;
+  private Button clearFilterInputText;
   private Intent intent = null;
   private int page = 0;
   private RestQueryResultReceiver receiver;
   private ItemListAdapter<InboxItem> itemListAdapter;
   private boolean serviceRunning = false;
-  protected List<StackXPage<InboxItem>> pages;
+  protected List<StackXPage<InboxItem>> pages = new ArrayList<StackXPage<InboxItem>>();
   private StackXPage<InboxItem> currentPageObject;
+  private CharSequence searchHint;
+  private HashSet<String> autocompleteOptions = new HashSet<String>();
+  private ArrayAdapter<String> searchOptionsAdapter;
+
+  public class InboxFilter extends Filter {
+    private Object filterLock = new Object();
+
+    @Override
+    protected FilterResults performFiltering(CharSequence constraint) {
+      FilterResults result = new FilterResults();
+      ArrayList<InboxItem> filteredInboxItems = new ArrayList<InboxItem>();
+      synchronized (filterLock) {
+        if (constraint != null && constraint.length() > 0) {
+          for (StackXPage<InboxItem> page : pages) {
+            for (InboxItem inboxItem : page.items) {
+              String[] words = constraint.toString().split(",");
+              boolean match = true;
+              for (String word : words) {
+                String trimmedWord = word.trim();
+                boolean titleMatch =
+                    Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(inboxItem.title).find();
+                if (!inboxItem.itemType.getRepr().contains(trimmedWord)
+                    && !inboxItem.site.apiSiteParameter.contains(trimmedWord) && !titleMatch) {
+                  match = false;
+                  break;
+                }
+              }
+
+              if (match) {
+                filteredInboxItems.add(inboxItem);
+              }
+            }
+          }
+
+          result.count = filteredInboxItems.size();
+          result.values = filteredInboxItems;
+        } else {
+
+          for (StackXPage<InboxItem> page : pages) {
+            for (InboxItem inboxItem : page.items) {
+              filteredInboxItems.add(inboxItem);
+            }
+          }
+          result.count = filteredInboxItems.size();
+          result.values = filteredInboxItems;
+        }
+
+      }
+      return result;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void publishResults(CharSequence constraint, FilterResults results) {
+      ArrayList<InboxItem> filteredTags = (ArrayList<InboxItem>) results.values;
+
+      itemListAdapter.notifyDataSetChanged();
+      itemListAdapter.clear();
+
+      itemListAdapter.addAll(filteredTags);
+      itemListAdapter.notifyDataSetInvalidated();
+    }
+
+  }
 
   static class InboxItemViewHolder {
     TextView title;
@@ -70,11 +152,14 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     TextView creationTime;
     TextView itemType;
     TextView itemSite;
+    ImageView siteIcon;
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    setContentView(R.layout.inbox);
 
     receiver = new RestQueryResultReceiver(new Handler());
     receiver.setReceiver(this);
@@ -82,23 +167,62 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     if (progressBar == null)
       progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
 
-    if (pages == null)
-      pages = new ArrayList<StackXPage<InboxItem>>();
-
-    setContentView(R.layout.list_view);
+    setupSearch();
     setupListView();
     startIntentService();
   }
 
-  @Override
-  protected void setActionBarTitle(String title) {
-    getActionBar().setTitle(getString(R.string.inbox));
-  }
+  private void setupSearch() {
+    searchOptionsAdapter = new ArrayAdapter<String>(this, R.layout.tag_include_exclude, new ArrayList<String>());
+    searchInputText = (MultiAutoCompleteTextView) findViewById(R.id.search);
+    searchInputText.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+    searchInputText.setAdapter(searchOptionsAdapter);
+    searchHint = searchInputText.getHint();
+    clearFilterInputText = (Button) findViewById(R.id.clearTextAndFocus);
 
-  @Override
-  protected void setActionBarHomeIcon(Site site) {
-    getActionBar().setIcon(R.drawable.icon);
-    getActionBar().setHomeButtonEnabled(true);
+    searchInputText.setOnFocusChangeListener(new OnFocusChangeListener() {
+
+      @Override
+      public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus) {
+          searchInputText.setHint("");
+          clearFilterInputText.setVisibility(View.VISIBLE);
+        } else
+          clearFilterInputText.setVisibility(View.GONE);
+      }
+    });
+
+    searchInputText.addTextChangedListener(new TextWatcher() {
+
+      private int lastCount;
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+      }
+
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        lastCount = count;
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        if (s.length() < lastCount || s.length() > 3)
+          itemListAdapter.getFilter().filter(s);
+      }
+    });
+
+    clearFilterInputText.setOnClickListener(new View.OnClickListener() {
+
+      @Override
+      public void onClick(View v) {
+        searchInputText.setText("");
+        searchInputText.setHint(searchHint);
+        listView.requestFocus();
+        AppUtils.hideSoftInput(getApplicationContext(), v);
+      }
+    });
+
   }
 
   private void setupListView() {
@@ -106,6 +230,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     listView.addFooterView(progressBar);
     itemListAdapter =
         new ItemListAdapter<InboxItem>(getApplicationContext(), R.layout.inbox_item, new ArrayList<InboxItem>(), this);
+    itemListAdapter.setFilter(new InboxFilter());
     listView.setAdapter(itemListAdapter);
     listView.setOnScrollListener(this);
     listView.setOnItemClickListener(new OnItemClickListener() {
@@ -121,22 +246,13 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
             Intent intent = new Intent(UserInboxActivity.this, InboxItemActivity.class);
             intent.putExtra(StringConstants.INBOX_ITEM, item);
             startActivity(intent);
-          }
-          else {
+          } else {
             Toast.makeText(UserInboxActivity.this, "Sorry, this message type not supported by application",
                 Toast.LENGTH_LONG).show();
           }
         }
       }
     });
-  }
-
-  @Override
-  public void onResume() {
-    super.onResume();
-
-    if (itemListAdapter != null)
-      itemListAdapter.notifyDataSetChanged();
   }
 
   private void startIntentService() {
@@ -151,6 +267,25 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
       startService(intent);
       serviceRunning = true;
     }
+  }
+
+  @Override
+  protected void setActionBarTitle(String title) {
+    getActionBar().setTitle(getString(R.string.inbox));
+  }
+
+  @Override
+  protected void setActionBarHomeIcon(Site site) {
+    getActionBar().setIcon(R.drawable.icon);
+    getActionBar().setHomeButtonEnabled(true);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    
+    if (itemListAdapter != null)
+      itemListAdapter.notifyDataSetChanged();
   }
 
   @Override
@@ -182,7 +317,34 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
     if (currentPageObject != null) {
       pages.add(currentPageObject);
+      updateAutoCompleteOptions();
       itemListAdapter.addAll(currentPageObject.items);
+    }
+  }
+
+  private void updateAutoCompleteOptions() {
+    for (InboxItem inboxItem : currentPageObject.items) {
+      boolean notifyAutoCompleteAdapter = false;
+
+      if (!autocompleteOptions.contains(inboxItem.itemType.getRepr())) {
+        autocompleteOptions.add(inboxItem.itemType.getRepr());
+        System.out.println("added " + inboxItem.itemType.getRepr());
+        notifyAutoCompleteAdapter = true;
+      }
+
+      if (!autocompleteOptions.contains(inboxItem.site.apiSiteParameter)) {
+        autocompleteOptions.add(inboxItem.site.apiSiteParameter);
+        System.out.println("added " + inboxItem.site.apiSiteParameter);
+        notifyAutoCompleteAdapter = true;
+      }
+
+      if (notifyAutoCompleteAdapter) {
+        searchOptionsAdapter.clear();
+        searchOptionsAdapter.notifyDataSetInvalidated();
+
+        searchOptionsAdapter.addAll(autocompleteOptions);
+        searchOptionsAdapter.notifyDataSetChanged();
+      }
     }
   }
 
@@ -197,15 +359,16 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
       inboxItemViewHolder.creationTime = (TextView) convertView.findViewById(R.id.itemCreationTime);
       inboxItemViewHolder.itemType = (TextView) convertView.findViewById(R.id.itemType);
       inboxItemViewHolder.itemSite = (TextView) convertView.findViewById(R.id.itemSite);
+      inboxItemViewHolder.siteIcon = (ImageView) convertView.findViewById(R.id.siteIcon);
       convertView.setTag(inboxItemViewHolder);
-    }
-    else
+    } else
       inboxItemViewHolder = (InboxItemViewHolder) convertView.getTag();
 
+    loadSiteIcon(convertView.findViewById(R.id.siteAndItemTypeLayout), inboxItemViewHolder.siteIcon, item.site);
     inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
-    inboxItemViewHolder.creationTime.setText(DateTimeUtils.getElapsedDurationSince(item.creationDate));
+    inboxItemViewHolder.creationTime.setText(DateTimeUtils.toDateString(item.creationDate));
     inboxItemViewHolder.itemType.setText(item.itemType.getRepr());
-    inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
+
     if (item.body != null)
       inboxItemViewHolder.body.setText(Html.fromHtml(item.body));
 
@@ -217,8 +380,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     if (item.unread) {
       inboxItemViewHolder.title.setTypeface(null, Typeface.BOLD);
       inboxItemViewHolder.body.setTypeface(null, Typeface.BOLD);
-    }
-    else {
+    } else {
       inboxItemViewHolder.title.setTypeface(null, Typeface.NORMAL);
       inboxItemViewHolder.body.setTypeface(null, Typeface.NORMAL);
     }
@@ -235,6 +397,31 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         startIntentService();
       }
     }
+  }
+
+  private void loadSiteIcon(final View parent, final ImageView imageView, final Site site) {
+    if (!BitmapCache.getInstance().containsKey(site.iconUrl)) {
+      final ProgressBar siteIconLoadProgress = (ProgressBar) parent.findViewById(R.id.siteIconLoadProgress);
+      siteIconLoadProgress.setVisibility(View.VISIBLE);
+      AsyncTaskCompletionNotifier<Bitmap> imageFetchAsyncTaskCompleteNotiferImpl =
+          new AsyncTaskCompletionNotifier<Bitmap>() {
+            @Override
+            public void notifyOnCompletion(Bitmap result) {
+              siteIconLoadProgress.setVisibility(View.GONE);
+              displayImage(imageView, result);
+            }
+          };
+
+      AsyncTaskExecutor.getInstance().executeInThreadPoolExecutor(
+          new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl), site.iconUrl);
+    } else {
+      displayImage(imageView, BitmapCache.getInstance().get(site.iconUrl));
+    }
+  }
+
+  private void displayImage(final ImageView imageView, final Bitmap bitmap) {
+    imageView.setVisibility(View.VISIBLE);
+    imageView.setImageBitmap(bitmap);
   }
 
   @Override

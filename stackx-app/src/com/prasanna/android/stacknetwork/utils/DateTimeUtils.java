@@ -19,9 +19,14 @@
 
 package com.prasanna.android.stacknetwork.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DateTimeUtils {
   private static final String JUST_NOW = "just now";
   private static final String AGO = "ago";
+
+  private static final SimpleDateFormat formatter = new SimpleDateFormat("MMM dd yyyy HH:mm");
 
   public static final String SECOND = "s";
   public static final String MINUTE = "m";
@@ -36,6 +41,10 @@ public class DateTimeUtils {
   public static final int DAYS_IN_MONTH = 30;
   public static final int MONTHS_IN_YEAR = 12;
 
+  public static String toDateString(long seconds) {
+    return formatter.format(new Date(seconds * 1000L));
+  }
+
   public static String getElapsedDurationSince(long seconds) {
     String unit = SECOND;
     String residueUnit = null;
@@ -49,12 +58,10 @@ public class DateTimeUtils {
     if (elapsedTimeInSeconds > SECONDS_IN_MIN && elapsedTimeInSeconds < SECONDS_IN_HOUR) {
       count = (int) (elapsedTimeInSeconds / SECONDS_IN_MIN);
       unit = MINUTE;
-    }
-    else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY) {
+    } else if (elapsedTimeInSeconds > SECONDS_IN_HOUR && elapsedTimeInSeconds < SECONDS_IN_DAY) {
       count = (int) (elapsedTimeInSeconds / SECONDS_IN_HOUR);
       unit = HOUR;
-    }
-    else if (elapsedTimeInSeconds > SECONDS_IN_DAY) {
+    } else if (elapsedTimeInSeconds > SECONDS_IN_DAY) {
       count = (int) (elapsedTimeInSeconds / SECONDS_IN_DAY);
       if (count > DAYS_IN_MONTH) {
 
@@ -66,13 +73,11 @@ public class DateTimeUtils {
           count /= MONTHS_IN_YEAR;
           unit = YEAR;
           residueUnit = MONTH;
-        }
-        else {
+        } else {
           unit = MONTH;
           residueUnit = DAY;
         }
-      }
-      else {
+      } else {
         unit = DAY;
       }
     }

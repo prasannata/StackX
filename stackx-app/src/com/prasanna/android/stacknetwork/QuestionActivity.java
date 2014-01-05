@@ -107,7 +107,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         Fragment fragment = getFragmentManager().findFragmentByTag(getViewPagerFragmentTag(position));
 
         if (fragment == null)
-          return AnswerFragment.newFragment(question.answers.get(position - 1), position, QuestionActivity.this);
+          return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
 
         return fragment;
       }
@@ -434,8 +434,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
   }
 
   private String getViewPagerFragmentTag(int position) {
-    String currentViewPagerFragmentTag = "android:switcher:" + R.id.viewPager + ":" + position;
-    return currentViewPagerFragmentTag;
+    return "android:switcher:" + R.id.viewPager + ":" + position;
   }
 
   @Override

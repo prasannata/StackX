@@ -187,11 +187,9 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
             return true;
         }
 
-      }
-      catch (SQLException e) {
+      } catch (SQLException e) {
         LogWrapper.d(TAG, e.getMessage());
-      }
-      finally {
+      } finally {
         dao.close();
       }
 
@@ -227,8 +225,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
           result.count = filteredTags.size();
           result.values = filteredTags;
         }
-      }
-      else {
+      } else {
         result.count = tags.size();
         result.values = tags;
       }
@@ -280,8 +277,6 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-
     criteriaLayout = (ScrollView) inflater.inflate(R.layout.search_criteria_builder, null);
 
     searchQuery = (EditText) criteriaLayout.findViewById(R.id.searchQuery);
@@ -316,8 +311,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
         if (isChecked) {
           buttonView.setBackgroundResource(R.drawable.rounded_border_delft);
           buttonView.setTextColor(getResources().getColor(R.color.delft));
-        }
-        else {
+        } else {
           buttonView.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
           buttonView.setTextColor(getResources().getColor(R.color.lightGrey));
         }
@@ -342,22 +336,19 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
           LogWrapper.d(TAG, tag + " tagged");
           addTagView(textView, R.color.lichen);
         }
-      }
-      else {
+      } else {
         if (!notTaggedSet.contains(tag)) {
           notTaggedSet.add(tag);
           LogWrapper.d(TAG, tag + " not tagged");
           addTagView(textView, R.color.pulp);
         }
       }
-    }
-    else {
+    } else {
       if (include) {
         taggedSet.remove(tag);
         LogWrapper.d(TAG, tag + " removed from included");
         removeTagView(tag, include, textView);
-      }
-      else {
+      } else {
         notTaggedSet.remove(tag);
         LogWrapper.d(TAG, tag + " removed from excluded");
         removeTagView(tag, include, textView);
@@ -393,8 +384,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
     if (currentRow == null) {
       currentRow = createNewRowForTags(getActivity(), 3);
       selectedTags.addView(currentRow, layoutParams);
-    }
-    else {
+    } else {
       tagTextView.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
       currentRow.measure(LinearLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
@@ -576,8 +566,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
 
         if (savedCriteria) {
           showSavedSearchCriteria();
-        }
-        else {
+        } else {
           searchQuery.setText("");
           tagEditText.setText("");
           sortSpinner.setSelection(0);
@@ -598,8 +587,7 @@ public class SearchCriteriaFragment extends Fragment implements TextWatcher {
     if (s == null || s.length() == 0) {
       toggleTagged.setChecked(false);
       toggleNotTagged.setChecked(false);
-    }
-    else {
+    } else {
       tagArrayAdapter.getFilter().filter(s, new FilterListener() {
         @Override
         public void onFilterComplete(int count) {

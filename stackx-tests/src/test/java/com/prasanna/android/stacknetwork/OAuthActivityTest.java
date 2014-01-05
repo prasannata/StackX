@@ -21,17 +21,17 @@ import android.webkit.WebView;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 
 @RunWith(RobolectricTestRunner.class)
-public class OAuthActivityTest {
+public class OAuthActivityTest extends AbstractBaseActivityTest {
   private OAuthActivity oAuthActivity;
 
   @Before
   public void setup() {
-    oAuthActivity = new OAuthActivity();
+    OAuthActivity.setTestMode();
+    oAuthActivity = createActivity(OAuthActivity.class);
   }
 
   @Test
   public void oauthWithWebView() throws MalformedURLException {
-    oAuthActivity.onCreate(null);
     WebView webView = (WebView) oAuthActivity.findViewById(R.id.web_view);
     assertNotNull(webView);
     ShadowWebView shadowWebView = Robolectric.shadowOf(webView);

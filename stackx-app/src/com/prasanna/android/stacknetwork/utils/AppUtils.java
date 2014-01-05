@@ -40,6 +40,7 @@ import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.SearchCriteriaListActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
+import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
@@ -106,6 +107,13 @@ public class AppUtils {
           SharedPreferencesUtil.deleteFile(file);
       }
     }
+  }
+
+  public static String createEmailBody(final Question question) {
+    final StringBuilder stringBuilder = new StringBuilder();
+    stringBuilder.append(question.link + "\n\n").append(question.body + "\n\n")
+        .append("Sent using StackX.(Available in Google Play Store)");
+    return stringBuilder.toString();
   }
 
   public static String formatReputation(int reputation) {
@@ -187,8 +195,7 @@ public class AppUtils {
           errorMsg = error.name;
         else
           errorMsg = e.getStatusCode() + " " + e.getStatusDescription();
-      }
-      else
+      } else
         errorMsg = e.getCode().getDescription();
     }
     return errorMsg;

@@ -448,7 +448,7 @@ public class SearchCriteriaListActivity extends AbstractUserActionBarActivity {
       searchCriteriaArrayAdapter.notifyDataSetChanged();
   }
 
-  private AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> getReadCriteriaTaskCompletionNotifier() {
+  protected AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>> getReadCriteriaTaskCompletionNotifier() {
     return new AsyncTaskCompletionNotifier<ArrayList<SearchCriteriaDomain>>() {
       @Override
       public void notifyOnCompletion(ArrayList<SearchCriteriaDomain> result) {

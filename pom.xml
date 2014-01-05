@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.prasanna.android</groupId>
     <artifactId>stackx</artifactId>
-    <version>1.0.14</version>
+    <version>1.1.1</version>
     <packaging>pom</packaging>
     <name>StackX Parent POM</name>
     <description>Android application for Stack Exchange</description>
@@ -14,7 +14,7 @@
         <android.version>4.2</android.version>
         <android.support.version>13</android.support.version>
         <htmlcleaner.version>2.2.1</htmlcleaner.version>
-        <robolectric.version>2.0-alpha-1</robolectric.version>
+        <robolectric.version>2.2</robolectric.version>
         <junit.version>4.8.2</junit.version>
         <mockito.version>1.9.5</mockito.version>
         <gson.version>2.2.2</gson.version>

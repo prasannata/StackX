@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
     android:paddingBottom="2dp"
@@ -12,17 +12,60 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_list_item"
-        android:orientation="vertical"
-        android:padding="2dp" >
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/siteAndItemTypeLayout"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="1dp" >
+
+            <include
+                android:id="@+id/siteIconLoadProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                layout="@layout/progress_bar"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/siteIcon"
+                android:layout_width="60dp"
+                android:layout_height="65dp"
+                android:layout_alignParentTop="true"
+                android:contentDescription="@string/avatar"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/itemType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/siteIcon"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/itemTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_marginBottom="2dp"
             android:layout_marginRight="2dp"
             android:layout_marginTop="2dp"
+            android:layout_toRightOf="@id/siteAndItemTypeLayout"
             android:padding="2dp"
             android:textColor="@color/black"
             android:textIsSelectable="false"
@@ -32,56 +75,46 @@
             android:id="@+id/itemBodyPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/itemTitle"
             android:layout_below="@id/itemTitle"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="2dp"
             android:layout_marginTop="2dp"
             android:textColor="@color/black"
             android:textIsSelectable="false"
-            android:textSize="12sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/itemSite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
+            android:layout_alignLeft="@id/itemTitle"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/itemBodyPreview"
-            android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
-            android:layout_marginTop="5dp"
-            android:gravity="right"
-            android:textColor="@color/delft"
+            android:layout_marginTop="3dp"
+            android:gravity="left"
+            android:textColor="@android:color/holo_blue_dark"
             android:textIsSelectable="false"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/itemCreationTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@id/itemSite"
             android:layout_below="@id/itemBodyPreview"
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
+            android:layout_marginTop="3dp"
             android:layout_toRightOf="@id/itemSite"
             android:gravity="right"
-            android:textColor="@color/delft"
+            android:textColor="@android:color/holo_blue_dark"
             android:textIsSelectable="false"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/itemType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/itemSite"
-            android:layout_below="@id/itemBodyPreview"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_toRightOf="@id/itemSite"
-            android:gravity="right"
-            android:textColor="@color/delft"
-            android:textIsSelectable="false"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </RelativeLayout>
 
 </FrameLayout>

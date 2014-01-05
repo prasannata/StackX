@@ -84,6 +84,7 @@
     <string name="version">Version</string>
     <string name="writeRestrictions">Write restrictions</string>
     <string name="writeRestrictionsSummary">Why can\'t I ask a question or answer a question or upvote or....?</string>
+    <string name="inboxSearchHint">Search E.g. comment, stackoverflow, text in title</string>
     <!-- Sites updated -->
     <string name="siteListUpdated">Site list updated!</string>
 

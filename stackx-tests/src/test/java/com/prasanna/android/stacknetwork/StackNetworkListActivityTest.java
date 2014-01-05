@@ -3,28 +3,27 @@ package com.prasanna.android.stacknetwork;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
-import org.junit.Before;
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.matchers.StartedMatcher;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowHandler;
-import org.robolectric.shadows.ShadowListActivity;
 import org.robolectric.shadows.ShadowToast;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.prasanna.android.runners.ConfigurableRobolectricTestRunner;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.model.WritePermission;
@@ -33,46 +32,55 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-@RunWith(ConfigurableRobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class StackNetworkListActivityTest extends AbstractBaseListActivityTest<Site> {
   private StackNetworkListActivity stackNetworkListActivity;
 
-  @Before
-  public void setup() {
-    stackNetworkListActivity = new StackNetworkListActivity();
+  public void createStackNetWorkListActivity() {
+    stackNetworkListActivity = createActivity(StackNetworkListActivity.class);
     super.setContext(stackNetworkListActivity);
   }
 
   @Test
-  public void siteListDisplayedForNonAuthUser() {
+  public void siteListDisplayedForNonAuthUser() throws JSONException {
     ArrayList<Site> siteList = getSiteArrayListForNonAuthUser();
-
-    stackNetworkListActivity.onCreate(null);
+    createStackNetWorkListActivity();
     ListView listView = (ListView) stackNetworkListActivity.findViewById(android.R.id.list);
 
-    ShadowListActivity shadowListActivity = Robolectric.shadowOf(stackNetworkListActivity);
+    ShadowActivity shadowListActivity = Robolectric.shadowOf(stackNetworkListActivity);
     assertGetUserSitesIntentServiceStarted(shadowListActivity, false);
-    ArrayList<View> siteListViews = assertListView(listView, siteList);
+
+    Bundle bundle = stubIntentServiceResponseBundle(siteList);
+    stackNetworkListActivity.onReceiveResult(UserIntentService.GET_USER_SITES, bundle);
+    ArrayList<View> siteListViews = assertListViewAndGetListItemViews(listView, siteList);
     assertListItemClick(siteList, siteListViews, 0);
     assertOnDefaultSiteClick(siteList, siteListViews, 0);
+  }
+
+  private Bundle stubIntentServiceResponseBundle(ArrayList<Site> siteList) {
+    Bundle bundle = new Bundle();
+    bundle.putSerializable(StringConstants.SITES, siteList);
+    return bundle;
   }
 
   @Test
   public void siteListDisplayedForAuthUserWithWrite() {
     ArrayList<Site> siteList = getSiteArrayListForAuthUserWithWrite();
     AppUtils.setAccessToken(stackNetworkListActivity, "validAccessToken");
-    stackNetworkListActivity.onCreate(null);
+    createStackNetWorkListActivity();
     ListView listView = (ListView) stackNetworkListActivity.findViewById(android.R.id.list);
 
-    ShadowListActivity shadowListActivity = Robolectric.shadowOf(stackNetworkListActivity);
+    ShadowActivity shadowListActivity = Robolectric.shadowOf(stackNetworkListActivity);
     assertGetUserSitesIntentServiceStarted(shadowListActivity, true);
-    ArrayList<View> siteListViews = assertListView(listView, siteList);
+    Bundle bundle = stubIntentServiceResponseBundle(siteList);
+    stackNetworkListActivity.onReceiveResult(UserIntentService.GET_USER_SITES, bundle);
+    ArrayList<View> siteListViews = assertListViewAndGetListItemViews(listView, siteList);
     assertListItemClick(siteList, siteListViews, 1);
   }
 
   private void assertListItemClick(ArrayList<Site> siteList, ArrayList<View> siteListViews, int position) {
     assertTrue(siteListViews.get(position).performClick());
-    assertThat(stackNetworkListActivity, new StartedMatcher(QuestionsActivity.class));
+    assertNextActivity(stackNetworkListActivity, QuestionsActivity.class);
     assertSame(siteList.get(position), OperatingSite.getSite());
   }
 
@@ -120,10 +128,10 @@ public class StackNetworkListActivityTest extends AbstractBaseListActivityTest<S
     }
   }
 
-  private void assertGetUserSitesIntentServiceStarted(ShadowListActivity shadowListActivity, boolean me) {
+  private void assertGetUserSitesIntentServiceStarted(ShadowActivity shadowListActivity, boolean me) {
     Intent nextStartedServiceIntent = assertNextStartedIntentService(shadowListActivity, UserIntentService.class);
     assertEquals(UserIntentService.GET_USER_SITES, nextStartedServiceIntent.getIntExtra(StringConstants.ACTION, -1));
-    assertEquals(me, nextStartedServiceIntent.getBooleanExtra(StringConstants.ME, true));
+    assertEquals(me, nextStartedServiceIntent.getBooleanExtra(StringConstants.ME, !me));
     assertNotNull(nextStartedServiceIntent.getParcelableExtra(StringConstants.RESULT_RECEIVER));
   }
 

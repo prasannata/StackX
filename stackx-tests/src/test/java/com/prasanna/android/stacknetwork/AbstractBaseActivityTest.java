@@ -7,8 +7,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 
 import org.junit.After;
+import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.TextView;
@@ -27,6 +29,14 @@ public abstract class AbstractBaseActivityTest {
     this.context = context;
   }
 
+  protected <T extends Activity> T createActivity(Class<T> clazz) {
+    return Robolectric.buildActivity(clazz).create().get();
+  }
+
+  protected <T extends Activity> T createActivityAndResume(Class<T> clazz) {
+    return Robolectric.buildActivity(clazz).create().resume().get();
+  }
+  
   protected Intent assertNextStartedIntentService(ShadowActivity shadowActivity, Class<?> clazz) {
     Intent intent = shadowActivity.getNextStartedService();
     assertNotNull(intent);
@@ -76,6 +86,12 @@ public abstract class AbstractBaseActivityTest {
   protected void assertToggleButtonState(ToggleButton toggleButton, boolean expectedState) {
     assertNotNull(toggleButton);
     assertTrue(toggleButton.isChecked() == expectedState);
+  }
+
+  protected void assertNextActivity(Activity currentActivity, Class<? extends Activity> nextActivity) {
+    Intent intent = Robolectric.shadowOf(currentActivity).getNextStartedActivity();
+    assertNotNull(intent);
+    assertEquals(nextActivity.getCanonicalName(), intent.getComponent().getClassName());
   }
 
   @After

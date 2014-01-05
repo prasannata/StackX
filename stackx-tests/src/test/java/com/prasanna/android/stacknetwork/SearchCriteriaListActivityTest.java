@@ -10,17 +10,15 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowActivity;
 
-import android.app.ActionBar;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.prasanna.android.runners.ConfigurableRobolectricTestRunner;
 import com.prasanna.android.stacknetwork.SearchCriteriaListActivity.SearchCriteriaViewHolder;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteria.SearchSort;
@@ -30,33 +28,25 @@ import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 
-@RunWith(ConfigurableRobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class SearchCriteriaListActivityTest extends AbstractBaseListActivityTest<SearchCriteriaDomain> {
-  private class SearchCriteriaListActivityStub extends SearchCriteriaListActivity {
-    private final ActionBar actionBar = Mockito.mock(ActionBar.class);
-
-    @Override
-    public ActionBar getActionBar() {
-      return actionBar;
-    }
-  }
-
-  private SearchCriteriaListActivityStub searchCriteriaListActivity;
+  private SearchCriteriaListActivity searchCriteriaListActivity;
 
   @Before
   public void setup() {
-    searchCriteriaListActivity = new SearchCriteriaListActivityStub();
-    setContext(searchCriteriaListActivity);
     OperatingSite.setSite(getSite("Stack Overflow", "stackoverflow", true, true));
+    searchCriteriaListActivity = createActivityAndResume(SearchCriteriaListActivity.class);
+    setContext(searchCriteriaListActivity);
   }
 
   @Test
   public void loadCriteria() {
-    searchCriteriaListActivity.onCreate(null);
-    ListView listView = (ListView) searchCriteriaListActivity.findViewById(android.R.id.list);
-
     assertSortOptionSpinner();
-    ArrayList<View> listViews = assertListView(listView, getExpectedSearchCriteriaList());
+
+    ListView listView = (ListView) searchCriteriaListActivity.findViewById(android.R.id.list);
+    ArrayList<SearchCriteriaDomain> expectedSearchCriteriaList = getExpectedSearchCriteriaList();
+    searchCriteriaListActivity.getReadCriteriaTaskCompletionNotifier().notifyOnCompletion(expectedSearchCriteriaList);
+    ArrayList<View> listViews = assertListViewAndGetListItemViews(listView, expectedSearchCriteriaList);
     assetListItemClick(listViews.get(0));
   }
 

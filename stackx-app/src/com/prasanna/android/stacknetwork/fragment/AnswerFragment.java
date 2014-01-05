@@ -63,7 +63,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
   private StackXQuickActionMenu quickActionMenu;
   private OnShowCommentsListener onShowCommentsListener;
 
-  public static AnswerFragment newFragment(Answer answer, int viewPageNumber, PageSelectAdapter pageSelectAdapter) {
+  public static AnswerFragment newFragment(Answer answer, PageSelectAdapter pageSelectAdapter) {
     AnswerFragment answerFragment = new AnswerFragment();
     answerFragment.setRetainInstance(true);
     answerFragment.answer = answer;

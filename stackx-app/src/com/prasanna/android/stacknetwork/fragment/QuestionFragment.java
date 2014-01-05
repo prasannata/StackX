@@ -172,7 +172,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     quickActionMenu.addCommentsItem(onShowCommentsListener).addUserProfileItem(question.owner.id,
         Html.fromHtml(question.owner.getDisplayName()).toString());
     return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
-        .addEmailQuickActionItem(question.title, question.body);
+        .addEmailQuickActionItem(question.title, AppUtils.createEmailBody(question));
   }
 
   private void setupTextViewForAnswerCount() {
@@ -185,8 +185,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
       answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
       answerCountView.setVisibility(View.GONE);
-    }
-    else {
+    } else {
       answerCountView.setVisibility(View.VISIBLE);
       answerCountView.setText(AppUtils.formatNumber(question.answerCount));
 
@@ -327,8 +326,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
       if (cachedQuestion != null) {
         cachedQuestion.comments = question.comments;
         QuestionsCache.getInstance().add(question.id, cachedQuestion);
-      }
-      else
+      } else
         QuestionsCache.getInstance().remove(question.id);
     }
   }

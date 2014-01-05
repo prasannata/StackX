@@ -22,7 +22,12 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.prasanna.android.stacknetwork.model.User.UserType;
+import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
 
 public class Site implements Serializable {
   private static final long serialVersionUID = 7057957647981597410L;
@@ -51,6 +56,28 @@ public class Site implements Serializable {
 
   public long userId = -1;
 
+  public static Site parses(JSONObjectWrapper siteJsonObject) {
+    if (siteJsonObject == null)
+      return null;
+
+    Site site = new Site();
+    site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
+    site.logoUrl = siteJsonObject.getString(JsonFields.Site.LOGO_URL);
+    site.name = siteJsonObject.getString(JsonFields.Site.NAME);
+    site.audience = siteJsonObject.getString(JsonFields.Site.AUDIENCE);
+    site.link = siteJsonObject.getString(JsonFields.Site.SITE_URL);
+    site.faviconUrl = siteJsonObject.getString(JsonFields.Site.FAVICON_URL);
+    site.iconUrl = siteJsonObject.getString(JsonFields.Site.ICON_URL);
+    return site;
+  }
+
+  public JSONObject toJson() throws JSONException {
+    JSONObject jsonObject = new JSONObject();
+    jsonObject.put(JsonFields.Site.API_SITE_PARAMETER, apiSiteParameter);
+    jsonObject.put(JsonFields.Site.NAME, name);
+    return jsonObject;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -73,20 +100,17 @@ public class Site implements Serializable {
     if (apiSiteParameter == null) {
       if (other.apiSiteParameter != null)
         return false;
-    }
-    else if (!apiSiteParameter.equals(other.apiSiteParameter))
+    } else if (!apiSiteParameter.equals(other.apiSiteParameter))
       return false;
     if (link == null) {
       if (other.link != null)
         return false;
-    }
-    else if (!link.equals(other.link))
+    } else if (!link.equals(other.link))
       return false;
     if (name == null) {
       if (other.name != null)
         return false;
-    }
-    else if (!name.equals(other.name))
+    } else if (!name.equals(other.name))
       return false;
     return true;
   }

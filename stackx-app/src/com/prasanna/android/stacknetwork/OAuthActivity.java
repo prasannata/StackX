@@ -47,9 +47,14 @@ public class OAuthActivity extends Activity {
   private static final String YAHOO_LOGIN_URL = "https://login.yahoo.com";
   private static final String PROGRESS_BAR_TEXT = "to stackexchange.com...";
   private static final String LOGIN = "Login";
+  private static boolean TEST_MODE = false;
 
   private ProgressDialog progressDialog;
   private String oauthUrl;
+
+  protected static void setTestMode() {
+    TEST_MODE = true;
+  }
 
   private class OAuthWebViewClient extends WebViewClient {
     @Override
@@ -66,7 +71,7 @@ public class OAuthActivity extends Activity {
       LogWrapper.d(TAG, url);
 
       if (url.startsWith(StackUri.QueryParamDefaultValues.REDIRECT_URI)) {
-        deleteStoredTags();
+        TagDAO.deleteAll(OAuthActivity.this);
 
         AlarmUtils.cancelInboxRefreshAlarm(getApplicationContext());
         AlarmUtils.cancelPeriodicAccountSync(getApplicationContext());
@@ -119,17 +124,6 @@ public class OAuthActivity extends Activity {
     }
   }
 
-  private void deleteStoredTags() {
-    TagDAO tagDAO = new TagDAO(this);
-
-    try {
-      tagDAO.open();
-      tagDAO.deleteAll();
-    } finally {
-      tagDAO.close();
-    }
-  }
-
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -148,6 +142,7 @@ public class OAuthActivity extends Activity {
     webview.loadUrl(oauthUrl);
   }
 
+  @SuppressWarnings("deprecation")
   @SuppressLint("SetJavaScriptEnabled")
   private WebView initWebview() {
     final WebView webview = (WebView) findViewById(R.id.web_view);
@@ -157,10 +152,11 @@ public class OAuthActivity extends Activity {
     webview.setHorizontalScrollBarEnabled(true);
     webview.getSettings().setJavaScriptEnabled(true);
     webview.getSettings().setDomStorageEnabled(true);
-    webview.getSettings().setLoadsImagesAutomatically(true);
-    webview.getSettings().setSaveFormData(false);
-    webview.getSettings().setSavePassword(false);
-    webview.getSettings().setBlockNetworkImage(false);
+    
+    if (!TEST_MODE) {
+      webview.getSettings().setSaveFormData(false);
+      webview.getSettings().setSavePassword(false);
+    }
     webview.getSettings().setUseWideViewPort(false);
     webview.setWebChromeClient(new WebChromeClient() {
       public void onProgressChanged(WebView view, int progress) {

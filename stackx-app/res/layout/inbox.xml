@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@color/white"
+    android:id="@+id/listContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightGrey"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:orientation="vertical" >
 
     <LinearLayout
@@ -13,14 +16,14 @@
         android:orientation="horizontal"
         android:weightSum="1" >
 
-        <EditText
-            android:id="@+id/searchList"
+        <MultiAutoCompleteTextView
+            android:id="@+id/search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="0.9"
             android:cursorVisible="true"
-            android:hint="@string/search"
+            android:hint="@string/inboxSearchHint"
             android:inputType="text"
             android:padding="5dp"
             android:textColor="@color/black"
@@ -35,10 +38,28 @@
             android:layout_marginRight="5dp"
             android:layout_weight="0.1"
             android:background="@drawable/dark_24x24_cancel"
-            android:padding="5dp"
-            android:visibility="gone" />
+            android:padding="5dp" />
     </LinearLayout>
 
-    <include layout="@layout/stackx_simple_list_view" />
+    <include
+        android:id="@+id/emptyItems"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        layout="@layout/empty_items"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:choiceMode="none"
+        android:clickable="true"
+        android:descendantFocusability="beforeDescendants"
+        android:divider="@android:color/transparent"
+        android:listSelector="@android:color/transparent"
+        android:scrollbarThumbVertical="@drawable/scrollbar" >
+    </ListView>
 
 </LinearLayout>
