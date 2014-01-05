@@ -186,6 +186,7 @@ public abstract class AbstractBaseServiceHelper {
     Answer answer = new Answer();
     answer.id = jsonObject.getLong(JsonFields.Answer.ANSWER_ID);
     answer.questionId = jsonObject.getLong(JsonFields.Answer.QUESTION_ID);
+    answer.link = jsonObject.getString(JsonFields.Answer.LINK);
     answer.body = jsonObject.getString(JsonFields.Answer.BODY);
     answer.title = jsonObject.getString(JsonFields.Answer.TITLE);
     answer.score = jsonObject.getInt(JsonFields.Answer.SCORE);

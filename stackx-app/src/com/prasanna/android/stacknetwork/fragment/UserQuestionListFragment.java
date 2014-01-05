@@ -32,6 +32,7 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
+import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.StackXQuickActionMenu;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
@@ -97,7 +98,7 @@ public class UserQuestionListFragment extends AbstractQuestionListFragment {
 
     StackXQuickActionMenu quickActionMenu = new StackXQuickActionMenu(getActivity());
     return quickActionMenu.addSimilarQuestionsItem(question.title).addRelatedQuickActionItem(question.id)
-        .addEmailQuickActionItem(question.title, question.body).build();
+        .addEmailQuickActionItem(question.title, AppUtils.createEmailBody(question)).build();
   }
 
   @Override

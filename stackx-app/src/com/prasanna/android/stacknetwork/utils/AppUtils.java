@@ -40,7 +40,7 @@ import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.SearchCriteriaListActivity;
 import com.prasanna.android.stacknetwork.fragment.SettingsFragment;
-import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.Post;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXError;
 import com.prasanna.android.stacknetwork.model.WritePermission;
@@ -50,6 +50,7 @@ public class AppUtils {
   private static String userAccessToken;
   public static final boolean DEBUG = false;
   public static final boolean AMAZON_APK = false;
+  private static final String EMAIL_FOOTNOTE = "Sent using StackX.(Available in Google Play Store)";
 
   public static void setAccessToken(Context context, String accessToken) {
     if (userAccessToken == null && accessToken != null) {
@@ -109,13 +110,23 @@ public class AppUtils {
     }
   }
 
-  public static String createEmailBody(final Question question) {
+  public static String createEmailBody(final Post post) {
     final StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append(question.link + "\n\n").append(question.body + "\n\n")
-        .append("Sent using StackX.(Available in Google Play Store)");
+    if (post.link != null)
+      stringBuilder.append(post.link + "\n\n");
+
+    if (post.body != null)
+      stringBuilder.append(post.body + "\n\n");
+
+    stringBuilder.append(EMAIL_FOOTNOTE);
     return stringBuilder.toString();
   }
 
+  
+  public static String createEmailBody(final String body) {
+    return body + "\n\n" + EMAIL_FOOTNOTE;
+  }
+  
   public static String formatReputation(int reputation) {
     if (reputation > 0)
       return formatNumber(reputation);

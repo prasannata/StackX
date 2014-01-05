@@ -81,8 +81,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
 
       try {
         hasMore = addSites(sites, jsonObject);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(getLogTag(), e.getMessage());
         hasMore = false;
       }
@@ -195,8 +194,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
             JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
             page.items.add(getSerializedAnswerObject(jsonObject));
           }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
           LogWrapper.d(getLogTag(), e.getMessage());
         }
       }
@@ -206,17 +204,14 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
   }
 
   public StackXPage<Answer> getMyAnswers(int page) {
-    String restEndPoint = "/me/answers";
-
-    Map<String, String> queryParams = getQueryParams(page);
-    queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
-
-    return getAnswers(restEndPoint, queryParams);
+    return answers("/me/answers", page);
   }
 
   public StackXPage<Answer> getAnswersByUser(long userId, int page) {
-    String restEndPoint = "/users/" + userId + "/answers";
+    return answers("/users/" + userId + "/answers", page);
+  }
 
+  private StackXPage<Answer> answers(String restEndPoint, int page) {
     Map<String, String> queryParams = getQueryParams(page);
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
     return getAnswers(restEndPoint, queryParams);
@@ -250,8 +245,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
             permission.userId = permissionJsonObject.getLong(JsonFields.Permission.USER_ID);
             permissions.add(permission);
           }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
           LogWrapper.d(getLogTag(), e.getMessage());
         }
       }
@@ -302,8 +296,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
             JSONObjectWrapper itemJsonObject = JSONObjectWrapper.wrap(itemsArray.getJSONObject(i));
             if (itemJsonObject != null)
               page.items.add(getSerializedInboxItem(itemJsonObject));
-          }
-          catch (JSONException e) {
+          } catch (JSONException e) {
             LogWrapper.d(getLogTag(), e.getMessage());
           }
 
@@ -365,8 +358,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
             account.siteUrl = accountJsonObject.getString(JsonFields.Account.SITE_URL);
             account.userType = UserType.toEnum(accountJsonObject.getString(JsonFields.Account.USER_TYPE));
             accounts.put(account.siteUrl, account);
-          }
-          catch (JSONException e) {
+          } catch (JSONException e) {
             LogWrapper.d(getLogTag(), e.getMessage());
           }
         }
@@ -423,8 +415,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
             try {
               JSONObjectWrapper tagJson = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
               tags.add(new Tag(tagJson.getString(JsonFields.Tag.NAME)));
-            }
-            catch (JSONException e) {
+            } catch (JSONException e) {
               LogWrapper.d(getLogTag(), e.getMessage());
             }
           }
@@ -447,8 +438,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
   private void sleep(long ms) {
     try {
       Thread.sleep(ms);
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       LogWrapper.e(TAG, e.getMessage());
     }
   }

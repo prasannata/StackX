@@ -136,8 +136,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
       viewHolder.answerBody = (TextView) convertView.findViewById(R.id.answerBodyPreview);
       viewHolder.quickActionMenuImg = (ImageView) convertView.findViewById(R.id.itemContextMenu);
       convertView.setTag(viewHolder);
-    }
-    else
+    } else
       viewHolder = (ViewHolder) convertView.getTag();
 
     viewHolder.itemTitle.setText(Html.fromHtml(answer.title));
@@ -155,8 +154,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
       if (answerBody.length() > ANSWER_PREVIEW_LEN) {
         answerBody = answerBody.substring(0, ANSWER_PREVIEW_LEN);
         viewHolder.answerBody.setText(Html.fromHtml(answerBody + ANS_CONTNUES));
-      }
-      else
+      } else
         viewHolder.answerBody.setText(Html.fromHtml(answerBody));
     }
 
@@ -165,7 +163,7 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
   }
 
   /* Shouldn't I recycle quick action menu as well? Yes, but how? */
-  private void setupQuickActionMenu(final Answer answer, ViewHolder holder) {
+  private void setupQuickActionMenu(final Answer answer, final ViewHolder holder) {
     final QuickActionMenu quickActionMenu = initQuickActionMenu(answer);
     holder.quickActionMenuImg.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -177,7 +175,8 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
 
   protected QuickActionMenu initQuickActionMenu(final Answer answer) {
     return new StackXQuickActionMenu(getActivity()).addSimilarQuestionsItem(answer.title)
-        .addRelatedQuickActionItem(answer.questionId).addEmailQuickActionItem(answer.title, answer.body).build();
+        .addRelatedQuickActionItem(answer.questionId)
+        .addEmailQuickActionItem(answer.title, AppUtils.createEmailBody(answer)).build();
   }
 
   @Override
