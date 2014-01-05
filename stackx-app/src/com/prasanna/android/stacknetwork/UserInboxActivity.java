@@ -283,7 +283,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
   @Override
   public void onResume() {
     super.onResume();
-    
+
     if (itemListAdapter != null)
       itemListAdapter.notifyDataSetChanged();
   }
@@ -361,10 +361,11 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
       inboxItemViewHolder.itemSite = (TextView) convertView.findViewById(R.id.itemSite);
       inboxItemViewHolder.siteIcon = (ImageView) convertView.findViewById(R.id.siteIcon);
       convertView.setTag(inboxItemViewHolder);
-    } else
+    } else {
       inboxItemViewHolder = (InboxItemViewHolder) convertView.getTag();
+    }
 
-    loadSiteIcon(convertView.findViewById(R.id.siteAndItemTypeLayout), inboxItemViewHolder.siteIcon, item.site);
+    loadSiteIcon(convertView, inboxItemViewHolder.siteIcon, item.site);
     inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
     inboxItemViewHolder.creationTime.setText(DateTimeUtils.toDateString(item.creationDate));
     inboxItemViewHolder.itemType.setText(item.itemType.getRepr());
