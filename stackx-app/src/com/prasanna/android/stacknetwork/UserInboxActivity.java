@@ -328,13 +328,11 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
       if (!autocompleteOptions.contains(inboxItem.itemType.getRepr())) {
         autocompleteOptions.add(inboxItem.itemType.getRepr());
-        System.out.println("added " + inboxItem.itemType.getRepr());
         notifyAutoCompleteAdapter = true;
       }
 
       if (!autocompleteOptions.contains(inboxItem.site.apiSiteParameter)) {
         autocompleteOptions.add(inboxItem.site.apiSiteParameter);
-        System.out.println("added " + inboxItem.site.apiSiteParameter);
         notifyAutoCompleteAdapter = true;
       }
 
