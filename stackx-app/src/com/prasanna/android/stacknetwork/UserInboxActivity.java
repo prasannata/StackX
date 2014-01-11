@@ -90,45 +90,52 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
     @Override
     protected FilterResults performFiltering(CharSequence constraint) {
+      synchronized (filterLock) {
+        if (constraint != null && constraint.length() > 0) return filterList(constraint);
+        else return clearFilter();
+      }
+    }
+
+    private FilterResults filterList(CharSequence constraint) {
       FilterResults result = new FilterResults();
       ArrayList<InboxItem> filteredInboxItems = new ArrayList<InboxItem>();
-      synchronized (filterLock) {
-        if (constraint != null && constraint.length() > 0) {
-          for (StackXPage<InboxItem> page : pages) {
-            for (InboxItem inboxItem : page.items) {
-              String[] words = constraint.toString().split(",");
-              boolean match = true;
-              for (String word : words) {
-                String trimmedWord = word.trim();
-                boolean titleMatch =
-                    Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(inboxItem.title).find();
-                if (!inboxItem.itemType.getRepr().contains(trimmedWord)
-                    && !inboxItem.site.apiSiteParameter.contains(trimmedWord) && !titleMatch) {
-                  match = false;
-                  break;
-                }
-              }
 
-              if (match) {
-                filteredInboxItems.add(inboxItem);
-              }
+      for (StackXPage<InboxItem> page : pages) {
+        for (InboxItem inboxItem : page.items) {
+          String[] words = constraint.toString().split(",");
+          boolean match = true;
+          for (String word : words) {
+            String trimmedWord = word.trim();
+            boolean titleMatch =
+                Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(inboxItem.title).find();
+            if (!inboxItem.itemType.getRepr().contains(trimmedWord)
+                && !inboxItem.site.apiSiteParameter.contains(trimmedWord) && !titleMatch) {
+              match = false;
+              break;
             }
           }
 
-          result.count = filteredInboxItems.size();
-          result.values = filteredInboxItems;
-        } else {
-
-          for (StackXPage<InboxItem> page : pages) {
-            for (InboxItem inboxItem : page.items) {
-              filteredInboxItems.add(inboxItem);
-            }
-          }
-          result.count = filteredInboxItems.size();
-          result.values = filteredInboxItems;
+          if (match) filteredInboxItems.add(inboxItem);
         }
-
       }
+
+      result.count = filteredInboxItems.size();
+      result.values = filteredInboxItems;
+      return result;
+    }
+
+    private FilterResults clearFilter() {
+      FilterResults result = new FilterResults();
+      ArrayList<InboxItem> filteredInboxItems = new ArrayList<InboxItem>();
+
+      for (StackXPage<InboxItem> page : pages) {
+        for (InboxItem inboxItem : page.items) {
+          filteredInboxItems.add(inboxItem);
+        }
+      }
+
+      result.count = filteredInboxItems.size();
+      result.values = filteredInboxItems;
       return result;
     }
 
@@ -143,7 +150,6 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
       itemListAdapter.addAll(filteredTags);
       itemListAdapter.notifyDataSetInvalidated();
     }
-
   }
 
   static class InboxItemViewHolder {
@@ -164,8 +170,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
     receiver = new RestQueryResultReceiver(new Handler());
     receiver.setReceiver(this);
 
-    if (progressBar == null)
-      progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
+    if (progressBar == null) progressBar = (ProgressBar) getLayoutInflater().inflate(R.layout.progress_bar, null);
 
     setupSearch();
     setupListView();
@@ -187,8 +192,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         if (hasFocus) {
           searchInputText.setHint("");
           clearFilterInputText.setVisibility(View.VISIBLE);
-        } else
-          clearFilterInputText.setVisibility(View.GONE);
+        } else clearFilterInputText.setVisibility(View.GONE);
       }
     });
 
@@ -207,8 +211,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
 
       @Override
       public void afterTextChanged(Editable s) {
-        if (s.length() < lastCount || s.length() > 3)
-          itemListAdapter.getFilter().filter(s);
+        if (s.length() < lastCount || s.length() > 3) itemListAdapter.getFilter().filter(s);
       }
     });
 
@@ -239,10 +242,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
         InboxItem item = (InboxItem) adapter.getItemAtPosition(position);
 
         if (item.itemType != null) {
-          boolean isSupportedItem =
-              item.itemType.equals(InboxItem.ItemType.COMMENT) || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER);
-
-          if (isSupportedItem) {
+          if (item.itemType.equals(InboxItem.ItemType.COMMENT) || item.itemType.equals(InboxItem.ItemType.NEW_ANSWER)) {
             Intent intent = new Intent(UserInboxActivity.this, InboxItemActivity.class);
             intent.putExtra(StringConstants.INBOX_ITEM, item);
             startActivity(intent);
@@ -284,8 +284,7 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
   public void onResume() {
     super.onResume();
 
-    if (itemListAdapter != null)
-      itemListAdapter.notifyDataSetChanged();
+    if (itemListAdapter != null) itemListAdapter.notifyDataSetChanged();
   }
 
   @Override
@@ -359,22 +358,17 @@ public class UserInboxActivity extends AbstractUserActionBarActivity implements 
       inboxItemViewHolder.itemSite = (TextView) convertView.findViewById(R.id.itemSite);
       inboxItemViewHolder.siteIcon = (ImageView) convertView.findViewById(R.id.siteIcon);
       convertView.setTag(inboxItemViewHolder);
-    } else {
-      inboxItemViewHolder = (InboxItemViewHolder) convertView.getTag();
-    }
+    } else inboxItemViewHolder = (InboxItemViewHolder) convertView.getTag();
 
     loadSiteIcon(convertView, inboxItemViewHolder.siteIcon, item.site);
     inboxItemViewHolder.title.setText(Html.fromHtml(item.title));
     inboxItemViewHolder.creationTime.setText(DateTimeUtils.toDateString(item.creationDate));
     inboxItemViewHolder.itemType.setText(item.itemType.getRepr());
 
-    if (item.body != null)
-      inboxItemViewHolder.body.setText(Html.fromHtml(item.body));
+    if (item.body != null) inboxItemViewHolder.body.setText(Html.fromHtml(item.body));
 
-    if (item.site != null)
-      inboxItemViewHolder.itemSite.setText(item.site.name);
-    else
-      inboxItemViewHolder.itemSite.setVisibility(View.GONE);
+    if (item.site != null) inboxItemViewHolder.itemSite.setText(item.site.name);
+    else inboxItemViewHolder.itemSite.setVisibility(View.GONE);
 
     if (item.unread) {
       inboxItemViewHolder.title.setTypeface(null, Typeface.BOLD);

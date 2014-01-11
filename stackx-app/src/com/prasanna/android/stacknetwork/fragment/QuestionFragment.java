@@ -30,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -59,6 +60,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
   private StackXQuickActionMenu quickActionMenu;
   private OnShowCommentsListener onShowCommentsListener;
   private View questionTitleLayout;
+  private boolean backToAnswerFlash = false;
 
   private String STR_VIEWS;
   private String STR_COMMENTS;
@@ -82,11 +84,9 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    if (parentLayout == null)
-      createView(inflater);
+    if (parentLayout == null) createView(inflater);
 
-    if (savedInstanceState != null)
-      question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
+    if (savedInstanceState != null) question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
 
     return parentLayout;
   }
@@ -98,8 +98,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     ctxMenuImage.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (quickActionMenu == null)
-          quickActionMenu = initQuickActionMenu();
+        if (quickActionMenu == null) quickActionMenu = initQuickActionMenu();
 
         quickActionMenu.build().show(v);
       }
@@ -130,19 +129,16 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
   @Override
   public void onSaveInstanceState(Bundle outState) {
-    if (question != null)
-      outState.putSerializable(StringConstants.QUESTION, question);
+    if (question != null) outState.putSerializable(StringConstants.QUESTION, question);
 
     super.onSaveInstanceState(outState);
   }
 
   private void displayQuestion() {
     if (question != null) {
-      if (questionTitleLayout.getVisibility() == View.INVISIBLE)
-        questionTitleLayout.setVisibility(View.VISIBLE);
+      if (questionTitleLayout.getVisibility() == View.INVISIBLE) questionTitleLayout.setVisibility(View.VISIBLE);
 
-      if (quickActionMenu == null)
-        quickActionMenu = initQuickActionMenu();
+      if (quickActionMenu == null) quickActionMenu = initQuickActionMenu();
 
       TextView textView = (TextView) parentLayout.findViewById(R.id.score);
       textView.setText(AppUtils.formatNumber(question.score));
@@ -233,8 +229,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
   public void setComments(ArrayList<Comment> comments) {
     if (question != null) {
       question.comments = comments;
-      if (parentLayout != null)
-        displayNumComments();
+      if (parentLayout != null) displayNumComments();
     }
   }
 
@@ -242,8 +237,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     setQuestion(question);
 
     if (parentLayout != null) {
-      if (isAdded())
-        getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
+      if (isAdded()) getActivity().getActionBar().setTitle(Html.fromHtml(question.title));
 
       displayQuestion();
     }
@@ -252,16 +246,18 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
   public void enableNavigationBack(OnClickListener clickListener) {
     backIv.setVisibility(View.VISIBLE);
     backIv.setOnClickListener(clickListener);
+    if (!backToAnswerFlash) {
+      backIv.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.flash));
+      backToAnswerFlash = true;
+    }
   }
 
   @Override
   public void onCommentAdd(Comment comment) {
     // One reply to comments come here, add new comment is directly handled
-    // by QuestionAcitivy. So no need to initialize comments if null because
-    // it can never be null here.
+    // by QuestionAcitivy.
     if (comment != null) {
-      if (question.comments == null)
-        question.comments = new ArrayList<Comment>();
+      if (question.comments == null) question.comments = new ArrayList<Comment>();
 
       question.comments.add(comment);
       updateCacheWithNewCommentIfExists(comment);
@@ -310,8 +306,7 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
     if (QuestionsCache.getInstance().containsKey(question.id)) {
       Question cachedQuestion = QuestionsCache.getInstance().get(question.id);
 
-      if (cachedQuestion.comments == null)
-        cachedQuestion.comments = new ArrayList<Comment>();
+      if (cachedQuestion.comments == null) cachedQuestion.comments = new ArrayList<Comment>();
 
       if (!cachedQuestion.comments.contains(comment)) {
         cachedQuestion.comments.add(comment);
@@ -326,14 +321,12 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
       if (cachedQuestion != null) {
         cachedQuestion.comments = question.comments;
         QuestionsCache.getInstance().add(question.id, cachedQuestion);
-      } else
-        QuestionsCache.getInstance().remove(question.id);
+      } else QuestionsCache.getInstance().remove(question.id);
     }
   }
 
   private void removeQuestionFromCache() {
-    if (QuestionsCache.getInstance().containsKey(question.id))
-      QuestionsCache.getInstance().remove(question.id);
+    if (QuestionsCache.getInstance().containsKey(question.id)) QuestionsCache.getInstance().remove(question.id);
   }
 
 }
