@@ -614,13 +614,12 @@
             android:layout_marginTop="2dp"
             android:background="@color/lightGrey" />
 
-        <LinearLayout
+        <include
             android:id="@+id/accountsList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/accountsUnderline"
-            android:orientation="vertical" >
-        </LinearLayout>
+            layout="@layout/list_view" />
     </RelativeLayout>
 
 </ScrollView>

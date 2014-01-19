@@ -91,8 +91,10 @@ public class JsonFields {
     public static final String ACCOUNT_ID = "account_id";
     public static final String USER_ID = "user_id";
     public static final String SITE_NAME = "site_name";
+    public static final String REPUTATION = "reputation";
     public static final String SITE_URL = "site_url";
     public static final String USER_TYPE = "user_type";
+    public static final String BADGE_COUNTS = "badge_counts";
   }
 
   public static class BadgeCounts {

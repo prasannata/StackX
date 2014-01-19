@@ -97,8 +97,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
         for (int i = 0; i < jsonArray.length(); i++) {
           JSONObject siteJsonObject = jsonArray.getJSONObject(i);
           Site site = getSerializedSiteObject(new JSONObjectWrapper(siteJsonObject));
-          if (site != null)
-            sites.put(site.link, site);
+          if (site != null) sites.put(site.link, site);
         }
       }
 
@@ -109,8 +108,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
   }
 
   private Site getSerializedSiteObject(JSONObjectWrapper siteJsonObject) {
-    if (siteJsonObject == null)
-      return null;
+    if (siteJsonObject == null) return null;
 
     Site site = new Site();
     site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
@@ -126,9 +124,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
   private StackXPage<Question> getQuestions(String restEndPoint, Map<String, String> queryParams) {
     JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-    if (questionsJsonResponse != null) {
-      return getQuestionModel(questionsJsonResponse);
-    }
+    if (questionsJsonResponse != null) { return getQuestionModel(questionsJsonResponse); }
 
     return null;
   }
@@ -172,8 +168,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
     queryParams.put(StackUri.QueryParams.SITE, site);
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-    if (userId != -1)
-      page = getSerializedUserObject(executeHttpGetRequest("/users/" + userId, queryParams));
+    if (userId != -1) page = getSerializedUserObject(executeHttpGetRequest("/users/" + userId, queryParams));
 
     return page;
   }
@@ -294,8 +289,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
         for (int i = 0; i < itemsArray.length(); i++) {
           try {
             JSONObjectWrapper itemJsonObject = JSONObjectWrapper.wrap(itemsArray.getJSONObject(i));
-            if (itemJsonObject != null)
-              page.items.add(getSerializedInboxItem(itemJsonObject));
+            if (itemJsonObject != null) page.items.add(getSerializedInboxItem(itemJsonObject));
           } catch (JSONException e) {
             LogWrapper.d(getLogTag(), e.getMessage());
           }
@@ -355,6 +349,8 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
             account.id = accountJsonObject.getLong(JsonFields.Account.ACCOUNT_ID);
             account.userId = accountJsonObject.getLong(JsonFields.Account.USER_ID);
             account.siteName = accountJsonObject.getString(JsonFields.Account.SITE_NAME);
+            account.badgeCount = getBadgeCounts(accountJsonObject.getJSONObject(JsonFields.Account.BADGE_COUNTS));
+            account.rep = accountJsonObject.getInt(JsonFields.Account.REPUTATION);
             account.siteUrl = accountJsonObject.getString(JsonFields.Account.SITE_URL);
             account.userType = UserType.toEnum(accountJsonObject.getString(JsonFields.Account.USER_TYPE));
             accounts.put(account.siteUrl, account);
@@ -408,8 +404,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
       if (jsonObjectWrapper != null) {
         JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
         if (jsonArray != null && jsonArray.length() > 0) {
-          if (tags == null)
-            tags = new LinkedHashSet<Tag>();
+          if (tags == null) tags = new LinkedHashSet<Tag>();
 
           for (int i = 0; i < jsonArray.length(); i++) {
             try {

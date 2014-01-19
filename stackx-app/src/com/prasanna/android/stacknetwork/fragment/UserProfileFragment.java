@@ -21,6 +21,7 @@ package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -35,10 +36,11 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.prasanna.android.http.HttpException;
@@ -65,10 +67,8 @@ import com.prasanna.android.utils.LogWrapper;
 
 public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver {
   private static final String TAG = UserProfileFragment.class.getSimpleName();
-  private ScrollView profileHomeLayout;
-  private LinearLayout userAccountList;
+  private RelativeLayout profileHomeLayout;
   private Intent userProfileIntent;
-  private int userAccountListCursor = 0;
   private User user;
   private boolean me = false;
   private RestQueryResultReceiver resultReceiver;
@@ -76,6 +76,15 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   private boolean forceRefresh;
   private Site site;
   private Context appContext;
+  private ListView accountListView;
+
+  static class AccountViewHolder {
+    TextView accountNameTextView;
+    TextView accountRepTextView;
+    TextView goldCountTextView;
+    TextView silverCountTextView;
+    TextView bronzeCountTextView;
+  }
 
   static class PersistMyAvatarAsyncTask extends AsyncTask<Bitmap, Void, Void> {
     private Context context;
@@ -90,14 +99,41 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
       try {
         profileDAO.open();
         profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, params[0]);
-      }
-      catch (SQLException e) {
+      } catch (SQLException e) {
         LogWrapper.e(TAG, e.getMessage());
-      }
-      finally {
+      } finally {
         profileDAO.close();
       }
       return null;
+    }
+  }
+
+  class AccountArrayAdapter extends ArrayAdapter<Account> {
+
+    public AccountArrayAdapter(Context context, int resource, List<Account> objects) {
+      super(context, resource, objects);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+      AccountViewHolder accountViewHolder = null;
+      if (convertView == null) {
+        accountViewHolder = new AccountViewHolder();
+        convertView = getActivity().getLayoutInflater().inflate(R.layout.account, null);
+        accountViewHolder.accountNameTextView = (TextView) convertView.findViewById(R.id.accountName);
+        accountViewHolder.accountRepTextView = (TextView) convertView.findViewById(R.id.userRep);
+        accountViewHolder.goldCountTextView = (TextView) convertView.findViewById(R.id.profileUserGoldNum);
+        accountViewHolder.silverCountTextView = (TextView) convertView.findViewById(R.id.profileUserSilverNum);
+        accountViewHolder.bronzeCountTextView = (TextView) convertView.findViewById(R.id.profileUserBronzeNum);
+        convertView.setTag(accountViewHolder);
+      } else accountViewHolder = (AccountViewHolder) convertView.getTag();
+
+      accountViewHolder.accountNameTextView.setText(Html.fromHtml(getItem(position).siteName));
+      accountViewHolder.accountRepTextView.setText(AppUtils.formatReputation(getItem(position).rep));
+      accountViewHolder.goldCountTextView.setText(String.valueOf(getItem(position).badgeCount[0]));
+      accountViewHolder.silverCountTextView.setText(String.valueOf(getItem(position).badgeCount[1]));
+      accountViewHolder.bronzeCountTextView.setText(String.valueOf(getItem(position).badgeCount[2]));
+      return convertView;
     }
   }
 
@@ -112,7 +148,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    userAccountListCursor = 0;
     resultReceiver = new RestQueryResultReceiver(new Handler());
     resultReceiver.setReceiver(this);
 
@@ -121,8 +156,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
       userId = savedInstanceState.getLong(StringConstants.USER_ID);
       site = (Site) savedInstanceState.getSerializable(StringConstants.SITE);
       forceRefresh = false;
-    }
-    else {
+    } else {
       me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
       userId = getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L);
       site = (Site) getActivity().getIntent().getSerializableExtra(StringConstants.SITE);
@@ -133,8 +167,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     if (profileHomeLayout == null) {
-      profileHomeLayout = (ScrollView) inflater.inflate(R.layout.user_proile_layout, container, false);
-      userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
+      profileHomeLayout = (RelativeLayout) inflater.inflate(R.layout.user_proile_layout, container, false);
+      accountListView = (ListView) profileHomeLayout.findViewById(R.id.accountsList);
     }
 
     return profileHomeLayout;
@@ -144,8 +178,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   public void onResume() {
     super.onResume();
 
-    if (user == null)
-      startUserProfileService();
+    if (user == null) startUserProfileService();
     else {
       showUserDetail();
       showUserAccounts();
@@ -175,10 +208,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
   private void showUserDetail() {
     if (user != null && profileHomeLayout != null) {
-      if (isAdded())
-        getActivity().getActionBar().setTitle(Html.fromHtml(user.getDisplayName()) + "'s profile");
-
-      profileHomeLayout.findViewById(R.id.userProfile).setVisibility(View.VISIBLE);
+      if (isAdded()) getActivity().getActionBar().setTitle(Html.fromHtml(user.getDisplayName()) + "'s profile");
 
       showProfileInfo();
       showItemsCount();
@@ -200,10 +230,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     textView.setText(getString(R.string.views) + " " + user.profileViews);
 
     textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
-    if (user.acceptRate > -1)
-      textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
-    else
-      textView.setVisibility(View.GONE);
+    if (user.acceptRate > -1) textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
+    else textView.setVisibility(View.GONE);
 
     textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
     textView.setText(getString(R.string.lastSeen) + " " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
@@ -266,10 +294,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   }
 
   private void getAndDisplayUserAvatar() {
-    if (user.avatar == null)
-      runAsyncTaskToGetAvatar();
-    else
-      displayAvatar(user.avatar);
+    if (user.avatar == null) runAsyncTaskToGetAvatar();
+    else displayAvatar(user.avatar);
   }
 
   private void runAsyncTaskToGetAvatar() {
@@ -283,8 +309,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             displayAvatar(result);
             avatarProgressBar.setVisibility(View.GONE);
 
-            if (me)
-              new PersistMyAvatarAsyncTask(appContext).execute(result);
+            if (me) new PersistMyAvatarAsyncTask(appContext).execute(result);
           }
 
         };
@@ -295,12 +320,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
   private void showUserAccounts() {
     if (user != null && user.accounts != null) {
-      for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++) {
-        TextView textView =
-            (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor, null);
-        textView.setText(Html.fromHtml(user.accounts.get(userAccountListCursor).siteName));
-        userAccountList.addView(textView);
-      }
+      accountListView.setAdapter(new AccountArrayAdapter(getActivity(), R.layout.textview_black_textcolor,
+          user.accounts));
     }
   }
 
@@ -312,8 +333,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
   @Override
   public void onReceiveResult(int resultCode, Bundle resultData) {
-    if (isAdded() && isVisible())
-      getActivity().setProgressBarIndeterminateVisibility(false);
+    if (isAdded() && isVisible()) getActivity().setProgressBarIndeterminateVisibility(false);
 
     switch (resultCode) {
       case UserIntentService.GET_USER_PROFILE:
@@ -338,8 +358,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
       HashMap<String, Account> accounts =
           (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
       if (accounts != null) {
-        if (user.accounts == null)
-          user.accounts = new ArrayList<Account>();
+        if (user.accounts == null) user.accounts = new ArrayList<Account>();
 
         user.accounts.addAll(accounts.values());
         showUserAccounts();

@@ -73,8 +73,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
     @Override
     public void onTagClick(Context context, String tag) {
       if (QuestionsIntentService.GET_QUESTIONS_FOR_TAG != intentAction || questionTag == null
-          || !questionTag.equals(tag))
-        super.onTagClick(context, tag);
+          || !questionTag.equals(tag)) super.onTagClick(context, tag);
     }
 
   }
@@ -103,19 +102,16 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
   public static String getFragmentTag(String tag, String sort) {
     String fragmentTag = null;
 
-    if (tag != null)
-      fragmentTag = FRAGMENT_TAG_PREFIX + "_" + tag.replaceAll(" ", "_");
+    if (tag != null) fragmentTag = FRAGMENT_TAG_PREFIX + "_" + tag.replaceAll(" ", "_");
 
-    if (sort != null)
-      fragmentTag = fragmentTag + "_" + sort;
+    if (sort != null) fragmentTag = fragmentTag + "_" + sort;
 
     return fragmentTag;
   }
 
   private static QuestionListFragment getFragment(String fragmentTag) {
     QuestionListFragment fragment = QuestionsActivity.getFragment(fragmentTag);
-    if (fragment == null)
-      fragment = new QuestionListFragment();
+    if (fragment == null) fragment = new QuestionListFragment();
 
     fragment.fragmentTag = fragmentTag;
     return fragment;
@@ -130,8 +126,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
               this);
     }
 
-    if (savedInstanceState != null)
-      action = savedInstanceState.getInt(StringConstants.ACTION);
+    if (savedInstanceState != null) action = savedInstanceState.getInt(StringConstants.ACTION);
 
     return itemsContainer;
   }
@@ -147,11 +142,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
       }
 
       getActivity().getActionBar().setTitle(Html.fromHtml(tag));
-    }
-    else if (OperatingSite.getSite() != null)
-      getActivity().getActionBar().setTitle(Html.fromHtml(OperatingSite.getSite().name));
-    else
-      getActivity().getActionBar().setTitle(R.string.app_name);
+    } else if (OperatingSite.getSite() != null) getActivity().getActionBar().setTitle(
+        Html.fromHtml(OperatingSite.getSite().name));
+    else getActivity().getActionBar().setTitle(R.string.app_name);
 
     findActionAndStartService();
   }
@@ -194,8 +187,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
       }
 
       created = true;
-    }
-    else {
+    } else {
       LogWrapper.d(TAG, "Fragment " + tag + " was already created. Restoring");
 
       if (itemListAdapter != null) {
@@ -235,8 +227,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
   }
 
   private void stopRunningServiceAndReceiver() {
-    if (isServiceRunning())
-      getActivity().stopService(intent);
+    if (isServiceRunning()) getActivity().stopService(intent);
   }
 
   private void clean() {

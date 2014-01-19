@@ -28,6 +28,10 @@ public class Account extends IdentifiableItem implements Serializable {
 
   public long userId;
 
+  public int rep = 0;
+
+  public int[] badgeCount = new int[3];
+
   public String siteName;
 
   public String siteUrl;
@@ -45,21 +49,14 @@ public class Account extends IdentifiableItem implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     Account other = (Account) obj;
-    if (id != other.id)
-      return false;
+    if (id != other.id) return false;
     if (siteUrl == null) {
-      if (other.siteUrl != null)
-        return false;
-    }
-    else if (!siteUrl.equals(other.siteUrl))
-      return false;
+      if (other.siteUrl != null) return false;
+    } else if (!siteUrl.equals(other.siteUrl)) return false;
     return true;
   }
 
