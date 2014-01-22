@@ -71,18 +71,15 @@ public class WritePermissionDAO extends AbstractBaseDao {
             LogWrapper.d(TAG, permission.objectType + " add: " + permission.canAdd + ", edit: " + permission.canEdit
                 + ", delete: " + permission.canDelete);
             database.insert(TABLE_NAME, null, getContentValues(site, permission));
-          }
-          else {
+          } else {
             Log.w(TAG, "Object type null for permission for site: " + site.apiSiteParameter);
           }
         }
 
         database.setTransactionSuccessful();
-      }
-      catch (SQLException e) {
+      } catch (SQLException e) {
 
-      }
-      finally {
+      } finally {
         database.endTransaction();
       }
     }
@@ -110,19 +107,21 @@ public class WritePermissionDAO extends AbstractBaseDao {
   }
 
   public WritePermission getPermission(String site, ObjectType objectType) {
-    if (site == null || objectType == null)
-      return null;
+    if (site == null || objectType == null) return null;
 
     String selection = WritePermissionTable.COLUMN_SITE + " = ? and" + WritePermissionTable.COLUMN_OBJECT_TYPE + " = ?";
     String[] selectionArgs = { site, objectType.getValue() };
 
     Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
-    if (cursor == null || cursor.getCount() == 0)
-      return null;
+    if (cursor == null || cursor.getCount() == 0) return null;
 
     LogWrapper.d(TAG, "Permission retrieved from DB");
 
-    return getPermission(cursor);
+    try {
+      return getPermission(cursor);
+    } finally {
+      cursor.close();
+    }
   }
 
   public ArrayList<String> getSites() {
@@ -133,8 +132,7 @@ public class WritePermissionDAO extends AbstractBaseDao {
     String[] selectionArgs = { "1", "1", "1" };
 
     Cursor cursor = database.query(TABLE_NAME, cols, selection, selectionArgs, null, null, null);
-    if (cursor == null || cursor.getCount() == 0)
-      return null;
+    if (cursor == null || cursor.getCount() == 0) return null;
 
     try {
       ArrayList<String> sites = new ArrayList<String>();
@@ -144,29 +142,25 @@ public class WritePermissionDAO extends AbstractBaseDao {
         cursor.moveToNext();
       }
       return sites;
-    }
-    finally {
+    } finally {
       cursor.close();
     }
   }
 
   public HashMap<ObjectType, WritePermission> getPermissions(String site) {
-    if (site == null)
-      return null;
+    if (site == null) return null;
 
     String selection = WritePermissionTable.COLUMN_SITE + " = ?";
     String[] selectionArgs = { site };
 
     Cursor cursor = database.query(TABLE_NAME, null, selection, selectionArgs, null, null, null);
-    if (cursor == null || cursor.getCount() == 0)
-      return null;
+    if (cursor == null || cursor.getCount() == 0) return null;
 
     LogWrapper.d(TAG, "Permissions retrieved from DB for " + site);
 
     try {
       return getPermissions(cursor);
-    }
-    finally {
+    } finally {
       cursor.close();
     }
   }
@@ -177,8 +171,7 @@ public class WritePermissionDAO extends AbstractBaseDao {
 
     while (!cursor.isAfterLast()) {
       WritePermission permission = getPermission(cursor);
-      if (permission.objectType != null)
-        permissions.put(permission.objectType, permission);
+      if (permission.objectType != null) permissions.put(permission.objectType, permission);
       cursor.moveToNext();
     }
 
@@ -218,11 +211,9 @@ public class WritePermissionDAO extends AbstractBaseDao {
     try {
       writePermissionDAO.open();
       writePermissionDAO.update(id, site, writePermission);
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    finally {
+    } finally {
       writePermissionDAO.close();
     }
 
@@ -233,11 +224,9 @@ public class WritePermissionDAO extends AbstractBaseDao {
     try {
       writePermissionDAO.open();
       return writePermissionDAO.getPermissions(site);
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    finally {
+    } finally {
       writePermissionDAO.close();
     }
 
@@ -249,11 +238,9 @@ public class WritePermissionDAO extends AbstractBaseDao {
     try {
       writePermissionDAO.open();
       writePermissionDAO.deleteAll();
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    finally {
+    } finally {
       writePermissionDAO.close();
     }
 
@@ -264,11 +251,9 @@ public class WritePermissionDAO extends AbstractBaseDao {
     try {
       writePermissionDAO.open();
       writePermissionDAO.delete(deletedAccounts);
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    finally {
+    } finally {
       writePermissionDAO.close();
     }
   }
