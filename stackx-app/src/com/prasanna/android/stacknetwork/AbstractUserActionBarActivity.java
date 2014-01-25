@@ -20,6 +20,7 @@
 package com.prasanna.android.stacknetwork;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -291,5 +292,10 @@ public abstract class AbstractUserActionBarActivity extends Activity {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     startActivity(intent);
     return true;
+  }
+  
+  @SuppressWarnings("unchecked")
+  protected <T extends Fragment> T findFragmentByTag(String tag, Class<T> clazz){
+    return (T) getFragmentManager().findFragmentByTag(tag);
   }
 }

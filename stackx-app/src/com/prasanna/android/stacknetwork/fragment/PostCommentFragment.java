@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -87,15 +87,13 @@ public class PostCommentFragment extends Fragment {
           charCount.setText(String.valueOf(COMMENT_MAX_LEN - s.length()));
           sendComment.setTextColor(getResources().getColor(R.color.delft));
           sendComment.setClickable(true);
-        }
-        else {
+        } else {
           if ((s.length() < COMMENT_MIN_LEN || s.length() > COMMENT_MAX_LEN) && sendComment.isClickable()) {
             sendComment.setTextColor(getResources().getColor(R.color.lightGrey));
             sendComment.setClickable(false);
           }
 
-          if (s.length() > COMMENT_MAX_LEN)
-            charCount.setText(String.valueOf(s.length() - COMMENT_MAX_LEN));
+          if (s.length() > COMMENT_MAX_LEN) charCount.setText(String.valueOf(s.length() - COMMENT_MAX_LEN));
         }
       }
     }
@@ -129,9 +127,8 @@ public class PostCommentFragment extends Fragment {
     sendProgressBar.setVisibility(View.GONE);
 
     if (sendStatus != null) {
-      String failureText = "Failed";
       StackXError error = StackXError.deserialize(errorResponse);
-      sendStatus.setText(error != null ? error.name : failureText);
+      sendStatus.setText(error.name);
       sendStatus.setTextColor(Color.RED);
       sendStatus.setVisibility(View.VISIBLE);
       DialogBuilder.okDialog(getActivity(), error.msg, new OnClickListener() {
@@ -152,8 +149,7 @@ public class PostCommentFragment extends Fragment {
   }
 
   public String getCurrentText() {
-    if (editText != null && editText.getText() != null)
-      return editText.getText().toString();
+    if (editText != null && editText.getText() != null) return editText.getText().toString();
 
     return null;
   }
@@ -180,8 +176,7 @@ public class PostCommentFragment extends Fragment {
   public void onSaveInstanceState(Bundle outState) {
     LogWrapper.d(TAG, "onSaveInstanceState");
 
-    if (getCurrentText() != null)
-      outState.putString(TEXT, getCurrentText().toString());
+    if (getCurrentText() != null) outState.putString(TEXT, getCurrentText().toString());
 
     super.onSaveInstanceState(outState);
   }
@@ -211,8 +206,7 @@ public class PostCommentFragment extends Fragment {
       @Override
       public void onClick(View v) {
         if (editText.getText() != null && editText.getText().toString().length() > 0) {
-          if (sendComment(postId, editText.getText().toString()))
-            updateUIElements();
+          if (sendComment(postId, editText.getText().toString())) updateUIElements();
         }
       }
     });
@@ -226,27 +220,22 @@ public class PostCommentFragment extends Fragment {
   }
 
   public void hideSoftKeyboard() {
-    if (isVisible() && editText != null)
-      AppUtils.hideSoftInput(getActivity(), editText);
+    if (isVisible() && editText != null) AppUtils.hideSoftInput(getActivity(), editText);
   }
 
   public void show() {
-    if (View.GONE == parentLayout.getVisibility())
-      parentLayout.setVisibility(View.VISIBLE);
+    if (View.GONE == parentLayout.getVisibility()) parentLayout.setVisibility(View.VISIBLE);
 
-    if (draftText != null)
-      editText.setText(Html.fromHtml(draftText));
+    if (draftText != null) editText.setText(Html.fromHtml(draftText));
 
-    if (editText.getText() != null)
-      editText.setSelection(editText.getText().length());
+    if (editText.getText() != null) editText.setSelection(editText.getText().length());
 
     editText.requestFocus();
     AppUtils.showSoftInput(getActivity(), editText);
   }
 
   public void hide() {
-    if (View.VISIBLE == parentLayout.getVisibility())
-      parentLayout.setVisibility(View.GONE);
+    if (View.VISIBLE == parentLayout.getVisibility()) parentLayout.setVisibility(View.GONE);
 
     editText.clearFocus();
     AppUtils.hideSoftInput(getActivity(), editText);
@@ -257,8 +246,7 @@ public class PostCommentFragment extends Fragment {
       if (AppUtils.allowedToWrite(getActivity())) {
         startCommentWriteService(postId, body);
         return true;
-      }
-      else {
+      } else {
         long minSecondsBetweenWrite =
             SharedPreferencesUtil.getLong(getActivity(), WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE, 0);
         Toast.makeText(getActivity(), "You have to wait a minium of " + minSecondsBetweenWrite + " between writes",
@@ -275,9 +263,7 @@ public class PostCommentFragment extends Fragment {
     if (myEdit) {
       intent.putExtra(StringConstants.COMMENT_ID, commentId);
       intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_EDIT_COMMENT);
-    }
-    else
-      intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
+    } else intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_ADD_COMMENT);
     intent.putExtra(StringConstants.VIEW_PAGER_POSITION, viewPagerPosition);
     intent.putExtra(StringConstants.POST_ID, postId);
     intent.putExtra(StringConstants.BODY, body);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -92,10 +92,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     textView = (TextView) findViewById(R.id.postType);
     switch (item.itemType) {
       case COMMENT:
-        if (item.questionId != -1)
-          textView.setText(item.itemType.getRepr() + " on question");
-        else
-          textView.setText(item.itemType.getRepr() + " on answer");
+        if (item.questionId != -1) textView.setText(item.itemType.getRepr() + " on question");
+        else textView.setText(item.itemType.getRepr() + " on answer");
         break;
       case NEW_ANSWER:
       default:
@@ -128,8 +126,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
 
   @Override
   protected void setActionBarTitleAndIcon() {
-    if (item == null || item.site == null)
-      super.setActionBarTitleAndIcon();
+    if (item == null || item.site == null) super.setActionBarTitleAndIcon();
 
     setActionBarTitle(item.title);
     setActionBarHomeIcon(item.site);
@@ -139,8 +136,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
   public boolean onCreateOptionsMenu(Menu menu) {
     boolean ret = super.onCreateOptionsMenu(menu);
 
-    if (menu != null)
-      menu.removeItem(R.id.menu_refresh);
+    if (menu != null) menu.removeItem(R.id.menu_refresh);
 
     return ret & true;
   }
@@ -168,10 +164,8 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
         if (comment != null) {
           boolean commentOnAnswer = isCommentOnAnswer();
           showPostDetail(comment);
-          if (commentOnAnswer)
-            startGetAnswerService();
-        } else
-          showPostBody(item.body);
+          if (commentOnAnswer) startGetAnswerService();
+        } else showPostBody(item.body);
         break;
       case AnswersIntentService.GET_ANSWER:
         setupOnClickForViewMyAnswer((Answer) resultData.getSerializable(StringConstants.ANSWER));

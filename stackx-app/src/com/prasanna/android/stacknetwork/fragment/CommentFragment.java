@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -106,8 +106,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     if (itemsContainer == null) {
-      if (comments == null)
-        comments = new ArrayList<Comment>();
+      if (comments == null) comments = new ArrayList<Comment>();
       itemsContainer = (ViewGroup) inflater.inflate(R.layout.comment_list_view, container, false);
       postCommentFragmentContainer = (LinearLayout) itemsContainer.findViewById(R.id.post_comment_fragment_container);
       itemListAdapter = new ItemListAdapter<Comment>(getActivity(), R.layout.comment, comments, this);
@@ -170,8 +169,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
       holder.commentEditOptions = (LinearLayout) commentLayout.findViewById(R.id.commentEditOptions);
 
       commentLayout.setTag(holder);
-    } else
-      holder = (CommentViewHolder) commentLayout.getTag();
+    } else holder = (CommentViewHolder) commentLayout.getTag();
 
     holder.id = comment.id;
     holder.score.setText(AppUtils.formatNumber(comment.score));
@@ -180,16 +178,14 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     holder.owner.setText(DateTimeUtils.getElapsedDurationSince(comment.creationDate) + " by "
         + Html.fromHtml(comment.owner.getDisplayName()));
 
-    if (AppUtils.inAuthenticatedRealm(getActivity()))
-      setupCommentWriteOptions(comment, position, holder);
+    if (AppUtils.inAuthenticatedRealm(getActivity())) setupCommentWriteOptions(comment, position, holder);
 
     if (selectedViewForReply != null && selectedViewForReply.id == comment.id) {
       selectedViewForReply.viewGroup.setBackgroundColor(getResources().getColor(R.color.lightGrey));
       selectedViewForReply.replyToComment.setVisibility(View.GONE);
     } else {
       holder.viewGroup.setBackgroundResource(R.drawable.rounded_border_grey_min_padding);
-      if (!isMyComment(comment))
-        holder.replyToComment.setVisibility(View.VISIBLE);
+      if (!isMyComment(comment)) holder.replyToComment.setVisibility(View.VISIBLE);
     }
 
     return commentLayout;
@@ -200,18 +196,15 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     holder.commentWriteOptions.setVisibility(View.VISIBLE);
 
-    if (canAddComment() && !myComment)
-      setupReplyToComment(comment, position, holder);
+    if (canAddComment() && !myComment) setupReplyToComment(comment, position, holder);
     else {
-      if (myComment)
-        setupMyCommentOptions(comment, position, holder);
+      if (myComment) setupMyCommentOptions(comment, position, holder);
     }
   }
 
   private boolean isMyComment(Comment comment) {
     long userId = OperatingSite.getSite().userId;
-    if (userId > 0)
-      return (comment.owner != null && comment.owner.id == userId);
+    if (userId > 0) return (comment.owner != null && comment.owner.id == userId);
 
     return false;
   }
@@ -229,7 +222,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         LogWrapper.d(TAG, "Select comment for reply: " + selectedViewForReply.id);
 
         String draftText =
-            comment.owner.isRegistered() ? "@" + comment.owner.getDisplayName().replaceAll("\\s", "") : "";
+            comment.owner.isRegistered() ? "@" + comment.owner.getDisplayName().replaceAll("\\s", "") + " " : "";
         displayPostCommentFragment(comment.post_id, comment.id, draftText, false, addCommentResultReceiver);
         getListView().smoothScrollToPositionFromTop(position, 0);
       }
@@ -239,11 +232,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
   private void setupMyCommentOptions(Comment comment, int position, CommentViewHolder holder) {
     holder.commentEditOptions.setVisibility(View.VISIBLE);
 
-    if (canEditComment())
-      setupEditComment(comment, position, holder);
+    if (canEditComment()) setupEditComment(comment, position, holder);
 
-    if (canDelComment())
-      setupDeleteComment(comment.id, holder);
+    if (canDelComment()) setupDeleteComment(comment.id, holder);
   }
 
   private void setupEditComment(final Comment comment, final int position, final CommentViewHolder holder) {
@@ -264,8 +255,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
       private OnClickListener listener = new OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          if (which == DialogInterface.BUTTON_POSITIVE)
-            startServiceForDelComment(commentId);
+          if (which == DialogInterface.BUTTON_POSITIVE) startServiceForDelComment(commentId);
         }
       };
 
@@ -314,8 +304,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
   @Override
   public void onReceiveResult(int resultCode, Bundle resultData) {
     serviceRunning = false;
-    if (progressDialog != null && progressDialog.isShowing())
-      progressDialog.dismiss();
+    if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
 
     switch (resultCode) {
       case WriteIntentService.ACTION_ADD_COMMENT:
@@ -342,10 +331,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     if (requestCode == WriteIntentService.ACTION_ADD_COMMENT) {
       HttpException e = (HttpException) resultData.getSerializable(StringConstants.EXCEPTION);
       String errorMsg = "Request failed for unknown reason";
-      if (e != null)
-        postCommentFragment.setSendError(e.getErrorResponse());
-      else
-        postCommentFragment.setSendError(errorMsg);
+      if (e != null) postCommentFragment.setSendError(e.getErrorResponse());
+      else postCommentFragment.setSendError(errorMsg);
     }
   }
 
@@ -380,8 +367,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
       onCommentChangeListener.onCommentDelete(resultData.getLong(StringConstants.COMMENT_ID));
 
       itemListAdapter.notifyDataSetChanged();
-      if (comments.isEmpty())
-        removeSelf();
+      if (comments.isEmpty()) removeSelf();
 
     }
   }
@@ -404,21 +390,17 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
       RestQueryResultReceiver receiver) {
     postCommentFragment = (PostCommentFragment) getFragmentManager().findFragmentByTag("postCommentFragment");
 
-    if (postCommentFragment == null)
-      addPostCommentFragment();
+    if (postCommentFragment == null) addPostCommentFragment();
 
     postCommentFragment.setPostId(postId);
     postCommentFragment.setCommentId(commenId);
     postCommentFragment.setDraftText(draftText);
     postCommentFragment.setResultReceiver(receiver);
     postCommentFragment.setMyEdit(myEdit);
-    if (myEdit)
-      postCommentFragment.setTitle("Editing");
-    else
-      postCommentFragment.setTitle("Replying to comment");
+    if (myEdit) postCommentFragment.setTitle("Editing");
+    else postCommentFragment.setTitle("Replying to comment");
 
-    if (postCommentFragment.isVisible())
-      postCommentFragment.refreshView();
+    if (postCommentFragment.isVisible()) postCommentFragment.refreshView();
 
     postCommentFragmentContainer.setVisibility(View.VISIBLE);
   }

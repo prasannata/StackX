@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2013 Prasanna Thirumalai
+ Copyright (C) 2014 Prasanna Thirumalai
 
  This file is part of StackX.
 
@@ -54,7 +54,6 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackX
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
@@ -80,29 +79,23 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
     @Override
     public int getCount() {
-      if (question == null)
-        return 1;
-      else
-        return question.answers == null ? 1 : 1 + question.answers.size();
+      if (question == null) return 1;
+      else return question.answers == null ? 1 : 1 + question.answers.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-      if (position == 0)
-        return QuestionActivity.this.getString(R.string.question);
+      if (position == 0) return QuestionActivity.this.getString(R.string.question);
       else {
-        if (question.answers.get(position - 1).accepted)
-          return QuestionActivity.this.getString(R.string.accepted) + " "
-              + QuestionActivity.this.getString(R.string.answer);
-        else
-          return QuestionActivity.this.getString(R.string.answer) + " " + position;
+        if (question.answers.get(position - 1).accepted) return QuestionActivity.this.getString(R.string.accepted)
+            + " " + QuestionActivity.this.getString(R.string.answer);
+        else return QuestionActivity.this.getString(R.string.answer) + " " + position;
       }
     }
 
     @Override
     public Fragment getItem(int position) {
-      if (position == 0)
-        return QuestionActivity.this.questionFragment;
+      if (position == 0) return QuestionActivity.this.questionFragment;
       else {
         Fragment fragment = getFragmentManager().findFragmentByTag(getViewPagerFragmentTag(position));
 
@@ -125,15 +118,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     resultReceiver = new RestQueryResultReceiver(new Handler());
     resultReceiver.setReceiver(this);
 
-    if (questionFragment == null)
-      questionFragment = QuestionFragment.newFragment();
+    if (questionFragment == null) questionFragment = QuestionFragment.newFragment();
 
     setupViewPager();
 
-    if (savedInstanceState != null && savedInstanceState.getSerializable(StringConstants.QUESTION) != null)
-      question = (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
-    else
-      prepareIntentAndStartService();
+    if (savedInstanceState != null && savedInstanceState.getSerializable(StringConstants.QUESTION) != null) question =
+        (Question) savedInstanceState.getSerializable(StringConstants.QUESTION);
+    else prepareIntentAndStartService();
   }
 
   @Override
@@ -145,19 +136,19 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
   public boolean onPrepareOptionsMenu(Menu menu) {
     boolean ret = super.onPrepareOptionsMenu(menu);
 
-    if (menu != null)
-      enableAddCommentIfPermitted(menu);
+    if (menu != null) enableAddCommentIfPermitted(menu);
 
     return ret;
   }
 
   private void enableAddCommentIfPermitted(Menu menu) {
-    boolean canAddComment =
-        WritePermissionUtil.canAdd(getApplicationContext(), OperatingSite.getSite().apiSiteParameter,
-            ObjectType.COMMENT);
+    if (AppUtils.inAuthenticatedRealm(this)) {
+      boolean canAddComment =
+          WritePermissionUtil.canAdd(getApplicationContext(), getIntent().getStringExtra(StringConstants.SITE),
+              ObjectType.COMMENT);
 
-    if (AppUtils.inAuthenticatedRealm(this) && canAddComment)
-      setupAddComment(menu);
+      if (canAddComment) setupAddComment(menu);
+    }
   }
 
   private void setupAddComment(Menu menu) {
@@ -190,8 +181,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     postCommentFragment.setTitle(title);
     postCommentFragment.setResultReceiver(resultReceiver);
 
-    if (commentsDraft.get(fragmentTag) != null)
-      postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));
+    if (commentsDraft.get(fragmentTag) != null) postCommentFragment.setDraftText(commentsDraft.get(fragmentTag));
 
     FragmentTransaction transaction = getFragmentManager().beginTransaction();
     transaction.replace(R.id.fragmentContainer, postCommentFragment, fragmentTag);
@@ -225,8 +215,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     } else {
       Question metaDetails = (Question) getIntent().getSerializableExtra(StringConstants.QUESTION);
 
-      if (metaDetails != null)
-        question = Question.copyMetaDeta(metaDetails);
+      if (metaDetails != null) question = Question.copyMetaDeta(metaDetails);
 
       if (question != null) {
         questionFragment.setQuestion(question);
@@ -243,8 +232,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
   @Override
   public void onBackPressed() {
-    if (commentFragment != null && commentFragment.isVisible())
-      commentFragment.onBackPressed();
+    if (commentFragment != null && commentFragment.isVisible()) commentFragment.onBackPressed();
 
     super.onBackPressed();
     dismissPostCommentFragmentIfVisible(false);
@@ -252,8 +240,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
   @Override
   public void onSaveInstanceState(Bundle outState) {
-    if (question != null)
-      outState.putSerializable(StringConstants.QUESTION, question);
+    if (question != null) outState.putSerializable(StringConstants.QUESTION, question);
 
     super.onSaveInstanceState(outState);
   }
@@ -297,8 +284,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     if (postCommentFragment != null) {
       postCommentFragment.hideSoftKeyboard();
 
-      if (!finish)
-        commentsDraft.put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
+      if (!finish) commentsDraft.put(postCommentFragment.getTag(), postCommentFragment.getCurrentText());
 
       getFragmentManager().popBackStackImmediate();
       postCommentFragment = null;
@@ -314,15 +300,12 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
       case QuestionDetailsIntentService.RESULT_CODE_Q:
         question = (Question) resultData.getSerializable(StringConstants.QUESTION);
         displayQuestion();
-        if (question.answerCount > 0 && (question.answers == null || question.answers.isEmpty()))
-          startServiceForAnswers();
-        else
-          setProgressBarIndeterminateVisibility(false);
+        if (question.answerCount > 0 && (question.answers == null || question.answers.isEmpty())) startServiceForAnswers();
+        else setProgressBarIndeterminateVisibility(false);
         break;
       case QuestionDetailsIntentService.RESULT_CODE_Q_BODY:
         questionFragment.displayBody(resultData.getString(StringConstants.BODY));
-        if (question.answerCount == 0)
-          setProgressBarIndeterminateVisibility(false);
+        if (question.answerCount == 0) setProgressBarIndeterminateVisibility(false);
         break;
       case QuestionDetailsIntentService.RESULT_CODE_Q_COMMENTS:
         question.comments = (ArrayList<Comment>) resultData.getSerializable(StringConstants.COMMENTS);
@@ -352,14 +335,10 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     int requestCode = resultData.getInt(StringConstants.REQUEST_CODE, -1);
 
     if (requestCode == WriteIntentService.ACTION_ADD_COMMENT) {
-      PostCommentFragment lastPostCommentFragment =
-          (PostCommentFragment) getFragmentManager().findFragmentByTag("postCommentFragment");
-      if (lastPostCommentFragment != null)
-        lastPostCommentFragment.setSendError(e.getErrorResponse());
-      else if (postCommentFragment != null)
-        postCommentFragment.setSendError(e.getErrorResponse());
-    } else
-      AppUtils.getErrorView(this, e);
+      PostCommentFragment lastPostCommentFragment = findFragmentByTag("postCommentFragment", PostCommentFragment.class);
+      if (lastPostCommentFragment != null) lastPostCommentFragment.setSendError(e.getErrorResponse());
+      else if (postCommentFragment != null) postCommentFragment.setSendError(e.getErrorResponse());
+    } else AppUtils.getErrorView(this, e);
   }
 
   protected void addMyCommentToPost(Bundle resultData) {
@@ -367,14 +346,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
     Comment comment = (Comment) resultData.getSerializable(StringConstants.COMMENT);
     int viewPagerPosition = resultData.getInt(StringConstants.VIEW_PAGER_POSITION, -1);
     if (viewPagerPosition == 0) {
-      if (question.comments == null)
-        question.comments = new ArrayList<Comment>();
+      if (question.comments == null) question.comments = new ArrayList<Comment>();
 
       question.comments.add(comment);
       questionFragment.setComments(question.comments);
     } else {
       AnswerFragment answerFragment =
-          (AnswerFragment) getFragmentManager().findFragmentByTag(getViewPagerFragmentTag(viewPagerPosition));
+          findFragmentByTag(getViewPagerFragmentTag(viewPagerPosition), AnswerFragment.class);
       answerFragment.onCommentAdd(comment);
     }
   }
@@ -391,8 +369,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
   }
 
   private void displayQuestion() {
-    if (questionFragment == null)
-      questionFragment = QuestionFragment.newFragment();
+    if (questionFragment == null) questionFragment = QuestionFragment.newFragment();
 
     questionFragment.setAndDisplay(question);
     titlePageIndicator.notifyDataSetChanged();
@@ -401,11 +378,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
   private void displayAnswers(ArrayList<Answer> answers, boolean add) {
     if (answers != null && !answers.isEmpty()) {
-      if (question.answers == null)
-        question.answers = new ArrayList<Answer>();
+      if (question.answers == null) question.answers = new ArrayList<Answer>();
 
-      if (add && !StringConstants.QUESTION_ID.equals(getIntent().getAction()))
-        question.answers.addAll(answers);
+      if (add && !StringConstants.QUESTION_ID.equals(getIntent().getAction())) question.answers.addAll(answers);
 
       titlePageIndicator.notifyDataSetChanged();
       questionViewPageAdapter.notifyDataSetChanged();
@@ -439,8 +414,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
   @Override
   public void onShowComments() {
-    if (viewPager.getCurrentItem() == 0)
-      prepareCommentFragment(question.id, question.comments);
+    if (viewPager.getCurrentItem() == 0) prepareCommentFragment(question.id, question.comments);
     else {
       Answer answer = question.answers.get(viewPager.getCurrentItem() - 1);
       prepareCommentFragment(answer.id, answer.comments);
@@ -448,15 +422,13 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
   }
 
   private void prepareCommentFragment(long postId, ArrayList<Comment> comments) {
-    if (comments != null && !comments.isEmpty())
-      showCommentFragment(postId, comments);
-    else
-      Toast.makeText(this, "No comments", Toast.LENGTH_SHORT).show();
+    if (comments != null && !comments.isEmpty()) showCommentFragment(postId, comments);
+    else Toast.makeText(this, "No comments", Toast.LENGTH_SHORT).show();
   }
 
   private void showCommentFragment(long postId, ArrayList<Comment> comments) {
     String fragmentTag = postId + "-" + StringConstants.COMMENTS;
-    commentFragment = (CommentFragment) getFragmentManager().findFragmentByTag(fragmentTag);
+    commentFragment = findFragmentByTag(fragmentTag, CommentFragment.class);
 
     if (commentFragment == null) {
       commentFragment = new CommentFragment();
@@ -468,8 +440,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
       OnCommentChangeListener onCommentChangeListener =
           (OnCommentChangeListener) getFragmentManager().findFragmentByTag(currentViewPagerFragmentTag);
 
-      if (onCommentChangeListener != null)
-        commentFragment.setOnCommentChangeListener(onCommentChangeListener);
+      if (onCommentChangeListener != null) commentFragment.setOnCommentChangeListener(onCommentChangeListener);
     }
 
     FragmentTransaction transaction = getFragmentManager().beginTransaction();
