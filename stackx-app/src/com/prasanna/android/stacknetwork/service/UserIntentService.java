@@ -97,7 +97,7 @@ public class UserIntentService extends AbstractIntentService {
           receiver.send(GET_USER_ANSWERS, bundle);
           break;
         case GET_USER_INBOX:
-          bundle.putSerializable(StringConstants.INBOX_ITEMS, userService.getInbox(page));
+          bundle.putSerializable(StringConstants.INBOX_ITEMS, userService.getInbox(page, 25));
           receiver.send(GET_USER_INBOX, bundle);
           break;
         case GET_USER_UNREAD_INBOX:

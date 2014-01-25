@@ -254,14 +254,14 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
     return permissions;
   }
 
-  public StackXPage<InboxItem> getInbox(int page) {
+  public StackXPage<InboxItem> getInbox(int page, int pageSize) {
     String restEndPoint = "inbox";
 
     Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
     queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
     queryParams.put(StackUri.QueryParams.SORT, StackUri.Sort.ACTIVITY);
     queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page));
-    queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(StackUri.QueryParamDefaultValues.PAGE_SIZE));
+    queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf(pageSize));
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_INBOX_FILTER);
 
     return getInboxItems(restEndPoint, queryParams);
