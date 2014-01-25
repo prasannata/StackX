@@ -91,7 +91,8 @@
             android:gravity="left"
             android:textColor="@android:color/holo_blue_dark"
             android:textIsSelectable="false"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/itemCreationTime"
@@ -107,7 +108,8 @@
             android:gravity="right"
             android:textColor="@android:color/holo_blue_dark"
             android:textIsSelectable="false"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold" />
     </RelativeLayout>
 
 </FrameLayout>
