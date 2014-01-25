@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.prasanna.android</groupId>
         <artifactId>stackx</artifactId>
-        <version>1.1.2</version>
+        <version>1.1.17</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
