@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
 import org.junit.After;
 import org.robolectric.Robolectric;
 import org.robolectric.shadows.ShadowActivity;
@@ -60,11 +58,6 @@ public abstract class AbstractBaseActivityTest {
 
     if (registered)
       site.userType = UserType.REGISTERED;
-
-    if (hasWritePermission) {
-      site.writePermissions = new ArrayList<WritePermission>();
-      site.writePermissions.add(getWritePermission(ObjectType.COMMENT));
-    }
 
     return site;
   }

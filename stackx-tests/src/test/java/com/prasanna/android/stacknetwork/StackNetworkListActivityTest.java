@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
-import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -103,7 +102,6 @@ public class StackNetworkListActivityTest extends AbstractBaseListActivityTest<S
     assertEquals(site.name, siteNameView.getText().toString());
 
     assertRegisteredUserHint(site, view);
-    assertWritePermissionHint(site, view);
 
     ImageView isDefaultSiteImageView = (ImageView) view.findViewById(R.id.isDefaultSite);
     assertNotNull(isDefaultSiteImageView);
@@ -115,17 +113,6 @@ public class StackNetworkListActivityTest extends AbstractBaseListActivityTest<S
       assertTrue(view.findViewById(R.id.siteUserTypeRegistered).getVisibility() == View.GONE);
     else if (UserType.REGISTERED.equals(site.userType))
       assertTrue(view.findViewById(R.id.siteUserTypeRegistered).getVisibility() == View.VISIBLE);
-  }
-
-  private void assertWritePermissionHint(Site site, View view) {
-    if (site.writePermissions == null || site.writePermissions.isEmpty())
-      assertTrue(view.findViewById(R.id.writePermissionEnabled).getVisibility() == View.GONE);
-    else {
-      for (WritePermission writePermission : site.writePermissions) {
-        if (writePermission.canAdd && writePermission.canEdit && writePermission.canDelete)
-          assertTrue(view.findViewById(R.id.writePermissionEnabled).getVisibility() == View.VISIBLE);
-      }
-    }
   }
 
   private void assertGetUserSitesIntentServiceStarted(ShadowActivity shadowListActivity, boolean me) {
