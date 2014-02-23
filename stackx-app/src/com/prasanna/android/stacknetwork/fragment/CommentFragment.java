@@ -20,14 +20,12 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.database.SQLException;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -43,11 +41,8 @@ import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
 import com.prasanna.android.stacknetwork.model.Comment;
-import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.DialogBuilder;
@@ -58,7 +53,6 @@ import com.prasanna.android.utils.LogWrapper;
 public class CommentFragment extends ItemListFragment<Comment> implements ListItemView<Comment> {
   private static final String TAG = CommentFragment.class.getSimpleName();
   private ArrayList<Comment> comments;
-  private HashMap<ObjectType, WritePermission> writePermissions;
   private ProgressDialog progressDialog;
   private OnCommentChangeListener onCommentChangeListener;
   private RestQueryResultReceiver addCommentResultReceiver;
@@ -122,19 +116,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     getListView().setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
     getListView().setItemsCanFocus(true);
     getListView().setClickable(false);
-    getWritePermissions();
-  }
-
-  private void getWritePermissions() {
-    WritePermissionDAO writePermissionDAO = new WritePermissionDAO(getActivity());
-    try {
-      writePermissionDAO.open();
-      writePermissions = writePermissionDAO.getPermissions(OperatingSite.getSite().apiSiteParameter);
-    } catch (SQLException e) {
-      LogWrapper.d(TAG, e.getMessage());
-    } finally {
-      writePermissionDAO.close();
-    }
   }
 
   @Override
@@ -196,10 +177,8 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
 
     holder.commentWriteOptions.setVisibility(View.VISIBLE);
 
-    if (canAddComment() && !myComment) setupReplyToComment(comment, position, holder);
-    else {
-      if (myComment) setupMyCommentOptions(comment, position, holder);
-    }
+    if (myComment) setupMyCommentOptions(comment, position, holder);
+    else setupReplyToComment(comment, position, holder);
   }
 
   private boolean isMyComment(Comment comment) {
@@ -232,9 +211,9 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
   private void setupMyCommentOptions(Comment comment, int position, CommentViewHolder holder) {
     holder.commentEditOptions.setVisibility(View.VISIBLE);
 
-    if (canEditComment()) setupEditComment(comment, position, holder);
+    setupEditComment(comment, position, holder);
 
-    if (canDelComment()) setupDeleteComment(comment.id, holder);
+    setupDeleteComment(comment.id, holder);
   }
 
   private void setupEditComment(final Comment comment, final int position, final CommentViewHolder holder) {
@@ -264,22 +243,6 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
         DialogBuilder.yesNoDialog(getActivity(), R.string.sureQuestion, listener).show();
       }
     });
-  }
-
-  private boolean canAddComment() {
-    return (isValid(ObjectType.COMMENT) && writePermissions.get(ObjectType.COMMENT).canAdd);
-  }
-
-  private boolean canEditComment() {
-    return (isValid(ObjectType.COMMENT) && writePermissions.get(ObjectType.COMMENT).canEdit);
-  }
-
-  private boolean canDelComment() {
-    return (isValid(ObjectType.COMMENT) && writePermissions.get(ObjectType.COMMENT).canDelete);
-  }
-
-  private boolean isValid(ObjectType objectType) {
-    return objectType != null && writePermissions != null && writePermissions.containsKey(objectType);
   }
 
   public boolean hasNoComments() {

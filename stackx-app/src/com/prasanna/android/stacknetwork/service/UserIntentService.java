@@ -120,8 +120,7 @@ public class UserIntentService extends AbstractIntentService {
           break;
       }
 
-    }
-    catch (AbstractHttpException e) {
+    } catch (AbstractHttpException e) {
       if (receiver != null) {
         bundle.putSerializable(StringConstants.EXCEPTION, e);
         receiver.send(ERROR, bundle);
@@ -136,31 +135,24 @@ public class UserIntentService extends AbstractIntentService {
       try {
         profileDAO.open();
         User myProfile = null;
-        if (!refresh)
-          myProfile = profileDAO.getMe(site);
+        if (!refresh) myProfile = profileDAO.getMe(site);
 
-        if (myProfile == null)
-          userPage = getUserProfile(profileDAO, site);
+        if (myProfile == null) userPage = getUserProfile(profileDAO, site);
         else {
-          if (AppUtils.aHalfAnHourSince(myProfile.lastUpdateTime))
-            syncUserProfile(site);
+          if (AppUtils.aHalfAnHourSince(myProfile.lastUpdateTime)) syncUserProfile(site);
 
           userPage = new StackXPage<User>();
           userPage.items = new ArrayList<User>();
           userPage.items.add(myProfile);
         }
-      }
-      catch (SQLException e) {
+      } catch (SQLException e) {
         LogWrapper.e(TAG, e.getMessage());
-      }
-      finally {
+      } finally {
         profileDAO.close();
       }
 
       return userPage;
-    }
-    else
-      return userService.getUserById(userId, site);
+    } else return userService.getUserById(userId, site);
   }
 
   private void syncUserProfile(final String site) {
@@ -171,11 +163,9 @@ public class UserIntentService extends AbstractIntentService {
         try {
           profileDAO.open();
           getUserProfile(profileDAO, site);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
           LogWrapper.e(TAG, e.getMessage());
-        }
-        finally {
+        } finally {
           profileDAO.close();
         }
       }
@@ -183,8 +173,7 @@ public class UserIntentService extends AbstractIntentService {
   }
 
   private HashMap<String, Account> getUserAccounts(boolean me, StackXPage<User> userDetail) {
-    if (me)
-      return getMyAccounts();
+    if (me) return getMyAccounts();
 
     if (userDetail != null && userDetail.items != null && !userDetail.items.isEmpty())
       return userService.getAccount(userDetail.items.get(0).accountId);
@@ -197,8 +186,7 @@ public class UserIntentService extends AbstractIntentService {
     if (accountId != -1) {
       ArrayList<Account> accounts = UserAccountsDAO.get(getApplicationContext(), accountId);
 
-      if (accounts == null)
-        return userService.getMyAccount();
+      if (accounts == null) return userService.getMyAccount();
 
       HashMap<String, Account> accountsMap = new HashMap<String, Account>();
       if (accounts != null) {
@@ -247,13 +235,11 @@ public class UserIntentService extends AbstractIntentService {
   private ArrayList<Site> getUserSites(ResultReceiver receiver, boolean forAuthenicatedUser) {
     ArrayList<Site> sites = getSites();
 
-    if (sites != null && !sites.isEmpty())
-      return sites;
+    if (sites != null && !sites.isEmpty()) return sites;
 
     LinkedHashMap<String, Site> linkSitesMap = userService.getAllSitesInNetwork();
 
-    if (!forAuthenicatedUser)
-      return persistAndGetList(linkSitesMap);
+    if (!forAuthenicatedUser) return persistAndGetList(linkSitesMap);
 
     LinkedHashMap<String, Site> regSitesFirstMap = new LinkedHashMap<String, Site>();
     HashMap<String, Account> linkAccountsMap = userService.getMyAccount();
@@ -278,8 +264,6 @@ public class UserIntentService extends AbstractIntentService {
           Site site = linkSitesMap.get(siteUrl);
           site.userId = linkAccountsMap.get(siteUrl).userId;
           site.userType = linkAccountsMap.get(siteUrl).userType;
-          site.writePermissions = userService.getWritePermissions(site.apiSiteParameter);
-          DbRequestThreadExecutor.persistPermissions(getApplicationContext(), site, site.writePermissions);
           regSitesFirstMap.put(siteUrl, site);
           linkSitesMap.remove(siteUrl);
         }
@@ -297,11 +281,9 @@ public class UserIntentService extends AbstractIntentService {
     try {
       siteDAO.open();
       return siteDAO.getSites();
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    finally {
+    } finally {
       siteDAO.close();
     }
 

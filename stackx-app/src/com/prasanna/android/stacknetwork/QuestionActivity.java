@@ -48,7 +48,6 @@ import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
@@ -57,7 +56,6 @@ import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
-import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
 import com.viewpagerindicator.TitlePageIndicator;
 
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
@@ -163,12 +161,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
       MenuItem favorite = setupFavoriteActionBarIcon();
       favorite.setVisible(true);
       menu.findItem(R.id.menu_refresh).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
-      boolean canAddComment =
-          WritePermissionUtil.canAdd(getApplicationContext(), getIntent().getStringExtra(StringConstants.SITE),
-              ObjectType.COMMENT);
-
-      if (canAddComment) setupAddComment(menu);
+      setupAddComment(menu);
     }
   }
 
@@ -190,7 +183,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
       else intent.putExtra(StringConstants.ACTION, QuestionDetailsIntentService.FAVORITE);
       intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
       intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
-      intent.putExtra(StringConstants.QUESTION_ID, question.id);
+      intent.putExtra(StringConstants.ID, question.id);
       startService(intent);
       serviceRunningForFavorite = true;
     }

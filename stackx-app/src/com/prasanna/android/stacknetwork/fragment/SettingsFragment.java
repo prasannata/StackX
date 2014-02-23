@@ -19,11 +19,9 @@
 
 package com.prasanna.android.stacknetwork.fragment;
 
-import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -39,9 +37,6 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.prasanna.android.stacknetwork.LogoutActivity;
@@ -70,7 +65,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
   public static final String KEY_PREF_NUM_SAVED_SEARCHES = "pref_numSavedSearches";
   public static final String KEY_PREF_RO_APP_VERSION = "pref_ro_appVersion";
   public static final String KEY_PREF_WRITE_RESTRICTIONS = "pref_write_restrictions";
-  public static final String PREFIX_KEY_PREF_WRITE_PERMISSION = "pref_writePermission_";
 
   private static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
   private static final String KEY_PREF_RATE_APP = "pref_rateApp";
@@ -253,7 +247,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
 
   private void setupAboutPreference() {
     setupVersionSummary();
-    setupWriteRestrictionSummary();
   }
 
   private void setupVersionSummary() {
@@ -261,54 +254,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
     appVersionROPref.setEntryValues(new String[0]);
     appVersionROPref.setEntries(new String[0]);
     appVersionROPref.setSummary(getAppVersion());
-  }
-
-  private void setupWriteRestrictionSummary() {
-    final ListPreference writeRestrictionsPref = (ListPreference) findPreference(KEY_PREF_WRITE_RESTRICTIONS);
-    writeRestrictionsPref.setEntryValues(new String[0]);
-    writeRestrictionsPref.setEntries(new String[0]);
-    writeRestrictionsPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-      @Override
-      public boolean onPreferenceClick(Preference preference) {
-        if (writeRestrictionsPref.getDialog() != null) {
-          writeRestrictionsPref.getDialog().dismiss();
-          showDialog(getWebView());
-          return true;
-        }
-
-        return false;
-      }
-
-      private WebView getWebView() {
-        WebView webView = new WebView(getActivity());
-        webView.setWebChromeClient(new WebChromeClient());
-        webView.setWebViewClient(new WebViewClient() {
-          public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url != null && url.startsWith("http://")) {
-              view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-              return true;
-            }
-
-            return false;
-          }
-        });
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl("file:///android_asset/write_permissions.html");
-        return webView;
-      }
-
-      private void showDialog(WebView webView) {
-        AlertDialog alertDialog = DialogBuilder.okDialog(getActivity(), webView, new OnClickListener() {
-
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            dialog.dismiss();
-          }
-        });
-        alertDialog.show();
-      }
-    });
   }
 
   private String getAppVersion() {

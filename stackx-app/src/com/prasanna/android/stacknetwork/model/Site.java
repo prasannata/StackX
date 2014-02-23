@@ -20,7 +20,6 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,8 +50,6 @@ public class Site implements Serializable {
   public String faviconUrl;
 
   public UserType userType = UserType.DOES_NOT_EXIST;
-
-  public ArrayList<WritePermission> writePermissions;
 
   public long userId = -1;
 

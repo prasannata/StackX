@@ -28,17 +28,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import android.content.Context;
-import android.database.SQLException;
 
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.SearchCriteriaDomain;
 import com.prasanna.android.stacknetwork.model.Site;
-import com.prasanna.android.stacknetwork.model.WritePermission;
 import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.utils.LogWrapper;
 
 public class DbRequestThreadExecutor {
@@ -60,56 +57,6 @@ public class DbRequestThreadExecutor {
         UserAccountsDAO.insertAll(context, accounts);
       }
     });
-  }
-
-  public static void persistPermissions(final Context context, final Site site,
-      final ArrayList<WritePermission> permissions) {
-    AppUtils.runOnBackgroundThread(new Runnable() {
-      @Override
-      public void run() {
-        persistPermissionsInCurrentThread(context, site, permissions);
-      }
-    });
-  }
-
-  public static void persistPermissionsInCurrentThread(final Context context, final Site site,
-      final ArrayList<WritePermission> permissions) {
-    WritePermissionDAO writePermissionDAO = new WritePermissionDAO(context);
-
-    try {
-      writePermissionDAO.open();
-      writePermissionDAO.insert(site, permissions);
-
-      for (WritePermission permission : permissions) {
-        if (permission.objectType != null)
-          switchOnObjectType(context, permission);
-      }
-    }
-    catch (SQLException e) {
-      LogWrapper.e(TAG, e.getMessage());
-    }
-    finally {
-      writePermissionDAO.close();
-    }
-  }
-
-  private static void switchOnObjectType(final Context context, final WritePermission permission) {
-    switch (permission.objectType) {
-      case ANSWER:
-        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_ANSWER_WRITE,
-            permission.minSecondsBetweenActions);
-        break;
-      case COMMENT:
-        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_COMMENT_WRITE,
-            permission.minSecondsBetweenActions);
-        break;
-      case QUESTION:
-        SharedPreferencesUtil.setLong(context, WritePermission.PREF_SECS_BETWEEN_QUESTION_WRITE,
-            permission.minSecondsBetweenActions);
-        break;
-      default:
-        break;
-    }
   }
 
   public static HashMap<String, SearchCriteria> getSearchesMarkedForTab(final Context context, final String site) {

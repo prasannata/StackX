@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -37,7 +37,6 @@ import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AlarmUtils;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
@@ -83,8 +82,7 @@ public class LogoutActivity extends Activity {
     super.onStop();
     try {
       unregisterReceiver(receiver);
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       LogWrapper.d(TAG, e.getMessage());
     }
   }
@@ -126,15 +124,13 @@ public class LogoutActivity extends Activity {
 
       clearDatabase();
       CookieManager.getInstance().removeAllCookie();
-      
-      SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);    
+
+      SharedPreferencesUtil.remove(getApplicationContext(), StringConstants.USER_ID);
       startLoginActivity();
-    }
-    else if (error != null && error.id > 0) {
+    } else if (error != null && error.id > 0) {
       LogWrapper.d(TAG, "Logout failed with " + error.message);
       finish();
-    }
-    else {
+    } else {
       LogWrapper.d(TAG, "Logout failed for unknown reason");
       finish();
     }
@@ -143,7 +139,6 @@ public class LogoutActivity extends Activity {
   private void clearDatabase() {
     SiteDAO.deleteAll(getApplicationContext());
     TagDAO.deleteAll(getApplicationContext());
-    WritePermissionDAO.deleteAll(getApplicationContext());
     ProfileDAO.deleteAll(getApplicationContext());
   }
 }

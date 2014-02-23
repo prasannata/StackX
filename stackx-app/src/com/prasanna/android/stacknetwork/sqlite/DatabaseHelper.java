@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -28,13 +28,12 @@ import com.prasanna.android.stacknetwork.sqlite.SearchCriteriaDAO.SearchCriteria
 import com.prasanna.android.stacknetwork.sqlite.SiteDAO.SiteTable;
 import com.prasanna.android.stacknetwork.sqlite.TagDAO.TagsTable;
 import com.prasanna.android.stacknetwork.sqlite.UserAccountsDAO.UserAccountsTable;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO.WritePermissionTable;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
   public static final String TABLE_AUDIT = "AUDIT";
 
   private static final String DATABASE_NAME = "stackx.db";
-  private static final int DATABASE_VERSION = 1;
+  private static final int DATABASE_VERSION = 2;
 
   public static final class AuditTable {
     public static final String COLUMN_ID = "_id";
@@ -56,7 +55,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     db.execSQL(SiteTable.CREATE_TABLE);
     db.execSQL(TagsTable.CREATE_TABLE);
     db.execSQL(AuditTable.CREATE_TABLE);
-    db.execSQL(WritePermissionTable.CREATE_TABLE);
     db.execSQL(ProfileTable.CREATE_TABLE);
     db.execSQL(UserAccountsTable.CREATE_TABLE);
     db.execSQL(SearchCriteriaTable.CREATE_TABLE);
@@ -64,6 +62,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    // TODO Auto-generated method stub
+    if (oldVersion == 1 && newVersion == 2) db.delete("WRITE_PERMISSION", null, null);
   }
 }

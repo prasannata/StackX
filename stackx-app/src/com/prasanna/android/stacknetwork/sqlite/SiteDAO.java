@@ -30,8 +30,6 @@ import android.database.SQLException;
 import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
-import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.utils.LogWrapper;
 
@@ -214,26 +212,10 @@ public class SiteDAO extends AbstractBaseDao {
       String userType = cursor.getString(cursor.getColumnIndex(SiteTable.COLUMN_USER_TYPE));
       site.userType = UserType.getEnum(userType);
     }
-    site.userId = cursor.getLong(cursor.getColumnIndex(SiteTable.COLUMN_USER_ID));
-    site.writePermissions = getWritePermission(site.apiSiteParameter);
+    site.userId = cursor.getLong(cursor.getColumnIndex(SiteTable.COLUMN_USER_ID));    
     return site;
   }
-
-  private ArrayList<WritePermission> getWritePermission(String apiSiteParameter) {
-    WritePermissionDAO dao = new WritePermissionDAO(context);
-    try {
-      dao.openReadOnly();
-      HashMap<ObjectType, WritePermission> permissions = dao.getPermissions(apiSiteParameter);
-      if (permissions != null)
-        return new ArrayList<WritePermission>(permissions.values());
-    }
-    finally {
-      dao.close();
-    }
-
-    return null;
-  }
-
+  
   public void deleteAll() {
     getDatabase().delete(TABLE_NAME, null, null);
     deleteAuditEntry(AUDIT_ENTRY_TYPE, null);
