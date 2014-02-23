@@ -28,14 +28,30 @@
         android:src="@drawable/menu_overflow" />
 
     <TextView
-        android:id="@+id/itemTitle"
+        android:id="@+id/itemBountyAmount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/scoreAndAns"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="2dp"
-        android:layout_toLeftOf="@id/itemContextMenu"
         android:layout_toRightOf="@id/scoreAndAns"
+        android:background="@color/skyBlue"
+        android:gravity="center"
+        android:padding="3dp"
+        android:textColor="@color/white"
+        android:textIsSelectable="false"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/itemTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/scoreAndAns"
+        android:layout_marginRight="2dp"
+        android:layout_toLeftOf="@id/itemContextMenu"
+        android:layout_toRightOf="@id/itemBountyAmount"
         android:textColor="@color/black"
         android:textIsSelectable="false"
         android:textSize="18sp" />

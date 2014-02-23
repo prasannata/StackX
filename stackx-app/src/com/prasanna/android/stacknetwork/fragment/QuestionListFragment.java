@@ -75,7 +75,6 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
       if (QuestionsIntentService.GET_QUESTIONS_FOR_TAG != intentAction || questionTag == null
           || !questionTag.equals(tag)) super.onTagClick(context, tag);
     }
-
   }
 
   public static QuestionListFragment newFragment(int action, String tag, String sort) {
@@ -150,7 +149,7 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
   @Override
   public void onResume() {
     super.onResume();
-    
+
     findActionAndStartService();
   }
 
@@ -167,6 +166,9 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
       switch (action) {
         case QuestionsIntentService.GET_FRONT_PAGE:
           getFrontPage();
+          break;
+        case QuestionsIntentService.GET_FEATURED:
+          getFeaturedQuestions();
           break;
         case QuestionsIntentService.GET_FAQ_FOR_TAG:
           getFaqsForTag();
@@ -242,10 +244,18 @@ public class QuestionListFragment extends AbstractQuestionListFragment {
   }
 
   private void getFrontPage() {
+    getQuestions(QuestionsIntentService.GET_FRONT_PAGE);
+  }
+
+  private void getFeaturedQuestions() {
+    getQuestions(QuestionsIntentService.GET_FEATURED);
+  }
+
+  private void getQuestions(final int action) {
     intent = getIntentForService(QuestionsIntentService.class, null);
 
     if (intent != null) {
-      intent.putExtra(StringConstants.ACTION, QuestionsIntentService.GET_FRONT_PAGE);
+      intent.putExtra(StringConstants.ACTION, action);
       startIntentService();
     }
   }

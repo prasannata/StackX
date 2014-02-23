@@ -151,6 +151,13 @@ public class QuestionFragment extends AbstractVotableFragment implements OnComme
       TextView textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
       textView.setText(Html.fromHtml(question.title));
 
+      if (question.bountyAmount > 0) {
+        textView = (TextView) parentLayout.findViewById(R.id.questionBountyAmount);
+        textView.setText(Html.fromHtml(question.title));
+        textView.setText("+" + String.valueOf(question.bountyAmount));
+        textView.setVisibility(View.VISIBLE);
+      }
+
       String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ") : "";
       textView = (TextView) parentLayout.findViewById(R.id.questionOwner);
       textView.setText(getTimeAndOwnerDisplay(acceptRate));
@@ -331,7 +338,7 @@ public class QuestionFragment extends AbstractVotableFragment implements OnComme
   private void removeQuestionFromCache() {
     if (QuestionsCache.getInstance().containsKey(question.id)) QuestionsCache.getInstance().remove(question.id);
   }
-  
+
   @Override
   protected void onScoreChange(int newScore) {
     scoreTextView.setText(AppUtils.formatNumber(newScore));

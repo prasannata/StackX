@@ -38,6 +38,7 @@ public class QuestionsIntentService extends AbstractIntentService {
   public static final int GET_SIMILAR = 0x505;
   public static final int SEARCH = 0x506;
   public static final int SEARCH_ADVANCED = 0x507;
+  public static final int GET_FEATURED = 0x508;
 
   private QuestionServiceHelper questionService = QuestionServiceHelper.getInstance();
 
@@ -64,6 +65,10 @@ public class QuestionsIntentService extends AbstractIntentService {
         case GET_FRONT_PAGE:
           LogWrapper.d(TAG, "Get front page");
           bundle.putSerializable(StringConstants.QUESTIONS, questionService.getAllQuestions(sort, page));
+          break;
+        case GET_FEATURED:
+          LogWrapper.d(TAG, "Get Featured questions");
+          bundle.putSerializable(StringConstants.QUESTIONS, questionService.getFeatured(page));
           break;
         case GET_FAQ_FOR_TAG:
           String tag = intent.getStringExtra(StringConstants.TAG);
@@ -101,8 +106,7 @@ public class QuestionsIntentService extends AbstractIntentService {
       }
 
       receiver.send(0, bundle);
-    }
-    catch (AbstractHttpException e) {
+    } catch (AbstractHttpException e) {
       bundle.putSerializable(StringConstants.EXCEPTION, e);
       receiver.send(ERROR, bundle);
     }

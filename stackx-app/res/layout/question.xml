@@ -43,13 +43,29 @@
                     android:src="@drawable/menu_overflow" />
 
                 <TextView
+                    android:id="@+id/questionBountyAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/scoreAndAns"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_toRightOf="@id/scoreAndAns"
+                    android:background="@color/skyBlue"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:textColor="@color/white"
+                    android:textIsSelectable="false"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/questionTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginBottom="10dp"                    
                     android:layout_toLeftOf="@id/questionOptionsContextMenu"
-                    android:layout_toRightOf="@id/scoreAndAns"
+                    android:layout_toRightOf="@id/questionBountyAmount"
                     android:textColor="@color/black"
                     android:textIsSelectable="true"
                     android:textSize="14sp" />

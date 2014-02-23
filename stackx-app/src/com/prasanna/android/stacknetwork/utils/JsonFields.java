@@ -49,6 +49,7 @@ public class JsonFields {
     public static final String UPVOTED = "upvoted";
     public static final String DOWNVOTED = "downvoted";
     public static final String FAVORITED = "favorited";
+    public static final String BOUNTY_AMOUNT = "bounty_amount";
   }
 
   public static class Answer extends CommonFields {

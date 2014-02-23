@@ -14,7 +14,7 @@
         android:background="@drawable/selector_list_item"
         android:orientation="vertical" >
 
-        <include layout="@layout/item_title" />
+        <include layout="@layout/question_title" />
 
         <RelativeLayout
             android:id="@+id/questionCountLinearLayout"

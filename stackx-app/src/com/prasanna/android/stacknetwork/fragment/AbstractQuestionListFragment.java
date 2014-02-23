@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -55,6 +55,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
     TextView answerCount;
     TextView views;
     TextView owner;
+    TextView bountyAmount;
     ArrayList<TextView> tagViews;
     TextView answerCountAnswered;
     ImageView quickActionImg;
@@ -104,11 +105,15 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
       holder.title = (TextView) questionRowLayout.findViewById(R.id.itemTitle);
       holder.views = (TextView) questionRowLayout.findViewById(R.id.questionViewsValue);
       holder.owner = (TextView) questionRowLayout.findViewById(R.id.questionOwner);
+      holder.bountyAmount = (TextView) questionRowLayout.findViewById(R.id.itemBountyAmount);
       holder.quickActionImg = (ImageView) questionRowLayout.findViewById(R.id.itemContextMenu);
       questionRowLayout.setTag(holder);
+    } else holder = (QuestionViewHolder) questionRowLayout.getTag();
+
+    if (question.bountyAmount > 0) {
+      holder.bountyAmount.setText("+" + String.valueOf(question.bountyAmount));
+      holder.bountyAmount.setVisibility(View.VISIBLE);
     }
-    else
-      holder = (QuestionViewHolder) questionRowLayout.getTag();
 
     questionRowLayout.setId((int) question.id);
     setValuesForQuestionView(holder, question);
@@ -147,8 +152,7 @@ public abstract class AbstractQuestionListFragment extends ItemListFragment<Ques
       holder.answerCountAnswered.setText(AppUtils.formatNumber(question.answerCount));
       holder.answerCountAnswered.setVisibility(View.VISIBLE);
       holder.answerCount.setVisibility(View.GONE);
-    }
-    else {
+    } else {
       holder.answerCount.setText(AppUtils.formatNumber(question.answerCount));
       holder.answerCount.setVisibility(View.VISIBLE);
       holder.answerCountAnswered.setVisibility(View.GONE);

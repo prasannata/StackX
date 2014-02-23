@@ -162,6 +162,7 @@ public abstract class AbstractBaseServiceHelper {
     question.upvoted = jsonObject.getBoolean(JsonFields.Question.UPVOTED);
     question.downvoted = jsonObject.getBoolean(JsonFields.Question.DOWNVOTED);
     question.favorited = jsonObject.getBoolean(JsonFields.Question.FAVORITED);
+    question.bountyAmount = jsonObject.getInt(JsonFields.Question.BOUNTY_AMOUNT);
     question.creationDate = jsonObject.getLong(JsonFields.Question.CREATION_DATE);
     question.link = jsonObject.getString(JsonFields.Question.LINK);
 

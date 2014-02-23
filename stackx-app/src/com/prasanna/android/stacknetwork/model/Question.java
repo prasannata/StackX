@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -26,8 +26,7 @@ public class Question extends VotablePost implements Serializable {
   private static final long serialVersionUID = -4722553914475051236L;
 
   public static Question copyMetaDeta(Question that) {
-    if (that == null)
-      return null;
+    if (that == null) return null;
 
     Question question = new Question();
     question.id = that.id;
@@ -44,6 +43,8 @@ public class Question extends VotablePost implements Serializable {
     question.downvoted = that.downvoted;
     question.favorited = that.favorited;
     question.hasAcceptedAnswer = that.hasAcceptedAnswer;
+    question.bountyAmount = that.bountyAmount;
+
     if (that.tags != null) {
       question.tags = new String[that.tags.length];
       for (int i = 0; i < that.tags.length; i++)
@@ -70,10 +71,12 @@ public class Question extends VotablePost implements Serializable {
   public boolean answered = false;
 
   public boolean hasAcceptedAnswer = false;
-  
+
   public boolean favorited = false;
-  
+
   public final PostType postType = PostType.QUESTION;
+
+  public int bountyAmount = 0;
 
   @Override
   public int hashCode() {
@@ -85,15 +88,11 @@ public class Question extends VotablePost implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     Answer other = (Answer) obj;
-    if (id != other.id)
-      return false;
+    if (id != other.id) return false;
     return true;
   }
 }

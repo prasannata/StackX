@@ -50,6 +50,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public class QuestionsActivity extends AbstractUserActionBarActivity implements OnTagSelectListener {
   private static final String TAB_TITLE_ACTIVE = "Active";
   private static final String TAB_TITLE_NEW = "New";
+  private static final String TAB_TITLE_FEATURED = "Featured";
   private static final String TAB_TITLE_MOST_VOTED = "Most Voted";
   private static final String TAB_TITLE_FAQ = "FAQ";
   private static final String LAST_SELECTED_TAB = "last_selected_tab";
@@ -132,6 +133,7 @@ public class QuestionsActivity extends AbstractUserActionBarActivity implements 
 
     createTab(TAB_TITLE_ACTIVE, QuestionListFragment.newFragment(action, tag, Sort.ACTIVITY), true);
     createTab(TAB_TITLE_NEW, QuestionListFragment.newFragment(action, tag, Sort.CREATION), false);
+    createTab(TAB_TITLE_FEATURED, QuestionListFragment.newFragment(QuestionsIntentService.GET_FEATURED, tag), false);
     createTab(TAB_TITLE_MOST_VOTED, QuestionListFragment.newFragment(action, tag, Sort.VOTES), false);
 
     if (!frontPage) {
