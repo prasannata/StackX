@@ -33,6 +33,22 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 public abstract class AbstractIntentService extends IntentService {
   public static final int ERROR = -1;
 
+  public static final class VotingActions {
+    public static final int UPVOTE = 0x702;
+    public static final int UPVOTE_UNDO = 0x703;
+    public static final int DOWNVOTE = 0x704;
+    public static final int DOWNVOTE_UNDO = 0x705;
+    public static final int UPVOTE_UNDO_DOWNVOTE = 0x706;
+    public static final int DOWNVOTE_UNDO_UPVOTE = 0x707;
+
+    public static final int RESULT_CODE_UPVOTE_SUCCESS = 0x708;
+    public static final int RESULT_CODE_UPVOTE_UNDO_SUCCESS = 0x709;
+    public static final int RESULT_CODE_DOWNVOTE_SUCCESS = 0x710;
+    public static final int RESULT_CODE_DOWNVOTE_UNDO_SUCCESS = 0x711;
+    public static final int RESULT_CODE_DOWNVOTE_UNDO_UPVOTE_SUCCESS = 0x712;
+    public static final int RESULT_CODE_UPVOTE_UNDO_DOWNVOTE_SUCCESS = 0x713;
+  }
+
   public AbstractIntentService(String name) {
     super(name);
   }

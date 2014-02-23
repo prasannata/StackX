@@ -54,6 +54,7 @@ import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackX
 import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.service.WriteIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.SharedPreferencesUtil;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.WritePermissionUtil;
@@ -62,6 +63,7 @@ import com.viewpagerindicator.TitlePageIndicator;
 public class QuestionActivity extends AbstractUserActionBarActivity implements OnPageChangeListener,
     StackXRestQueryResultReceiver, PageSelectAdapter, OnShowCommentsListener {
   private boolean serviceRunningForAnswers = false;
+  private boolean serviceRunningForFavorite = false;
   private Question question;
   private QuestionViewPageAdapter questionViewPageAdapter;
   private ViewPager viewPager;
@@ -71,6 +73,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
   private CommentFragment commentFragment;
   private PostCommentFragment postCommentFragment;
   private HashMap<String, String> commentsDraft = new HashMap<String, String>();
+  private Menu menu;
 
   public class QuestionViewPageAdapter extends FragmentPagerAdapter {
     public QuestionViewPageAdapter(FragmentManager fm) {
@@ -100,7 +103,8 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         Fragment fragment = getFragmentManager().findFragmentByTag(getViewPagerFragmentTag(position));
 
         if (fragment == null)
-          return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this);
+          return AnswerFragment.newFragment(question.answers.get(position - 1), QuestionActivity.this,
+              question.owner.id == OperatingSite.getSite().userId, question.hasAcceptedAnswer);
 
         return fragment;
       }
@@ -136,18 +140,59 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
   public boolean onPrepareOptionsMenu(Menu menu) {
     boolean ret = super.onPrepareOptionsMenu(menu);
 
-    if (menu != null) enableAddCommentIfPermitted(menu);
+    if (menu != null) {
+      this.menu = menu;
+      setupMenuIfAuthenticatedUser();
+    }
 
     return ret;
   }
 
-  private void enableAddCommentIfPermitted(Menu menu) {
+  private MenuItem setupFavoriteActionBarIcon() {
+    MenuItem favorite = menu.findItem(R.id.menu_favorite);
+    if (question != null && question.favorited) {
+      favorite.setIcon(R.drawable.favorited);
+    } else {
+      favorite.setIcon(R.drawable.favorite);
+    }
+    return favorite;
+  }
+
+  private void setupMenuIfAuthenticatedUser() {
     if (AppUtils.inAuthenticatedRealm(this)) {
+      MenuItem favorite = setupFavoriteActionBarIcon();
+      favorite.setVisible(true);
+      menu.findItem(R.id.menu_refresh).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+
       boolean canAddComment =
           WritePermissionUtil.canAdd(getApplicationContext(), getIntent().getStringExtra(StringConstants.SITE),
               ObjectType.COMMENT);
 
       if (canAddComment) setupAddComment(menu);
+    }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.menu_favorite:
+        startServiceToFavoriteQuestion();
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
+  }
+
+  private void startServiceToFavoriteQuestion() {
+    if (!serviceRunningForFavorite) {
+      Intent intent = new Intent(this, QuestionDetailsIntentService.class);
+      if (question.favorited) intent.putExtra(StringConstants.ACTION, QuestionDetailsIntentService.FAVORITE_UNDO);
+      else intent.putExtra(StringConstants.ACTION, QuestionDetailsIntentService.FAVORITE);
+      intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+      intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
+      intent.putExtra(StringConstants.QUESTION_ID, question.id);
+      startService(intent);
+      serviceRunningForFavorite = true;
     }
   }
 
@@ -202,6 +247,7 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
   private void prepareIntentAndStartService() {
     Intent intent = new Intent(this, QuestionDetailsIntentService.class);
+    intent.putExtra(StringConstants.ACTION, QuestionDetailsIntentService.QA);
     intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
 
     setProgressBarIndeterminateVisibility(true);
@@ -320,7 +366,19 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
         dismissPostCommentFragmentIfVisible(true);
         addMyCommentToPost(resultData);
         break;
+      case QuestionDetailsIntentService.RESULT_CODE_FAVORITE_SUCCESS:
+        serviceRunningForFavorite = false;
+        question.favorited = true;
+        setupFavoriteActionBarIcon();
+        break;
+      case QuestionDetailsIntentService.RESULT_CODE_FAVORITE_UNDO_SUCCESS:
+        serviceRunningForFavorite = false;
+        question.favorited = false;
+        setupFavoriteActionBarIcon();
+        break;
       case QuestionDetailsIntentService.ERROR:
+        if (serviceRunningForAnswers) serviceRunningForAnswers = false;
+        if (serviceRunningForFavorite) serviceRunningForFavorite = false;
         handleError(resultData);
         break;
       default:
@@ -359,8 +417,9 @@ public class QuestionActivity extends AbstractUserActionBarActivity implements O
 
   private void startServiceForAnswers() {
     Intent intent = new Intent(this, QuestionDetailsIntentService.class);
-    intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
     intent.setAction(StringConstants.ANSWERS);
+    intent.putExtra(StringConstants.ACTION, QuestionDetailsIntentService.QA);
+    intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
     intent.putExtra(StringConstants.SITE, getIntent().getStringExtra(StringConstants.SITE));
     intent.putExtra(StringConstants.QUESTION_ID, question.id);
     intent.putExtra(StringConstants.PAGE, getNextPageNumber());

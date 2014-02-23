@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -21,7 +21,7 @@ package com.prasanna.android.stacknetwork.utils;
 
 public class StackUri {
   public static final String OAUTH_DIALOG_URL = "https://stackexchange.com/oauth/dialog";
-  public static final String STACKX_API_HOST = "https://api.stackexchange.com/2.1";
+  public static final String STACKX_API_HOST = "https://api.stackexchange.com/2.2";
 
   public static class QueryParams {
     public static final String SITE = "site";
@@ -46,16 +46,17 @@ public class StackUri {
     public static final int PAGE_SIZE = 15;
     public static final int ANSWERS_PAGE_SIZE = 10;
     public static final String ORDER = "desc";
-    public static final String ITEM_DETAIL_FILTER = "!3*iPiFr7(VGAKJ6prx)I3ltcurP4fM*3vsE-9WUttiJsXw";
+    public static final String DEFAULT_FILTER = "default";
+    public static final String COLLECTION_FILTER = "!)r(UklJydkr9N6a-Q2gg";
+    public static final String ITEM_DETAIL_FILTER = "!9aMz979rkLNvEtm-gX70M.YWXodU)2gsgRenveU4XIunO)*0KsgmpeTtDO*";
     public static final String USER_DETAIL_FILTER = "!-q2RdWJy";
     public static final String USER_INBOX_FILTER = "!-q2RaosI";
     public static final String COMMENT_FILTER = "!-.mgWN4RPTQu";
     public static final String NETWORK_USER_TYPE_FILTER = "!-q2RbCAp";
     public static final String CLIENT_ID = "202";
     public static final String KEY = "Nt8I5NbbbzXXPPVwE0ujRg((";
-    public static final String SCOPE = "read_inbox,no_expiry,write_access";
+    public static final String SCOPE = "read_inbox,no_expiry,write_access,private_info";
     public static final String REDIRECT_URI = "https://stackexchange.com/oauth/login_success";
-    public static final String DEFAULT_FILTER = "default";
   }
 
   public static class Sort {

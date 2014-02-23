@@ -20,6 +20,11 @@
             android:layout_marginRight="3dp"
             android:layout_marginTop="2dp" >
 
+            <include
+                android:id="@+id/score_layout"
+                android:layout_alignParentLeft="true"
+                layout="@layout/score" />
+
             <ImageView
                 android:id="@+id/answerOptionsContextMenu"
                 android:layout_width="wrap_content"
@@ -31,18 +36,6 @@
                 android:src="@drawable/menu_overflow" />
 
             <TextView
-                android:id="@+id/answerScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/rounded_border_delft"
-                android:gravity="center"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="12sp" />
-
-            <TextView
                 android:id="@+id/answerAuthor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -50,7 +43,7 @@
                 android:layout_alignTop="@id/answerOptionsContextMenu"
                 android:layout_marginLeft="4dp"
                 android:layout_toLeftOf="@id/answerOptionsContextMenu"
-                android:layout_toRightOf="@id/answerScore"
+                android:layout_toRightOf="@id/score_layout"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textIsSelectable="false"
@@ -100,6 +93,27 @@
         android:layout_marginLeft="7dp"
         android:background="@drawable/selector_highlight"
         android:src="@drawable/dark_32x32_question_mark" />
+
+    <ImageView
+        android:id="@+id/acceptAnswer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/selector_highlight"
+        android:src="@drawable/answer_accept"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/answerAccepted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/answer_accepted"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/qTitleLayout"

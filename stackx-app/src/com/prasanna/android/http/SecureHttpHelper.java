@@ -39,6 +39,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -119,11 +120,9 @@ public class SecureHttpHelper {
       try {
         HttpResponse response = createSecureHttpClient().execute(getHttpGetObject(absoluteUrl));
         return getBitmap(response);
-      }
-      catch (ClientProtocolException e) {
+      } catch (ClientProtocolException e) {
         LogWrapper.e(TAG, e.getMessage());
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         LogWrapper.e(TAG, e.getMessage());
       }
 
@@ -142,7 +141,8 @@ public class SecureHttpHelper {
       for (Map.Entry<String, String> entry : requestHeaders.entrySet())
         request.setHeader(entry.getKey(), entry.getValue());
     }
-    request.setEntity(httpEntity);
+
+    if (httpEntity != null) request.setEntity(httpEntity);
     return executeRequest(getHttpClient(httpResponseInterceptor), request, responseBodyParser);
   }
 
@@ -162,24 +162,20 @@ public class SecureHttpHelper {
       String responseBody = EntityUtils.toString(entity, HTTP.UTF_8);
       int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-      if (statusCode == HttpStatus.SC_OK)
-        return responseBodyParser.parse(responseBody);
+      if (statusCode == HttpStatus.SC_OK) return responseBodyParser.parse(responseBody);
       else {
         LogWrapper.d(TAG, "Http request failed: " + statusCode + ", " + responseBody);
 
-        if (statusCode >= HttpErrorFamily.SERVER_ERROR)
-          throw new ServerException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), responseBody);
+        if (statusCode >= HttpErrorFamily.SERVER_ERROR) throw new ServerException(statusCode, httpResponse
+            .getStatusLine().getReasonPhrase(), responseBody);
         else if (statusCode >= HttpErrorFamily.CLIENT_ERROR)
           throw new ClientException(statusCode, httpResponse.getStatusLine().getReasonPhrase(), responseBody);
       }
-    }
-    catch (ClientProtocolException e) {
+    } catch (ClientProtocolException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (HttpResponseParseException e) {
+    } catch (HttpResponseParseException e) {
       throw new ClientException(ClientErrorCode.RESPONSE_PARSE_ERROR, e.getCause());
     }
 
@@ -188,8 +184,7 @@ public class SecureHttpHelper {
 
   private HttpClient getHttpClient(HttpResponseInterceptor httpResponseInterceptor) {
     HttpClient client = createSecureHttpClient();
-    if (httpResponseInterceptor != null)
-      ((DefaultHttpClient) client).addResponseInterceptor(httpResponseInterceptor);
+    if (httpResponseInterceptor != null) ((DefaultHttpClient) client).addResponseInterceptor(httpResponseInterceptor);
     return client;
   }
 
@@ -209,23 +204,17 @@ public class SecureHttpHelper {
       schemeRegistry.register(new Scheme(SCHEME_HTTP, PlainSocketFactory.getSocketFactory(), HTTP_PORT));
 
       return new DefaultHttpClient(new SingleClientConnManager(params, schemeRegistry), params);
-    }
-    catch (KeyManagementException e) {
+    } catch (KeyManagementException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (UnrecoverableKeyException e) {
+    } catch (UnrecoverableKeyException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (KeyStoreException e) {
+    } catch (KeyStoreException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (NoSuchAlgorithmException e) {
+    } catch (NoSuchAlgorithmException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (CertificateException e) {
+    } catch (CertificateException e) {
       LogWrapper.e(TAG, e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       LogWrapper.e(TAG, e.getMessage());
     }
 
@@ -255,6 +244,10 @@ public class SecureHttpHelper {
 
   protected HttpPost getHttpPostObject(String absoluteUrl) {
     return new HttpPost(absoluteUrl);
+  }
+
+  protected HttpPut getHttpPutObject(String absoluteUrl) {
+    return new HttpPut(absoluteUrl);
   }
 
 }

@@ -31,15 +31,6 @@
         android:textIsSelectable="false"
         android:textSize="18sp" />
 
-    <ImageView
-        android:id="@+id/writePermissionEnabled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="2dp"
-        android:src="@drawable/dark_24x24_edit"
-        android:visibility="gone" />
-
     <TextView
         android:id="@+id/siteUserTypeRegistered"
         android:layout_width="wrap_content"

@@ -180,7 +180,7 @@ public class InboxItemActivity extends AbstractUserActionBarActivity implements 
     Intent getAnswerIntent = new Intent(this, AnswersIntentService.class);
     getAnswerIntent.putExtra(StringConstants.SITE, item.site.apiSiteParameter);
     getAnswerIntent.putExtra(StringConstants.ACTION, AnswersIntentService.GET_ANSWER);
-    getAnswerIntent.putExtra(StringConstants.ANSWER_ID, item.answerId);
+    getAnswerIntent.putExtra(StringConstants.ID, item.answerId);
     getAnswerIntent.putExtra(StringConstants.RESULT_RECEIVER, receiver);
     startService(getAnswerIntent);
     setProgressBarIndeterminateVisibility(true);

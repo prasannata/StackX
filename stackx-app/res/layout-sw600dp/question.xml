@@ -29,7 +29,7 @@
                 <include
                     android:id="@+id/scoreAndAns"
                     android:layout_alignParentLeft="true"
-                    layout="@layout/score_answer_count" />
+                    layout="@layout/score" />
 
                 <ImageView
                     android:id="@+id/questionOptionsContextMenu"

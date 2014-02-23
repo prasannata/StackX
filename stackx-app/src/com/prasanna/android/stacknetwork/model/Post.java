@@ -33,6 +33,7 @@ public class Post extends IdentifiableItem implements Serializable {
   private static final String TAG = Post.class.getSimpleName();
 
   public enum PostType {
+    COMMENT("comment"),
     QUESTION("question"),
     ANSWER("answer");
 

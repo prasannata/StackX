@@ -29,6 +29,7 @@ import android.os.ResultReceiver;
 import com.prasanna.android.http.AbstractHttpException;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.model.Post.PostType;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.utils.QuestionsCache;
@@ -45,6 +46,12 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
   public static final int RESULT_CODE_Q_COMMENTS = 0x03;
   public static final int RESULT_CODE_ANSWERS = 0x04;
   public static final int RESULT_CODE_Q_CACHED = 0x05;
+  public static final int RESULT_CODE_FAVORITE_SUCCESS = 0x10;
+  public static final int RESULT_CODE_FAVORITE_UNDO_SUCCESS = 0x11;
+
+  public static final int QA = 0x1001;
+  public static final int FAVORITE = 0x1002;
+  public static final int FAVORITE_UNDO = 0x1003;
 
   public QuestionDetailsIntentService() {
     this(TAG);
@@ -57,19 +64,63 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
   @Override
   protected void onHandleIntent(Intent intent) {
     final ResultReceiver receiver = intent.getParcelableExtra(StringConstants.RESULT_RECEIVER);
+    final int action = intent.getIntExtra(StringConstants.ACTION, -1);
+    final long questionId = intent.getLongExtra(StringConstants.ID, 0);
+    final String site = intent.getStringExtra(StringConstants.SITE);
 
     try {
-      super.onHandleIntent(intent);
-      handleIntent(intent, receiver);
-    }
-    catch (AbstractHttpException e) {
+      switch (action) {
+        case QA:
+          getQuestion(intent, receiver);
+          break;
+        case VotingActions.UPVOTE:
+          sendSerializable(receiver, VotingActions.RESULT_CODE_UPVOTE_SUCCESS, StringConstants.SCORE,
+              questionService.upvote(PostType.QUESTION, site, questionId));
+          break;
+        case VotingActions.UPVOTE_UNDO:
+          sendSerializable(receiver, VotingActions.RESULT_CODE_UPVOTE_UNDO_SUCCESS, StringConstants.SCORE,
+              questionService.undoUpvote(PostType.QUESTION, site, questionId));
+          break;
+        case VotingActions.DOWNVOTE:
+          sendSerializable(receiver, VotingActions.RESULT_CODE_DOWNVOTE_SUCCESS, StringConstants.SCORE,
+              questionService.downvote(PostType.QUESTION, site, questionId));
+          break;
+        case VotingActions.DOWNVOTE_UNDO:
+          sendSerializable(receiver, VotingActions.RESULT_CODE_DOWNVOTE_UNDO_SUCCESS, StringConstants.SCORE,
+              questionService.undoDownvote(PostType.QUESTION, site, questionId));
+          break;
+        case VotingActions.UPVOTE_UNDO_DOWNVOTE:
+          questionService.undoUpvote(PostType.QUESTION, site, questionId);
+          sendSerializable(receiver, VotingActions.RESULT_CODE_UPVOTE_UNDO_DOWNVOTE_SUCCESS, StringConstants.SCORE,
+              questionService.downvote(PostType.QUESTION, site, questionId));
+          break;
+        case VotingActions.DOWNVOTE_UNDO_UPVOTE:
+          questionService.undoDownvote(PostType.QUESTION, site, questionId);
+          sendSerializable(receiver, VotingActions.RESULT_CODE_DOWNVOTE_UNDO_UPVOTE_SUCCESS, StringConstants.SCORE,
+              questionService.upvote(PostType.QUESTION, site, questionId));
+          break;
+
+        case FAVORITE:
+          questionService.favorite(site, questionId);
+          sendSerializable(receiver, RESULT_CODE_FAVORITE_SUCCESS, null, null);
+          break;
+        case FAVORITE_UNDO:
+          questionService.undoFavorite(site, questionId);
+          sendSerializable(receiver, RESULT_CODE_FAVORITE_UNDO_SUCCESS, null, null);
+          break;
+        default:
+          sendSerializable(receiver, ERROR, "reason", "unrecognizable action");
+          break;
+      }
+
+    } catch (AbstractHttpException e) {
       Bundle bundle = new Bundle();
       bundle.putSerializable(StringConstants.EXCEPTION, e);
       receiver.send(ERROR, bundle);
     }
   }
 
-  private void handleIntent(Intent intent, ResultReceiver receiver) {
+  private void getQuestion(Intent intent, ResultReceiver receiver) {
     final String action = intent.getAction();
 
     if (action != null) {
@@ -78,10 +129,8 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
         int page = intent.getIntExtra(StringConstants.PAGE, 0);
         final String site = intent.getStringExtra(StringConstants.SITE);
 
-        if (questionId > 0 && page > 0)
-          getAnswersForQuestion(receiver, site, questionId, page);
-      }
-      else {
+        if (questionId > 0 && page > 0) getAnswersForQuestion(receiver, site, questionId, page);
+      } else {
         getQuestionDetail(receiver, intent);
       }
     }
@@ -105,13 +154,11 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
     if (question != null) {
       LogWrapper.d(TAG, "Question " + questionId + " recovered from cache.");
       sendSerializable(receiver, RESULT_CODE_Q_CACHED, StringConstants.QUESTION, question);
-    }
-    else {
+    } else {
       if (StringConstants.QUESTION.equals(intent.getAction())) {
         question = (Question) intent.getSerializableExtra(StringConstants.QUESTION);
         getQuestionAndAnswers(site, receiver, question);
-      }
-      else {
+      } else {
         LogWrapper.d(TAG, "Get question for " + questionId + " in " + site);
         question = getQuestionMetaAndBodyAndSend(site, receiver, questionId);
       }
@@ -126,8 +173,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
 
     getCommentsAndSend(site, receiver, question);
 
-    if (question.answerCount > 0)
-      question.answers = getAnswersAndSend(receiver, site, question.id, 1);
+    if (question.answerCount > 0) question.answers = getAnswersAndSend(receiver, site, question.id, 1);
   }
 
   private void getCommentsAndSend(String site, ResultReceiver receiver, Question question) {
@@ -138,8 +184,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
         question.comments = commentsPage.items;
         sendSerializable(receiver, RESULT_CODE_Q_COMMENTS, StringConstants.COMMENTS, question.comments);
       }
-    }
-    catch (AbstractHttpException e) {
+    } catch (AbstractHttpException e) {
       LogWrapper.e(TAG, e.getMessage());
     }
   }
@@ -159,7 +204,7 @@ public class QuestionDetailsIntentService extends AbstractIntentService {
 
   private void sendSerializable(ResultReceiver receiver, int resultCode, String key, Serializable value) {
     Bundle bundle = new Bundle();
-    bundle.putSerializable(key, value);
+    if (key != null && value != null) bundle.putSerializable(key, value);
     receiver.send(resultCode, bundle);
   }
 

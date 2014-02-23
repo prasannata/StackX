@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -20,9 +20,11 @@
 package com.prasanna.android.stacknetwork.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +43,9 @@ import com.prasanna.android.stacknetwork.model.User.UserType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
+import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
+import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
 import com.prasanna.android.utils.LogWrapper;
 
 public abstract class AbstractBaseServiceHelper {
@@ -55,8 +59,7 @@ public abstract class AbstractBaseServiceHelper {
     public JSONObjectWrapper parse(String responseBody) throws HttpResponseParseException {
       try {
         return new JSONObjectWrapper(new JSONObject(responseBody));
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         throw new HttpResponseParseException(e);
       }
     }
@@ -136,8 +139,7 @@ public abstract class AbstractBaseServiceHelper {
           try {
             JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
             page.items.add(getSerializedQuestionObject(jsonObject));
-          }
-          catch (JSONException e) {
+          } catch (JSONException e) {
             LogWrapper.d(getLogTag(), e.getMessage());
           }
         }
@@ -157,11 +159,13 @@ public abstract class AbstractBaseServiceHelper {
     question.answerCount = jsonObject.getInt(JsonFields.Question.ANSWER_COUNT);
     question.viewCount = jsonObject.getInt(JsonFields.Question.VIEW_COUNT);
     question.tags = getTags(jsonObject);
+    question.upvoted = jsonObject.getBoolean(JsonFields.Question.UPVOTED);
+    question.downvoted = jsonObject.getBoolean(JsonFields.Question.DOWNVOTED);
+    question.favorited = jsonObject.getBoolean(JsonFields.Question.FAVORITED);
     question.creationDate = jsonObject.getLong(JsonFields.Question.CREATION_DATE);
     question.link = jsonObject.getString(JsonFields.Question.LINK);
 
-    if (jsonObject.has(JsonFields.Question.ACCEPTED_ANSWER_ID))
-      question.hasAcceptedAnswer = true;
+    if (jsonObject.has(JsonFields.Question.ACCEPTED_ANSWER_ID)) question.hasAcceptedAnswer = true;
 
     question.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Question.OWNER));
     return question;
@@ -192,7 +196,8 @@ public abstract class AbstractBaseServiceHelper {
     answer.score = jsonObject.getInt(JsonFields.Answer.SCORE);
     answer.creationDate = jsonObject.getLong(JsonFields.Answer.CREATION_DATE);
     answer.accepted = jsonObject.getBoolean(JsonFields.Answer.IS_ACCEPTED);
-
+    answer.upvoted = jsonObject.getBoolean(JsonFields.Answer.UPVOTED);
+    answer.downvoted = jsonObject.getBoolean(JsonFields.Answer.DOWNVOTED);
     answer.owner = getSerializableUserSnippetObject(jsonObject.getJSONObject(JsonFields.Answer.OWNER));
     return answer;
   }
@@ -218,8 +223,7 @@ public abstract class AbstractBaseServiceHelper {
     if (jsonArray != null && jsonArray.length() > index) {
       try {
         wrapperObject = (T) jsonArray.get(index);
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         Log.w(getLogTag(), e.getMessage());
       }
     }
@@ -227,12 +231,21 @@ public abstract class AbstractBaseServiceHelper {
     return wrapperObject;
   }
 
+  protected List<BasicNameValuePair> getBasicNameValuePartListForPost() {
+    List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.loadAccessToken(null)));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
+    parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
+    return parameters;
+  }
+  
   protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams) {
     return getHttpHelper().executeHttpGet(StackUri.STACKX_API_HOST, restEndPoint, queryParams,
         SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
   }
-
-  protected JSONObjectWrapper executeHttpPostequest(String restEndPoint, Map<String, String> requestHeaders,
+  
+  protected JSONObjectWrapper executeHttpPostRequest(String restEndPoint, Map<String, String> requestHeaders,
       Map<String, String> queryParams, HttpEntity httpEntity) {
     return getHttpHelper().executeHttpPost(StackUri.STACKX_API_HOST, restEndPoint, requestHeaders, queryParams,
         httpEntity, SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
@@ -241,7 +254,9 @@ public abstract class AbstractBaseServiceHelper {
 
   protected Map<String, String> getDefaultQueryParams(String apiSiteParameter) {
     Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
-    queryParams.put(StackUri.QueryParams.SITE, apiSiteParameter);
+    if (apiSiteParameter != null) {
+      queryParams.put(StackUri.QueryParams.SITE, apiSiteParameter);
+    }
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
     return queryParams;
   }

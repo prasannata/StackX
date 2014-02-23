@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -91,8 +92,7 @@ public class AppUtils {
       File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
       if (dir.exists() && dir.isDirectory()) {
         File file = new File(dir, StringConstants.SITE);
-        if (file.exists() && file.isFile())
-          return (Site) SharedPreferencesUtil.readObject(file);
+        if (file.exists() && file.isFile()) return (Site) SharedPreferencesUtil.readObject(file);
       }
     }
 
@@ -104,32 +104,27 @@ public class AppUtils {
       File dir = new File(context.getCacheDir(), StringConstants.DEFAULTS);
       if (dir.exists() && dir.isDirectory()) {
         File file = new File(dir, StringConstants.SITE);
-        if (file.exists() && file.isFile())
-          SharedPreferencesUtil.deleteFile(file);
+        if (file.exists() && file.isFile()) SharedPreferencesUtil.deleteFile(file);
       }
     }
   }
 
   public static String createEmailBody(final Post post) {
     final StringBuilder stringBuilder = new StringBuilder();
-    if (post.link != null)
-      stringBuilder.append(post.link + "\n\n");
+    if (post.link != null) stringBuilder.append(post.link + "\n\n");
 
-    if (post.body != null)
-      stringBuilder.append(post.body + "\n\n");
+    if (post.body != null) stringBuilder.append(post.body + "\n\n");
 
     stringBuilder.append(EMAIL_FOOTNOTE);
     return stringBuilder.toString();
   }
 
-  
   public static String createEmailBody(final String body) {
     return body + "\n\n" + EMAIL_FOOTNOTE;
   }
-  
+
   public static String formatReputation(int reputation) {
-    if (reputation > 0)
-      return formatNumber(reputation);
+    if (reputation > 0) return formatNumber(reputation);
 
     return "";
   }
@@ -137,10 +132,8 @@ public class AppUtils {
   public static String formatNumber(int number) {
     String reputationString = "";
 
-    if (number > 10000)
-      reputationString += String.format("%.1fk", ((float) number) / 1000f);
-    else
-      reputationString += number;
+    if (number > 10000) reputationString += String.format("%.1fk", ((float) number) / 1000f);
+    else reputationString += number;
 
     return reputationString;
   }
@@ -162,6 +155,7 @@ public class AppUtils {
     if (accessToken != null) {
       queryParams.put(StackUri.QueryParams.ACCESS_TOKEN, accessToken);
       queryParams.put(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY);
+      queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COLLECTION_FILTER);
     }
 
     return queryParams;
@@ -173,8 +167,7 @@ public class AppUtils {
   }
 
   public static boolean allowedToWrite(Context context) {
-    if (context == null)
-      return false;
+    if (context == null) return false;
 
     long lastCommentWrite = SharedPreferencesUtil.getLong(context, WritePermission.PREF_LAST_COMMENT_WRITE, 0);
     long minSecondsBetweenWrite =
@@ -202,12 +195,9 @@ public class AppUtils {
     if (e != null) {
       if (e.getCode() == null) {
         StackXError error = StackXError.deserialize(e.getErrorResponse());
-        if (error != null)
-          errorMsg = error.name;
-        else
-          errorMsg = e.getStatusCode() + " " + e.getStatusDescription();
-      } else
-        errorMsg = e.getCode().getDescription();
+        if (error != null) errorMsg = error.name;
+        else errorMsg = e.getStatusCode() + " " + e.getStatusDescription();
+      } else errorMsg = e.getCode().getDescription();
     }
     return errorMsg;
   }
@@ -223,10 +213,8 @@ public class AppUtils {
   private static void toggleSoftInput(Context context, View v, boolean hide) {
     if (context != null && v != null) {
       InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-      if (hide)
-        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-      else
-        imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+      if (hide) imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+      else imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
     }
   }
 
@@ -250,8 +238,7 @@ public class AppUtils {
   public static void decrementNumSavedSearches(Context context) {
     long num = getNumSavedSearches(context);
 
-    if (num > 0)
-      SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, --num);
+    if (num > 0) SharedPreferencesUtil.setLong(context, SettingsFragment.KEY_PREF_NUM_SAVED_SEARCHES, --num);
   }
 
   public static void decrementNumSavedSearches(Context context, int by) {
@@ -282,10 +269,23 @@ public class AppUtils {
   }
 
   public static boolean isNetworkAvailable(Context context) {
-    if (context == null)
-      return false;
+    if (context == null) return false;
 
     ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnectedOrConnecting();
+  }
+
+  public static void prepareUpvote(final boolean upvoted, final ImageView imageView) {
+    prepareUpDownVote(imageView, upvoted, R.drawable.arrow_up_orange);
+  }
+
+  public static void prepareDownvote(final boolean downvoted, final ImageView imageView) {
+    prepareUpDownVote(imageView, downvoted, R.drawable.arrow_down_orange);
+  }
+
+  private static void prepareUpDownVote(final ImageView imageView, final boolean isSet, final int setResId) {
+    if (isSet) {
+      imageView.setImageResource(setResId);
+    }
   }
 }

@@ -24,6 +24,8 @@ public class StringConstants {
 
   public static String SORT = "sort";
 
+  public static String SCORE = "score";
+
   public static final String ACCESS_TOKEN = "access_token";
   public static final String AUTHENTICATED = "authenticated";
 
@@ -40,7 +42,6 @@ public class StringConstants {
   public static final String QUESTIONS = "questions";
 
   public static final String ANSWER = "answer";
-  public static final String ANSWER_ID = "answer_id";
   public static final String ANSWERS = "answers";
   public static final String ANSWER_COUNT = "answer_count";
 
@@ -95,6 +96,10 @@ public class StringConstants {
   public static final String REQUEST_CODE = "request_code";
 
   public static final String VIEW_PAGER_POSITION = "view_pager_position";
+
+  public static final String POST_TYPE = "post_type";
+
+  public static final String ID = "id";
 
   public static final class HttpError {
     public static final String CODE = "code";

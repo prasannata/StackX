@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -47,13 +47,10 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
-import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.service.UserIntentService;
 import com.prasanna.android.stacknetwork.sqlite.ProfileDAO;
-import com.prasanna.android.stacknetwork.sqlite.WritePermissionDAO;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.OperatingSite;
@@ -90,11 +87,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
       try {
         profileDAO.open();
         profileDAO.updateMyAvatar(OperatingSite.getSite().apiSiteParameter, params[0]);
-      }
-      catch (SQLException e) {
+      } catch (SQLException e) {
         LogWrapper.e(TAG, e.getMessage());
-      }
-      finally {
+      } finally {
         profileDAO.close();
       }
       return null;
@@ -121,8 +116,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
       userId = savedInstanceState.getLong(StringConstants.USER_ID);
       site = (Site) savedInstanceState.getSerializable(StringConstants.SITE);
       forceRefresh = false;
-    }
-    else {
+    } else {
       me = getActivity().getIntent().getBooleanExtra(StringConstants.ME, false);
       userId = getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L);
       site = (Site) getActivity().getIntent().getSerializableExtra(StringConstants.SITE);
@@ -144,12 +138,10 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   public void onResume() {
     super.onResume();
 
-    if (user == null)
-      startUserProfileService();
+    if (user == null) startUserProfileService();
     else {
       showUserDetail();
       showUserAccounts();
-      showWritePermissions();
     }
   }
 
@@ -175,8 +167,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
   private void showUserDetail() {
     if (user != null && profileHomeLayout != null) {
-      if (isAdded())
-        getActivity().getActionBar().setTitle(Html.fromHtml(user.getDisplayName()) + "'s profile");
+      if (isAdded()) getActivity().getActionBar().setTitle(Html.fromHtml(user.getDisplayName()) + "'s profile");
 
       profileHomeLayout.findViewById(R.id.userProfile).setVisibility(View.VISIBLE);
 
@@ -200,10 +191,8 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     textView.setText(getString(R.string.views) + " " + user.profileViews);
 
     textView = (TextView) profileHomeLayout.findViewById(R.id.profileAcceptRate);
-    if (user.acceptRate > -1)
-      textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
-    else
-      textView.setVisibility(View.GONE);
+    if (user.acceptRate > -1) textView.setText(getString(R.string.acceptRate) + " " + user.acceptRate + "%");
+    else textView.setVisibility(View.GONE);
 
     textView = (TextView) profileHomeLayout.findViewById(R.id.profileUserLastSeen);
     textView.setText(getString(R.string.lastSeen) + " " + DateTimeUtils.getElapsedDurationSince(user.lastAccessTime));
@@ -238,38 +227,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     textView.setText(getString(R.string.downvotes) + " " + String.valueOf(user.downvoteCount));
   }
 
-  private void showWritePermissions() {
-    if (me && user != null && profileHomeLayout != null) {
-      profileHomeLayout.findViewById(R.id.writePermissions).setVisibility(View.VISIBLE);
-
-      ((TextView) profileHomeLayout.findViewById(R.id.writePermissionsInfo)).setText(Html
-          .fromHtml(getString(R.string.writePermissionsInfo)));
-
-      HashMap<ObjectType, WritePermission> permissions =
-          WritePermissionDAO.getPermissions(getActivity(), OperatingSite.getSite().apiSiteParameter);
-      WritePermission writePermission = permissions.get(ObjectType.COMMENT);
-
-      if (writePermission != null) {
-        if (writePermission.canAdd)
-          ((TextView) profileHomeLayout.findViewById(R.id.canAddComment)).setText(getString(R.string.yes));
-
-        if (writePermission.canEdit)
-          ((TextView) profileHomeLayout.findViewById(R.id.canEditComment)).setText(getString(R.string.yes));
-
-        if (writePermission.canDelete)
-          ((TextView) profileHomeLayout.findViewById(R.id.canDelComment)).setText(getString(R.string.yes));
-
-        ((TextView) profileHomeLayout.findViewById(R.id.numCommentActionsPerDay)).setText(String
-            .valueOf(writePermission.maxDailyActions));
-      }
-    }
-  }
-
   private void getAndDisplayUserAvatar() {
-    if (user.avatar == null)
-      runAsyncTaskToGetAvatar();
-    else
-      displayAvatar(user.avatar);
+    if (user.avatar == null) runAsyncTaskToGetAvatar();
+    else displayAvatar(user.avatar);
   }
 
   private void runAsyncTaskToGetAvatar() {
@@ -283,8 +243,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
             displayAvatar(result);
             avatarProgressBar.setVisibility(View.GONE);
 
-            if (me)
-              new PersistMyAvatarAsyncTask(appContext).execute(result);
+            if (me) new PersistMyAvatarAsyncTask(appContext).execute(result);
           }
 
         };
@@ -312,8 +271,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
   @Override
   public void onReceiveResult(int resultCode, Bundle resultData) {
-    if (isAdded() && isVisible())
-      getActivity().setProgressBarIndeterminateVisibility(false);
+    if (isAdded() && isVisible()) getActivity().setProgressBarIndeterminateVisibility(false);
 
     switch (resultCode) {
       case UserIntentService.GET_USER_PROFILE:
@@ -338,14 +296,11 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
       HashMap<String, Account> accounts =
           (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
       if (accounts != null) {
-        if (user.accounts == null)
-          user.accounts = new ArrayList<Account>();
+        if (user.accounts == null) user.accounts = new ArrayList<Account>();
 
         user.accounts.addAll(accounts.values());
         showUserAccounts();
       }
-
-      showWritePermissions();
     }
   }
 }

@@ -294,7 +294,7 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
     progressDialog = new ProgressDialog(getActivity(), R.style.dialogNoText);
     progressDialog.show();
 
-    Intent intent = new Intent(getActivity(), WriteIntentService.class);
+    Intent intent = new Intent(getActivity().getApplicationContext(), WriteIntentService.class);
     intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
     intent.putExtra(StringConstants.COMMENT_ID, commentId);
     intent.putExtra(StringConstants.ACTION, WriteIntentService.ACTION_DEL_COMMENT);
@@ -426,5 +426,4 @@ public class CommentFragment extends ItemListFragment<Comment> implements ListIt
   protected void loadNextPage() {
 
   }
-
 }

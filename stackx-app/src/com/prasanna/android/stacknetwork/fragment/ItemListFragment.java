@@ -86,13 +86,11 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (resultReceiver == null)
-      resultReceiver = new RestQueryResultReceiver(new Handler());
+    if (resultReceiver == null) resultReceiver = new RestQueryResultReceiver(new Handler());
 
     resultReceiver.setReceiver(this);
 
-    if (pages == null)
-      pages = new ArrayList<StackXPage<T>>();
+    if (pages == null) pages = new ArrayList<StackXPage<T>>();
   }
 
   @SuppressWarnings("unchecked")
@@ -109,8 +107,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
 
     if (savedInstanceState != null) {
       items = (ArrayList<T>) savedInstanceState.getSerializable(StringConstants.ITEMS);
-      if (items != null)
-        itemListAdapter.addAll(items);
+      if (items != null) itemListAdapter.addAll(items);
     }
   }
 
@@ -119,11 +116,9 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     super.onResume();
 
     if (itemListAdapter != null) {
-      if (itemListAdapter.getCount() > 0)
-        itemListAdapter.notifyDataSetChanged();
+      if (itemListAdapter.getCount() > 0) itemListAdapter.notifyDataSetChanged();
       else {
-        if (items != null && !items.isEmpty())
-          itemListAdapter.addAll(items);
+        if (items != null && !items.isEmpty()) itemListAdapter.addAll(items);
       }
     }
   }
@@ -143,8 +138,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
   protected Intent getIntentForService(Class<?> clazz, String action) {
     if (!serviceRunning) {
       Intent intentForService = new Intent(applicationContext, clazz);
-      if (action != null)
-        intentForService.setAction(action);
+      if (action != null) intentForService.setAction(action);
       return intentForService;
     }
 
@@ -155,9 +149,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     if (!isServiceRunning() && intent != null) {
       getActivity().startService(intent);
       serviceRunning = true;
-    }
-    else
-      dismissProgressBar();
+    } else dismissProgressBar();
   }
 
   protected void stopService(Intent intent) {
@@ -178,12 +170,10 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
   }
 
   protected void removeErrorViewIfShown() {
-    if (getListView().getVisibility() == View.GONE)
-      getListView().setVisibility(View.VISIBLE);
+    if (getListView().getVisibility() == View.GONE) getListView().setVisibility(View.VISIBLE);
 
     View errorView = getParentLayout().findViewById(R.id.errorLayout);
-    if (errorView != null)
-      getParentLayout().removeView(errorView);
+    if (errorView != null) getParentLayout().removeView(errorView);
   }
 
   @SuppressWarnings("unchecked")
@@ -193,8 +183,8 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
 
     dismissProgressBar();
 
-    if (resultCode == AbstractIntentService.ERROR)
-      onHttpError((HttpException) resultData.getSerializable(StringConstants.EXCEPTION));
+    if (resultCode == AbstractIntentService.ERROR) onHttpError((HttpException) resultData
+        .getSerializable(StringConstants.EXCEPTION));
     else {
       currentPageObject = (StackXPage<T>) resultData.getSerializable(getReceiverExtraName());
       if (currentPageObject != null) {
@@ -206,17 +196,14 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
 
   private void displayItems(ArrayList<T> newItems) {
     if (itemListAdapter != null && newItems != null) {
-      if (items == null)
-        items = new ArrayList<T>();
+      if (items == null) items = new ArrayList<T>();
 
       items.addAll(newItems);
       if (items.isEmpty()) {
-        if (emptyItemsTextView == null)
-          emptyItemsTextView = (TextView) itemsContainer.findViewById(R.id.emptyItems);
+        if (emptyItemsTextView == null) emptyItemsTextView = (TextView) itemsContainer.findViewById(R.id.emptyItems);
 
         emptyItemsTextView.setVisibility(View.VISIBLE);
-      }
-      else {
+      } else {
         itemListAdapter.addAll(newItems);
         if (emptyItemsTextView != null && View.VISIBLE == emptyItemsTextView.getVisibility())
           emptyItemsTextView.setVisibility(View.GONE);
@@ -227,12 +214,10 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
   private void onHttpError(HttpException e) {
     LogWrapper.d(TAG, "Http error " + e.getStatusCode() + " " + e.getErrorResponse());
 
-    if (activityCreated)
-      getListView().setVisibility(View.GONE);
+    if (activityCreated) getListView().setVisibility(View.GONE);
 
     View errorLayout = getParentLayout().findViewById(R.id.errorLayout);
-    if (errorLayout == null)
-      getParentLayout().addView(AppUtils.getErrorView(applicationContext, e));
+    if (errorLayout == null) getParentLayout().addView(AppUtils.getErrorView(applicationContext, e));
     else {
       TextView textView = (TextView) errorLayout.findViewById(R.id.errorMsg);
       textView.setText(AppUtils.getStackXErrorMsg(e));
@@ -243,8 +228,7 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
   public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
     if (!isServiceRunning() && totalItemCount >= StackUri.QueryParamDefaultValues.PAGE_SIZE
         && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1)) {
-      if (currentPageObject != null && currentPageObject.hasMore)
-        loadNextPage();
+      if (currentPageObject != null && currentPageObject.hasMore) loadNextPage();
     }
   }
 

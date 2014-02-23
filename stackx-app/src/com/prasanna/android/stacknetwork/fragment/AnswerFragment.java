@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -43,6 +43,7 @@ import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowComments
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.service.AnswersIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
@@ -52,7 +53,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.HtmlTextView;
 
-public class AnswerFragment extends Fragment implements OnCommentChangeListener {
+public class AnswerFragment extends AbstractVotableFragment implements OnCommentChangeListener {
   private static final String TAG = AnswerFragment.class.getSimpleName();
   private FrameLayout parentLayout;
   private LinearLayout answerBodyLayout;
@@ -62,12 +63,19 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
   private PageSelectAdapter pageSelectAdapter;
   private StackXQuickActionMenu quickActionMenu;
   private OnShowCommentsListener onShowCommentsListener;
+  private boolean forMyQuestion = false;
+  private boolean questionHasAcceptedAnswer = false;
+  private TextView scoreTextView;
+  private ImageView acceptAnswerImage;
 
-  public static AnswerFragment newFragment(Answer answer, PageSelectAdapter pageSelectAdapter) {
+  public static AnswerFragment newFragment(Answer answer, PageSelectAdapter pageSelectAdapter, boolean forMyQuestion,
+      boolean questionHasAcceptedAnswer) {
     AnswerFragment answerFragment = new AnswerFragment();
     answerFragment.setRetainInstance(true);
     answerFragment.answer = answer;
     answerFragment.pageSelectAdapter = pageSelectAdapter;
+    answerFragment.forMyQuestion = forMyQuestion;
+    answerFragment.questionHasAcceptedAnswer = questionHasAcceptedAnswer;
     return answerFragment;
   }
 
@@ -90,8 +98,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
       answerCtxMenuImageView = (ImageView) answerMetaInfoLayout.findViewById(R.id.answerOptionsContextMenu);
     }
 
-    if (savedInstanceState != null)
-      answer = (Answer) savedInstanceState.getSerializable(StringConstants.ANSWER);
+    if (savedInstanceState != null) answer = (Answer) savedInstanceState.getSerializable(StringConstants.ANSWER);
 
     return parentLayout;
   }
@@ -112,27 +119,27 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
 
   @Override
   public void onSaveInstanceState(Bundle outState) {
-    if (answer != null)
-      outState.putSerializable(StringConstants.ANSWER, answer);
+    if (answer != null) outState.putSerializable(StringConstants.ANSWER, answer);
 
     super.onSaveInstanceState(outState);
   }
 
   private void displayAnswer() {
     if (answer != null) {
-      if (quickActionMenu == null)
-        quickActionMenu = initQuickActionMenu();
+      if (quickActionMenu == null) quickActionMenu = initQuickActionMenu();
 
-      TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerScore);
-      textView.setText(AppUtils.formatNumber(answer.score));
-      if (answer.accepted)
-        textView.setBackgroundResource(R.drawable.ans_score_answered_padded);
+      scoreTextView = (TextView) answerMetaInfoLayout.findViewById(R.id.score);
+      scoreTextView.setText(AppUtils.formatNumber(answer.score));
+
+      prepareUpDownVote(answer, parentLayout, AnswersIntentService.class);
 
       String acceptRate = answer.owner.acceptRate > 0 ? (answer.owner.acceptRate + "%, ") : "";
-      textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
+      TextView textView = (TextView) answerMetaInfoLayout.findViewById(R.id.answerAuthor);
       textView.setText(getOwnerDisplayText(acceptRate));
 
       displayNumComments();
+
+      prepareAcceptAnswer();
 
       final ImageView questionMarkImageView = (ImageView) parentLayout.findViewById(R.id.goBackToQ);
       showQuestionTitleOnClick(questionMarkImageView);
@@ -144,6 +151,42 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
       for (View answerView : MarkdownFormatter.parse(getActivity(), answer.body))
         answerBodyLayout.addView(answerView);
     }
+  }
+
+  private void prepareAcceptAnswer() {
+    if (forMyQuestion) {
+      prepareAcceptAnswerForMyQuestion();
+    } else {
+      if (answer.accepted) {
+        ImageView acceptedAnswerImage = (ImageView) parentLayout.findViewById(R.id.answerAccepted);
+        acceptedAnswerImage.setVisibility(View.VISIBLE);
+      }
+    }
+  }
+
+  private void prepareAcceptAnswerForMyQuestion() {
+    acceptAnswerImage = (ImageView) parentLayout.findViewById(R.id.acceptAnswer);
+    acceptAnswerImage.setVisibility(View.VISIBLE);
+    if (questionHasAcceptedAnswer && answer.accepted) {
+      acceptAnswerImage.setImageResource(R.drawable.answer_accepted);
+    }
+
+    acceptAnswerImage.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(getActivity().getApplicationContext(), AnswersIntentService.class);
+
+        if (questionHasAcceptedAnswer) intent.putExtra(StringConstants.ACTION, AnswersIntentService.ACCEPT_UNDO);
+        else intent.putExtra(StringConstants.ACTION, AnswersIntentService.ACCEPT);
+
+        intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+        intent.putExtra(StringConstants.SITE, getActivity().getIntent().getStringExtra(StringConstants.SITE));
+        intent.putExtra(StringConstants.ID, answer.id);
+
+        getActivity().setProgressBarIndeterminateVisibility(true);
+        getActivity().startService(intent);
+      }
+    });
   }
 
   private StackXQuickActionMenu initQuickActionMenu() {
@@ -161,8 +204,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
     if (answer.comments != null && !answer.comments.isEmpty()) {
       textView.setText(getString(R.string.comments) + ":" + String.valueOf(answer.comments.size()));
       textView.setVisibility(View.VISIBLE);
-    } else
-      textView.setVisibility(View.GONE);
+    } else textView.setVisibility(View.GONE);
   }
 
   private void setupQuickActionMenuForAnswer() {
@@ -283,8 +325,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
     // by QuestionAcitivy. So no need to initialize comments if null because
     // it can never be null here.
     if (comment != null) {
-      if (answer.comments == null)
-        answer.comments = new ArrayList<Comment>();
+      if (answer.comments == null) answer.comments = new ArrayList<Comment>();
 
       answer.comments.add(comment);
       updateCacheWithNewCommentIfExists(comment);
@@ -298,8 +339,7 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
       Question cachedQuestion = QuestionsCache.getInstance().get(answer.questionId);
       for (Answer answer : cachedQuestion.answers) {
         if (answer.id == comment.post_id) {
-          if (answer.comments == null)
-            answer.comments = new ArrayList<Comment>();
+          if (answer.comments == null) answer.comments = new ArrayList<Comment>();
 
           if (!answer.comments.contains(comment)) {
             answer.comments.add(comment);
@@ -307,8 +347,32 @@ public class AnswerFragment extends Fragment implements OnCommentChangeListener 
           }
           break;
         }
-
       }
     }
+  }
+
+  @Override
+  public void onReceiveResult(int resultCode, Bundle resultData) {
+    getActivity().setProgressBarIndeterminateVisibility(false);
+    switch (resultCode) {
+      case AnswersIntentService.RESULT_CODE_ACCEPT_ANS_SUCCESS:
+        questionHasAcceptedAnswer = true;
+        answer.accepted = true;
+        acceptAnswerImage.setImageResource(R.drawable.answer_accepted);
+        break;
+      case AnswersIntentService.RESULT_CODE_ACCEPT_ANS_UNDO_SUCCESS:
+        questionHasAcceptedAnswer = false;
+        answer.accepted = false;
+        acceptAnswerImage.setImageResource(R.drawable.answer_accept);
+        break;
+      default:
+        super.onReceiveResult(resultCode, resultData);
+        break;
+    }
+  }
+
+  @Override
+  protected void onScoreChange(int newScore) {
+    scoreTextView.setText(AppUtils.formatNumber(newScore));
   }
 }

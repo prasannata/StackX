@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -19,17 +19,23 @@
 
 package com.prasanna.android.stacknetwork.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.prasanna.android.http.AbstractHttpException;
+import com.prasanna.android.http.ClientException;
+import com.prasanna.android.http.HttpContentTypes;
+import com.prasanna.android.http.HttpHeaderParams;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.Comment;
+import com.prasanna.android.stacknetwork.model.Post.PostType;
 import com.prasanna.android.stacknetwork.model.Question;
 import com.prasanna.android.stacknetwork.model.SearchCriteria;
 import com.prasanna.android.stacknetwork.model.StackXPage;
@@ -68,8 +74,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
           JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
           questionBody = jsonObject.getString(JsonFields.Question.BODY);
         }
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -99,17 +104,13 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
           for (int i = 0; i < jsonArray.length(); i++) {
             JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(i));
             Answer answer = getSerializedAnswerObject(jsonObject);
-            if (answer.accepted && answers.size() > 0)
-              answers.add(0, answer);
-            else
-              answers.add(answer);
+            if (answer.accepted && answers.size() > 0) answers.add(0, answer);
+            else answers.add(answer);
           }
 
-          if (!answers.isEmpty())
-            getCommentsForAnswers(answers);
+          if (!answers.isEmpty()) getCommentsForAnswers(answers);
         }
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -129,8 +130,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
       stringBuilder.deleteCharAt(stringBuilder.length() - 1);
 
       getCommensAndUpdateAnswer(stringBuilder.toString(), idAnswerMap);
-    }
-    catch (AbstractHttpException e) {
+    } catch (AbstractHttpException e) {
       LogWrapper.e(TAG, e.getMessage());
     }
   }
@@ -152,9 +152,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
         }
 
         hasMore = commentsPage.hasMore;
-      }
-      else
-        hasMore = false;
+      } else hasMore = false;
 
     }
   }
@@ -186,8 +184,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
 
           commentsPage.items.add(Comment.parse(JSONObjectWrapper.wrap(jsonObject)));
         }
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -239,8 +236,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
           question = getSerializedQuestionObject(jsonObject);
           question.body = jsonObject.getString(JsonFields.Question.BODY);
         }
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
@@ -253,8 +249,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
   }
 
   public StackXPage<Question> getAllQuestions(String sort, int page) {
-    if (sort == null)
-      sort = StackUri.Sort.ACTIVITY;
+    if (sort == null) sort = StackUri.Sort.ACTIVITY;
 
     Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
     queryParams.put(StackUri.QueryParams.ORDER, StackUri.QueryParamDefaultValues.ORDER);
@@ -294,8 +289,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
   }
 
   public StackXPage<Question> getQuestionsForTag(String tag, String sort, int page) {
-    if (sort == null)
-      sort = StackUri.Sort.ACTIVITY;
+    if (sort == null) sort = StackUri.Sort.ACTIVITY;
     if (tag != null) {
       String restEndPoint = "search/advanced";
 
@@ -333,8 +327,7 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
   private StackXPage<Question> getQuestionPage(String restEndPoint, Map<String, String> queryParams) {
     JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-    if (questionsJsonResponse != null)
-      return getQuestionModel(questionsJsonResponse);
+    if (questionsJsonResponse != null) return getQuestionModel(questionsJsonResponse);
 
     return null;
   }
@@ -357,11 +350,72 @@ public class QuestionServiceHelper extends AbstractBaseServiceHelper {
           answer.body = jsonObject.getString(JsonFields.Question.BODY);
           return answer;
         }
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         LogWrapper.d(TAG, e.getMessage());
       }
     }
     return null;
+  }
+
+  public int upvote(final PostType postType, final String site, final long id) {
+    return score(urlEncodedPost(postType.getValue() + "s/" + id + "/upvote"));
+  }
+
+  public int downvote(final PostType postType, final String site, final long id) {
+    return score(urlEncodedPost(postType.getValue() + "s/" + id + "/downvote"));
+  }
+
+  public int undoUpvote(final PostType postType, final String site, final long id) {
+    return score(urlEncodedPost(postType.getValue() + "s/" + id + "/upvote/undo"));
+  }
+
+  public int undoDownvote(final PostType postType, final String site, final long id) {
+    return score(urlEncodedPost(postType.getValue() + "s/" + id + "/downvote/undo"));
+  }
+
+  private int score(JSONObjectWrapper jsonObjectWrapper) {
+    if (jsonObjectWrapper != null) {
+      try {
+        JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+
+        if (jsonArray != null && jsonArray.length() == 1) {
+          JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
+          return jsonObject.getInt(JsonFields.Answer.SCORE);
+        }
+      } catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
+    }
+
+    return Integer.MIN_VALUE;
+  }
+
+  public void favorite(final String site, final long id) {
+    urlEncodedPost("questions/" + id + "/favorite");
+  }
+
+  public void undoFavorite(final String site, final long id) {
+    urlEncodedPost("questions/" + id + "/favorite/undo");
+  }
+
+  public void acceptAnswer(final long answerId, final String site) {
+    urlEncodedPost("answers/" + answerId + "/accept");
+  }
+
+  public void undoAcceptAnswer(final long answerId, final String site) {
+    urlEncodedPost("answers/" + answerId + "/accept/undo");
+  }
+
+  private JSONObjectWrapper urlEncodedPost(String restEndPoint) {
+    Map<String, String> requestHeaders = new HashMap<String, String>();
+    requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
+    requestHeaders.put(HttpHeaderParams.ACCEPT, HttpContentTypes.APPLICATION_JSON);
+
+    try {
+      return executeHttpPostRequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(
+          getBasicNameValuePartListForPost()));
+    } catch (UnsupportedEncodingException e) {
+      throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);
+    }
   }
 }

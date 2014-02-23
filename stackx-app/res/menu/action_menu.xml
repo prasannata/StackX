@@ -23,6 +23,13 @@
         android:title="@string/addComment"
         android:visible="false"/>
     <item
+        android:id="@+id/menu_favorite"
+        android:icon="@drawable/favorite"
+        android:orderInCategory="0"
+        android:showAsAction="always"
+        android:title="@string/refresh"
+        android:visible="false"/>
+    <item
         android:id="@+id/menu_search"
         android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/search"
@@ -78,4 +85,5 @@
         android:orderInCategory="6"
         android:showAsAction="never"
         android:title="@string/settings"/>
+
 </menu>

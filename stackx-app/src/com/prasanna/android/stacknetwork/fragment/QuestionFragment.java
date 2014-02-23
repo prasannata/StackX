@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -41,6 +40,7 @@ import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnCommentChang
 import com.prasanna.android.stacknetwork.fragment.CommentFragment.OnShowCommentsListener;
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.service.QuestionDetailsIntentService;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.DateTimeUtils;
 import com.prasanna.android.stacknetwork.utils.MarkdownFormatter;
@@ -50,7 +50,7 @@ import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.stacknetwork.utils.TagsViewBuilder;
 import com.prasanna.android.utils.LogWrapper;
 
-public class QuestionFragment extends Fragment implements OnCommentChangeListener {
+public class QuestionFragment extends AbstractVotableFragment implements OnCommentChangeListener {
   private static final String TAG = QuestionFragment.class.getSimpleName();
 
   private FrameLayout parentLayout;
@@ -64,6 +64,8 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
   private String STR_VIEWS;
   private String STR_COMMENTS;
+
+  private TextView scoreTextView;
 
   public static QuestionFragment newFragment() {
     QuestionFragment questionFragment = new QuestionFragment();
@@ -140,12 +142,13 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
       if (quickActionMenu == null) quickActionMenu = initQuickActionMenu();
 
-      TextView textView = (TextView) parentLayout.findViewById(R.id.score);
-      textView.setText(AppUtils.formatNumber(question.score));
+      scoreTextView = (TextView) parentLayout.findViewById(R.id.score);
+      scoreTextView.setText(AppUtils.formatNumber(question.score));
 
-      setupTextViewForAnswerCount();
+      prepareUpDownVote(question, parentLayout, QuestionDetailsIntentService.class);
+      // setupTextViewForAnswerCount();
 
-      textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
+      TextView textView = (TextView) parentLayout.findViewById(R.id.questionTitle);
       textView.setText(Html.fromHtml(question.title));
 
       String acceptRate = question.owner.acceptRate > 0 ? (question.owner.acceptRate + "%, ") : "";
@@ -327,6 +330,11 @@ public class QuestionFragment extends Fragment implements OnCommentChangeListene
 
   private void removeQuestionFromCache() {
     if (QuestionsCache.getInstance().containsKey(question.id)) QuestionsCache.getInstance().remove(question.id);
+  }
+  
+  @Override
+  protected void onScoreChange(int newScore) {
+    scoreTextView.setText(AppUtils.formatNumber(newScore));
   }
 
 }

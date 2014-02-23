@@ -35,8 +35,6 @@ import android.widget.Toast;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.User.UserType;
-import com.prasanna.android.stacknetwork.model.WritePermission;
-import com.prasanna.android.stacknetwork.model.WritePermission.ObjectType;
 import com.prasanna.android.stacknetwork.utils.AppUtils;
 
 public class SiteListAdapter extends ArrayAdapter<Site> {
@@ -57,7 +55,6 @@ public class SiteListAdapter extends ArrayAdapter<Site> {
     TextView siteNameView;
     TextView siteAudience;
     TextView registeredView;
-    ImageView writePermissionView;
     ImageView defaultSiteOpt;
   }
 
@@ -71,7 +68,6 @@ public class SiteListAdapter extends ArrayAdapter<Site> {
       holder.siteNameView = (TextView) convertView.findViewById(R.id.siteName);
       holder.siteAudience = (TextView) convertView.findViewById(R.id.siteAudience);
       holder.registeredView = (TextView) convertView.findViewById(R.id.siteUserTypeRegistered);
-      holder.writePermissionView = (ImageView) convertView.findViewById(R.id.writePermissionEnabled);
       holder.defaultSiteOpt = (ImageView) convertView.findViewById(R.id.isDefaultSite);
       convertView.setTag(holder);
     }
@@ -87,19 +83,6 @@ public class SiteListAdapter extends ArrayAdapter<Site> {
       holder.registeredView.setVisibility(View.VISIBLE);
     else
       holder.registeredView.setVisibility(View.GONE);
-
-    holder.writePermissionView.setVisibility(View.GONE);
-
-    if (site.writePermissions != null) {
-      for (WritePermission permission : site.writePermissions) {
-        if (permission.objectType != null && ObjectType.COMMENT.equals(permission.objectType)) {
-          if (permission.canAdd & permission.canDelete & permission.canEdit) {
-            holder.writePermissionView.setVisibility(View.VISIBLE);
-            break;
-          }
-        }
-      }
-    }
 
     setViewAndListenerForDefaultSiteOption(position, holder);
     setOnClickForSite(position, convertView);

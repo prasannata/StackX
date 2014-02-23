@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -20,7 +20,6 @@
 package com.prasanna.android.stacknetwork.service;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +33,8 @@ import com.prasanna.android.http.ClientException;
 import com.prasanna.android.http.HttpContentTypes;
 import com.prasanna.android.http.HttpHeaderParams;
 import com.prasanna.android.stacknetwork.model.Comment;
-import com.prasanna.android.stacknetwork.utils.AppUtils;
 import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
 import com.prasanna.android.stacknetwork.utils.JsonFields;
-import com.prasanna.android.stacknetwork.utils.OperatingSite;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StackUri.QueryParamDefaultValues;
 import com.prasanna.android.utils.LogWrapper;
@@ -68,7 +65,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper {
   }
 
   private Comment writeComment(String restEndPoint, String body) {
-    List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
+    List<BasicNameValuePair> parameters = getBasicNameValuePartListForPost();
     parameters.add(new BasicNameValuePair(StackUri.QueryParams.FILTER, QueryParamDefaultValues.ITEM_DETAIL_FILTER));
     parameters.add(new BasicNameValuePair(StackUri.QueryParams.BODY, body));
 
@@ -78,7 +75,7 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper {
 
     try {
       JSONObjectWrapper jsonObject =
-          executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
+          executeHttpPostRequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
       JSONArray jsonArray = jsonObject.getJSONArray(JsonFields.ITEMS);
       if (jsonArray != null && jsonArray.length() == 1)
         return Comment.parse(JSONObjectWrapper.wrap(jsonArray.getJSONObject(0)));
@@ -92,25 +89,16 @@ public class WriteServiceHelper extends AbstractBaseServiceHelper {
     return null;
   }
 
-  private List<BasicNameValuePair> getBasicNameValuePartListForWriteComment() {
-    List<BasicNameValuePair> parameters = new ArrayList<BasicNameValuePair>();
-    parameters.add(new BasicNameValuePair(StackUri.QueryParams.ACCESS_TOKEN, AppUtils.loadAccessToken(null)));
-    parameters.add(new BasicNameValuePair(StackUri.QueryParams.KEY, StackUri.QueryParamDefaultValues.KEY));
-    parameters.add(new BasicNameValuePair(StackUri.QueryParams.CLIENT_ID, QueryParamDefaultValues.CLIENT_ID));
-    parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
-    return parameters;
-  }
-
   public void deleteComment(long commentId) {
     String restEndPoint = "/comments/" + commentId + "/delete";
 
-    List<BasicNameValuePair> parameters = getBasicNameValuePartListForWriteComment();
+    List<BasicNameValuePair> parameters = getBasicNameValuePartListForPost();
 
     Map<String, String> requestHeaders = new HashMap<String, String>();
     requestHeaders.put(HttpHeaderParams.CONTENT_TYPE, HttpContentTypes.APPLICATION_FROM_URL_ENCODED);
 
     try {
-      executeHttpPostequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
+      executeHttpPostRequest(restEndPoint, requestHeaders, null, new UrlEncodedFormEntity(parameters));
     }
     catch (UnsupportedEncodingException e) {
       throw new ClientException(ClientException.ClientErrorCode.INVALID_ENCODING);

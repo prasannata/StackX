@@ -46,12 +46,17 @@ public class JsonFields {
     public static final String VIEW_COUNT = "view_count";
     public static final String TAGS = "tags";
     public static final String ACCEPTED_ANSWER_ID = "accepted_answer_id";
+    public static final String UPVOTED = "upvoted";
+    public static final String DOWNVOTED = "downvoted";
+    public static final String FAVORITED = "favorited";
   }
 
   public static class Answer extends CommonFields {
     public static final String ANSWER_ID = "answer_id";
     public static final String QUESTION_ID = "question_id";
     public static final String IS_ACCEPTED = "is_accepted";
+    public static final String UPVOTED = "upvoted";
+    public static final String DOWNVOTED = "downvoted";
   }
 
   public static class Comment extends CommonFields {

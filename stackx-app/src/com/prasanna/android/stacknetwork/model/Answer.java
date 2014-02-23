@@ -22,7 +22,7 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Answer extends Post implements Serializable {
+public class Answer extends VotablePost implements Serializable {
   private static final long serialVersionUID = -307252373087687685L;
 
   public long questionId = -1;
@@ -46,17 +46,12 @@ public class Answer extends Post implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
     Answer other = (Answer) obj;
-    if (id != other.id)
-      return false;
-    if (questionId != other.questionId)
-      return false;
+    if (id != other.id) return false;
+    if (questionId != other.questionId) return false;
     return true;
   }
 }

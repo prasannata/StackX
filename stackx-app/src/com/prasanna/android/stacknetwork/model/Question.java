@@ -22,7 +22,7 @@ package com.prasanna.android.stacknetwork.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Question extends Post implements Serializable {
+public class Question extends VotablePost implements Serializable {
   private static final long serialVersionUID = -4722553914475051236L;
 
   public static Question copyMetaDeta(Question that) {
@@ -40,6 +40,9 @@ public class Question extends Post implements Serializable {
     question.answerCount = that.answerCount;
     question.relativeLink = that.relativeLink;
     question.answered = that.answered;
+    question.upvoted = that.upvoted;
+    question.downvoted = that.downvoted;
+    question.favorited = that.favorited;
     question.hasAcceptedAnswer = that.hasAcceptedAnswer;
     if (that.tags != null) {
       question.tags = new String[that.tags.length];
@@ -64,10 +67,12 @@ public class Question extends Post implements Serializable {
 
   public ArrayList<Comment> comments;
 
-  public boolean answered;
+  public boolean answered = false;
 
   public boolean hasAcceptedAnswer = false;
-
+  
+  public boolean favorited = false;
+  
   public final PostType postType = PostType.QUESTION;
 
   @Override
