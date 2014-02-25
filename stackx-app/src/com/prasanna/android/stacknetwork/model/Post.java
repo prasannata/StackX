@@ -20,6 +20,8 @@
 package com.prasanna.android.stacknetwork.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,8 +51,7 @@ public class Post extends IdentifiableItem implements Serializable {
       if (string != null) {
         try {
           postType = valueOf(string.toUpperCase());
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
           postType = null;
         }
 
@@ -72,34 +73,58 @@ public class Post extends IdentifiableItem implements Serializable {
   public String body;
 
   public User owner;
-  
+
   public static Post parse(final JSONObjectWrapper jsonObjectWrapper) {
 
-    if (jsonObjectWrapper == null)
-      return null;
+    if (jsonObjectWrapper == null) return null;
 
     try {
       JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
 
       if (jsonArray != null && jsonArray.length() == 1) {
         JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(0));
-
-        if (jsonObject != null) {
-          Post post = new Post();
-          post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
-          post.body = jsonObject.getString(JsonFields.Post.BODY);
-          post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
-          post.postType = PostType.getEnum(jsonObject.getString(JsonFields.Post.POST_TYPE));
-          post.score = jsonObject.getInt(JsonFields.Post.SCORE);
-          post.owner = User.parseAsSnippet(jsonObject.getJSONObject(JsonFields.Post.OWNER));
-          return post;
-        }
+        return parsePost(jsonObject);
       }
-    }
-    catch (JSONException e) {
+    } catch (JSONException e) {
       LogWrapper.d(TAG, e.getMessage());
     }
 
     return null;
+  }
+
+  private static Post parsePost(JSONObjectWrapper jsonObject) {
+    if (jsonObject != null) {
+      Post post = new Post();
+      post.id = jsonObject.getLong(JsonFields.Post.POST_ID);
+      post.title = jsonObject.getString(JsonFields.Post.TITLE);
+      post.body = jsonObject.getString(JsonFields.Post.BODY);
+      post.creationDate = jsonObject.getLong(JsonFields.Post.CREATION_DATE);
+      post.postType = PostType.getEnum(jsonObject.getString(JsonFields.Post.POST_TYPE));
+      post.score = jsonObject.getInt(JsonFields.Post.SCORE);
+      post.owner = User.parseAsSnippet(jsonObject.getJSONObject(JsonFields.Post.OWNER));
+      return post;
+    }
+
+    return null;
+  }
+
+  public static List<Post> parseCollection(final JSONObjectWrapper jsonObjectWrapper) {
+    List<Post> posts = new ArrayList<Post>();
+    if (jsonObjectWrapper != null) {
+      try {
+        JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
+        if (jsonArray != null) {
+          for (int idx = 0; idx < jsonArray.length(); idx++) {
+            JSONObjectWrapper jsonObject = JSONObjectWrapper.wrap(jsonArray.getJSONObject(idx));
+            Post post = parsePost(jsonObject);
+            if (post != null) posts.add(post);
+          }
+        }
+      } catch (JSONException e) {
+        LogWrapper.d(TAG, e.getMessage());
+      }
+    }
+
+    return posts;
   }
 }

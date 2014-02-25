@@ -99,6 +99,8 @@ public class StringConstants {
 
   public static final String POST_TYPE = "post_type";
 
+  public static final String REP_HISTORY = "rep_history";
+  
   public static final String ID = "id";
 
   public static final class HttpError {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -55,6 +55,7 @@ public class UserIntentService extends AbstractIntentService {
   public static final int GET_USER_UNREAD_INBOX = 0x5;
   public static final int GET_USER_SITES = 0x6;
   public static final int GET_USER_FAVORITES = 0x7;
+  public static final int GET_USER_REP_HISTORY_FULL = 0x8;
   public static final int DEAUTH_APP = 0x201;
 
   private UserServiceHelper userService = UserServiceHelper.getInstance();
@@ -111,6 +112,10 @@ public class UserIntentService extends AbstractIntentService {
         case GET_USER_FAVORITES:
           bundle.putSerializable(StringConstants.QUESTIONS, getFavorites(me, userId, page));
           receiver.send(GET_USER_FAVORITES, bundle);
+          break;
+        case GET_USER_REP_HISTORY_FULL:
+          bundle.putSerializable(StringConstants.REP_HISTORY, userService.reputationHistoryFull(page));
+          receiver.send(GET_USER_REP_HISTORY_FULL, bundle);
           break;
         case DEAUTH_APP:
           deauthenticateApp(intent.getStringExtra(StringConstants.ACCESS_TOKEN));

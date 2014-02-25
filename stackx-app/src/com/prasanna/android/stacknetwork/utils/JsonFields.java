@@ -122,6 +122,14 @@ public class JsonFields {
     public static final String ERROR_MESSAGE = "error_message";
   }
 
+  public static class Reputation {
+    public static final String POST_ID = "post_id";
+    public static final String CREATION_DATE = "creation_date";
+    public static final String REPUTATION_CHANGE = "reputation_change";
+    public static final String REPUTATION_HISTORY_TYPE = "reputation_history_type";
+    public static final String USER_ID = "user_id";
+  }
+
   public static class Permission {
     public static final String CAN_ADD = "can_add";
     public static final String CAN_DELETE = "can_delete";

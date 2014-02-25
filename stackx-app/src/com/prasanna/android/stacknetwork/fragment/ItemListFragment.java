@@ -39,7 +39,7 @@ import android.widget.TextView;
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
-import com.prasanna.android.stacknetwork.model.Post;
+import com.prasanna.android.stacknetwork.model.IdentifiableItem;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver;
 import com.prasanna.android.stacknetwork.receiver.RestQueryResultReceiver.StackXRestQueryResultReceiver;
@@ -49,7 +49,7 @@ import com.prasanna.android.stacknetwork.utils.StackUri;
 import com.prasanna.android.stacknetwork.utils.StringConstants;
 import com.prasanna.android.utils.LogWrapper;
 
-public abstract class ItemListFragment<T extends Post> extends ListFragment implements OnScrollListener,
+public abstract class ItemListFragment<T extends IdentifiableItem> extends ListFragment implements OnScrollListener,
     StackXRestQueryResultReceiver {
   private static final String TAG = ItemListFragment.class.getSimpleName();
 
@@ -68,8 +68,6 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
   private Context applicationContext;
 
   protected abstract String getReceiverExtraName();
-
-  protected abstract void loadNextPage();
 
   protected abstract void startIntentService();
 
@@ -240,5 +238,9 @@ public abstract class ItemListFragment<T extends Post> extends ListFragment impl
     if (progressBar == null)
       progressBar = (ProgressBar) LayoutInflater.from(applicationContext).inflate(R.layout.progress_bar, null);
     return progressBar;
+  }
+
+  protected void loadNextPage() {
+    startIntentService();
   }
 }

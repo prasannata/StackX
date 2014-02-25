@@ -48,7 +48,7 @@ public class StackUri {
     public static final String ORDER = "desc";
     public static final String DEFAULT_FILTER = "default";
     public static final String COLLECTION_FILTER = "!)r(UklJydkr9N6a-Q2gg";
-    public static final String ITEM_DETAIL_FILTER = "!9aMz979rkLNvEtm-gX70M.YWXodU)2gsgRenveU4XIunO)*0KsgmpeTtDO*";
+    public static final String ITEM_DETAIL_FILTER = "!--Cmm88s-oaEuQIIjvWmCePYbGeAtfW6G8((0xcQ1JBcC2R)gtNBSc776D-e)i";
     public static final String USER_DETAIL_FILTER = "!-q2RdWJy";
     public static final String USER_INBOX_FILTER = "!-q2RaosI";
     public static final String COMMENT_FILTER = "!-.mgWN4RPTQu";

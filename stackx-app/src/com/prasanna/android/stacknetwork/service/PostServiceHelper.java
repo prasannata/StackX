@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -19,10 +19,15 @@
 
 package com.prasanna.android.stacknetwork.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.prasanna.android.stacknetwork.model.Comment;
 import com.prasanna.android.stacknetwork.model.Post;
+import com.prasanna.android.stacknetwork.utils.JSONObjectWrapper;
+import com.prasanna.android.stacknetwork.utils.JsonFields;
 import com.prasanna.android.stacknetwork.utils.StackUri;
 
 public class PostServiceHelper extends AbstractBaseServiceHelper {
@@ -49,5 +54,28 @@ public class PostServiceHelper extends AbstractBaseServiceHelper {
     Map<String, String> queryParams = getDefaultQueryParams(site);
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.COMMENT_FILTER);
     return Comment.parseCommentItem(executeHttpGetRequest("/comments/" + id, queryParams));
+  }
+
+  public List<Post> getPosts(Collection<Long> postIds, String site) {
+    final StringBuffer semiColonDelimitedPostIds = new StringBuffer();
+    final List<Post> posts = new ArrayList<Post>();
+    boolean hasMore = true;
+    int page = 1;
+
+    for (Long postId : postIds) {
+      semiColonDelimitedPostIds.append(postId + ";");
+    }
+
+    final String ids = semiColonDelimitedPostIds.substring(0, semiColonDelimitedPostIds.length() - 1);
+    Map<String, String> defaultQueryParams = getDefaultQueryParams(site);
+    defaultQueryParams.put(StackUri.QueryParams.PAGE_SIZE, "50");
+    while (hasMore) {
+      defaultQueryParams.put(StackUri.QueryParams.PAGE, String.valueOf(page++));
+      JSONObjectWrapper responseJson = executeHttpGetRequest("/posts/" + ids, defaultQueryParams);
+      posts.addAll(Post.parseCollection(responseJson));
+      hasMore = responseJson.getBoolean(JsonFields.HAS_MORE);
+      sleep(100);
+    }
+    return posts;
   }
 }

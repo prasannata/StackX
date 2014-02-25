@@ -27,9 +27,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
-import com.prasanna.android.stacknetwork.model.Post;
+import com.prasanna.android.stacknetwork.model.IdentifiableItem;
 
-public class ItemListAdapter<T extends Post> extends ArrayAdapter<T> {
+public class ItemListAdapter<T extends IdentifiableItem> extends ArrayAdapter<T> {
   private final ListItemView<T> listItemView;
   private Filter filter;
 

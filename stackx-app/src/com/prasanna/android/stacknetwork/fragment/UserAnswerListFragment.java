@@ -187,9 +187,4 @@ public class UserAnswerListFragment extends ItemListFragment<Answer> implements 
     intent.putExtra(StringConstants.SITE, OperatingSite.getSite().apiSiteParameter);
     startActivity(intent);
   }
-
-  @Override
-  protected void loadNextPage() {
-    startIntentService();
-  }
 }

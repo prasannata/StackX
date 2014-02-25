@@ -16,5 +16,7 @@
     <color name="codeBg">#EAEAEA</color>
     <color name="pulp">#F5785A</color>
     <color name="skyBlue">#1967D1</color>
+    <color name="positiveRepChange">#2C6807</color>
+    <color name="negativeRepChange">#621410</color>
 
 </resources>

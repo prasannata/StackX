@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -104,11 +104,9 @@ public class QuickActionMenu {
     int screenHeight = context.getResources().getDisplayMetrics().heightPixels;
     anchor.getLocationOnScreen(anchorLocation);
 
-    if (anchorLocation[1] > (screenHeight / 2 + 150))
-      popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, anchorLocation[0],
-          anchorLocation[1] - rootView.getHeight());
-    else
-      popupWindow.showAsDropDown(anchor);
+    if (anchorLocation[1] > (screenHeight / 2 + 150)) popupWindow.showAtLocation(anchor, Gravity.NO_GRAVITY,
+        anchorLocation[0], anchorLocation[1] - rootView.getHeight());
+    else popupWindow.showAsDropDown(anchor);
   }
 
   public void setOnDismissListener(OnDismissListener onDismissListener) {

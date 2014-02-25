@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -33,7 +34,9 @@ import com.prasanna.android.stacknetwork.model.Account;
 import com.prasanna.android.stacknetwork.model.Answer;
 import com.prasanna.android.stacknetwork.model.InboxItem;
 import com.prasanna.android.stacknetwork.model.InboxItem.ItemType;
+import com.prasanna.android.stacknetwork.model.Post;
 import com.prasanna.android.stacknetwork.model.Question;
+import com.prasanna.android.stacknetwork.model.Reputation;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackExchangeHttpError;
 import com.prasanna.android.stacknetwork.model.StackXPage;
@@ -97,8 +100,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
         for (int i = 0; i < jsonArray.length(); i++) {
           JSONObject siteJsonObject = jsonArray.getJSONObject(i);
           Site site = getSerializedSiteObject(new JSONObjectWrapper(siteJsonObject));
-          if (site != null)
-            sites.put(site.link, site);
+          if (site != null) sites.put(site.link, site);
         }
       }
 
@@ -109,8 +111,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
   }
 
   private Site getSerializedSiteObject(JSONObjectWrapper siteJsonObject) {
-    if (siteJsonObject == null)
-      return null;
+    if (siteJsonObject == null) return null;
 
     Site site = new Site();
     site.apiSiteParameter = siteJsonObject.getString(JsonFields.Site.API_SITE_PARAMETER);
@@ -126,9 +127,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
   private StackXPage<Question> getQuestions(String restEndPoint, Map<String, String> queryParams) {
     JSONObjectWrapper questionsJsonResponse = executeHttpGetRequest(restEndPoint, queryParams);
 
-    if (questionsJsonResponse != null) {
-      return getQuestionModel(questionsJsonResponse);
-    }
+    if (questionsJsonResponse != null) { return getQuestionModel(questionsJsonResponse); }
 
     return null;
   }
@@ -172,8 +171,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
     queryParams.put(StackUri.QueryParams.SITE, site);
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.USER_DETAIL_FILTER);
 
-    if (userId != -1)
-      page = getSerializedUserObject(executeHttpGetRequest("/users/" + userId, queryParams));
+    if (userId != -1) page = getSerializedUserObject(executeHttpGetRequest("/users/" + userId, queryParams));
 
     return page;
   }
@@ -294,8 +292,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
         for (int i = 0; i < itemsArray.length(); i++) {
           try {
             JSONObjectWrapper itemJsonObject = JSONObjectWrapper.wrap(itemsArray.getJSONObject(i));
-            if (itemJsonObject != null)
-              page.items.add(getSerializedInboxItem(itemJsonObject));
+            if (itemJsonObject != null) page.items.add(getSerializedInboxItem(itemJsonObject));
           } catch (JSONException e) {
             LogWrapper.d(getLogTag(), e.getMessage());
           }
@@ -408,8 +405,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
       if (jsonObjectWrapper != null) {
         JSONArray jsonArray = jsonObjectWrapper.getJSONArray(JsonFields.ITEMS);
         if (jsonArray != null && jsonArray.length() > 0) {
-          if (tags == null)
-            tags = new LinkedHashSet<Tag>();
+          if (tags == null) tags = new LinkedHashSet<Tag>();
 
           for (int i = 0; i < jsonArray.length(); i++) {
             try {
@@ -435,11 +431,34 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
     return tags;
   }
 
-  private void sleep(long ms) {
-    try {
-      Thread.sleep(ms);
-    } catch (InterruptedException e) {
-      LogWrapper.e(TAG, e.getMessage());
+  public StackXPage<Reputation> reputationHistoryFull(int pageNum) {
+    final StackXPage<Reputation> page = new StackXPage<Reputation>();
+    final String restEndPoint = "me/reputation-history/full";
+
+    Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+    queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
+    queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(pageNum));
+    queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf("50"));
+
+    JSONObjectWrapper repHistory = executeHttpGetRequest(restEndPoint, queryParams);
+    getPageInfo(repHistory, page);
+    page.items = Reputation.parseCollection(repHistory);
+
+    final Map<Long, List<Reputation>> postIdToRepMap = new HashMap<Long, List<Reputation>>();
+
+    for (Reputation reputation : page.items) {
+      if (!postIdToRepMap.containsKey(reputation.postId)) {
+        postIdToRepMap.put(reputation.postId, new ArrayList<Reputation>());
+      }
+      postIdToRepMap.get(reputation.postId).add(reputation);
     }
+
+    for (Post post : PostServiceHelper.getInstance().getPosts(postIdToRepMap.keySet(),
+        OperatingSite.getSite().apiSiteParameter)) {
+      for (Reputation reputation : postIdToRepMap.get(post.id)) {
+        reputation.postTitle = new String(post.title);
+      }
+    }
+    return page;
   }
 }

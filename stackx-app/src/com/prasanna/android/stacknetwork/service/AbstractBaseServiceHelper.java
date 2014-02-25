@@ -240,12 +240,12 @@ public abstract class AbstractBaseServiceHelper {
     parameters.add(new BasicNameValuePair(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter));
     return parameters;
   }
-  
+
   protected JSONObjectWrapper executeHttpGetRequest(String restEndPoint, Map<String, String> queryParams) {
     return getHttpHelper().executeHttpGet(StackUri.STACKX_API_HOST, restEndPoint, queryParams,
         SecureHttpHelper.HTTP_GZIP_RESPONSE_INTERCEPTOR, JSON_PARSER);
   }
-  
+
   protected JSONObjectWrapper executeHttpPostRequest(String restEndPoint, Map<String, String> requestHeaders,
       Map<String, String> queryParams, HttpEntity httpEntity) {
     return getHttpHelper().executeHttpPost(StackUri.STACKX_API_HOST, restEndPoint, requestHeaders, queryParams,
@@ -261,4 +261,13 @@ public abstract class AbstractBaseServiceHelper {
     queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.ITEM_DETAIL_FILTER);
     return queryParams;
   }
+
+  protected void sleep(long ms) {
+    try {
+      Thread.sleep(ms);
+    } catch (InterruptedException e) {
+      LogWrapper.e(getLogTag(), e.getMessage());
+    }
+  }
+
 }

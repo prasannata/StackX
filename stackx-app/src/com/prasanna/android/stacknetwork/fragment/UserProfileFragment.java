@@ -20,7 +20,7 @@
 package com.prasanna.android.stacknetwork.fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,15 +36,18 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.prasanna.android.http.HttpException;
 import com.prasanna.android.stacknetwork.R;
-import com.prasanna.android.stacknetwork.model.Account;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter;
+import com.prasanna.android.stacknetwork.adapter.ItemListAdapter.ListItemView;
+import com.prasanna.android.stacknetwork.model.Reputation;
 import com.prasanna.android.stacknetwork.model.Site;
 import com.prasanna.android.stacknetwork.model.StackXPage;
 import com.prasanna.android.stacknetwork.model.User;
@@ -60,19 +64,30 @@ import com.prasanna.android.task.AsyncTaskExecutor;
 import com.prasanna.android.task.GetImageAsyncTask;
 import com.prasanna.android.utils.LogWrapper;
 
-public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver {
+public class UserProfileFragment extends Fragment implements StackXRestQueryResultReceiver, ListItemView<Reputation> {
   private static final String TAG = UserProfileFragment.class.getSimpleName();
-  private ScrollView profileHomeLayout;
-  private LinearLayout userAccountList;
+  private ViewGroup profileHomeLayout;
   private Intent userProfileIntent;
-  private int userAccountListCursor = 0;
   private User user;
   private boolean me = false;
   private RestQueryResultReceiver resultReceiver;
+  private ArrayList<Reputation> repHistory = new ArrayList<Reputation>();
+  private ItemListAdapter<Reputation> itemListAdapter;
   private long userId;
   private boolean forceRefresh;
   private Site site;
   private Context appContext;
+  private ListView repHistoryView;
+  private int repHistoryPage = 1;
+  private ProgressBar progressBar;
+  private StackXPage<Reputation> repHistPage;
+  private AtomicBoolean repHistoryServiceRunning = new AtomicBoolean(false);
+
+  static class ReputationViewHolder {
+    TextView repChangeTv;
+    TextView repChangeTypeTv;
+    TextView postTitleTv;
+  }
 
   static class PersistMyAvatarAsyncTask extends AsyncTask<Bitmap, Void, Void> {
     private Context context;
@@ -107,7 +122,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    userAccountListCursor = 0;
     resultReceiver = new RestQueryResultReceiver(new Handler());
     resultReceiver.setReceiver(this);
 
@@ -127,8 +141,25 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     if (profileHomeLayout == null) {
-      profileHomeLayout = (ScrollView) inflater.inflate(R.layout.user_proile_layout, container, false);
-      userAccountList = (LinearLayout) profileHomeLayout.findViewById(R.id.accountsList);
+      profileHomeLayout = (ViewGroup) inflater.inflate(R.layout.user_proile_layout, container, false);
+      repHistoryView = (ListView) profileHomeLayout.findViewById(android.R.id.list);
+      repHistoryView.addFooterView(getProgressBar());
+      repHistoryView.setOnScrollListener(new OnScrollListener() {
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+          if (!repHistoryServiceRunning.get() && (totalItemCount - visibleItemCount) <= (firstVisibleItem + 1)) {
+            if (repHistPage != null && repHistPage.hasMore) startRepHistoryService();
+          }
+        }
+      });
+
+      itemListAdapter = new ItemListAdapter<Reputation>(getActivity(), R.layout.reputation, repHistory, this);
+      repHistoryView.setAdapter(itemListAdapter);
     }
 
     return profileHomeLayout;
@@ -138,10 +169,11 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
   public void onResume() {
     super.onResume();
 
-    if (user == null) startUserProfileService();
-    else {
+    if (user == null) {
+      startUserProfileService();
+      startRepHistoryService();
+    } else {
       showUserDetail();
-      showUserAccounts();
     }
   }
 
@@ -163,6 +195,20 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     userProfileIntent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
     userProfileIntent.putExtra(StringConstants.SITE, site.apiSiteParameter);
     getActivity().startService(userProfileIntent);
+  }
+
+  private void startRepHistoryService() {
+    Intent intent = new Intent(getActivity(), UserIntentService.class);
+    if (intent != null) {
+      intent.putExtra(StringConstants.ACTION, UserIntentService.GET_USER_REP_HISTORY_FULL);
+      intent.putExtra(StringConstants.ME, getActivity().getIntent().getBooleanExtra(StringConstants.ME, false));
+      intent.putExtra(StringConstants.USER_ID, getActivity().getIntent().getLongExtra(StringConstants.USER_ID, 0L));
+      intent.putExtra(StringConstants.PAGE, repHistoryPage++);
+      intent.putExtra(StringConstants.RESULT_RECEIVER, resultReceiver);
+      progressBar.setVisibility(View.VISIBLE);
+      repHistoryServiceRunning.getAndSet(true);
+      getActivity().startService(intent);
+    }
   }
 
   private void showUserDetail() {
@@ -252,17 +298,6 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
         new GetImageAsyncTask(imageFetchAsyncTaskCompleteNotiferImpl), user.profileImageLink);
   }
 
-  private void showUserAccounts() {
-    if (user != null && user.accounts != null) {
-      for (; userAccountListCursor < user.accounts.size(); userAccountListCursor++) {
-        TextView textView =
-            (TextView) getActivity().getLayoutInflater().inflate(R.layout.textview_black_textcolor, null);
-        textView.setText(Html.fromHtml(user.accounts.get(userAccountListCursor).siteName));
-        userAccountList.addView(textView);
-      }
-    }
-  }
-
   private void displayAvatar(Bitmap result) {
     ImageView userProfileImage = (ImageView) profileHomeLayout.findViewById(R.id.profileUserImage);
     userProfileImage.setVisibility(View.VISIBLE);
@@ -276,6 +311,9 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     switch (resultCode) {
       case UserIntentService.GET_USER_PROFILE:
         showUserProfile(resultData);
+        break;
+      case UserIntentService.GET_USER_REP_HISTORY_FULL:
+        showRepHistory(resultData);
         break;
       case UserIntentService.ERROR:
         ViewGroup errorView =
@@ -292,15 +330,56 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     if (isVisible() && userPage != null && userPage.items != null && !userPage.items.isEmpty()) {
       user = userPage.items.get(0);
       showUserDetail();
-
-      HashMap<String, Account> accounts =
-          (HashMap<String, Account>) resultData.getSerializable(StringConstants.USER_ACCOUNTS);
-      if (accounts != null) {
-        if (user.accounts == null) user.accounts = new ArrayList<Account>();
-
-        user.accounts.addAll(accounts.values());
-        showUserAccounts();
-      }
     }
   }
+
+  @SuppressWarnings("unchecked")
+  private void showRepHistory(Bundle resultData) {
+    repHistoryServiceRunning.getAndSet(false);
+    progressBar.setVisibility(View.GONE);
+    repHistPage = (StackXPage<Reputation>) resultData.getSerializable(StringConstants.REP_HISTORY);
+    if (repHistPage != null) {
+      repHistory.addAll(repHistPage.items);
+      itemListAdapter.notifyDataSetChanged();
+    }
+  }
+
+  @Override
+  public View getView(Reputation item, int position, View convertView, ViewGroup parent) {
+    ReputationViewHolder holder;
+    if (convertView == null) {
+      convertView = getActivity().getLayoutInflater().inflate(R.layout.reputation, null);
+      holder = new ReputationViewHolder();
+      holder.repChangeTv = (TextView) convertView.findViewById(R.id.repChange);
+      holder.repChangeTypeTv = (TextView) convertView.findViewById(R.id.repChangeType);
+      holder.postTitleTv = (TextView) convertView.findViewById(R.id.postTitle);
+      convertView.setTag(holder);
+    } else holder = (ReputationViewHolder) convertView.getTag();
+
+    holder.repChangeTypeTv.setText(item.reputationHistoryType.getDisplayText());
+
+    if (item.reputationChange > 0) {
+      holder.repChangeTv.setTextColor(Color.GREEN);
+      holder.repChangeTv.setText("+" + item.reputationChange);
+    } else {
+      holder.repChangeTv.setTextColor(Color.RED);
+      holder.repChangeTv.setText(String.valueOf(item.reputationChange));
+    }
+
+    if (item.postTitle != null) {
+      holder.postTitleTv.setText(Html.fromHtml(item.postTitle));
+    } else {
+      holder.postTitleTv.setText("Unknown post");
+    }
+    return convertView;
+  }
+
+  private ProgressBar getProgressBar() {
+    if (progressBar == null)
+      progressBar =
+          (ProgressBar) LayoutInflater.from(getActivity().getApplicationContext()).inflate(R.layout.progress_bar, null);
+
+    return progressBar;
+  }
+
 }
