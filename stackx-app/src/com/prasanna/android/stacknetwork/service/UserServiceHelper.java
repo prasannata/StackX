@@ -436,6 +436,7 @@ public class UserServiceHelper extends AbstractBaseServiceHelper {
     final String restEndPoint = "me/reputation-history/full";
 
     Map<String, String> queryParams = AppUtils.getDefaultQueryParams();
+    queryParams.put(StackUri.QueryParams.FILTER, StackUri.QueryParamDefaultValues.POST_TITLE_FILTER);
     queryParams.put(StackUri.QueryParams.SITE, OperatingSite.getSite().apiSiteParameter);
     queryParams.put(StackUri.QueryParams.PAGE, String.valueOf(pageNum));
     queryParams.put(StackUri.QueryParams.PAGE_SIZE, String.valueOf("50"));

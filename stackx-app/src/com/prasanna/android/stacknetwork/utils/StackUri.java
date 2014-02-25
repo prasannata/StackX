@@ -51,6 +51,7 @@ public class StackUri {
     public static final String ITEM_DETAIL_FILTER = "!--Cmm88s-oaEuQIIjvWmCePYbGeAtfW6G8((0xcQ1JBcC2R)gtNBSc776D-e)i";
     public static final String USER_DETAIL_FILTER = "!-q2RdWJy";
     public static final String USER_INBOX_FILTER = "!-q2RaosI";
+    public static final String POST_TITLE_FILTER = "!9WgJfhdlL";
     public static final String COMMENT_FILTER = "!-.mgWN4RPTQu";
     public static final String NETWORK_USER_TYPE_FILTER = "!-q2RbCAp";
     public static final String CLIENT_ID = "202";

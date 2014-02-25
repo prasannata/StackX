@@ -28,7 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.SQLException;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -171,7 +170,7 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
 
     if (user == null) {
       startUserProfileService();
-      startRepHistoryService();
+      if (me) startRepHistoryService();
     } else {
       showUserDetail();
     }
@@ -359,18 +358,16 @@ public class UserProfileFragment extends Fragment implements StackXRestQueryResu
     holder.repChangeTypeTv.setText(item.reputationHistoryType.getDisplayText());
 
     if (item.reputationChange > 0) {
-      holder.repChangeTv.setTextColor(Color.GREEN);
+      holder.repChangeTv.setTextColor(getActivity().getResources().getColor(R.color.positiveRepChange));
       holder.repChangeTv.setText("+" + item.reputationChange);
     } else {
-      holder.repChangeTv.setTextColor(Color.RED);
+      holder.repChangeTv.setTextColor(getActivity().getResources().getColor(R.color.negativeRepChange));
       holder.repChangeTv.setText(String.valueOf(item.reputationChange));
     }
 
-    if (item.postTitle != null) {
-      holder.postTitleTv.setText(Html.fromHtml(item.postTitle));
-    } else {
-      holder.postTitleTv.setText("Unknown post");
-    }
+    if (item.postTitle != null) holder.postTitleTv.setText(Html.fromHtml(item.postTitle));
+    else holder.postTitleTv.setText("Unknown post");
+
     return convertView;
   }
 
