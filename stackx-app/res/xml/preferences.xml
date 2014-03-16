@@ -55,10 +55,6 @@
         android:key="pref_about"        
         android:title="@string/about" >
         <ListPreference
-            android:key="pref_write_restrictions"            
-            android:title="@string/writeRestrictions"
-            android:summary="@string/writeRestrictionsSummary" />                        
-        <ListPreference
             android:key="pref_ro_appVersion"
             android:selectable="false"
             android:title="@string/version" />

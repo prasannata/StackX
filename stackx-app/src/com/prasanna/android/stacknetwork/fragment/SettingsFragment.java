@@ -64,7 +64,6 @@ public class SettingsFragment extends PreferenceFragment implements OnSharedPref
   public static final String KEY_PREF_SEARCH_ONLY_ANSWERED = "pref_searchOnlyAnswered";
   public static final String KEY_PREF_NUM_SAVED_SEARCHES = "pref_numSavedSearches";
   public static final String KEY_PREF_RO_APP_VERSION = "pref_ro_appVersion";
-  public static final String KEY_PREF_WRITE_RESTRICTIONS = "pref_write_restrictions";
 
   private static final String KEY_PREF_ACCOUNT_ACTION = "pref_accountAction";
   private static final String KEY_PREF_RATE_APP = "pref_rateApp";

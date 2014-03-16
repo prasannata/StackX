@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2013 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -115,7 +115,7 @@ public class SecureHttpHelper {
     return httpHelper;
   }
 
-  public Bitmap getImage(String absoluteUrl) {
+  public Bitmap getImage(final String absoluteUrl) {
     if (absoluteUrl != null) {
       try {
         HttpResponse response = createSecureHttpClient().execute(getHttpGetObject(absoluteUrl));

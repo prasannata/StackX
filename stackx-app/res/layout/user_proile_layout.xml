@@ -1,291 +1,260 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/userAccountScroll"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/userProfile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:scrollbarThumbVertical="@drawable/scrollbar" >
+    android:background="@color/white" >
 
-    <RelativeLayout
-        android:id="@+id/userProfile"
+    <LinearLayout
+        android:id="@+id/profileUserInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone" >
+        android:layout_marginTop="10dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="1.0" >
 
         <LinearLayout
-            android:id="@+id/profileUserInfo"
-            android:layout_width="match_parent"
+            android:id="@+id/profileImageAndNumbers"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal"
-            android:weightSum="1.0" >
+            android:layout_weight="0.4"
+            android:orientation="vertical" >
+
+            <include
+                android:id="@+id/getAvatarProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                layout="@layout/progress_bar" />
+
+            <ImageView
+                android:id="@+id/profileUserImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@string/avatar"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/profileUserReputation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:id="@+id/profileImageAndNumbers"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.4"
-                android:orientation="vertical" >
-
-                <include
-                    android:id="@+id/getAvatarProgressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    layout="@layout/progress_bar" />
+                android:id="@+id/profileBadges"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/profileUserImage"
-                    android:layout_width="match_parent"
+                    android:id="@+id/profileUserGoldBadge"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:contentDescription="@string/avatar"
-                    android:visibility="gone" />
+                    android:layout_marginLeft="10dp"
+                    android:contentDescription="@string/badge"
+                    android:src="@drawable/circle_gold" />
 
                 <TextView
-                    android:id="@+id/profileUserReputation"
-                    android:layout_width="match_parent"
+                    android:id="@+id/profileUserGoldNum"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
                     android:gravity="center"
+                    android:text="@string/zero"
                     android:textColor="@color/black"
                     android:textIsSelectable="false"
-                    android:textSize="20sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
-                    android:id="@+id/profileBadges"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="2dp"
-                    android:gravity="center"
-                    android:orientation="horizontal" >
-
-                    <ImageView
-                        android:id="@+id/profileUserGoldBadge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="10dp"
-                        android:contentDescription="@string/badge"
-                        android:src="@drawable/circle_gold" />
-
-                    <TextView
-                        android:id="@+id/profileUserGoldNum"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:gravity="center"
-                        android:text="@string/zero"
-                        android:textColor="@color/black"
-                        android:textIsSelectable="false"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:id="@+id/profileUserSilverBadge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:contentDescription="@string/badge"
-                        android:src="@drawable/circle_silver" />
-
-                    <TextView
-                        android:id="@+id/profileUserSilverNum"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:gravity="center"
-                        android:text="@string/zero"
-                        android:textColor="@color/black"
-                        android:textIsSelectable="false"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <ImageView
-                        android:id="@+id/profileUserBronzeBadge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:contentDescription="@string/badge"
-                        android:src="@drawable/circle_bronze" />
-
-                    <TextView
-                        android:id="@+id/profileUserBronzeNum"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:gravity="center"
-                        android:text="@string/zero"
-                        android:textColor="@color/black"
-                        android:textIsSelectable="false"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/profilePersonalInfo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.6"
-                android:orientation="vertical" >
-
-                <TextView
-                    android:id="@+id/profileDisplayName"
+                <ImageView
+                    android:id="@+id/profileUserSilverBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_marginLeft="5dp"
+                    android:contentDescription="@string/badge"
+                    android:src="@drawable/circle_silver" />
+
+                <TextView
+                    android:id="@+id/profileUserSilverNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
                     android:gravity="center"
+                    android:text="@string/zero"
                     android:textColor="@color/black"
                     android:textIsSelectable="false"
-                    android:textSize="25sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/registerDate"
+                <ImageView
+                    android:id="@+id/profileUserBronzeBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textIsSelectable="false"
-                    android:textSize="12sp" />
+                    android:layout_marginLeft="5dp"
+                    android:contentDescription="@string/badge"
+                    android:src="@drawable/circle_bronze" />
 
                 <TextView
-                    android:id="@+id/profileAcceptRate"
+                    android:id="@+id/profileUserBronzeNum"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginLeft="5dp"
                     android:gravity="center"
+                    android:text="@string/zero"
                     android:textColor="@color/black"
                     android:textIsSelectable="false"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/profileViews"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textIsSelectable="false"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/profileUserLastSeen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"
-                    android:textColor="@color/black"
-                    android:textIsSelectable="false"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
-
-        <View
-            android:id="@+id/statsUnderline"
-            android:layout_width="match_parent"
-            android:layout_height="0.1dip"
-            android:layout_below="@id/profileUserInfo"
-            android:layout_marginTop="2dp"
-            android:background="@color/lightGrey" />
-
-        <RelativeLayout
-            android:id="@+id/userStats"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/statsUnderline"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/white" >
-
-            <TextView
-                android:id="@+id/questionCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_gravity="left"
-                android:gravity="left"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/upvoteCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_gravity="right"
-                android:layout_toRightOf="@id/questionCount"
-                android:gravity="right"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/answerCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@id/questionCount"
-                android:layout_below="@id/questionCount"
-                android:layout_gravity="left"
-                android:layout_marginTop="5dp"
-                android:gravity="left"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/downvoteCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@id/answerCount"
-                android:layout_below="@id/upvoteCount"
-                android:layout_gravity="right"
-                android:gravity="right"
-                android:textColor="@color/black"
-                android:textIsSelectable="false"
-                android:textSize="15sp" />
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/accountsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/userStats"
-            android:layout_gravity="left"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="15dp"
-            android:gravity="left"
-            android:text="@string/accounts"
-            android:textColor="@color/black"
-            android:textSize="15sp" />
-
-        <View
-            android:id="@+id/accountsUnderline"
-            android:layout_width="match_parent"
-            android:layout_height="0.1dip"
-            android:layout_below="@id/accountsLabel"
-            android:layout_marginTop="2dp"
-            android:background="@color/lightGrey" />
 
         <LinearLayout
-            android:id="@+id/accountsList"
-            android:layout_width="match_parent"
+            android:id="@+id/profilePersonalInfo"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/accountsUnderline"
+            android:layout_weight="0.6"
             android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/profileDisplayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/registerDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/profileAcceptRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/profileViews"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/profileUserLastSeen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textIsSelectable="false"
+                android:textSize="12sp" />
         </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:id="@+id/statsUnderline"
+        android:layout_width="match_parent"
+        android:layout_height="0.1dip"
+        android:layout_below="@id/profileUserInfo"
+        android:layout_marginTop="2dp"
+        android:background="@color/lightGrey" />
+
+    <RelativeLayout
+        android:id="@+id/userStats"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/statsUnderline"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/white" >
+
+        <TextView
+            android:id="@+id/questionCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="left"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/upvoteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:layout_toRightOf="@id/questionCount"
+            android:gravity="right"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/answerCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/questionCount"
+            android:layout_below="@id/questionCount"
+            android:layout_gravity="left"
+            android:layout_marginTop="5dp"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/downvoteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/answerCount"
+            android:layout_below="@id/upvoteCount"
+            android:layout_gravity="right"
+            android:gravity="right"
+            android:textColor="@color/black"
+            android:textIsSelectable="false"
+            android:textSize="15sp" />
     </RelativeLayout>
 
-</ScrollView>
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userStats"
+        layout="@layout/stackx_simple_list_view" />
+
+</RelativeLayout>

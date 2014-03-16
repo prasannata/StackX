@@ -49,8 +49,9 @@ import com.prasanna.android.stacknetwork.sqlite.SiteDAO;
 
 public class AppUtils {
   private static String userAccessToken;
-  public static final boolean DEBUG = true;
+  public static final boolean DEBUG = false;
   public static final boolean AMAZON_APK = false;
+  private static final String API_2DOT2_UPGRADE = "api_2dot2_upgrade";
   private static final String EMAIL_FOOTNOTE = "Sent using StackX.(Available in Google Play Store)";
 
   public static void setAccessToken(Context context, String accessToken) {
@@ -281,6 +282,14 @@ public class AppUtils {
 
   public static void prepareDownvote(final boolean downvoted, final ImageView imageView) {
     prepareUpDownVote(imageView, downvoted, R.drawable.arrow_down_orange);
+  }
+
+  public static void setApi2Dot2UpgradeDone(final Context context) {
+    SharedPreferencesUtil.setBoolean(context, API_2DOT2_UPGRADE, true);
+  }
+
+  public static boolean isApi2Dot2UpgradeDone(final Context context) {
+    return SharedPreferencesUtil.isSet(context, API_2DOT2_UPGRADE, true);
   }
 
   private static void prepareUpDownVote(final ImageView imageView, final boolean isSet, final int setResId) {

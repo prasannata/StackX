@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Prasanna Thirumalai
+    Copyright (C) 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -42,14 +42,16 @@ public class GetImageAsyncTask extends AsyncTask<String, Void, Bitmap> {
   @Override
   protected Bitmap doInBackground(String... urls) {
     if (urls != null && urls.length == 1) {
+      String url = urls[0];
+      if (urls[0].startsWith("//")) url = "http:" + url;
+
       Bitmap bitmap = BitmapCache.getInstance().get(urls[0]);
 
       if (bitmap == null) {
         try {
-          bitmap = SecureHttpHelper.getInstance().getImage((String) urls[0]);
+          bitmap = SecureHttpHelper.getInstance().getImage(url);
           BitmapCache.getInstance().add(urls[0], bitmap);
-        }
-        catch (ClientException e) {
+        } catch (ClientException e) {
         }
       }
 

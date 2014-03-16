@@ -1,5 +1,5 @@
 /*
-    Copyright 2012 Prasanna Thirumalai
+    Copyright 2014 Prasanna Thirumalai
     
     This file is part of StackX.
 
@@ -47,12 +47,16 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.prasanna.android.http.HttpContentTypes;
 import com.prasanna.android.stacknetwork.FullscreenTextActivity;
 import com.prasanna.android.stacknetwork.R;
 import com.prasanna.android.task.AsyncTaskCompletionNotifier;
@@ -61,6 +65,22 @@ import com.prasanna.android.utils.LogWrapper;
 import com.prasanna.android.views.QuickActionMenu;
 
 public class MarkdownFormatter {
+  private static final String BASE_URL = "file:///android_asset/google_code_prettify/prettify.js";
+  private static final String CODE_HTML_PREFIX = "<html><head>"
+      + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"
+      + "<link href=\"prettify_no_line_nums.css\" type=\"text/css\" rel=\"stylesheet\" />"
+      + "<script type=\"text/javascript\" src=\"prettify.js\"></script>" + "<title>Insert title here</title>"
+      + "</head>" + "<body onload=\"prettyPrint();\" bgcolor=\"#F5F4F2\">" + "<pre class=\"prettyprint linenums\">";
+  private static final String CODE_HTML_SUFFIX = "</pre></body></html>";
+
+  public static void loadText(final WebView webView, final String text) {
+    webView.setWebChromeClient(new WebChromeClient());
+    webView.setWebViewClient(new WebViewClient());
+    webView.getSettings().setJavaScriptEnabled(true);
+    webView.loadDataWithBaseURL(BASE_URL, CODE_HTML_PREFIX + MarkdownFormatter.escapeHtml(text) + CODE_HTML_SUFFIX,
+        HttpContentTypes.TEXT_HTML, HTTP.UTF_8, null);
+  }
+
   private static final String TAG = MarkdownFormatter.class.getSimpleName();
   private static final String NEW_LINE = System.getProperty("line.separator");
   private static final String CR = "\r";
@@ -86,8 +106,7 @@ public class MarkdownFormatter {
 
     @Override
     public void notifyOnCompletion(Bitmap result) {
-      if (progressDialog != null)
-        progressDialog.dismiss();
+      if (progressDialog != null) progressDialog.dismiss();
 
       ImageView imageView = new ImageView(context);
       imageView.setImageBitmap(result);
@@ -104,27 +123,21 @@ public class MarkdownFormatter {
         }
       });
 
-      if (!((Activity) context).isFinishing())
-        imageDialog.show();
+      if (!((Activity) context).isFinishing()) imageDialog.show();
     }
   };
 
   public static String escapeHtml(CharSequence text) {
-    if (text == null)
-      return null;
+    if (text == null) return null;
 
     StringBuilder builder = new StringBuilder();
     for (int i = 0; i < text.length(); i++) {
       char c = text.charAt(i);
 
-      if (c == '<')
-        builder.append("&lt;");
-      else if (c == '>')
-        builder.append("&gt;");
-      else if (c == '&')
-        builder.append("&amp;");
-      else
-        builder.append(c);
+      if (c == '<') builder.append("&lt;");
+      else if (c == '>') builder.append("&gt;");
+      else if (c == '&') builder.append("&amp;");
+      else builder.append(c);
 
     }
     return builder.toString();
@@ -157,7 +170,7 @@ public class MarkdownFormatter {
    * @return
    */
   public static ArrayList<View> parse(Context context, String markdownText) {
-    if (context != null && markdownText != null) {
+    if (context != null && markdownText != null) {      
       ArrayList<View> views = new ArrayList<View>();
       try {
         markdownText = clean(markdownText);
@@ -177,17 +190,14 @@ public class MarkdownFormatter {
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         while (eventType != XmlPullParser.END_DOCUMENT) {
           if (eventType == XmlPullParser.START_DOCUMENT) {
-          }
-          else if (eventType == XmlPullParser.START_TAG) {
-            if (xmlPullParser.getName().equals(Tags.CODE))
-              codeFound = true;
+          } else if (eventType == XmlPullParser.START_TAG) {
+            if (xmlPullParser.getName().equals(Tags.CODE)) codeFound = true;
             else if (xmlPullParser.getName().equals(Tags.IMG)) {
               addSimpleTextToView(context, views, buffer, params);
 
-              String attributeValue = xmlPullParser.getAttributeValue(null, Attributes.SRC);
+              String attributeValue = xmlPullParser.getAttributeValue(null, Attributes.SRC);              
               addImgLinkText(context, views, attributeValue, params);
-            }
-            else {
+            } else {
               buffer.append("<" + xmlPullParser.getName());
               for (int i = 0; i < xmlPullParser.getAttributeCount(); i++) {
                 buffer.append(" " + xmlPullParser.getAttributeName(i) + "=\"" + xmlPullParser.getAttributeValue(i)
@@ -196,27 +206,22 @@ public class MarkdownFormatter {
 
               buffer.append(">");
             }
-          }
-          else if (eventType == XmlPullParser.END_TAG) {
+          } else if (eventType == XmlPullParser.END_TAG) {
             if (xmlPullParser.getName().equals(Tags.CODE)) {
               codeFound = false;
 
-              if (oneLineCode)
-                oneLineCode = false;
+              if (oneLineCode) oneLineCode = false;
               else {
                 addSimpleTextToView(context, views, buffer, params);
                 views.add(getTextViewForCode(context, code.toString()));
                 code.delete(0, code.length());
               }
-            }
-            else if (xmlPullParser.getName().equals(Tags.IMG)) {
+            } else if (xmlPullParser.getName().equals(Tags.IMG)) {
               LogWrapper.v(TAG, "Ignore img tag");
-            }
-            else {
+            } else {
               buffer.append("</" + xmlPullParser.getName() + ">");
             }
-          }
-          else if (eventType == XmlPullParser.TEXT) {
+          } else if (eventType == XmlPullParser.TEXT) {
             String text = xmlPullParser.getText();
 
             if (codeFound) {
@@ -226,12 +231,10 @@ public class MarkdownFormatter {
 
                 buffer.append(text);
                 oneLineCode = true;
-              }
-              else {
+              } else {
                 code.append(text);
               }
-            }
-            else {
+            } else {
               text = text.replace(NEW_LINE, " ").replace(CR, " ");
               buffer.append(text);
             }
@@ -241,11 +244,9 @@ public class MarkdownFormatter {
         }
 
         addSimpleTextToView(context, views, buffer, params);
-      }
-      catch (XmlPullParserException e) {
+      } catch (XmlPullParserException e) {
         LogWrapper.e(TAG, "Error parsing: " + e);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         LogWrapper.e(TAG, "Error parsing: " + e);
       }
       return views;
@@ -305,17 +306,15 @@ public class MarkdownFormatter {
     int screentLayoutSize =
         context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
     if (screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_LARGE
-        || screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_XLARGE)
-      textSize = 15f;
+        || screentLayoutSize == Configuration.SCREENLAYOUT_SIZE_XLARGE) textSize = 15f;
     return textSize;
   }
 
   private static RelativeLayout getTextViewForCode(final Context context, final String text) {
     final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     final RelativeLayout codeLayout = (RelativeLayout) inflater.inflate(R.layout.code, null);
-    final TextView textView = (TextView) codeLayout.findViewById(R.id.code);
-    textView.setText(text);
-    textView.setTextSize(getTextSize(context));
+    final WebView webView = (WebView) codeLayout.findViewById(R.id.code);
+    loadText(webView, text);
 
     StackXQuickActionMenu quickActionMenu =
         new StackXQuickActionMenu(context).addEmailQuickActionItem("Code sample from StackX", text)
@@ -324,7 +323,7 @@ public class MarkdownFormatter {
       @Override
       public void onClick(View v) {
         Intent intent = new Intent(context, FullscreenTextActivity.class);
-        intent.putExtra(StringConstants.TEXT, textView.getText());
+        intent.putExtra(StringConstants.TEXT, text);
         context.startActivity(intent);
       }
     }).build();

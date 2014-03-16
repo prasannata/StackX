@@ -81,17 +81,4 @@ ol.linenums {
 
 li span {
 	position: relative;
-	left: 23px;
-}
-
-li:before {
-	position: absolute;
-	display: block;
-	left: -12px;
-	padding-right: 2px;
-	text-align: right;
-	width: 30px;
-	content: counter(item) "";
-	counter-increment: item;
-	background-color: #eaeaea;
 }

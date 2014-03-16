@@ -67,6 +67,8 @@ public class QuestionFragment extends AbstractVotableFragment implements OnComme
 
   private TextView scoreTextView;
 
+  private boolean bodyDisplayed = false;
+
   public static QuestionFragment newFragment() {
     QuestionFragment questionFragment = new QuestionFragment();
     questionFragment.setRetainInstance(true);
@@ -181,25 +183,6 @@ public class QuestionFragment extends AbstractVotableFragment implements OnComme
         .addEmailQuickActionItem(question.title, AppUtils.createEmailBody(question));
   }
 
-  private void setupTextViewForAnswerCount() {
-    TextView answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
-    TextView answerCountAnsweredView = (TextView) parentLayout.findViewById(R.id.answerCountAnswered);
-
-    if (question.hasAcceptedAnswer) {
-      answerCountAnsweredView.setVisibility(View.VISIBLE);
-      answerCountAnsweredView.setText(AppUtils.formatNumber(question.answerCount));
-
-      answerCountView = (TextView) parentLayout.findViewById(R.id.answerCount);
-      answerCountView.setVisibility(View.GONE);
-    } else {
-      answerCountView.setVisibility(View.VISIBLE);
-      answerCountView.setText(AppUtils.formatNumber(question.answerCount));
-
-      answerCountAnsweredView = (TextView) parentLayout.findViewById(R.id.answerCountAnswered);
-      answerCountAnsweredView.setVisibility(View.GONE);
-    }
-  }
-
   private String getTimeAndOwnerDisplay(String acceptRate) {
     return DateTimeUtils.getElapsedDurationSince(question.creationDate) + " by "
         + Html.fromHtml(question.owner.getDisplayName()) + " [" + acceptRate
@@ -220,14 +203,15 @@ public class QuestionFragment extends AbstractVotableFragment implements OnComme
       question.body = text;
       final LinearLayout questionBodyLayout = (LinearLayout) parentLayout.findViewById(R.id.questionBody);
 
-      if (isAdded() && questionBodyLayout != null) {
-        questionBodyLayout.removeAllViews();
+      if (isAdded() && !bodyDisplayed) {
         ArrayList<View> views = MarkdownFormatter.parse(getActivity(), question.body);
 
         if (views != null) {
           for (final View questionBodyTextView : views)
             questionBodyLayout.addView(questionBodyTextView);
         }
+
+        bodyDisplayed = true;
       }
     }
   }
